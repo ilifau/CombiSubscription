@@ -1,0 +1,126 @@
+// 
+// German Language File for CombinesSubscription Plugin
+//
+
+<!-- language file start -->
+obj_xcos#:#Kombinierte Anmeldung
+objs_xcos#:#Kombinierte Anmeldungen
+obj_xcos_duplicate#:#Kopieren
+objs_xcos_duplicate#:#Kopiere kombinierte Anmeldung
+obj_xcos_select#:#Wähle kombinierte Anmeldung aus
+xcos_add#:#Füge kombinierte Anmeldung hinzu
+xcos_new#:#füge neue kombinierte Anmeldung hinzu
+xcos_read#:#Lesezugriff auf kombinierte Anmeldung
+xcos_write#:#Bearbeite kombinierte Anmeldung
+xcos_delete#:#Lösche kombinierte Anmeldung
+xcos_visible#:#Kombinierte Anmeldung ist sichtbar
+xcos_edit_permission#:#Ändere Rechteeinstellungen
+crs_create_xcos#:#Erstelle kombinierte Anmeldung
+grp_create_xcos#:#Erstelle kombinierte Anmeldung
+fold_create_xcos#:#Erstelle kombinierte Anmeldung
+root_create_xcos#:#Erstelle kombinierte Anmeldung
+cat_create_xcos#:#Erstelle kombinierte Anmeldung
+content#:#Inhalt
+properties#:#Eigenschaften
+edit_properties#:#Eigenschaften bearbeiten
+title#:#Titel
+description#:#Beschreibung
+sub_start#:#Anmelde-Start
+sub_end#:#Anmelde-Ende
+save#:#Speichern
+cancel#:#Abbruch
+edit#:#Bearbeiten
+status#:#Status
+offline#:#Offline
+plugin_configuration#:#Plugin-Konfiguration
+nothing_to_configure#:#Das Plugin benötigt zur Zeit keine Konfiguration.
+assignment_method#:#Zuteilungs-Methode
+assignment_methods#:#Zuteilungs-Methoden
+registration#:#Anmeldung
+registration_items#:#Auswahl-Einheiten
+create_item#:#Neue Einheit erstellen
+add_repository_items#:#Kurse/Gruppen als Einheiten hinzufügen
+sub_min#:#Minimale Zuteilungen
+sub_min_short#:#Minimal
+sub_max#:#Maximale Zuteilungen
+sub_max_short#:#Maximal
+target_object#:#Ziel-Objekt
+msg_item_created#:#Die Einheit wurde erstellt.
+msg_items_created#:#Die Einheiten wurden erstellt.
+delete_items#:#Einheiten löschen
+confirm_delete_items#:#Möchten Sie die folgenden Einheiten löschen?
+edit_item#:#Einheit bearbeiten
+msg_item_updated#:#Die Einheit wurde aktualisiert.
+msg_items_deleted#:#Die Einheiten wurden gelöscht.
+msg_item_deleted#:#Die Einheit wurde gelöscht.
+target_object_info#:#Kurs oder Gruppe, mit der diese Einheit verbunden ist. Bei der Auswahl werden Titel, Beschreibung und maximale Mitgliederzahl übernommen.
+select_target_object#:#Bitte wählen Sie das Ziel-Objekt:
+ilcosubmethodsafre_title#:#Drei Prioritäten
+ilcosubmethodsafre_description#:#Heuristik mit drei Prioritäten
+registration_header_item#:#Option
+registration_header_choices#:#Auswahl
+save_registration#:#Auswahl speichern
+method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
+msg_registration_saved#:#Die Auswahl wurde gespeichert.
+assignment#:#Zuteilung
+assignments#:#Zuteilungen
+save_assignments#:#Zuteilungen speichern
+msg_assignments_saved#:#Die Zuteilungen wurden gespeichert.
+satisfaction#:#Erfüllung
+satisfied_not#:#Nicht erfüllt
+satisfied_medium#:#Ausreichend erfüllt
+satisfied_full#:#Voll erfüllt
+new_calculation#:#Neue Berechnung
+msg_calculation_started#:#Die Berechnung wurde gestartet. Wenn sie abgeschlossen ist, wird ihr Ergebnis hier gelistet.
+msg_calculation_finished#:#Die Berechnung wurde durchgeführt.
+set_run_assignments#:#Zuteilungen aus Berechnung übernehmen
+msg_run_assignments_set#:#Die Zuteilungen der Berechnung wurden übernommen
+subscription_period#:#Anmeldezeitraum
+sub_limit_from_to#:#%s bis %s Teilnehmer
+sub_limit_to#:#Max. %s Teilnehmer
+peers#:#Freunde
+explanation#:#Erklärung
+default_explanation#:#Sie können für jede Priorität (bevorzugt, alternativ) mehrere Auswahlen treffen. Nach dem Anmeldezeitraum werden die Zuteilungen durch ein automatisches Verfahren getroffen, das möglichst viele Prioritäten berücksichtigt. Pro Benutzer wird nur eine Option zugeteilt.
+subscription_period_not_started#:#Der Anmeldezeitraum hat noch nicht begonnen.
+subscription_period_finished#:#Der Anmeldezeitraum ist beeendet.
+sub_min_not_reached#:#Das Minimum an Zuteilungen wurde nicht erreicht.
+sub_max_exceeded#:#Das Maximum an Zuteilungen wurde überschritten.
+sub_limits_satisfied#:#Die Anzahl der Zuteilungen ist möglich.
+item_assignment_sum_label#:#Zuteilungen:
+calculations#:#Berechnungen
+satisfied#:#Erfüllt
+users_assigned#:#Zugeteilte Nutzer
+users_satisfied#:#Erfüllte Nutzer-Prioritäten
+items_satisfied#:#Erfüllte Einheits-Bedingungen
+delete_calculations#:#Berechnungen löschen
+not_finished#:#nicht beendet
+confirm_delete_calculations#:#Möchten Sie die folgenden Berechungen löschen?
+msg_calculations_deleted#:#Die Berechnungen wurden gelöscht.
+msg_calculation_start_failed#:#Die Berechnung konnte nicht gestartet werden.
+msg_calculation_finished2#:#Die Berechnung wurde beendet:
+msg_calculation_failed#:#Die Berechnung schlug fehl:
+msg_check_for_result_failed#:#Das Berechnungsergebnis konnte nicht abgefragt werden:
+save_assignments_as_run#:#Als neue Berechnung speichern
+msg_assignments_saved_as_run#:#Die Zuteilungen wurden als neue Berechnung gespeichert.
+run_details_manual#:#Manuelle Speicherung durch %s
+calc_properties#:#Methoden-Einstellungen
+basic_configuration#:#Basis-Konfiguration
+ilcosubmethodeatts_title#:#EATTS
+ilcosubmethodeatts_description#:#Erlangen Advanced Time Tabling System
+ilcosubmethodeatts_select_preferred#:#bevorzugt
+ilcosubmethodeatts_select_alternative#:#alternativ
+ilcosubmethodeatts_select_not#:#nicht gewählt
+ilcosubmethodeatts_calculation_properties#:#Berechnungs-Einstellungen für EATTS
+ilcosubmethodeatts_time_limit#:#Maximale Rechendauer
+ilcosubmethodeatts_max_iterations#:#Maximale Iterationen
+ilcosubmethodeatts_priority_weight#:#Gewichtung der Prioritäten
+ilcosubmethodeatts_sub_max_weight#:#Gewichtung maximaler Zuteilungen
+ilcosubmethodeatts_sub_min_weight#:#Gewichtung minimaler Zuteilungen
+ilcosubmethodeatts_peers_weight#:#Gewichtung der Freunde-Auswahl
+ilcosubmethodeatts_server_url#:#EATTS Server-Url
+ilcosubmethodeatts_license_url#:#Lizenz-Server-Url
+ilcosubmethodeatts_license#:#Lizenz
+ilcosubmethodeatts_log_level#:#Log-Level
+ilcosubmethodeatts_log_level_info#:#Info
+add_as_members#:#Als Mitglieder eintragen
+msg_users_added_as_members#:#Die zugeteilten Nutzer wurden bei den Zielobjekten als Mitglieder eingetragen.

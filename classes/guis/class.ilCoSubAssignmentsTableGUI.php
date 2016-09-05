@@ -1,0 +1,204 @@
+<?php
+
+require_once('Services/Table/classes/class.ilTable2GUI.php');
+/**
+ * Table GUI for registration items
+ */
+class ilCoSubAssignmentsTableGUI extends ilTable2GUI
+{
+	/** @var  ilCtrl */
+	protected $ctrl;
+
+	/**
+	 * List of item ids
+	 * @var integer[]
+	 */
+	protected $item_ids = array();
+
+	/**
+	 * List of run_ids
+	 * @var array   label => run_id
+	 */
+	protected $run_ids = array();
+
+	/**
+	 * User priorities
+	 * @var array  (user_id => item_id => priority)
+	 */
+	protected $priorities;
+
+	/**
+	 * Run assignments
+	 * @var array   (run_id => user_id => item_id => assign_id)
+	 */
+	protected $assignments;
+
+	/**
+	 * ilCoSubItemsTableGUI constructor.
+	 * @param ilCoSubAssignmentsGUI     $a_parent_gui
+	 * @param string                    $a_parent_cmd
+	 */
+	function __construct($a_parent_gui, $a_parent_cmd)
+	{
+		global $ilCtrl;
+
+		$this->setId('il_xcos_ass');
+		parent::__construct($a_parent_gui, $a_parent_cmd);
+
+		$this->parent = $a_parent_gui;
+		$this->plugin = $a_parent_gui->plugin;
+		$this->object = $a_parent_gui->object;
+		$this->ctrl = $ilCtrl;
+		$this->setFormAction($this->ctrl->getFormAction($this->parent));
+		$this->setRowTemplate('tpl.il_xcos_assignments_row.html', $this->plugin->getDirectory());
+
+		$this->addColumn($this->lng->txt('user'), 'user');
+		$this->addColumn($this->plugin->txt('satisfaction'), 'result');
+
+		$this->setDefaultOrderField('user');
+		$this->setDefaultOrderDirection('asc');
+
+		$this->addCommandButton('saveAssignments', $this->plugin->txt('save_assignments'));
+		$this->addCommandButton('saveAssignmentsAsRun', $this->plugin->txt('save_assignments_as_run'));
+	}
+
+	/**
+	 * Prepare the data to be displayed
+	 */
+	public function prepareData()
+	{
+		$sums = $this->object->getAssignmentsSums();
+
+		// create the item column headers
+		foreach ($this->object->getItems() as $index => $item)
+		{
+			$this->item_ids[$index] = $item->item_id;
+			if ($item->sub_min > 0)
+			{
+				$limit = sprintf($this->plugin->txt('sub_limit_from_to'), $item->sub_min, $item->sub_max);
+			}
+			else
+			{
+				$limit = sprintf($this->plugin->txt('sub_limit_to'),$item->sub_max);
+			}
+
+			$sum = $sums[$item->item_id];
+
+			$tpl = $this->plugin->getTemplate('/default/tpl.il_xcos_assignments_header.html');
+			$tpl->setVariable('TITLE', $item->title);
+			$tpl->setVariable('LIMIT', $limit);
+			$tpl->setVariable('SUM_LABEL', $this->plugin->txt('item_assignment_sum_label'));
+			$tpl->setVariable('SUM', $sum);
+
+			if ($sum < $item->sub_min)
+			{
+				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
+				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_min_not_reached'));
+			}
+			elseif ($sum > $item->sub_max)
+			{
+				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
+				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_max_exceeded'));
+			}
+			else
+			{
+				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_FULL));
+				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_limits_satisfied'));
+			}
+
+			$this->addColumn($tpl->get(),'','',false,'',$item->description);
+		}
+
+
+
+		foreach ($this->object->getRunsFinished() as $index => $run)
+		{
+			$this->run_ids[$this->object->getRunLabel($index)] = $run->run_id;
+		}
+		$this->priorities = $this->object->getPriorities();
+		$this->assignments = $this->object->getAssignments();
+
+
+		if (empty($this->priorities))
+		{
+			$this->setData(array());
+			return;
+		}
+
+		// query for users
+		include_once("Services/User/classes/class.ilUserQuery.php");
+		$user_query = new ilUserQuery();
+		$user_query->setUserFilter(array_keys($this->priorities));
+		$user_query->setLimit(0);
+		$user_query_result = $user_query->query();
+
+
+		// prepare only the data that is used for sorting
+		// all other data will only be calculated for the shown rows
+		foreach ($user_query_result['set'] as $user)
+		{
+			$data[] = array(
+				'user_id' => $user['usr_id'],
+				'user' => $user['lastname'] . ', ' . $user['firstname'],
+				'result' => $this->object->getSatisfaction($user['usr_id'], 0)
+			);
+		}
+
+		$this->setMaxCount($user_query_result['cnt']);
+		$this->setData($data);
+	}
+
+	/**
+	 * Fill a single data row
+	 *
+	 * @param array $a_set [
+	 *                  'user_id' => int
+	 *                  'user' => string
+	 *                  'result' => integer, e.g. SATISFIED_FULL ]
+	 */
+	protected function fillRow($a_set)
+	{
+		$user_id = $a_set['user_id'];
+
+		if (empty($user_id))
+		{
+			return $this->fillItemSumRow();
+		}
+
+		foreach ($this->item_ids as $item_id)
+		{
+			$this->tpl->setCurrentBlock('item');
+
+			// priority background
+			if (isset($this->priorities[$user_id][$item_id]))
+			{
+				$color = $this->object->getMethodObject()->getPriorityBackgroundColor($this->priorities[$user_id][$item_id]);
+				$this->tpl->setVariable('PRIO_COLOR', 'background-color:'.$color.';');
+			}
+
+			// radio button
+			$this->tpl->setVariable('USER_ID', $user_id);
+			$this->tpl->setVariable('ITEM_ID', $item_id);
+			if (isset($this->assignments[0][$user_id][$item_id]))
+			{
+				$this->tpl->setVariable('CHECKED', 'checked="checked"');
+			}
+
+			// run list
+			$runs = array();
+			foreach ($this->run_ids as $label => $run_id)
+			{
+				if (isset($this->assignments[$run_id][$user_id][$item_id]))
+				{
+					$runs[] = $label;
+				}
+			}
+			$this->tpl->setVariable('RUNS', implode(' ', $runs));
+			$this->tpl->parseCurrentBlock();
+		}
+
+		$this->tpl->setVariable('USER', $a_set['user']);
+		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
+		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
+	}
+}

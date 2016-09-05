@@ -1,0 +1,126 @@
+// 
+// English Language File for CombinedSubscription Plugin
+//
+
+<!-- language file start -->
+obj_xcos#:#Combined Subscription
+objs_xcos#:#Combined Subscriptions
+obj_xcos_duplicate#:#Kopieren
+objs_xcos_duplicate#:#Copy Combined Subscription
+obj_xcos_select#:#Select Combined Subscription
+xcos_add#:#Add Combined Subscription
+xcos_new#:#Add New Combined Subscription
+xcos_read#:#Read access to Combined Subscription
+xcos_write#:#Edit Combined Subscription
+xcos_delete#:#Delete Combined Subscription
+xcos_visible#:#Combined Subscription is visible
+xcos_edit_permission#:#Change permission settings
+crs_create_xcos#:#Create Combined Subscription
+grp_create_xcos#:#Create Combined Subscription
+fold_create_xcos#:#Create Combined Subscription
+root_create_xcos#:#Create Combined Subscription
+cat_create_xcos#:#Create Combined Subscription
+content#:#Content
+properties#:#Properties
+edit_properties#:#Edit Properties
+title#:#Title
+description#:#Description
+sub_start#:#Subscription Start
+sub_end#:#Subscription End
+save#:#Save
+cancel#:#Cancel
+edit#:#Edit
+status#:#Status
+offline#:#Offline
+plugin_configuration#:#Plugin Configuration
+nothing_to_configure#:#This plugin does not yet need a configuration.
+assignment_method#:#Assignment Method
+assignment_methods#:#Assignment Methods
+registration#:#Registration
+registration_items#:#Registration Items
+create_item#:#Create New Item
+add_repository_items#:#Add Courses/Groups as Items
+sub_min#:#Minimum Assingments
+sub_min_short#:#Minimum
+sub_max#:#Maximum Assignments
+sub_max_short#:#Maximum
+target_object#:#Target Object
+msg_item_created#:#The item was created.
+msg_items_created#:#The items were created.
+delete_items#:#Delete Items
+confirm_delete_items#:#Delete the following items?
+edit_item#:#Edit Item
+msg_item_updated#:#The item was updated.
+msg_items_deleted#:#The items were deleted.
+msg_item_deleted#:#The item was deleted.
+target_object_info#:#Course or Group which is connected to this item. A selection will update the properties title, description and max members.
+select_target_object#:#Please select the targt object:
+ilcosubmethodsafre_title#:#Three Priorities
+ilcosubmethodsafre_description#:#Heuristics with Three Priorities
+registration_header_item#:#Option
+registration_header_choices#:#Choice
+save_registration#:#Save Choices
+method_not_defined#:#This object has not assignment method defined!
+msg_registration_saved#:#The choices where saved.
+assignment#:#Assigment
+assignments#:#Assignments
+save_assignments#:#Save Assignments
+msg_assignments_saved#:#The assignments were saved.
+satisfaction#:#Satisfaction
+satisfied_not#:#Not satisfiend
+satisfied_medium#:#Sufficiently satisfied
+satisfied_full#:#Fully satisfied
+new_calculation#:#New Calculation
+msg_calculation_started#:#The calculation is started. Its results will be shown here when it is finished.
+msg_calculation_finished#:#The calculation is finished.
+set_run_assignments#:#Set Calculation Assignments
+msg_run_assignments_set#:#The calculation assignments were set
+subscription_period#:#Subscription Period
+sub_limit_from_to#:#%s to %s Participants
+sub_limit_to#:#Max. %s Participants
+peers#:#Peers
+explanation#:#Explanation
+default_explanation#:#You can select a number of items for each priority (perferred, alternative). The assignments will be done with an optimising algorithm after the subscription period. It tries to respect as much priorities as possible. Each subscriber will get only one item assigned.
+subscription_period_not_started#:#The subscription period has not yet started.
+subscription_period_finished#:#The subscription period is finished.
+sub_min_not_reached#:#The minimum of assignments is not reached.
+sub_max_exceeded#:#The maximum of assignments is exceeded.
+sub_limits_satisfied#:#The number of assignments is possible.
+item_assignment_sum_label#:#Assignments:
+calculations#:#Calculations
+satisfied#:#Satisfied
+users_assigned#:#Assigned Users
+users_satisfied#:#Satisfied User Priorities
+items_satisfied#:#Satisfied Item Limits
+delete_calculations#:#Delete Calculations
+not_finished#:#not finished
+confirm_delete_calculations#:#Delete the following calculations?
+msg_calculations_deleted#:#The calculations were deleted.
+msg_calculation_start_failed#:#The calculation could not start.
+msg_calculation_finished2#:#The calculation is finished:
+msg_calculation_failed#:#The calculation failed:
+msg_check_for_result_failed#:#The calculation result could not be queried:
+save_assignments_as_run#:#Save as New Calculation
+msg_assignments_saved_as_run#:#The assignments were saved as a new calculation.
+run_details_manual#:#Manual saving by %s
+calc_properties#:#Method Properties
+basic_configuration#:#Basic Configuration
+ilcosubmethodeatts_title#:#EATTS
+ilcosubmethodeatts_description#:Erlangen Advanced Time Tabling System
+ilcosubmethodeatts_select_preferred#:#preferred
+ilcosubmethodeatts_select_alternative#:#alternative
+ilcosubmethodeatts_select_not#:#not selected
+ilcosubmethodeatts_calculation_properties#:#Calculation Settings for EATTS
+ilcosubmethodeatts_time_limit#:#Maximum Duration
+ilcosubmethodeatts_max_iterations#:#Maximum Iterations
+ilcosubmethodeatts_priority_weight#:#Weight of Priorities
+ilcosubmethodeatts_sub_max_weight#:#Weight of max. Assignments
+ilcosubmethodeatts_sub_min_weight#:#Weight of min. Assignments
+ilcosubmethodeatts_peers_weight#:#Weight of Peer Selection
+ilcosubmethodeatts_server_url#:#EATTS Server Url
+ilcosubmethodeatts_license_url#:#Lizenz Server Url
+ilcosubmethodeatts_license#:#Lizenz
+ilcosubmethodeatts_log_level#:#Log Level
+ilcosubmethodeatts_log_level_info#:#Info
+add_as_members#:#Add as Members
+msg_users_added_as_members#:#The users were added as members to the target objects.

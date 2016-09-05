@@ -1,0 +1,21 @@
+<tr class="{CSS_ROW}">
+    <td class="std">
+         {USER}
+    </td>
+    <td class="std">
+        <!-- BEGIN user_result -->
+        <img src="{RESULT_IMAGE}" title="{RESULT_TITLE}" alt ="{RESULT_TITLE}" />
+        <!-- END user_result -->
+    </td>
+    <!-- BEGIN item -->
+    <td class="std" style="{PRIO_COLOR}">
+        <input type="radio" name="assignment[{USER_ID}]" value="{ITEM_ID}" {CHECKED} /> {RUNS}
+     </td>
+    <!-- END item -->
+    <!-- BEGIN item_sum -->
+    <td class="std">
+        <img src="{SUM_IMAGE}" title="{SUM_STATUS}" alt ="{SUM_STATUS}" />
+        {SUM_LABEL} {SUM}
+    </td>
+    <!-- END item_sum -->
+</tr>
