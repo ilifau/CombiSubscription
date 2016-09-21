@@ -277,7 +277,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		$input = $this->form->getItemByPostVar('target_ref_id');
 		$input->readFromSession();
-		$item = $this->object->getItemForTarget($input->getValue());
+		$item = $this->object->getItemForTarget($input->	getValue());
 		$this->loadItemProperties($item);
 
 		$this->tpl->setContent($this->form->getHTML());
@@ -298,7 +298,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$rs->setClickableTypes($this->plugin->getAvailableTargetTypes());
 		$rs->setInfo($this->plugin->txt('target_object_info'));
 		$rs->setHeaderMessage($this->plugin->txt('select_target_object'));
-		$rs->setMulti(false);
 		$this->form->addItem($rs);
 
 		// title
