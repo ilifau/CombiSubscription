@@ -17,6 +17,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var array 		item_id => priority => count */
 	protected $priority_counts = array();
 
+	/** @var array  	item_id => count */
+	protected $assign_counts = array();
 
 	/**
 	 * Get the name of the properties GUI class
@@ -106,21 +108,21 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->items = $this->object->getItems();
 		$this->priorities = $this->object->getPriorities();
 		$this->priority_counts = $this->object->getPriorityCounts();
+		$this->assign_counts = array();
 
 
 		for ($priority = 0; $priority <= 1; $priority++)
 		{
 			foreach ($this->getSortedItemsForPriority($priority) as $item)
 			{
-				$assigned = 0;
 				foreach ($this->getSortedUsersForItemAndPriority($item, $priority) as $user_id)
 				{
-					if ($assigned >= $item->sub_max)
+					if ($this->assign_counts[$item->item_id] >= $item->sub_max)
 					{
 						break;
 					}
 					$this->assignUser($user_id, $item->item_id);
-					$assigned++;
+					$this->assign_counts[$item->item_id]++;
 				}
 			}
 		}
