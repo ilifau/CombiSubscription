@@ -122,5 +122,10 @@ ilcosubmethodeatts_license_url#:#Lizenz-Server-Url
 ilcosubmethodeatts_license#:#Lizenz
 ilcosubmethodeatts_log_level#:#Log-Level
 ilcosubmethodeatts_log_level_info#:#Info
+ilcosubmethodrandom_title#:#Zufallsauswahl
+ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufall aus.
+ilcosubmethodrandom_select_preferred#:#bevorzugt
+ilcosubmethodrandom_select_alternative#:#alternativ
+ilcosubmethodrandom_select_not#:#nicht gewählt
 add_as_members#:#Als Mitglieder eintragen
 msg_users_added_as_members#:#Die zugeteilten Nutzer wurden bei den Zielobjekten als Mitglieder eingetragen.

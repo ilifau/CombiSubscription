@@ -298,7 +298,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$rs->setClickableTypes($this->plugin->getAvailableTargetTypes());
 		$rs->setInfo($this->plugin->txt('target_object_info'));
 		$rs->setHeaderMessage($this->plugin->txt('select_target_object'));
-		$rs->setMulti(false);
 		$this->form->addItem($rs);
 
 		// title

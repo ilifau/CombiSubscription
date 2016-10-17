@@ -262,7 +262,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 			case 'settings':
 				$this->tabs_gui->addSubTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this,'editProperties'));
 
-				if ($this->object->getMethodObject() and $classname = $this->object->getMethodObject()->getPropertiesGuiName())
+				if ($this->object->getMethodObject() && $classname = $this->object->getMethodObject()->getPropertiesGuiName())
 				{
 					$this->tabs_gui->addSubTab('calc', $this->txt('calc_properties'), $this->ctrl->getLinkTargetByClass($classname));
 				}

@@ -526,8 +526,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the counts of priorities for this object
-	 * Used to show the bars o nthe registration screen
-	 * This should avooid reading all choices
+	 * Used to show the bars on the registration screen
+	 * This should avoid reading all choices
 	 * @return array item_id => priority => count
 	 */
 	public function getPriorityCounts()
