@@ -524,6 +524,27 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $this->priorities[$a_user_id];
 	}
 
+
+	/**
+	 * Get the priorities of all users regarding an item
+	 * @return  array   user_id => priority
+	 */
+	public function getPrioritiesOfItem($a_item_id)
+	{
+		$priorities = array();
+
+		foreach ($this->getPriorities() as $user_id => $item_priorities)
+		{
+			if (isset($item_priorities[$a_item_id]))
+			{
+				$priorities[$user_id] = $item_priorities[$a_item_id];
+			}
+		}
+
+		return $priorities;
+	}
+
+
 	/**
 	 * Get the counts of priorities for this object
 	 * Used to show the bars on the registration screen

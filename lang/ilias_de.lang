@@ -127,5 +127,7 @@ ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufal
 ilcosubmethodrandom_select_preferred#:#bevorzugt
 ilcosubmethodrandom_select_alternative#:#alternativ
 ilcosubmethodrandom_select_not#:#nicht gewählt
-add_as_members#:#Als Mitglieder eintragen
+add_as_members#:#Mitglieder eintragen
 msg_users_added_as_members#:#Die zugeteilten Nutzer wurden bei den Zielobjekten als Mitglieder eingetragen.
+add_as_subscribers#:#Anmeldungen eintragen
+msg_users_added_as_subscribers#:#Die nicht zugeteilten Nutzer wurden bei den Zielobjekten als Anmeldungen eingetragen.

@@ -127,5 +127,7 @@ ilcosubmethodrandom_description#:Selects the assignments randomly per priority
 ilcosubmethodrandom_select_preferred#:#preferred
 ilcosubmethodrandom_select_alternative#:#alternative
 ilcosubmethodrandom_select_not#:#not selected
-add_as_members#:#Add as Members
-msg_users_added_as_members#:#The users were added as members to the target objects.
+add_as_members#:#Add Members
+msg_users_added_as_members#:#The assigned users were added as members to the target objects.
+add_as_members#:#Add Subscribers
+msg_users_added_as_members#:#The non assigned users were added as subscribers to the target objects.

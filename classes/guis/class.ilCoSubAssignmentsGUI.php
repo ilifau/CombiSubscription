@@ -24,6 +24,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'saveAssignmentsAsRun':
 			case 'setRunAssignments':
 			case 'addAssignedUsersAsMembers':
+			case 'addNonAssignedUsersAsSubscribers':
 			case 'loadLotLists':
 				$this->$cmd();
 				return;
@@ -67,6 +68,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 		// todo: implement confirmations
 		$ilToolbar->addFormButton($this->plugin->txt('add_as_members'), 'addAssignedUsersAsMembers');
+		$ilToolbar->addFormButton($this->plugin->txt('add_as_subscribers'), 'addNonAssignedUsersAsSubscribers');
 		//$ilToolbar->addFormButton($this->plugin->txt('load_lot_lists'), 'loadLotLists');
 
 		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
@@ -196,6 +198,20 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$targets_obj->addAssignedUsersAsMembers();
 
 		ilUtil::sendSuccess($this->plugin->txt('msg_users_added_as_members'), true);
+		$this->ctrl->redirect($this,'editAssignments');
+	}
+
+
+	/**
+	 * Add the currently assigned users as members
+	 */
+	public function addNonAssignedUsersAsSubscribers()
+	{
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$targets_obj->addNonAssignedUsersAsSubscribers();
+
+		ilUtil::sendSuccess($this->plugin->txt('msg_users_added_as_subscribers'), true);
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
