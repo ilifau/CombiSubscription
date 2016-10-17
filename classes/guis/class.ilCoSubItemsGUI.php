@@ -323,7 +323,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		// maximum subscriptions
 		$sm = new ilNumberInputGUI($this->plugin->txt('sub_max'), 'sub_max');
 		$sm->setDecimals(0);
-		$sm->setMinValue(1);
+		$sm->setMinValue(0);
 		$sm->setSize(4);
 		$sm->setRequired(true);
 		$this->form->addItem($sm);

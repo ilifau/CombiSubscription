@@ -115,6 +115,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		{
 			foreach ($this->getSortedItemsForPriority($priority) as $item)
 			{
+				if (!isset($this->assign_counts[$item->item_id]))
+				{
+					$this->assign_counts[$item->item_id] = 0;
+				}
+
 				foreach ($this->getSortedUsersForItemAndPriority($item, $priority) as $user_id)
 				{
 					if ($this->assign_counts[$item->item_id] >= $item->sub_max)

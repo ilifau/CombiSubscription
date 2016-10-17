@@ -66,7 +66,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		}
 
 		// todo: implement confirmations
-		//$ilToolbar->addFormButton($this->plugin->txt('add_as_members'), 'addAssignedUsersAsMembers');
+		$ilToolbar->addFormButton($this->plugin->txt('add_as_members'), 'addAssignedUsersAsMembers');
 		//$ilToolbar->addFormButton($this->plugin->txt('load_lot_lists'), 'loadLotLists');
 
 		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
