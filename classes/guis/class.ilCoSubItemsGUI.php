@@ -277,7 +277,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		$input = $this->form->getItemByPostVar('target_ref_id');
 		$input->readFromSession();
-		$item = $this->object->getItemForTarget($input->getValue());
+		$item = $this->object->getItemForTarget($input->	getValue());
 		$this->loadItemProperties($item);
 
 		$this->tpl->setContent($this->form->getHTML());

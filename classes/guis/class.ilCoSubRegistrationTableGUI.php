@@ -12,7 +12,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	/** @var array   $value => $text */
 	protected $options = array();
 
-	/** @var int maximum coices count of all item priorities */
+	/** @var int maximum choices count of all item priorities */
 	protected $max_choices = 0;
 
 	/** @var bool	setting choices is disabled  */
@@ -115,8 +115,21 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	 */
 	protected function fillRow($a_set)
 	{
+		/** @var ilAccessHandler $ilAccess */
+		global $ilAccess;
+
+		require_once('Services/Locator/classes/class.ilLocatorGUI.php');
+
 		$this->tpl->setVariable('TITLE', $a_set['title']);
 		$this->tpl->setVariable('DESCRIPTION', $a_set['description']);
+
+		if (!empty($a_set['target_ref_id']) && $ilAccess->checkAccess('visible','', $a_set['target_ref_id']))
+		{
+			require_once('Services/Locator/classes/class.ilLocatorGUI.php');
+			$locator = new ilLocatorGUI();
+			$locator->addContextItems($a_set['target_ref_id']);
+			$this->tpl->setVariable('PATH', $locator->getHTML());
+		}
 
 		if ($a_set['sub_min'] > 0)
 		{
