@@ -23,9 +23,10 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'saveAssignments':
 			case 'saveAssignmentsAsRun':
 			case 'setRunAssignments':
-			case 'addAssignedUsersAsMembers':
-			case 'addNonAssignedUsersAsSubscribers':
+			case 'transferAssignments':
+			case 'transferAssignmentsConfirmation':
 			case 'loadLotLists':
+			case 'mailToUsers':
 				$this->$cmd();
 				return;
 
@@ -44,6 +45,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	{
 		global $ilUser, $ilToolbar;
 
+		require_once 'Services/UIComponent/Button/classes/class.ilSubmitButton.php';
 		$this->parent->checkUnfinishedRuns();
 
 		/** @var ilToolbarGUI $ilToolbar */
@@ -62,19 +64,57 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			$si->setValue($last_run_id);
 
 			$ilToolbar->addInputItem($si);
-			$ilToolbar->addFormButton($this->plugin->txt('set_run_assignments'), 'setRunAssignments');
+
+			$button = ilSubmitButton::getInstance();
+			$button->setCommand('setRunAssignments');
+			$button->setCaption($this->plugin->txt('set_run_assignments'), false);
+			$ilToolbar->addButtonInstance($button);
 			$ilToolbar->addSeparator();
 		}
 
-		// todo: implement confirmations
-		$ilToolbar->addFormButton($this->plugin->txt('add_as_members'), 'addAssignedUsersAsMembers');
-		$ilToolbar->addFormButton($this->plugin->txt('add_as_subscribers'), 'addNonAssignedUsersAsSubscribers');
-		//$ilToolbar->addFormButton($this->plugin->txt('load_lot_lists'), 'loadLotLists');
+		$button = ilSubmitButton::getInstance();
+		$button->setCommand('transferAssignmentsConfirmation');
+		$button->setCaption($this->plugin->txt('transfer_assignments'), false);
+		$ilToolbar->addButtonInstance($button);
 
 		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
 		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
 		$table_gui->prepareData();
 		$this->tpl->setContent($table_gui->getHTML());
+
+		$this->showTransferTime();
+	}
+
+
+	/**
+	 * Send an e-mail to selected users
+	 */
+	public function mailToUsers()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+		$rcps = array();
+		foreach($_POST['ids'] as $usr_id)
+		{
+			$rcps[] = ilObjUser::_lookupLogin($usr_id);
+		}
+
+		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		require_once 'Services/Link/classes/class.ilLink.php';
+		ilMailFormCall::setRecipients($rcps);
+
+		$signature = "\n\n" . $this->plugin->txt('mail_signature') . "\n" . ilLink::_getStaticLink($this->object->getRefId());
+
+		$target = ilMailFormCall::getRedirectTarget(
+			$this,
+			'editAssignments',
+			array(),
+			array('type' => 'new', 'sig' => rawurlencode(base64_encode($signature))));
+
+		ilUtil::redirect($target);
 	}
 
 
@@ -189,30 +229,67 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	}
 
 	/**
-	 * Add the currently assigned users as members
+	 * Confirm the transfer of assignments to target objects
 	 */
-	public function addAssignedUsersAsMembers()
+	public function transferAssignmentsConfirmation()
 	{
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
-		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-		$targets_obj->addAssignedUsersAsMembers();
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+		require_once('Services/Locator/classes/class.ilLocatorGUI.php');
 
-		ilUtil::sendSuccess($this->plugin->txt('msg_users_added_as_members'), true);
-		$this->ctrl->redirect($this,'editAssignments');
+		$conf_gui = new ilConfirmationGUI();
+		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'transferAssignments'));
+		$conf_gui->setHeaderText($this->plugin->txt('transfer_assignments_confirmation'));
+		$conf_gui->setConfirm($this->plugin->txt('transfer_assignments'),'transferAssignments');
+		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+		$count = 0;
+		foreach ($this->object->getItems() as $item)
+		{
+			$locator = new ilLocatorGUI();
+			if (!empty($item->target_ref_id))
+			{
+				$locator->addContextItems($item->target_ref_id);
+				$count++;
+			}
+			$conf_gui->addItem('ref_id', $item->target_ref_id, $locator->getHTML());
+		}
+
+		if ($count == 0)
+		{
+			ilUtil::sendFailure($this->plugin-txt('no_target_objects'),true);
+			$this->ctrl->redirect($this,'editAssignments');
+		}
+
+		$this->tpl->setContent($conf_gui->getHTML());
+		$this->showTransferTime();
 	}
 
 
 	/**
 	 * Add the currently assigned users as members
 	 */
-	public function addNonAssignedUsersAsSubscribers()
+	public function transferAssignments()
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$targets_obj->addAssignedUsersAsMembers();
 		$targets_obj->addNonAssignedUsersAsSubscribers();
 
-		ilUtil::sendSuccess($this->plugin->txt('msg_users_added_as_subscribers'), true);
+		$this->object->setClassProperty(get_class($this), 'transfer_time', time());
 		$this->ctrl->redirect($this,'editAssignments');
+	}
+
+	/**
+	 * Show the date when the assignments were already transferred
+	 */
+	public function showTransferTime()
+	{
+		$time = $this->object->getClassProperty(get_class($this), 'transfer_time', 0);
+		if ($time > 0)
+		{
+			$date = new ilDateTime($time, IL_CAL_UNIX);
+			ilUtil::sendInfo(sprintf($this->plugin->txt('transfer_assignments_time'), ilDatePresentation::formatDate($date)));
+		}
 	}
 
 	/**

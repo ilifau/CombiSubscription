@@ -127,7 +127,10 @@ ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufal
 ilcosubmethodrandom_select_preferred#:#bevorzugt
 ilcosubmethodrandom_select_alternative#:#alternativ
 ilcosubmethodrandom_select_not#:#nicht gewählt
-add_as_members#:#Mitglieder eintragen
-msg_users_added_as_members#:#Die zugeteilten Nutzer wurden bei den Zielobjekten als Mitglieder eingetragen.
-add_as_subscribers#:#Anmeldungen eintragen
-msg_users_added_as_subscribers#:#Die nicht zugeteilten Nutzer wurden bei den Zielobjekten als Anmeldungen eingetragen.
+mail_to_users#:#E-Mail schreiben
+mail_signature#:#Diese Nachricht betrifft die folgende kombinierte Anmeldung:
+transfer_assignments#:#Zuteilungen übertragen
+transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste oder Losliste gesetzt.
+transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
+no_target_objets#:#Es wurden keine Zielobjekte gefunden!
+

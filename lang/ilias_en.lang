@@ -131,3 +131,5 @@ add_as_members#:#Add Members
 msg_users_added_as_members#:#The assigned users were added as members to the target objects.
 add_as_members#:#Add Subscribers
 msg_users_added_as_members#:#The non assigned users were added as subscribers to the target objects.
+mail_to_users#:#Send E-Mail
+mail_signature#:#This message relates to the following combined subscription:

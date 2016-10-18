@@ -52,12 +52,15 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
 		$this->setRowTemplate('tpl.il_xcos_assignments_row.html', $this->plugin->getDirectory());
 
+		$this->addColumn('','', 1, true);
 		$this->addColumn($this->lng->txt('user'), 'user');
 		$this->addColumn($this->plugin->txt('satisfaction'), 'result');
 
 		$this->setDefaultOrderField('user');
 		$this->setDefaultOrderDirection('asc');
+		$this->setSelectAllCheckbox('id');
 
+		$this->addMultiCommand('mailToUsers', $this->plugin->txt('mail_to_users'));
 		$this->addCommandButton('saveAssignments', $this->plugin->txt('save_assignments'));
 		$this->addCommandButton('saveAssignmentsAsRun', $this->plugin->txt('save_assignments_as_run'));
 	}
@@ -197,6 +200,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$this->tpl->parseCurrentBlock();
 		}
 
+		$this->tpl->setVariable('ID', $a_set['user_id']);
 		$this->tpl->setVariable('USER', $a_set['user']);
 		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
 		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
