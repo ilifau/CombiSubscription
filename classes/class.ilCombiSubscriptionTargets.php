@@ -89,7 +89,7 @@ class ilCombiSubscriptionTargets
 				ilSubscribersLot::_removeUser($action['obj_id'], $user_id);
 				foreach ($conditions as $condition)
 				{
-					lSubscribersLot::_removeUser($condition['target_obj_id'], $user_id);
+					ilSubscribersLot::_removeUser($condition['target_obj_id'], $user_id);
 				}
 			}
 		}
