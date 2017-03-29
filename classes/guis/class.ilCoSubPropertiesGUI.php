@@ -98,6 +98,15 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$end->setShowTime(true);
 		$this->form->addItem($end);
 
+		// minimum choices
+		$min_choices = new ilNumberInputGUI($this->plugin->txt('min_choices'), 'min_choices');
+		$min_choices->setRequired(true);
+		$min_choices->setInfo($this->plugin->txt('min_choices_info'));
+		$min_choices->setSize(3);
+		$min_choices->setDecimals(0);
+		$min_choices->setValue(0);
+		$this->form->addItem($min_choices);
+
 		// method
 		$method = new ilRadioGroupInputGUI($this->plugin->txt('assignment_method'), 'method');
 		$method->setRequired(true);
@@ -130,6 +139,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->getItemByPostVar('explanation')->setValue($this->object->getExplanation());
 		$this->form->getItemByPostVar('sub_start')->setDate($this->object->getSubscriptionStart());
 		$this->form->getItemByPostVar('sub_end')->setDate($this->object->getSubscriptionEnd());
+		$this->form->getItemByPostVar('min_choices')->setValue($this->object->getMinChoices());
 		$this->form->getItemByPostVar('method')->setValue($this->object->getMethod());
 	}
 
@@ -147,6 +157,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->object->setExplanation($this->form->getInput('explanation'));
 		$this->object->setSubscriptionStart(new ilDateTime($start['date'].' '.$start['time'], IL_CAL_DATETIME));
 		$this->object->setSubscriptionEnd(new ilDateTime($end['date'].' '.$end['time'], IL_CAL_DATETIME));
+		$this->object->setMinChoices($this->form->getInput('min_choices'));
 		$this->object->setMethod($this->form->getInput('method'));
 		$this->object->update();
 	}

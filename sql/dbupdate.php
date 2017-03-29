@@ -219,3 +219,15 @@
 	$ilDB->createTable('rep_robj_xcos_prop', $fields);
 	$ilDB->addPrimaryKey('rep_robj_xcos_prop', array('obj_id','class','property'));
 ?>
+<#7>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_data', 'min_choices'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_data', 'min_choices', array(
+                'type'    => 'integer',
+                'length'  => 4,
+                'notnull' => true,
+                'default' => 0)
+        );
+    }
+?>

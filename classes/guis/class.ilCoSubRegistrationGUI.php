@@ -35,8 +35,9 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Edit the registration of the current user
+	 * @param array|null	posted priorities to be set (item_id => priority)
 	 */
-	public function editRegistration()
+	public function editRegistration($priorities = null)
 	{
 		global $ilUser;
 
@@ -50,17 +51,22 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			ilUtil::sendInfo($this->plugin->txt('subscription_period_finished'));
 		}
 
-
 		if ($this->object->getExplanation())
 		{
 			$intro = '<p>'.$this->object->getExplanation().'</p>';
+		}
+
+		// take the current priorities of hte user if none are posted
+		if (!isset($priorities))
+		{
+			$priorities = $this->object->getPrioritiesOfUser($ilUser->getId());
 		}
 
 		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 		$table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
 		$table_gui->prepareData(
 			$this->object->getItems(),
-			$this->object->getPrioritiesOfUser($ilUser->getId()),
+			$priorities,
 			$this->object->getPriorityCounts());
 		$this->tpl->setContent($intro . $table_gui->getHTML());
 	}
@@ -82,11 +88,21 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 
 		$method = $this->object->getMethodObject();
+		$min_choices = $this->object->getMinChoices();
 		$has_mc = $method->hasMultipleChoice();
 		$max_prio = count($method->getPriorities()) - 1;
 		$used_prio = array();
 		$choices = array();
 
+		// get and validate the posted choices
+		$posted = $this->getPostedPriorities();
+		if (count($posted) > 0 && count($posted) < $min_choices)
+		{
+			ilUtil::sendFailure(sprintf($this->plugin->txt('min_choices_alert'), $min_choices));
+			return $this->editRegistration($posted);
+		}
+
+		// create choice objects to be saved
 		foreach ($this->object->getItems() as $item)
 		{
 			$priority = $_POST['priority'][$item->item_id];
@@ -121,5 +137,24 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	public function cancelRegistration()
 	{
 		$this->parent->returnToContainer();
+	}
+
+
+	/**
+	 * Get the posted priority slection of a user
+	 * The 'not selected' options are filtered out
+	 * @return array	item_id => priority
+	 */
+	protected function getPostedPriorities()
+	{
+		$priorities = array();
+		foreach ((array) $_POST['priority'] as $item_id => $priority)
+		{
+			if (is_numeric($item_id) && is_numeric($priority))
+			{
+				$priorities[$item_id] = $priority;
+			}
+		}
+		return $priorities;
 	}
 }

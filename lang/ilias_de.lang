@@ -133,4 +133,7 @@ transfer_assignments#:#Zuteilungen übertragen
 transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste oder Losliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
 no_target_objets#:#Es wurden keine Zielobjekte gefunden!
+min_choices#:#Minimale Auswahlen
+min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
+min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
 

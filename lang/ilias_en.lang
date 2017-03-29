@@ -133,3 +133,6 @@ add_as_members#:#Add Subscribers
 msg_users_added_as_members#:#The non assigned users were added as subscribers to the target objects.
 mail_to_users#:#Send E-Mail
 mail_signature#:#This message relates to the following combined subscription:
+min_choices#:#Minimum Choices
+min_choices_info#:#Minimum number of chosen items to save a subscription
+min_choices_alert#:#You must select at least %s items to get your subscription saved.
