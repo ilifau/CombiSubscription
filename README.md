@@ -3,6 +3,7 @@ GPLv3, see LICENSE
 
 Author Fred Neumann <fred.neumann@fau.de>
 
+This plugin includes the PHPExcel library, see lib/PHPExcel-1.8/license.md
 
 INSTALLATION
 ------------

@@ -27,6 +27,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'transferAssignmentsConfirmation':
 			case 'loadLotLists':
 			case 'mailToUsers':
+			case 'exportAssignments':
 				$this->$cmd();
 				return;
 
@@ -43,7 +44,22 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	 */
 	public function editAssignments()
 	{
-		global $ilUser, $ilToolbar;
+		$this->setAssignmentsToolbar();
+
+		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
+		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
+		$table_gui->prepareData();
+		$this->tpl->setContent($table_gui->getHTML());
+
+		$this->showTransferTime();
+	}
+
+	/**
+	 * Set the toolbar for the assignments screen
+	 */
+	protected function setAssignmentsToolbar()
+	{
+		global $ilToolbar;
 
 		require_once 'Services/UIComponent/Button/classes/class.ilSubmitButton.php';
 		$this->parent->checkUnfinishedRuns();
@@ -77,14 +93,31 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$button->setCaption($this->plugin->txt('transfer_assignments'), false);
 		$ilToolbar->addButtonInstance($button);
 
-		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
-		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
-		$table_gui->prepareData();
-		$this->tpl->setContent($table_gui->getHTML());
+		// Export
+		$ilToolbar->addSeparator();
 
-		$this->showTransferTime();
+		require_once 'Services/Form/classes/class.ilSelectInputGUI.php';
+		$this->plugin->includeClass('export/class.ilCoSubExport.php');
+		$export_mode = new ilSelectInputGUI($this->lng->txt('type'), 'export_mode');
+		$options = array(
+			ilCoSubExport::MODE_REG_BY_ITEM => $this->plugin->txt('export_mode_reg_by_item'),
+		);
+		$export_mode->setOptions($options);
+		$ilToolbar->addInputItem($export_mode, true);
+
+		$export_type = new ilSelectInputGUI('', 'export_type');
+		$options = array(
+			ilCoSubExport::TYPE_EXCEL => $this->plugin->txt('export_type_excel'),
+			ilCoSubExport::TYPE_CSV => $this->plugin->txt('export_type_csv'),
+		);
+		$export_type->setOptions($options);
+		$ilToolbar->addInputItem($export_type, true);
+
+		$button = ilSubmitButton::getInstance();
+		$button->setCommand('exportAssignments');
+		$button->setCaption($this->lng->txt('export'), false);
+		$ilToolbar->addButtonInstance($button);
 	}
-
 
 	/**
 	 * Send an e-mail to selected users
@@ -307,4 +340,51 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
+
+	/**
+	 * Export theassignments
+	 */
+	public function exportAssignments()
+	{
+		$this->plugin->includeClass("export/class.ilCoSubExport.php");
+
+
+		$type = $_POST['export_type'];
+		switch ($_POST['export_type'])
+		{
+			case ilCoSubExport::TYPE_CSV:
+				$suffix = ".csv";
+				break;
+
+			case ilCoSubExport::TYPE_EXCEL:
+			default;
+				$suffix = ".xlsx";
+				break;
+		}
+
+		$mode = $_POST['export_mode'];
+		switch ($_POST['export_mode'])
+		{
+			case ilCoSubExport::MODE_REG_BY_ITEM:
+			default:
+				$name = 'registrations';
+				break;
+		}
+
+		// create and send the export file
+		$tempname = ilUtil::ilTempnam();
+		$export = new ilCoSubExport($this->plugin, $this->object, $type, $mode);
+		$export->buildExportFile($tempname);
+
+
+		if (is_file($tempname))
+		{
+			ilUtil::deliverFile($tempname, $name.$suffix);
+		}
+		else
+		{
+			ilUtil::sendFailure($this->plugin->txt('export_not_found'), true);
+			$this->ctrl->redirect($this);
+		}
+	}
 }

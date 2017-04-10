@@ -136,4 +136,7 @@ no_target_objets#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
 min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
 min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
-
+export_mode_reg_by_item#:#Anmeldungen nach Einheiten
+export_type_excel#:#MS Excel
+export_type_csv#:#CSV
+export_failed#:#Die Export-Datei konnte nicht erzeugt werden.

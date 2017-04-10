@@ -136,3 +136,7 @@ mail_signature#:#This message relates to the following combined subscription:
 min_choices#:#Minimum Choices
 min_choices_info#:#Minimum number of chosen items to save a subscription
 min_choices_alert#:#You must select at least %s items to get your subscription saved.
+export_mode_reg_by_item#:#Subscriptions by Items
+export_type_excel#:#MS Excel
+export_type_csv#:#CSV
+export_failed#:#The export file coudn't be written.
