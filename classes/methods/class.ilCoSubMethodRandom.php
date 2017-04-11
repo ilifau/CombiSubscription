@@ -171,7 +171,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		}
 
 		krsort($indexed);
-		log_var($indexed);
 		return array_values($indexed);
 	}
 
