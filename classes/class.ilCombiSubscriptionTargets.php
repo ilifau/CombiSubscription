@@ -35,8 +35,6 @@ class ilCombiSubscriptionTargets
 		include_once('./Modules/Course/classes/class.ilCourseMembershipMailNotification.php');
 		require_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
 
-		include_once('./Services/Membership/classes/class.ilSubscribersLot.php');
-
 		// collect the actions to be done
 		$actions = array();
 		foreach ($this->object->getItems() as $item)
@@ -56,7 +54,7 @@ class ilCombiSubscriptionTargets
 		foreach ($actions as $action)
 		{
 			// get membership limitation conditions
-			$conditions = ilObjCourseGrouping::_getGroupingConditions($action['obj_id'], $action['type']);
+			$conditions = self::_getGroupingConditions($action['obj_id'], $action['type']);
 
 			switch($action['type'])
 			{
@@ -67,6 +65,7 @@ class ilCombiSubscriptionTargets
 					break;
 
 				case 'crs':
+				default:
 					$part_obj = ilCourseParticipants::_getInstanceByObjId($action['obj_id']);
 					$role = IL_CRS_MEMBER;
 					$notification_type = $part_obj->NOTIFY_ACCEPT_SUBSCRIBER;
@@ -76,7 +75,7 @@ class ilCombiSubscriptionTargets
 			foreach ($action['users'] as $user_id)
 			{
 				// check if user is already member in one of the other groups/course
-				if (ilObjCourseGrouping::_findGroupingMembership($user_id, $action['type'], $conditions))
+				if (self::_findGroupingMembership($user_id, $action['type'], $conditions))
 				{
 					continue;
 				}
@@ -84,13 +83,6 @@ class ilCombiSubscriptionTargets
 				// adding the user also deletes the user from the subscribers and from the waiting list
 				$part_obj->add($user_id,$role);
 				$part_obj->sendNotification($notification_type, $user_id);
-
-				// take the user from the lot lists of the group/course and of the other groups/courses
-				ilSubscribersLot::_removeUser($action['obj_id'], $user_id);
-				foreach ($conditions as $condition)
-				{
-					ilSubscribersLot::_removeUser($condition['target_obj_id'], $user_id);
-				}
 			}
 		}
 	}
@@ -104,7 +96,6 @@ class ilCombiSubscriptionTargets
 		include_once('./Modules/Course/classes/class.ilCourseWaitingList.php');
 		require_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
 
-		include_once('./Services/Membership/classes/class.ilSubscribersLot.php');
 
 		// collect the actions to be done
 		$actions = array();
@@ -136,7 +127,7 @@ class ilCombiSubscriptionTargets
 		foreach ($actions as $action)
 		{
 			// get membership limitation conditions
-			$conditions = ilObjCourseGrouping::_getGroupingConditions($action['obj_id'], $action['type']);
+			$conditions = self::_getGroupingConditions($action['obj_id'], $action['type']);
 
 			switch($action['type'])
 			{
@@ -145,10 +136,6 @@ class ilCombiSubscriptionTargets
 					if ($object->isWaitingListEnabled())
 					{
 						$list_obj = new ilGroupWaitingList($action['obj_id']);
-					}
-					elseif ($object->enabledLotList())
-					{
-						$list_obj = new ilSubscribersLot($action['obj_id']);
 					}
 					else
 					{
@@ -163,11 +150,6 @@ class ilCombiSubscriptionTargets
 						$action['list'] = 'waiting_list';
 						$list_obj = new ilCourseWaitingList($action['obj_id']);
 					}
-					elseif ($object->enabledLotList())
-					{
-						$action['list'] = 'lot_list';
-						$list_obj = new ilSubscribersLot($action['obj_id']);
-					}
 					else
 					{
 						$list_obj = null;
@@ -178,7 +160,7 @@ class ilCombiSubscriptionTargets
 			foreach ($action['users'] as $user_id)
 			{
 				// check if user is already member in one of the other groups/course
-				if (ilObjCourseGrouping::_findGroupingMembership($user_id, $action['type'], $conditions))
+				if (self::_findGroupingMembership($user_id, $action['type'], $conditions))
 				{
 					continue;
 				}
@@ -192,29 +174,84 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
-	 * Load the users from the lot lists
+	 * Get grouping conditions of a container object
+	 *
+	 * @param 	int     $a_obj_id
+	 * @param	string	$a_type
+	 * @return 	array   assoc: grouping conditions
 	 */
-	public function loadLotLists()
+	function _getGroupingConditions($a_obj_id, $a_type)
 	{
-		include_once('./Services/Membership/classes/class.ilSubscribersLot.php');
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
+		global $tree;
 
-		foreach ($this->object->getItems() as $item)
+		static $cached_conditions;
+		if (isset($cached_conditions[$a_obj_id]))
 		{
-			if (!empty($item->target_ref_id))
-			{
-				$lot_list = new ilSubscribersLot(ilObject::_lookupObjId($item->target_ref_id));
+			return $cached_conditions[$a_obj_id];
+		}
 
-				foreach($lot_list->getUserIds() as $user_id)
+		include_once './Services/AccessControl/classes/class.ilConditionHandler.php';
+
+		$ref_id = current(ilObject::_getAllReferences($a_obj_id));
+		$trigger_ids = array();
+		$conditions = array();
+
+		foreach(ilConditionHandler::_getConditionsOfTarget($ref_id, $a_obj_id, $a_type) as $condition)
+		{
+			if($condition['operator'] == 'not_member')
+			{
+				$trigger_ids[] = $condition['trigger_obj_id'];
+			}
+		}
+		foreach ($trigger_ids as $trigger_id)
+		{
+			foreach(ilConditionHandler::_getConditionsOfTrigger('crsg', $trigger_id) as $condition)
+			{
+				// Handle deleted items
+				if(!$tree->isDeleted($condition['target_ref_id'])
+					and $condition['operator'] == 'not_member')
 				{
-					$choice = new ilCoSubChoice;
-					$choice->obj_id = $this->object->getId();
-					$choice->item_id = $item->item_id;
-					$choice->user_id = $user_id;
-					$choice->priority = 0;
-					$choice->save();
+					$conditions[$condition['target_ref_id']] = $condition;
 				}
 			}
 		}
+
+		$cached_conditions[$a_obj_id] = array_values($conditions);
+		return $cached_conditions[$a_obj_id];
+	}
+
+
+	/**
+	 * Check the grouping conditions for a user
+	 *
+	 * @param  	int 	    $user_id
+	 * @param    string     $type 'grp' or 'crs'
+	 * @param  	array 		$conditions
+	 * @return   string     obj_id
+	 */
+	function _findGroupingMembership($user_id, $type, $conditions)
+	{
+		foreach ($conditions as $condition)
+		{
+			if ($type == 'crs')
+			{
+				include_once('Modules/Course/classes/class.ilCourseParticipants.php');
+				$members = ilCourseParticipants::_getInstanceByObjId($condition['target_obj_id']);
+				if($members->isGroupingMember($user_id, $condition['value']))
+				{
+					return $condition['target_obj_id'];
+				}
+			}
+			elseif ($type == 'grp')
+			{
+				include_once('Modules/Group/classes/class.ilGroupParticipants.php');
+				$members = ilGroupParticipants::_getInstanceByObjId($condition['target_obj_id']);
+				if($members->isGroupingMember($user_id, $condition['value']))
+				{
+					return $condition['target_obj_id'];
+				}
+			}
+		}
+		return false;
 	}
 }

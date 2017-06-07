@@ -25,7 +25,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'setRunAssignments':
 			case 'transferAssignments':
 			case 'transferAssignmentsConfirmation':
-			case 'loadLotLists':
 			case 'mailToUsers':
 			case 'exportAssignments':
 				$this->$cmd();
@@ -324,22 +323,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			ilUtil::sendInfo(sprintf($this->plugin->txt('transfer_assignments_time'), ilDatePresentation::formatDate($date)));
 		}
 	}
-
-	/**
-	 * Load the candidates of lot lists
-	 */
-	public function loadLotLists()
-	{
-		$this->object->removeUserData();
-
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
-		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-		$targets_obj->loadLotLists();
-
-		ilUtil::sendSuccess($this->plugin->txt('msg_users_loaded_from_lot_lists'), true);
-		$this->ctrl->redirect($this,'editAssignments');
-	}
-
 
 	/**
 	 * Export theassignments
