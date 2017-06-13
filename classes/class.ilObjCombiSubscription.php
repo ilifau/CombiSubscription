@@ -21,6 +21,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	protected $explanation = '';
 	protected $sub_start = null;
 	protected $sub_end = null;
+	protected $show_bars = true;
 	protected $min_choices = 0;
 	protected $method = 'ilCoSubMethodRandom';
 	protected $class_properties = array();
@@ -84,12 +85,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$dummyDate = new ilDateTime(time(), IL_CAL_UNIX);
 
 		$ilDB->manipulate("INSERT INTO rep_robj_xcos_data ".
-			"(obj_id, is_online, explanation, sub_start, sub_end, min_choices, method) VALUES (".
+			"(obj_id, is_online, explanation, sub_start, sub_end, show_bars, min_choices, method) VALUES (".
 			$ilDB->quote($this->getId(), 'integer').','.
 			$ilDB->quote(0, 'integer').','.
 			$ilDB->quote($this->plugin->txt('default_explanation'), 'text').','.
 			$ilDB->quote($dummyDate->get(IL_CAL_DATETIME), 'text').','.
 			$ilDB->quote($dummyDate->get(IL_CAL_DATETIME), 'text').','.
+			$ilDB->quote($this->getShowBars(), 'integer').','.
 			$ilDB->quote($this->getMinChoices(), 'integer').','.
 			$ilDB->quote('ilCoSubMethodRandom', 'text').
 			")");
@@ -111,6 +113,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$this->setExplanation($rec['explanation']);
 			$this->setSubscriptionStart(new ilDateTime($rec['sub_start'],IL_CAL_DATETIME));
 			$this->setSubscriptionEnd(new ilDateTime($rec['sub_end'],IL_CAL_DATETIME));
+			$this->setShowBars((bool) $rec['show_bars']);
 			$this->setMinChoices($rec['min_choices']);
 			$this->setMethod($rec['method']);
 		}
@@ -120,6 +123,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$this->setExplanation($this->plugin->txt('default_explanation'));
 			$this->setSubscriptionStart(new ilDateTime(time(), IL_CAL_UNIX));
 			$this->setSubscriptionEnd(new ilDateTime(time(), IL_CAL_UNIX));
+			$this->setShowBars(true);
 			$this->setMinChoices(0);
 			$this->setMethod('ilCoSubMethodRandom');
 		}
@@ -137,6 +141,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			" explanation = ".$ilDB->quote($this->getExplanation(), 'text').','.
 			" sub_start = ".$ilDB->quote($this->getSubscriptionStart()->get(IL_CAL_DATETIME), 'timestamp').','.
 			" sub_end = ".$ilDB->quote($this->getSubscriptionEnd()->get(IL_CAL_DATETIME), 'timestamp').','.
+			" show_bars = ".$ilDB->quote($this->getShowBars(), 'integer').','.
 			" min_choices = ".$ilDB->quote($this->getMinChoices(), 'integer').','.
 			" method = ".$ilDB->quote($this->getMethod(),'text').
 			" WHERE obj_id = ".$ilDB->quote($this->getId(), 'integer')
@@ -168,6 +173,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$new_obj->setExplanation($this->getExplanation());
 		$new_obj->setSubscriptionStart($this->getSubscriptionStart());
 		$new_obj->setSubscriptionEnd($this->getSubscriptionEnd());
+		$new_obj->setShowBars($this->getShowBars());
 		$new_obj->setMinChoices($this->getMinChoices());
 		$new_obj->setMethod($this->getMethod());
 		$new_obj->update();
@@ -279,6 +285,25 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 		return false;
 	}
+
+	/**
+	 * Get if bars should be shown on the registratin screen
+	 */
+	public function getShowBars()
+	{
+		return $this->show_bars;
+	}
+
+
+	/**
+	 * Set if bars should be shown on the registration screen
+	 * @param bool	$a_show_bars
+	 */
+	public function setShowBars($a_show_bars)
+	{
+		$this->show_bars = (bool) $a_show_bars;
+	}
+
 
 	/**
 	 * Get the minimum choices that must be selected for registration

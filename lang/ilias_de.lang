@@ -25,6 +25,8 @@ properties#:#Eigenschaften
 edit_properties#:#Eigenschaften bearbeiten
 title#:#Titel
 description#:#Beschreibung
+identifier#:#Kennung
+identifier_info#:#Spaltenkennung auf der Zuteilungsseite und im Export/Import. Falls leer, wird der Titel verwendet.
 sub_start#:#Anmelde-Start
 sub_end#:#Anmelde-Ende
 save#:#Speichern
@@ -59,6 +61,8 @@ ilcosubmethodsafre_title#:#Drei Prioritäten
 ilcosubmethodsafre_description#:#Heuristik mit drei Prioritäten
 registration_header_item#:#Option
 registration_header_choices#:#Auswahl
+registration_header_priorities#:#Priorität (1 = höchste)
+registration_header_bars_info#:#Die Balken zeigen die Anzahl bisheriger Auswahlen
 save_registration#:#Auswahl speichern
 method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
@@ -77,16 +81,18 @@ set_run_assignments#:#Zuteilungen aus Berechnung übernehmen
 msg_run_assignments_set#:#Die Zuteilungen der Berechnung wurden übernommen
 subscription_period#:#Anmeldezeitraum
 sub_limit_from_to#:#%s bis %s Teilnehmer
+sub_limit_from#:#Min. %s Teilnehmer
 sub_limit_to#:#Max. %s Teilnehmer
 peers#:#Freunde
 explanation#:#Erklärung
-default_explanation#:#Sie können für jede Priorität (bevorzugt, alternativ) mehrere Auswahlen treffen. Nach dem Anmeldezeitraum werden die Zuteilungen durch ein automatisches Verfahren getroffen, das möglichst viele Prioritäten berücksichtigt. Pro Benutzer wird nur eine Option zugeteilt.
+default_explanation#:#Sie können für jede Priorität mehrere Auswahlen treffen. Nach dem Anmeldezeitraum werden die Zuteilungen durch ein automatisches Verfahren getroffen, das möglichst viele Prioritäten berücksichtigt. Pro Benutzer wird nur eine Option zugeteilt.
 subscription_period_not_started#:#Der Anmeldezeitraum hat noch nicht begonnen.
 subscription_period_finished#:#Der Anmeldezeitraum ist beeendet.
 sub_min_not_reached#:#Das Minimum an Zuteilungen wurde nicht erreicht.
 sub_max_exceeded#:#Das Maximum an Zuteilungen wurde überschritten.
 sub_limits_satisfied#:#Die Anzahl der Zuteilungen ist möglich.
 item_assignment_sum_label#:#Zuteilungen:
+not_assigned#:#Nicht zugeteilt
 calculations#:#Berechnungen
 satisfied#:#Erfüllt
 users_assigned#:#Zugeteilte Nutzer
@@ -124,15 +130,32 @@ ilcosubmethodeatts_log_level#:#Log-Level
 ilcosubmethodeatts_log_level_info#:#Info
 ilcosubmethodrandom_title#:#Zufallsauswahl
 ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufall aus.
+ilcosubmethodrandom_select_yes#:#gewählt
+ilcosubmethodrandom_select_not#:#nicht gewählt
 ilcosubmethodrandom_select_preferred#:#bevorzugt
 ilcosubmethodrandom_select_alternative#:#alternativ
-ilcosubmethodrandom_select_not#:#nicht gewählt
+ilcosubmethodrandom_select_prio_x#:#%s.
+ilcosubmethodrandom_selection_properties#:#Auswahl-Einstellungen
+ilcosubmethodrandom_number_priorities#:#Anzahl Prioritäten
+ilcosubmethodrandom_number_priorities_info#:#Anzahl der angebotenen Prioritäten zur Auswahl. Eine Priorität wird als "gewählt" benannt, zwei Prioritäten (Standard) als "bevorzugt" und "alternativ", ab drei werden die Prioritäten numeriert.
+ilcosubmethodrandom_number_assignments#:#Anzahl Zuteilungen
+ilcosubmethodrandom_number_assignments_info#:#Anzahl der zugeteilten Einheiten in der Berechnung. Falls höher als eine (Standard) gwünscht ist, setzen Sie bitte auch die Mindestzahl auszuwählender Einheiten entsprechend hoch und passen Sie den Erklärungstext an.
+ilcosubmethodrandom_one_per_priority#:#Eindeutige Auswahl
+ilcosubmethodrandom_one_per_priority_info#:#Bei der Anmeldung muss für jede Priorität genau eine Auswahl getroffen werden. Dies ersetzt die allgemeine Einstellung "Minimale Auswahlen". Bitte sehen Sie mindestens so viele Auswahl-Einheiten vor, wie es Prioritäten gibt und passen Sie den Erklärungstext für die Anmeldeseite an.
+show_bars#:#Balken zeigen
+show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben
 mail_signature#:#Diese Nachricht betrifft die folgende kombinierte Anmeldung:
+mail_notify_subject#:#Zuteilung für "%s"
+mail_notify_no_assignment#:#Sie haben leider keine Zuteilung erhalten.
+mail_notify_assignments#:#Sie haben die folgenden Zuteilungen erhalten:
 transfer_assignments#:#Zuteilungen übertragen
-transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste oder Losliste gesetzt.
+transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
-no_target_objets#:#Es wurden keine Zielobjekte gefunden!
+notify_assignments#:#Nutzer benachrichtigen
+notify_assignments_confirmation#:#Die Nutzer werden über ihre Zuteilung per E-Mail informiert.
+notify_assignments_time#:#Die Nutzer wurden über ihre Zuteilungen informiert (%s).
+no_target_objects#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
 min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
 min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
@@ -140,3 +163,5 @@ export_mode_reg_by_item#:#Anmeldungen nach Einheiten
 export_type_excel#:#MS Excel
 export_type_csv#:#CSV
 export_failed#:#Die Export-Datei konnte nicht erzeugt werden.
+multiple_choice_alert#:#Sie können eine Priorität nicht mehrfach auswählen!
+empty_choice_alert#:#Sie müssen für jede Priorität eine Auswahl treffen!

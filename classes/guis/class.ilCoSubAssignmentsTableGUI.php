@@ -76,29 +76,33 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		foreach ($this->object->getItems() as $index => $item)
 		{
 			$this->item_ids[$index] = $item->item_id;
-			if ($item->sub_min > 0)
+			if (isset($item->sub_min) && isset($item->sub_max))
 			{
 				$limit = sprintf($this->plugin->txt('sub_limit_from_to'), $item->sub_min, $item->sub_max);
 			}
-			else
+			elseif (isset($item->sub_min))
+			{
+				$limit = sprintf($this->plugin->txt('sub_limit_from'), $item->sub_min);
+			}
+			elseif (isset($item->sub_max))
 			{
 				$limit = sprintf($this->plugin->txt('sub_limit_to'),$item->sub_max);
 			}
-
 			$sum = $sums[$item->item_id];
 
 			$tpl = $this->plugin->getTemplate('/default/tpl.il_xcos_assignments_header.html');
-			$tpl->setVariable('TITLE', $item->title);
+			$tpl->setVariable('TITLE', isset($item->identifier) ? $item->identifier : $item->title);
+
 			$tpl->setVariable('LIMIT', $limit);
 			$tpl->setVariable('SUM_LABEL', $this->plugin->txt('item_assignment_sum_label'));
 			$tpl->setVariable('SUM', $sum);
 
-			if ($sum < $item->sub_min)
+			if (isset($item->sub_min) && $sum < $item->sub_min)
 			{
 				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
 				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_min_not_reached'));
 			}
-			elseif ($sum > $item->sub_max)
+			elseif (isset($item->sub_max) && $sum > $item->sub_max)
 			{
 				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
 				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_max_exceeded'));
@@ -112,7 +116,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$this->addColumn($tpl->get(),'','',false,'',$item->description);
 		}
 
-
+		if (!$this->object->getMethodObject()->hasMultipleAssignments())
+		{
+			$this->addColumn($this->plugin->txt('not_assigned'));
+		}
 
 		foreach ($this->object->getRunsFinished() as $index => $run)
 		{
@@ -162,12 +169,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	protected function fillRow($a_set)
 	{
 		$user_id = $a_set['user_id'];
+		$multiple_assignments = $this->object->getMethodObject()->hasMultipleAssignments();
 
-		if (empty($user_id))
-		{
-			return $this->fillItemSumRow();
-		}
-
+		$assigned = false;
+		$assigned_runs = array();
 		foreach ($this->item_ids as $item_id)
 		{
 			$this->tpl->setCurrentBlock('item');
@@ -179,12 +184,14 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				$this->tpl->setVariable('PRIO_COLOR', 'background-color:'.$color.';');
 			}
 
-			// radio button
+			// button
 			$this->tpl->setVariable('USER_ID', $user_id);
 			$this->tpl->setVariable('ITEM_ID', $item_id);
+			$this->tpl->setVariable('TYPE', $multiple_assignments ? 'checkbox' : 'radio');
 			if (isset($this->assignments[0][$user_id][$item_id]))
 			{
 				$this->tpl->setVariable('CHECKED', 'checked="checked"');
+				$assigned = true;
 			}
 
 			// run list
@@ -194,9 +201,24 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				if (isset($this->assignments[$run_id][$user_id][$item_id]))
 				{
 					$runs[] = $label;
+					$assigned_runs[$label] = true;
 				}
 			}
 			$this->tpl->setVariable('RUNS', implode(' ', $runs));
+			$this->tpl->parseCurrentBlock();
+		}
+
+		// 'not assigned' column
+		if (!$multiple_assignments)
+		{
+			$this->tpl->setCurrentBlock('not_assigned');
+			$this->tpl->setVariable('USER_ID', $user_id);
+			if (!$assigned)
+			{
+				$this->tpl->setVariable('CHECKED', 'checked="checked"');
+			}
+			$not_assigned_runs = array_diff(array_keys($this->run_ids), $assigned_runs);
+			$this->tpl->setVariable('RUNS', implode(' ', $not_assigned_runs));
 			$this->tpl->parseCurrentBlock();
 		}
 

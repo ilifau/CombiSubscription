@@ -99,18 +99,21 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 		$ni->setRequired(false);
 		$this->form->addItem($ni);
 
-		// maximum subscriptions
-		$ni = new ilNumberInputGUI($this->method->txt('sub_max_weight'), 'sub_max_weight');
-		$ni->setDecimals(1);
-		$ni->setMinValue(0);
-		$ni->setSize(4);
-		$ni->setRequired(false);
-		$this->form->addItem($ni);
-
+		// minimum subscriptions
 		if ($this->method->hasMinSubscription())
 		{
-			// minimum subscriptions
 			$ni = new ilNumberInputGUI($this->method->txt('sub_min_weight'), 'sub_min_weight');
+			$ni->setDecimals(1);
+			$ni->setMinValue(0);
+			$ni->setSize(4);
+			$ni->setRequired(false);
+			$this->form->addItem($ni);
+		}
+
+		// maximum subscriptions
+		if ($this->method->hasMaxSubscription())
+		{
+			$ni = new ilNumberInputGUI($this->method->txt('sub_max_weight'), 'sub_max_weight');
 			$ni->setDecimals(1);
 			$ni->setMinValue(0);
 			$ni->setSize(4);
@@ -152,6 +155,10 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 		{
 			$this->form->getItemByPostVar('sub_min_weight')->setValue($this->method->sub_min_weight);
 		}
+		if ($this->method->hasMaxSubscription())
+		{
+			$this->form->getItemByPostVar('sub_max_weight')->setValue($this->method->sub_max_weight);
+		}
 		if ($this->method->hasPeerSelection())
 		{
 			$this->form->getItemByPostVar('peers_weight')->setValue($this->method->peers_weight);
@@ -171,6 +178,10 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 		if ($this->method->hasMinSubscription())
 		{
 			$this->method->sub_min_weight = $this->form->getInput('sub_min_weight');
+		}
+		if ($this->method->hasMaxSubscription())
+		{
+			$this->method->sub_max_weight = $this->form->getInput('sub_max_weight');
 		}
 		if ($this->method->hasPeerSelection())
 		{

@@ -231,3 +231,49 @@
         );
     }
 ?>
+<#8>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_data', 'show_bars'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_data', 'show_bars', array(
+                'type'    => 'integer',
+                'length'  => 4,
+                'notnull' => true,
+                'default' => 1)
+        );
+    }
+?>
+<#9>
+<?php
+    if($ilDB->tableColumnExists('rep_robj_xcos_items', 'sub_max'))
+    {
+        $ilDB->modifyTableColumn('rep_robj_xcos_items', 'sub_max', array(
+                'notnull' => false,
+                'default' => null)
+        );
+    }
+?>
+<#10>
+<?php
+	if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'sort_position'))
+	{
+		$ilDB->addTableColumn('rep_robj_xcos_items', 'sort_position', array(
+				'type'    => 'integer',
+				'length'  => 4,
+				'notnull' => false,
+				'default' => null)
+		);
+	}
+?>
+<#11>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'identifier'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_items', 'identifier', array(
+                'type'    => 'text',
+                'length'  => 50,
+                'notnull' => false,
+                'default' => null)
+        );
+    }
+?>

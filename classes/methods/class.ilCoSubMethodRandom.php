@@ -18,16 +18,51 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	protected $priority_counts = array();
 
 	/** @var array  	item_id => count */
-	protected $assign_counts = array();
+	protected $assign_counts_item = array();
+	
+	/** @var array 		user_id = count */
+	protected $assign_counts_user = array();
+
+
+	/** @var int number of selectable priorities */
+	public $number_priorities = 2;
+
+	/** @var bool force once selection per priority */
+	public $one_per_priority = false;
+
+	/** @var int number of items to assign in the calculation */
+	public $number_assignments = 1;
 
 	/**
-	 * Get the name of the properties GUI class
-	 * (overwrite this if no properties GUI is provided)
-	 * @return string
+	 * Constructor
+	 * @param ilObjCombiSubscription        $a_object
+	 * @param ilCombiSubscriptionPlugin     $a_plugin
 	 */
-	public function getPropertiesGuiName()
+	public function __construct($a_object, $a_plugin)
 	{
-		return '';
+		parent::__construct($a_object, $a_plugin);
+
+		$this->number_priorities = (int) $this->getProperty('number_priorities','2');
+		$this->one_per_priority = (bool) $this->getProperty('one_per_priority','0');
+		$this->number_assignments = (int) $this->getProperty('number_assignments','1');
+	}
+
+
+
+	/**
+	 * Save the properties
+	 */
+	public function saveProperties()
+	{
+		$this->setProperty('number_priorities', sprintf('%d', $this->number_priorities));
+		$this->setProperty('one_per_priority', sprintf('%d', (int) $this->one_per_priority));
+		$this->setProperty('number_assignments', sprintf('%d', (int) $this->number_assignments));
+
+		if ($this->one_per_priority)
+		{
+			$this->object->setMinChoices(0);
+			$this->object->update();
+		}
 	}
 
 
@@ -38,10 +73,27 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	public function getPriorities()
 	{
-		return array(
-			0 => $this->txt('select_preferred'),
-			1 => $this->txt('select_alternative'),
-		);
+		switch ($this->number_priorities)
+		{
+			case 1:
+				return array(
+					0 => $this->txt('select_yes')
+				);
+
+			case 2:
+				return array(
+					0 => $this->txt('select_preferred'),
+					1 => $this->txt('select_alternative'),
+				);
+
+			default:
+				$priorities = array();
+				for ($i = 0; $i < $this->number_priorities; $i++)
+				{
+					$priorities[$i] = sprintf($this->txt('select_prio_x'), $i + 1);
+				}
+				return $priorities;
+		}
 	}
 
 	/**
@@ -53,13 +105,33 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	}
 
 	/**
-	 * This methods allows multipe selections per oriority
+	 * This method allows multiple assignments of items to a user
+	 */
+	public function hasMultipleAssignments()
+	{
+		return $this->number_assignments > 1;
+	}
+
+
+	/**
+	 * This methods allows multiple selections per priority
 	 * @return bool
 	 */
 	public function hasMultipleChoice()
 	{
-		return true;
+		return $this->one_per_priority ? false : true;
 	}
+
+
+	/**
+	 * This method allows a priority not being selected
+	 * @return bool
+	 */
+	public function hasEmptyChoice()
+	{
+		return $this->one_per_priority ? false : true;
+	}
+
 
 	/**
 	 * This method allows a selection of peers
@@ -78,6 +150,16 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	{
 		return false;
 	}
+
+	/**
+	 * This methods respects maximum subscriptions per assignment
+	 * @return bool
+	 */
+	public function hasMaxSubscription()
+	{
+		return true;
+	}
+
 
 	/**
 	 * This method is active
@@ -108,26 +190,26 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->items = $this->object->getItems();
 		$this->priorities = $this->object->getPriorities();
 		$this->priority_counts = $this->object->getPriorityCounts();
-		$this->assign_counts = array();
-
+		$this->assign_counts_item = array();
+		$this->assign_counts_user = array();
 
 		for ($priority = 0; $priority <= 1; $priority++)
 		{
 			foreach ($this->getSortedItemsForPriority($priority) as $item)
 			{
-				if (!isset($this->assign_counts[$item->item_id]))
+				if (!isset($this->assign_counts_item[$item->item_id]))
 				{
-					$this->assign_counts[$item->item_id] = 0;
+					$this->assign_counts_item[$item->item_id] = 0;
 				}
 
 				foreach ($this->getSortedUsersForItemAndPriority($item, $priority) as $user_id)
 				{
-					if ($this->assign_counts[$item->item_id] >= $item->sub_max)
+					if (isset($item->sub_max) && $this->assign_counts_item[$item->item_id] >= $item->sub_max)
 					{
 						break;
 					}
 					$this->assignUser($user_id, $item->item_id);
-					$this->assign_counts[$item->item_id]++;
+					$this->assign_counts_item[$item->item_id]++;
 				}
 			}
 		}
@@ -163,7 +245,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$p_count = isset($this->priority_counts[$item->item_id][$a_priority]) ? $this->priority_counts[$item->item_id][$a_priority] : 0;
 
 			// will go into reverse sorting
-			$key1 = ($p_count > $item->sub_max ? '0' : '1');	// satisfiable
+			$key1 = ((isset($item->sub_max) && $p_count > $item->sub_max) ? '0' : '1');	// satisfiable
 			$key2 = sprintf('%06d', $p_count);					// number of choices in this priority
 			$key3 = sprintf('%06d', $i_count - $i);				// reverse position
 
@@ -177,8 +259,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Get sorted choices for an item and a priority
 	 * Sorting criteria:
-	 * - 	first group: alternative choices of users without any other alternative choice (only prio 1)
-	 * -	second group: all other choices or all in prio 1
+	 * - 	first group: alternative choices of users without any other alternative choice (only lower priorities)
+	 * -	second group: all other choices or all in prio 0
 	 * -	users in each group are sorted randomly
 	 *
 	 * @param 	ilCoSubItem $a_item
@@ -205,7 +287,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 			if ($chosen)
 			{
-				if ($a_priority == 1 && $p_count == 1)
+				if ($a_priority > 0 && $p_count == 1)
 				{
 					$first[] = $user_id;
 				}
@@ -243,7 +325,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$this->priority_counts[$item_id][$priority]--;
 		}
 
-		// then remove user from the priorities list
-		unset($this->priorities[$a_user_id]);
+		// maximum assignments per user are reached?
+		$this->assign_counts_user[$a_user_id] = ((int) $this->assign_counts_user[$a_user_id]) + 1;
+		if ($this->assign_counts_user[$a_user_id] >= $this->number_assignments)
+		{
+			// then remove user from the priorities list
+			unset($this->priorities[$a_user_id]);
+		}
 	}
 }

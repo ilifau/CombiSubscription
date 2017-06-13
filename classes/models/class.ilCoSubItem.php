@@ -15,6 +15,9 @@ class ilCoSubItem
 	public $target_ref_id;
 
 	/** @var  string */
+	public $identifier;
+
+	/** @var  string */
 	public $title;
 
 	/** @var  string */
@@ -23,10 +26,10 @@ class ilCoSubItem
 	/** @var  integer */
 	public $sort_position;
 
-	/** @var  integer */
+	/** @var  integer|null */
 	public $sub_min;
 
-	/** @var  integer */
+	/** @var  integer|null */
 	public $sub_max;
 
 
@@ -108,6 +111,7 @@ class ilCoSubItem
 		$this->item_id = $data['item_id'];
 		$this->obj_id = $data['obj_id'];
 		$this->target_ref_id = $data['target_ref_id'];
+		$this->identifier = $data['identifier'];
 		$this->title = $data['title'];
 		$this->description = $data['description'];
 		$this->sort_position = $data['sort_position'];
@@ -138,6 +142,7 @@ class ilCoSubItem
 			array(
 				'obj_id' => array('integer', $this->obj_id),
 				'target_ref_id' => array('integer', $this->target_ref_id),
+				'identifier' => array('text', $this->identifier),
 				'title' => array('text', $this->title),
 				'description' => array('text', $this->description),
 				'sort_position' => array('integer', $this->sort_position),

@@ -29,13 +29,17 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 
 		$this->addColumn('', '', '1%', true);
 		$this->addColumn($this->lng->txt('sorting_header'), '', '1%');
+		$this->addColumn($this->plugin->txt('identifier'));
 		$this->addColumn($this->lng->txt('title'));
 		$this->addColumn($this->lng->txt('description'));
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
 			$this->addColumn($this->plugin->txt('sub_min_short'));
 		}
-		$this->addColumn($this->plugin->txt('sub_max_short'));
+		if ($this->parent->object->getMethodObject()->hasMaxSubscription())
+		{
+			$this->addColumn($this->plugin->txt('sub_max_short'));
+		}
 		$this->addColumn($this->plugin->txt('target_object'));
 		$this->addColumn('');
 
@@ -76,13 +80,14 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->tpl->parseCurrentBlock();
 
 
+		$columns = array('identifier', 'title', 'description');
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
-			$columns = array('title', 'description', 'sub_min', 'sub_max');
+			$column[] = 'sub_min';
 		}
-		else
+		if ($this->parent->object->getMethodObject()->hasMaxSubscription())
 		{
-			$columns = array('title', 'description', 'sub_max');
+			$columns[] = 'sub_max';
 		}
 		foreach ($columns as $key)
 		{

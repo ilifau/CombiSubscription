@@ -123,15 +123,31 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the background colors for a priority index (0 is the highest)
-	 * @return array    number => color string
+	 * @return string    css color expression
 	 */
 	public function getPriorityBackgroundColor($a_priority)
 	{
-		switch ($a_priority)
+
+		$low = array(210, 240, 202);
+		$high = array(255, 255, 204);
+		$steps = count($this->getPriorities()) - 1;
+
+		if ($a_priority == 0)
 		{
-			case 0: return 'rgb(210, 240, 202)';
-			case 1: return 'rgb(255, 255, 204)';
-			default: return 'transparent';
+			return sprintf('rgb(%d, %d, %d)', $low[0], $low[1], $low[2]);
+		}
+		elseif ($a_priority <= $steps)
+		{
+			$now = array();
+			for ($i = 0; $i <= 2; $i++)
+			{
+				$now[$i] = round($low[$i] + $a_priority * ($high[$i] - $low[$i]) / $steps );
+			}
+			return sprintf('rgb(%d, %d, %d)', $now[0], $now[1], $now[2]);
+		}
+		else
+		{
+			return 'transparent';
 		}
 	}
 
@@ -144,12 +160,29 @@ abstract class ilCoSubMethodBase
 	}
 
 	/**
-	 * This methods allows multipe selections per oriority
+	 * This method allows multiple assignments of items to a user
+	 */
+	public function hasMultipleAssignments()
+	{
+		return false;
+	}
+
+	/**
+	 * This methods allows multiple selections per priority
 	 * @return bool
 	 */
 	public function hasMultipleChoice()
 	{
 		return false;
+	}
+
+	/**
+	 * This method allows a priority not being selected
+	 * @return bool
+	 */
+	public function hasEmptyChoice()
+	{
+		return true;
 	}
 
 	/**
@@ -169,6 +202,16 @@ abstract class ilCoSubMethodBase
 	{
 		return false;
 	}
+
+	/**
+	 * This methods respects maximum subscriptions per assignment
+	 * @return bool
+	 */
+	public function hasMaxSubscription()
+	{
+		return true;
+	}
+
 
 	/**
 	 * This method is active

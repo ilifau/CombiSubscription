@@ -40,7 +40,14 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		$this->setEnableNumInfo(false);
 
 		$this->addColumn($this->plugin->txt('registration_header_item'),'','40%');
-		$this->addColumn($this->plugin->txt('registration_header_choices'),'','60%');
+
+		$priorities = $this->object->getMethodObject()->getPriorities();
+		$header_choices = $this->plugin->txt(count($priorities) < 3 ? 'registration_header_choices' : 'registration_header_priorities');
+		if ($this->object->getShowBars())
+		{
+			$header_choices .= '<br /><span class="text-muted small">' .$this->plugin->txt('registration_header_bars_info') . '</span>';
+		}
+		$this->addColumn($header_choices,'','60%');
 
 		// respecting subscription period
 		if ($this->object->isBeforeSubscription() || $this->object->isAfterSubscription())
@@ -131,11 +138,15 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 			$this->tpl->setVariable('PATH', $locator->getHTML());
 		}
 
-		if ($a_set['sub_min'] > 0)
+		if (isset($a_set['sub_min']) && isset($a_set['sub_max']))
 		{
 			$this->tpl->setVariable('LIMITS', sprintf($this->plugin->txt('sub_limit_from_to'), $a_set['sub_min'], $a_set['sub_max']));
 		}
-		else
+		elseif (isset($a_set['sub_min']))
+		{
+			$this->tpl->setVariable('LIMITS', sprintf($this->plugin->txt('sub_limit_from'), $a_set['sub_min']));
+		}
+		elseif (isset($a_set['sub_max']))
 		{
 			$this->tpl->setVariable('LIMITS', sprintf($this->plugin->txt('sub_limit_to'), $a_set['sub_max']));
 		}
@@ -143,22 +154,37 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		foreach ($this->options as $value => $text)
 		{
 			// progress bar
-			if ($this->max_choices > 0 && $value !== 'not')
+			if ($this->object->getShowBars() && $this->max_choices > 0 && $value !== 'not')
 			{
 				$count = isset($a_set['counts'][$value]) ? $a_set['counts'][$value] : 0;
-
-				$this->tpl->setCurrentBlock($value == 0 || $count == 0 ? 'progress_top' : 'progress');
-				$this->tpl->setVariable('COUNT', $count);
-				$this->tpl->setVariable('MAX', $this->max_choices);
-				$this->tpl->setVariable('PERCENT', round(100 * $count / $this->max_choices));
-				$this->tpl->parseCurrentBlock();
+				if ($count)
+				{
+					$this->tpl->setCurrentBlock($value == 0 ? 'progress_top' : 'progress');
+					$this->tpl->setVariable('COUNT', $count);
+					$this->tpl->setVariable('MAX', $this->max_choices);
+					$this->tpl->setVariable('PERCENT', round(100 * $count / $this->max_choices));
+					$this->tpl->parseCurrentBlock();
+				}
 			}
 
 			// choices
-			$this->tpl->setCurrentBlock('option');
+			if ($this->object->getShowBars())
+			{
+				$this->tpl->setCurrentBlock('option_progress');
+			}
+			elseif(count($this->options) <= 3)
+			{
+				$this->tpl->setCurrentBlock('option_vertical');
+			}
+			else
+			{
+				$this->tpl->setCurrentBlock('option_horizontal');
+			}
+
 			$this->tpl->setVariable('ITEM_ID', $a_set['item_id']);
 			$this->tpl->setVariable('PRIORITY', $value);
 			$this->tpl->setVariable('TEXT', $text);
+
 			if (isset($a_set['priority']))
 			{
 				if ($value == $a_set['priority'])

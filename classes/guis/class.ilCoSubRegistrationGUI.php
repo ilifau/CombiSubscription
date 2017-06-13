@@ -90,6 +90,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		$method = $this->object->getMethodObject();
 		$min_choices = $this->object->getMinChoices();
 		$has_mc = $method->hasMultipleChoice();
+		$has_ec = $method->hasEmptyChoice();
 		$max_prio = count($method->getPriorities()) - 1;
 		$used_prio = array();
 		$choices = array();
@@ -108,6 +109,12 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			$priority = $_POST['priority'][$item->item_id];
 			if (is_numeric($priority) && $priority >= 0 && $priority <= $max_prio)
 			{
+				if (isset($used_prio[$priority]) && !$has_mc)
+				{
+					ilUtil::sendFailure($this->plugin->txt('multiple_choice_alert'));
+					return $this->editRegistration($posted);
+				}
+
 				if ($has_mc || !isset($used_prio[$priority]))
 				{
 					$choice = new ilCoSubChoice();
@@ -120,6 +127,13 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 				}
 			}
 		}
+
+		if (count($used_prio) <= $max_prio && !$has_ec)
+		{
+			ilUtil::sendFailure($this->plugin->txt('empty_choice_alert'));
+			return $this->editRegistration($posted);
+		}
+
 
 		ilCoSubChoice::_deleteForObject($this->object->getId(), $ilUser->getId());
 		foreach ($choices as $choice)

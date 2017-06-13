@@ -10,7 +10,15 @@
         <!-- END path -->
     </td>
     <td class="std container" data-orig-color="">
-        <!-- BEGIN option -->
+        <!-- BEGIN option_horizontal -->
+        <input type="radio" id="option{ITEM_ID}_{PRIORITY}" name="priority[{ITEM_ID}]" value="{PRIORITY}" {CHECKED} {DISABLED}>
+        <label for="option{ITEM_ID}_{PRIORITY}">{TEXT}</label> &nbsp;
+        <!-- END option_horizontal -->
+        <!-- BEGIN option_vertical -->
+            <input type="radio" id="option{ITEM_ID}_{PRIORITY}" name="priority[{ITEM_ID}]" value="{PRIORITY}" {CHECKED} {DISABLED}>
+            <label for="option{ITEM_ID}_{PRIORITY}">{TEXT}</label> <br />
+        <!-- END option_vertical -->
+        <!-- BEGIN option_progress -->
         <div class="row">
             <div class="col-md-4">
                     <input type="radio" id="option{ITEM_ID}_{PRIORITY}" name="priority[{ITEM_ID}]" value="{PRIORITY}" {CHECKED} {DISABLED}>
@@ -18,17 +26,13 @@
             </div>
             <div class="col-md-8">
                 <!-- BEGIN progress_top -->
-                <div class="progress_not">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="{PERCENT}" aria-valuemin="0" aria-valuemax="100" style="width:{PERCENT}% ">{COUNT}</div>
-                </div>
+                <div class="progress-bar" role="progressbar" aria-valuenow="{PERCENT}" aria-valuemin="0" aria-valuemax="100" style="width:{PERCENT}% ">{COUNT}</div>
                 <!-- END progress_top -->
                 <!-- BEGIN progress -->
-                <div class="progress_not">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="{PERCENT}" aria-valuemin="0" aria-valuemax="100" style="width:{PERCENT}%; background-color: rgba(76, 101, 134, 0.41);">{COUNT}</div>
-                </div>
+                <div class="progress-bar" role="progressbar" aria-valuenow="{PERCENT}" aria-valuemin="0" aria-valuemax="100" style="width:{PERCENT}%; background-color: rgba(76, 101, 134, 0.41);">{COUNT}</div>
                 <!-- END progress -->
             </div>
         </div>
-        <!-- END option -->
+        <!-- END option_progress -->
     </td>
 </tr>

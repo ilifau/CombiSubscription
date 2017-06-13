@@ -25,6 +25,8 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'setRunAssignments':
 			case 'transferAssignments':
 			case 'transferAssignmentsConfirmation':
+			case 'notifyAssignments':
+			case 'notifyAssignmentsConfirmation':
 			case 'mailToUsers':
 			case 'exportAssignments':
 				$this->$cmd();
@@ -50,7 +52,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$table_gui->prepareData();
 		$this->tpl->setContent($table_gui->getHTML());
 
-		$this->showTransferTime();
+		$this->showInfo();
 	}
 
 	/**
@@ -91,6 +93,12 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$button->setCommand('transferAssignmentsConfirmation');
 		$button->setCaption($this->plugin->txt('transfer_assignments'), false);
 		$ilToolbar->addButtonInstance($button);
+
+		$button = ilSubmitButton::getInstance();
+		$button->setCommand('notifyAssignmentsConfirmation');
+		$button->setCaption($this->plugin->txt('notify_assignments'), false);
+		$ilToolbar->addButtonInstance($button);
+
 
 		// Export
 		$ilToolbar->addSeparator();
@@ -205,21 +213,23 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	 */
 	public function savePostedAssignments()
 	{
-		foreach ($_POST['assignment'] as $user_id => $new_item_id)
+		foreach (array_keys($this->object->getPriorities()) as $user_id)
 		{
-			$found = false;
-			foreach ($this->object->getAssignmentsOfUser($user_id, 0) as $item_id => $assign_id)
+			$assignments = $this->object->getAssignmentsOfUser($user_id, 0);
+
+			$new_item_ids = (array) $_POST['assignment'][$user_id];
+			$old_item_ids = array_keys($assignments);
+
+			foreach ($assignments as $item_id => $assign_id)
 			{
-				if ($item_id == $new_item_id)
-				{
-					$found = true;
-				}
-				else
+				if (!in_array($item_id, $new_item_ids))
 				{
 					ilCoSubAssign::_deleteById($assign_id);
 				}
 			}
-			if (!$found)
+
+			$to_add = array_diff($new_item_ids, $old_item_ids);
+			foreach ($to_add as $new_item_id)
 			{
 				$assign = new ilCoSubAssign;
 				$assign->obj_id = $this->object->getId();
@@ -288,12 +298,12 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 		if ($count == 0)
 		{
-			ilUtil::sendFailure($this->plugin-txt('no_target_objects'),true);
+			ilUtil::sendFailure($this->plugin->txt('no_target_objects'),true);
 			$this->ctrl->redirect($this,'editAssignments');
 		}
 
 		$this->tpl->setContent($conf_gui->getHTML());
-		$this->showTransferTime();
+		$this->showInfo();
 	}
 
 
@@ -311,18 +321,64 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
+
 	/**
-	 * Show the date when the assignments were already transferred
+	 * Confirm the transfer of assignments to target objects
 	 */
-	public function showTransferTime()
+	public function notifyAssignmentsConfirmation()
 	{
-		$time = $this->object->getClassProperty(get_class($this), 'transfer_time', 0);
-		if ($time > 0)
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+
+		$conf_gui = new ilConfirmationGUI();
+		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'notifyAssignments'));
+		$conf_gui->setHeaderText($this->plugin->txt('notify_assignments_confirmation'));
+		$conf_gui->setConfirm($this->plugin->txt('notify_assignments'),'notifyAssignments');
+		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+		$this->tpl->setContent($conf_gui->getHTML());
+		$this->showInfo();
+	}
+
+	/**
+	 * Notify the users about their Assignments
+	 */
+	public function notifyAssignments()
+	{
+		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+		$notification = new ilCombiSubscriptionMailNotification();
+		$notification->setPlugin($this->plugin);
+		$notification->setObject($this->object);
+		$notification->send();
+
+		$this->object->setClassProperty(get_class($this), 'notify_time', time());
+		$this->ctrl->redirect($this,'editAssignments');
+	}
+
+	/**
+	 * Show info about date when the assignments were already transferred ure users were notified
+	 */
+	public function showInfo()
+	{
+		$messages = array();
+		$transfer_time = $this->object->getClassProperty(get_class($this), 'transfer_time', 0);
+		if ($transfer_time > 0)
 		{
-			$date = new ilDateTime($time, IL_CAL_UNIX);
-			ilUtil::sendInfo(sprintf($this->plugin->txt('transfer_assignments_time'), ilDatePresentation::formatDate($date)));
+			$date = new ilDateTime($transfer_time, IL_CAL_UNIX);
+			$messages[] = sprintf($this->plugin->txt('transfer_assignments_time'), ilDatePresentation::formatDate($date));
+		}
+		$notify_time = $this->object->getClassProperty(get_class($this), 'notify_time', 0);
+		if ($notify_time > 0)
+		{
+			$date = new ilDateTime($notify_time, IL_CAL_UNIX);
+			$messages[] = sprintf($this->plugin->txt('notify_assignments_time'), ilDatePresentation::formatDate($date));
+		}
+
+		if (!empty($messages))
+		{
+			ilUtil::sendInfo(implode('<br />', $messages));
 		}
 	}
+
 
 	/**
 	 * Export theassignments

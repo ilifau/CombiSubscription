@@ -25,6 +25,8 @@ properties#:#Properties
 edit_properties#:#Edit Properties
 title#:#Title
 description#:#Description
+identifier#:#Identifier
+identifier_info#:#Identifier used on the assignments page and in the export/import. The title will be used if the identifier is empty.
 sub_start#:#Subscription Start
 sub_end#:#Subscription End
 save#:#Save
@@ -59,6 +61,8 @@ ilcosubmethodsafre_title#:#Three Priorities
 ilcosubmethodsafre_description#:#Heuristics with Three Priorities
 registration_header_item#:#Option
 registration_header_choices#:#Choice
+registration_header_priorities#:#Priority (1 = highest)
+registration_header_bars_info#:#The bars show the number of choices
 save_registration#:#Save Choices
 method_not_defined#:#This object has not assignment method defined!
 msg_registration_saved#:#The choices where saved.
@@ -77,16 +81,18 @@ set_run_assignments#:#Set Calculation Assignments
 msg_run_assignments_set#:#The calculation assignments were set
 subscription_period#:#Subscription Period
 sub_limit_from_to#:#%s to %s Participants
+sub_limit_from#:#Min. %s Participants
 sub_limit_to#:#Max. %s Participants
 peers#:#Peers
 explanation#:#Explanation
-default_explanation#:#You can select a number of items for each priority (perferred, alternative). The assignments will be done with an optimising algorithm after the subscription period. It tries to respect as much priorities as possible. Each subscriber will get only one item assigned.
+default_explanation#:#You can select a number of items for each priority. The assignments will be done automatically after the subscription period. It tries to respect as much priorities as possible. Each subscriber will get only one item assigned.
 subscription_period_not_started#:#The subscription period has not yet started.
 subscription_period_finished#:#The subscription period is finished.
 sub_min_not_reached#:#The minimum of assignments is not reached.
 sub_max_exceeded#:#The maximum of assignments is exceeded.
 sub_limits_satisfied#:#The number of assignments is possible.
 item_assignment_sum_label#:#Assignments:
+not_assigned#:#aot assigned
 calculations#:#Calculations
 satisfied#:#Satisfied
 users_assigned#:#Assigned Users
@@ -124,15 +130,34 @@ ilcosubmethodeatts_log_level#:#Log Level
 ilcosubmethodeatts_log_level_info#:#Info
 ilcosubmethodrandom_title#:#Random selections
 ilcosubmethodrandom_description#:Selects the assignments randomly per priority
+ilcosubmethodrandom_select_yes#:#selected
+ilcosubmethodrandom_select_not#:#not selected
 ilcosubmethodrandom_select_preferred#:#preferred
 ilcosubmethodrandom_select_alternative#:#alternative
-ilcosubmethodrandom_select_not#:#not selected
+ilcosubmethodrandom_select_prio_x#:#%s.
+ilcosubmethodrandom_selection_properties#:#Registration settings
+ilcosubmethodrandom_number_priorities#:#Number of Priorities
+ilcosubmethodrandom_number_priorities_info#:#Number of selection priorities. One priority will ba called 'chosen', two priorities (default) will be called 'preferred' and 'alternative', three priorities and higher will be numbered.
+ilcosubmethodrandom_number_assignments#:#Number of Assignments
+ilcosubmethodrandom_number_assignments_info#:#Number of items that will be assigned per user. If it is higher then the default one, please increase the number of selectable items and adapt the explanation text.
+ilcosubmethodrandom_one_per_priority#:#Unique Choice
+ilcosubmethodrandom_one_per_priority_info#:#A user must choose exactly one item per priority. This replaced the general setting 'minimum choices'. Please provide enough items and adapt the explanation text.
 add_as_members#:#Add Members
 msg_users_added_as_members#:#The assigned users were added as members to the target objects.
 add_as_members#:#Add Subscribers
 msg_users_added_as_members#:#The non assigned users were added as subscribers to the target objects.
 mail_to_users#:#Send E-Mail
 mail_signature#:#This message relates to the following combined subscription:
+mail_notify_subject#:#Assignment for '%s'
+mail_notify_no_assignment#:#Sorry, you didn't get an assignment.
+mail_notify_assignments#:#You got the following assignments:
+transfer_assignments#:#Transfer Assignments
+transfer_assignments_confirmation#:#The assigned users will get members of the following courses/groups. Not assigned users will be set on the waiting list if possible.
+transfer_assignments_time#:#The assignments are transferred (%s).
+notify_assignments#:#Notify Users
+notify_assignments_confirmation#:#The users will get an e-mail notification about their assignment result.
+notify_assignments_time#:#The users were notified(%s).
+no_target_objects#:#No target object found!
 min_choices#:#Minimum Choices
 min_choices_info#:#Minimum number of chosen items to save a subscription
 min_choices_alert#:#You must select at least %s items to get your subscription saved.
@@ -140,3 +165,5 @@ export_mode_reg_by_item#:#Subscriptions by Items
 export_type_excel#:#MS Excel
 export_type_csv#:#CSV
 export_failed#:#The export file coudn't be written.
+multiple_choice_alert#:#You can't choose a priority multiple times!
+empty_choice_alert#:#You must take a choice for each priority!

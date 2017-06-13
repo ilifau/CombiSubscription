@@ -309,24 +309,31 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$ta = new ilTextAreaInputGUI($this->plugin->txt('description'), 'description');
 		$this->form->addItem($ta);
 
+		// identifier
+		$ti = new ilTextInputGUI($this->plugin->txt('identifier'), 'identifier');
+		$ti->setInfo($this->plugin->txt('identifier_info'));
+		$ti->setRequired(false);
+		$this->form->addItem($ti);
+
 		if ($this->object->getMethodObject()->hasMinSubscription())
 		{
 			// minimum subscriptions
 			$sm = new ilNumberInputGUI($this->plugin->txt('sub_min'), 'sub_min');
 			$sm->setDecimals(0);
-			$sm->setMinValue(0);
 			$sm->setSize(4);
 			$sm->setRequired(false);
 			$this->form->addItem($sm);
 		}
 
-		// maximum subscriptions
-		$sm = new ilNumberInputGUI($this->plugin->txt('sub_max'), 'sub_max');
-		$sm->setDecimals(0);
-		$sm->setMinValue(0);
-		$sm->setSize(4);
-		$sm->setRequired(true);
-		$this->form->addItem($sm);
+		if ($this->object->getMethodObject()->hasMaxSubscription())
+		{
+			// maximum subscriptions
+			$sm = new ilNumberInputGUI($this->plugin->txt('sub_max'), 'sub_max');
+			$sm->setDecimals(0);
+			$sm->setSize(4);
+			$sm->setRequired(false);
+			$this->form->addItem($sm);
+		}
 
 		switch ($a_mode)
 		{
@@ -354,6 +361,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		$this->form->setValuesByArray(
 			array(
+				'identifier' => $a_item->identifier,
 				'title' => $a_item->title,
 				'description' => $a_item->description,
 				'target_ref_id' => $a_item->target_ref_id,
@@ -371,14 +379,20 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	protected function saveItemProperties($a_item)
 	{
 		$a_item->obj_id = $this->object->getId();
+		$a_item->identifier = $this->form->getInput('identifier');
 		$a_item->title = $this->form->getInput('title');
 		$a_item->description = $this->form->getInput('description');
 		$a_item->target_ref_id = $this->form->getInput('target_ref_id');
 		if ($this->object->getMethodObject()->hasMinSubscription())
 		{
-			$a_item->sub_min = $this->form->getInput('sub_min');
+			$sub_min = $this->form->getInput('sub_min');
+			$a_item->sub_min = empty($sub_min) ? null : $sub_min;
 		}
-		$a_item->sub_max = $this->form->getInput('sub_max');
+		if ($this->object->getMethodObject()->hasMaxSubscription())
+		{
+			$sub_max = $this->form->getInput('sub_max');
+			$a_item->sub_max = empty($sub_max) ? null : $sub_max;
+		}
 		return $a_item->save();
 	}
 }

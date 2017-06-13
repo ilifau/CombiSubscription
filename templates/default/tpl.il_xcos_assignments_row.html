@@ -13,13 +13,12 @@
     </td>
     <!-- BEGIN item -->
     <td class="std" style="{PRIO_COLOR}">
-        <input type="radio" name="assignment[{USER_ID}]" value="{ITEM_ID}" {CHECKED} /> {RUNS}
+        <input type="{TYPE}" name="assignment[{USER_ID}][]" value="{ITEM_ID}" {CHECKED} /> {RUNS}
      </td>
     <!-- END item -->
-    <!-- BEGIN item_sum -->
+    <!-- BEGIN not_assigned -->
     <td class="std">
-        <img src="{SUM_IMAGE}" title="{SUM_STATUS}" alt ="{SUM_STATUS}" />
-        {SUM_LABEL} {SUM}
+        <input type="radio" name="assignment[{USER_ID}][]" value="not" {CHECKED} /> {RUNS}
     </td>
-    <!-- END item_sum -->
+    <!-- END not_assigned -->
 </tr>

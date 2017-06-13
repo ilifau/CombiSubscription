@@ -151,6 +151,17 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 		return false;
 	}
 
+
+	/**
+	 * This methods respects maximum subscriptions per assignment
+	 * @return bool
+	 */
+	public function hasMaxSubscription()
+	{
+		return true;
+	}
+
+
 	/**
 	 * This method is active
 	 * @return bool
