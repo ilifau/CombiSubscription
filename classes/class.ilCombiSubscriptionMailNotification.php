@@ -37,10 +37,55 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 	}
 
 	/**
-	 * Send the notifications
+	 * Send a registration confirmation to the user
+	 * @param	array	$user_id
+	 */
+	public function sendRegistration($user_id)
+	{
+		$priorities = $this->object->getPrioritiesOfUser($user_id);
+		$names = $this->object->getMethodObject()->getPriorities();
+
+		/** @var ilCoSubItem[] $items */
+		$items = array();
+		foreach ($this->object->getItems() as $item)
+		{
+			$items[$item->item_id] = $item;
+		}
+		$this->initLanguage($user_id);
+		$this->initMail();
+		$this->setSubject(
+			sprintf($this->txt('mail_registration_subject'),$this->getObjectTitle(true))
+		);
+		$this->setBody(ilMail::getSalutation($user_id, $this->getLanguage()));
+		$this->appendBody("\n\n");
+
+		if (empty($priorities))
+		{
+			$this->appendBody($this->txt('mail_registration_no_choice')."\n\n");
+		}
+		else
+		{
+			$this->appendBody($this->txt('mail_registration_choices')."\n\n");
+			foreach ($priorities as $item_id => $priority)
+			{
+				$item = $items[$item_id];
+				$this->appendBody(' - '. $item->title .' (' . $names[$priority] .')'. "\n");
+			}
+			$this->appendBody("\n");
+		}
+
+		$this->appendBody($this->txt('mail_signature')."\n");
+		$this->appendBody($this->createPermanentLink());
+
+		$this->getMail()->appendInstallationSignature(true);
+		$this->sendMail(array($user_id),array('system'));
+	}
+
+	/**
+	 * Send the notifications about Assignments
 	 * Object and plugin must be set before
 	 */
-	public function send()
+	public function sendAssignments()
 	{
 		$users = array_keys($this->object->getPriorities());
 		$assignments = $this->object->getAssignments();

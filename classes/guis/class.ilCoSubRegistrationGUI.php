@@ -141,6 +141,12 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			$choice->save();
 		}
 
+		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+		$notification = new ilCombiSubscriptionMailNotification();
+		$notification->setPlugin($this->plugin);
+		$notification->setObject($this->object);
+		$notification->sendRegistration($ilUser->getId());
+
 		ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'), true);
 		$this->ctrl->redirect($this,'editRegistration');
 	}

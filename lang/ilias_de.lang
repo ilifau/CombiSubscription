@@ -63,7 +63,7 @@ registration_header_item#:#Option
 registration_header_choices#:#Auswahl
 registration_header_priorities#:#Priorität (1 = höchste)
 registration_header_bars_info#:#Die Balken zeigen die Anzahl bisheriger Auswahlen
-save_registration#:#Auswahl speichern
+save_registration#:#Anmeldung speichern
 method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
 assignment#:#Zuteilung
@@ -149,6 +149,9 @@ mail_signature#:#Diese Nachricht betrifft die folgende kombinierte Anmeldung:
 mail_notify_subject#:#Zuteilung für "%s"
 mail_notify_no_assignment#:#Sie haben leider keine Zuteilung erhalten.
 mail_notify_assignments#:#Sie haben die folgenden Zuteilungen erhalten:
+mail_registration_subject#:#Anmeldung bei "%s"
+mail_registration_no_choice#:#Sie haben keine Auswahl getroffen.
+mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getroffen:
 transfer_assignments#:#Zuteilungen übertragen
 transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).

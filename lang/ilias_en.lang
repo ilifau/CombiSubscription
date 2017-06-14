@@ -151,6 +151,9 @@ mail_signature#:#This message relates to the following combined subscription:
 mail_notify_subject#:#Assignment for '%s'
 mail_notify_no_assignment#:#Sorry, you didn't get an assignment.
 mail_notify_assignments#:#You got the following assignments:
+mail_registration_subject#:#Registration for "%s"
+mail_registration_no_choice#:#You made no selection.
+mail_registration_choices#:#You selected the following items (with priorities):
 transfer_assignments#:#Transfer Assignments
 transfer_assignments_confirmation#:#The assigned users will get members of the following courses/groups. Not assigned users will be set on the waiting list if possible.
 transfer_assignments_time#:#The assignments are transferred (%s).

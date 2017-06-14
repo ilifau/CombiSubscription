@@ -348,7 +348,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this->object);
-		$notification->send();
+		$notification->sendAssignments();
 
 		$this->object->setClassProperty(get_class($this), 'notify_time', time());
 		$this->ctrl->redirect($this,'editAssignments');
