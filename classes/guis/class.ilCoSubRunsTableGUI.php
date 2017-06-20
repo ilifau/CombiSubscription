@@ -28,14 +28,13 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 		$this->setRowTemplate("tpl.il_xcos_runs_row.html", $this->plugin->getDirectory());
 
 		$this->addColumn('', '', '1%', true);
-		$this->addColumn($this->lng->txt('start'),'start');
-		$this->addColumn($this->lng->txt('duration'), 'duration');
-		$this->addColumn($this->lng->txt('details'), 'details','30%');
+		$this->addColumn($this->plugin->txt('index'),'start');
+		$this->addColumn($this->lng->txt('details'), '','30%');
 		$this->addColumn($this->plugin->txt('users_assigned'), 'users_assigned');
 		$this->addColumn($this->plugin->txt('users_satisfied'), 'users_satisfied');
 		$this->addColumn($this->plugin->txt('items_satisfied'), 'items_status');
 
-		$this->addMultiCommand('confirmDeleteRuns', $this->plugin->txt('delete_calculations'));
+		$this->addMultiCommand('confirmDeleteRuns', $this->plugin->txt('delete_assignments'));
 	}
 
 	/**
@@ -49,9 +48,10 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 		$items = $this->parent->object->getItems();
 
 		$data = array();
-		foreach ($a_runs as $run)
+		foreach ($a_runs as $index => $run)
 		{
-			$row =  get_object_vars($run);
+			$row = get_object_vars($run);
+			$row['index'] = $index;
 			$row['run_id'] = $run->run_id;
 			$row['start'] = $run->run_start->get(IL_CAL_UNIX);
 			$row['details'] = $run->details;
@@ -62,7 +62,15 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 				continue;
 			}
 
-			$row['duration'] = $run->run_end->get(IL_CAL_UNIX) - $run->run_start->get(IL_CAL_UNIX);
+			if ($run->method != 'manual')
+			{
+				/** @var ilCoSubMethodBase $method */
+				$method = $this->parent->object->getMethodObjectByClass($row['method']);
+				$title = isset($method) ? $method->getTitle() : $this->plugin->txt('calculated');
+				$duration = $run->run_end->get(IL_CAL_UNIX) - $run->run_start->get(IL_CAL_UNIX);
+				$row['details'] = sprintf($this->plugin->txt('method_duration'), $title, $duration) . "\n" . $row['details'];
+			}
+
 			$row['all_users'] = count($priorities);
 			$row['users_assigned'] = isset($assignments[$run->run_id]) ? count($assignments[$run->run_id]) : 0;
 
@@ -118,17 +126,9 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 	{
 		$this->tpl->setVariable('RUN_ID',$a_set['run_id']);
 
-		$this->tpl->setVariable('START', ilDatePresentation::formatDate(new ilDateTime($a_set['start'], IL_CAL_UNIX)));
+		$this->tpl->setVariable('INDEX', $this->parent->object->getRunLabel($a_set['index'])
+			. ': ' . ilDatePresentation::formatDate(new ilDateTime($a_set['start'], IL_CAL_UNIX)));
 		$this->tpl->setVariable('DETAILS', nl2br($a_set['details']));
-
-		if (!isset($a_set['duration']))
-		{
-			$this->tpl->setVariable('DURATION', $this->plugin->txt('not_finished'));
-			return;
-		}
-
-		require_once('Services/Utilities/classes/class.ilFormat.php');
-		$this->tpl->setVariable('DURATION', ilFormat::_secondsToString($a_set['duration']));
 
 		$this->tpl->setVariable('USERS_ASSIGNED', $a_set['users_assigned']);
 		$this->tpl->setVariable('USERS_SATISFIED', $a_set['users_satisfied']);

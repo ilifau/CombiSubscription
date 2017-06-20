@@ -249,6 +249,8 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 			'run_id' => $this->run->run_id
 		);
 
+		$postfields = array();
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,            $this->server_url.'?'.http_build_query($getfields));
 		curl_setopt($ch, CURLOPT_TIMEOUT, 		 5 ); //seconds

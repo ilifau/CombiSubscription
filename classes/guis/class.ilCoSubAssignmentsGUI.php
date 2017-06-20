@@ -20,6 +20,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		switch ($cmd)
 		{
 			case 'editAssignments':
+			case 'calculateAssignments':
 			case 'saveAssignments':
 			case 'saveAssignmentsAsRun':
 			case 'setRunAssignments':
@@ -28,7 +29,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'notifyAssignments':
 			case 'notifyAssignmentsConfirmation':
 			case 'mailToUsers':
-			case 'exportAssignments':
 				$this->$cmd();
 				return;
 
@@ -39,22 +39,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		}
 	}
 
-
-	/**
-	 * Edit the registration of the current user
-	 */
-	public function editAssignments()
-	{
-		$this->setAssignmentsToolbar();
-
-		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
-		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
-		$table_gui->prepareData();
-		$this->tpl->setContent($table_gui->getHTML());
-
-		$this->showInfo();
-	}
-
 	/**
 	 * Set the toolbar for the assignments screen
 	 */
@@ -63,28 +47,38 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		global $ilToolbar;
 
 		require_once 'Services/UIComponent/Button/classes/class.ilSubmitButton.php';
-		$this->parent->checkUnfinishedRuns();
 
 		/** @var ilToolbarGUI $ilToolbar */
 		$ilToolbar->setFormAction($this->ctrl->getFormAction($this));
+
+		if ($this->object->getMethodObject()->isActive())
+		{
+			$button = ilSubmitButton::getInstance();
+			$button->setCommand('calculateAssignments');
+			$button->setCaption($this->plugin->txt('calculate_assignments'), false);
+			$ilToolbar->addButtonInstance($button);
+			$ilToolbar->addSeparator();
+		}
+
 		if ($runs = $this->object->getRunsFinished())
 		{
 			$options = array();
+			$last_run_id = 0;
 			foreach ($runs as $index => $run)
 			{
 				$options[$run->run_id] = $this->object->getRunLabel($index).': '.ilDatePresentation::formatDate($run->run_start);
 				$last_run_id = $run->run_id;
 			}
 			include_once './Services/Form/classes/class.ilSelectInputGUI.php';
-			$si = new ilSelectInputGUI($this->plugin->txt('calculation'), "run_id");
+			$si = new ilSelectInputGUI($this->plugin->txt('saved_label'), "run_id");
 			$si->setOptions($options);
 			$si->setValue($last_run_id);
 
-			$ilToolbar->addInputItem($si);
+			$ilToolbar->addInputItem($si, true);
 
 			$button = ilSubmitButton::getInstance();
 			$button->setCommand('setRunAssignments');
-			$button->setCaption($this->plugin->txt('set_run_assignments'), false);
+			$button->setCaption($this->plugin->txt('set_assignments'), false);
 			$ilToolbar->addButtonInstance($button);
 			$ilToolbar->addSeparator();
 		}
@@ -98,63 +92,64 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$button->setCommand('notifyAssignmentsConfirmation');
 		$button->setCaption($this->plugin->txt('notify_assignments'), false);
 		$ilToolbar->addButtonInstance($button);
-
-
-		// Export
-		$ilToolbar->addSeparator();
-
-		require_once 'Services/Form/classes/class.ilSelectInputGUI.php';
-		$this->plugin->includeClass('export/class.ilCoSubExport.php');
-		$export_mode = new ilSelectInputGUI($this->lng->txt('type'), 'export_mode');
-		$options = array(
-			ilCoSubExport::MODE_REG_BY_ITEM => $this->plugin->txt('export_mode_reg_by_item'),
-		);
-		$export_mode->setOptions($options);
-		$ilToolbar->addInputItem($export_mode, true);
-
-		$export_type = new ilSelectInputGUI('', 'export_type');
-		$options = array(
-			ilCoSubExport::TYPE_EXCEL => $this->plugin->txt('export_type_excel'),
-			ilCoSubExport::TYPE_CSV => $this->plugin->txt('export_type_csv'),
-		);
-		$export_type->setOptions($options);
-		$ilToolbar->addInputItem($export_type, true);
-
-		$button = ilSubmitButton::getInstance();
-		$button->setCommand('exportAssignments');
-		$button->setCaption($this->lng->txt('export'), false);
-		$ilToolbar->addButtonInstance($button);
 	}
 
 	/**
-	 * Send an e-mail to selected users
+	 * Edit the registration of the current user
 	 */
-	public function mailToUsers()
+	public function editAssignments()
 	{
-		if (empty($_POST['ids']))
+		$this->parent->checkUnfinishedRuns();
+		$this->setAssignmentsToolbar();
+
+		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
+		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
+		$table_gui->prepareData();
+		$this->tpl->setContent($table_gui->getHTML());
+
+		$this->showInfo();
+	}
+
+	/**
+	 * Calculate new assignments
+	 */
+	protected function calculateAssignments()
+	{
+		if (!$this->object->getMethodObject()->isActive())
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
-			$this->ctrl->redirect($this, 'editAssignments');
+			ilUtil::sendFailure($this->plugin->txt('msg_method_not_active'),true);
 		}
-		$rcps = array();
-		foreach($_POST['ids'] as $usr_id)
+		else
 		{
-			$rcps[] = ilObjUser::_lookupLogin($usr_id);
+			$this->plugin->includeClass('models/class.ilCoSubRun.php');
+			$run = new ilCoSubRun;
+			$run->obj_id = $this->object->getId();
+			$run->method = $this->object->getMethodObject()->getId();
+			$run->save();
+
+			if ($this->object->getMethodObject()->calculateAssignments($run))
+			{
+				if ($run->run_end)
+				{
+					$letter = $this->object->getRunLabel(count($this->object->getRuns()) -1);
+					$date = ilDatePresentation::formatDate($run->run_start);
+
+					// copy the calculated assignments of the run to the current assignments
+					$this->object->copyAssignments($run->run_id, 0);
+					ilUtil::sendSuccess(sprintf($this->plugin->txt('msg_calculation_finished'), $letter, $date), true);
+				}
+				else
+				{
+					ilUtil::sendInfo($this->plugin->txt('msg_calculation_started'), true);
+				}
+			}
+			else
+			{
+				ilUtil::sendFailure($this->plugin->txt('msg_calculation_start_failed')
+					.'<br />'.$this->object->getMethodObject()->getError(), true);
+			}
 		}
-
-		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
-		require_once 'Services/Link/classes/class.ilLink.php';
-		ilMailFormCall::setRecipients($rcps);
-
-		$signature = "\n\n" . $this->plugin->txt('mail_signature') . "\n" . ilLink::_getStaticLink($this->object->getRefId());
-
-		$target = ilMailFormCall::getRedirectTarget(
-			$this,
-			'editAssignments',
-			array(),
-			array('type' => 'new', 'sig' => rawurlencode(base64_encode($signature))));
-
-		ilUtil::redirect($target);
+		$this->ctrl->redirect($this,'editAssignments');
 	}
 
 
@@ -177,11 +172,10 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		/** @var ilObjUser $ilUser */
 		global $ilUser;
 
-		$this->plugin->includeClass('models/class.ilCoSubRun.php');
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 
 		$this->savePostedAssignments();
 
+		$this->plugin->includeClass('models/class.ilCoSubRun.php');
 		$run = new ilCoSubRun();
 		$run->obj_id = $this->object->getId();
 		$run->run_start = new ilDateTime(time(), IL_CAL_UNIX);
@@ -190,20 +184,11 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$run->details = sprintf($this->plugin->txt('run_details_manual'), $ilUser->getFullname());
 		$run->save();
 
-		$assignments = $this->object->getAssignments();
-		foreach ($assignments[0] as $user_id => $items)
-		{
-			foreach ($items as $item_id => $assign_id)
-			{
-				$assign = new ilCoSubAssign;
-				$assign->obj_id = $this->object->getId();
-				$assign->run_id = $run->run_id;
-				$assign->user_id = $user_id;
-				$assign->item_id = $item_id;
-				$assign->save();
-			}
-		}
-		ilUtil::sendSuccess($this->plugin->txt('msg_assignments_saved_as_run'), true);
+		$this->object->copyAssignments(0, $run->run_id);
+
+		$letter = $this->object->getRunLabel(count($this->object->getRuns()) -1);
+		$date = ilDatePresentation::formatDate($run->run_start);
+		ilUtil::sendSuccess(sprintf($this->plugin->txt('msg_assignments_saved_as_run'), $date, $letter), true);
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
@@ -247,25 +232,8 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	{
 		if (!empty($_POST['run_id']))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-			ilCoSubAssign::_deleteForObject($this->object->getId(), 0);
-
-			$assignments = $this->object->getAssignments();
-			if (is_array($assignments[$_POST['run_id']]))
-			{
-				foreach ($assignments[$_POST['run_id']] as $user_id => $items)
-				{
-					foreach ($items as $item_id => $assign_id)
-					{
-						$assign = new ilCoSubAssign;
-						$assign->obj_id = $this->object->getId();
-						$assign->user_id = $user_id;
-						$assign->item_id = $item_id;
-						$assign->save();
-					}
-				}
-			}
-			ilUtil::sendSuccess($this->plugin->txt('msg_run_assignments_set'), true);
+			$this->object->copyAssignments($_POST['run_id'], 0);
+			ilUtil::sendSuccess($this->plugin->txt('msg_assignments_set'), true);
 		}
 		$this->ctrl->redirect($this,'editAssignments');
 	}
@@ -381,49 +349,33 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 
 	/**
-	 * Export theassignments
+	 * Send an e-mail to selected users
 	 */
-	public function exportAssignments()
+	public function mailToUsers()
 	{
-		$this->plugin->includeClass("export/class.ilCoSubExport.php");
-
-
-		$type = $_POST['export_type'];
-		switch ($_POST['export_type'])
+		if (empty($_POST['ids']))
 		{
-			case ilCoSubExport::TYPE_CSV:
-				$suffix = ".csv";
-				break;
-
-			case ilCoSubExport::TYPE_EXCEL:
-			default;
-				$suffix = ".xlsx";
-				break;
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+		$rcps = array();
+		foreach($_POST['ids'] as $usr_id)
+		{
+			$rcps[] = ilObjUser::_lookupLogin($usr_id);
 		}
 
-		$mode = $_POST['export_mode'];
-		switch ($_POST['export_mode'])
-		{
-			case ilCoSubExport::MODE_REG_BY_ITEM:
-			default:
-				$name = 'registrations';
-				break;
-		}
+		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		require_once 'Services/Link/classes/class.ilLink.php';
+		ilMailFormCall::setRecipients($rcps);
 
-		// create and send the export file
-		$tempname = ilUtil::ilTempnam();
-		$export = new ilCoSubExport($this->plugin, $this->object, $type, $mode);
-		$export->buildExportFile($tempname);
+		$signature = "\n\n" . $this->plugin->txt('mail_signature') . "\n" . ilLink::_getStaticLink($this->object->getRefId());
 
+		$target = ilMailFormCall::getRedirectTarget(
+			$this,
+			'editAssignments',
+			array(),
+			array('type' => 'new', 'sig' => rawurlencode(base64_encode($signature))));
 
-		if (is_file($tempname))
-		{
-			ilUtil::deliverFile($tempname, $name.$suffix);
-		}
-		else
-		{
-			ilUtil::sendFailure($this->plugin->txt('export_not_found'), true);
-			$this->ctrl->redirect($this);
-		}
+		ilUtil::redirect($target);
 	}
 }

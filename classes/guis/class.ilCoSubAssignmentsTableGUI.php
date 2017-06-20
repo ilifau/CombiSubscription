@@ -217,7 +217,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			{
 				$this->tpl->setVariable('CHECKED', 'checked="checked"');
 			}
-			$not_assigned_runs = array_diff(array_keys($this->run_ids), $assigned_runs);
+			$not_assigned_runs = array_diff(array_keys($this->run_ids), array_keys($assigned_runs));
 			$this->tpl->setVariable('RUNS', implode(' ', $not_assigned_runs));
 			$this->tpl->parseCurrentBlock();
 		}

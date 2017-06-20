@@ -57,10 +57,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	#########################
 
 	/**
-	* Constructor
-	*
-	* @access	public
-	*/
+	 * Constructor
+	 *
+	 * @access    public
+	 * @param int $a_ref_id
+	 */
 	function __construct($a_ref_id = 0)
 	{
 		parent::__construct($a_ref_id);
@@ -188,7 +189,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	* Set online
 	*
-	* @param	boolean		online
+	* @param	boolean		$a_val
 	*/
 	public function setOnline($a_val)
 	{
@@ -208,7 +209,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Set explanation
 	 *
-	 * @param	string		explanation
+	 * @param	string		$a_val
 	 */
 	public function setExplanation($a_val)
 	{
@@ -246,7 +247,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Set Subscription End
-	 * @param ilDateTime    $a_sub_start
+	 * @param $a_sub_end
+	 * @internal param ilDateTime $a_sub_start
 	 */
 	public function setSubscriptionEnd($a_sub_end)
 	{
@@ -350,7 +352,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get a property for this class
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
-	 * @return array	value
+	 * @return string	value
 	 */
 	public function getProperty($a_key, $a_default_value)
 	{
@@ -359,22 +361,20 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Set a property for this class
-	 * @param   string  $a_class
 	 * @param   string  $a_key
 	 * @param   string  $a_value
 	 */
-	public function setProperty($a_class, $a_key, $a_value)
+	public function setProperty($a_key, $a_value)
 	{
 		$this->setClassProperty(get_class($this),  $a_key, $a_value);
 	}
-
 
 	/**
 	 * Get a property for a certain class
 	 * @param   string  $a_class
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
-	 * @return array	value
+	 * @return string	value
 	 */
 	public function getClassProperty($a_class, $a_key, $a_default_value)
 	{
@@ -410,6 +410,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Read the object properties for a certain class
+	 * @param $a_class
 	 */
 	private function readClassProperties($a_class)
 	{
@@ -431,6 +432,30 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			}
 		}
 	}
+
+	/**
+	 * Get a user preference stored in the session
+	 * @param $a_class
+	 * @param $a_key
+	 * @param $a_default_value
+	 * @return string
+	 */
+	public function getPreference($a_class, $a_key, $a_default_value)
+	{
+		return (isset($_SESSION['CombiSubscription'][$a_class][$a_key]) ? $_SESSION['CombiSubscription'][$a_class][$a_key] : $a_default_value);
+	}
+
+	/**
+	 * Set a user preference stored in the session
+	 * @param $a_class
+	 * @param $a_key
+	 * @param $a_value
+	 */
+	public function setPreference($a_class, $a_key, $a_value)
+	{
+		$_SESSION['CombiSubscription'][$a_class][$a_key] = $a_value;
+	}
+
 	# endregion
 
 	###########################
@@ -461,20 +486,30 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getMethodObject()
 	{
-		$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
-
 		if (!isset($this->method_object))
 		{
-			$classname = $this->method;
-			$classfile = $this->plugin->getDirectory().'/classes/methods/class.'.$classname.'.php';
-			if (is_file($classfile))
-			{
-				require_once($classfile);
-				$this->method_object = new $classname($this, $this->plugin);
-			}
+			$this->method_object = $this->getMethodObjectByClass($this->method);
 		}
-
 		return $this->method_object;
+	}
+
+
+	/**
+	 * Get an assignment method object by cnassname
+	 * @param $a_classname
+	 * @return null
+	 */
+	public function getMethodObjectByClass($a_classname)
+	{
+		$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
+
+		$classfile = $this->plugin->getDirectory().'/classes/methods/class.'.$a_classname.'.php';
+		if (is_file($classfile))
+		{
+			require_once($classfile);
+			return new $a_classname($this, $this->plugin);
+		}
+		return null;
 	}
 
 	/**
@@ -579,7 +614,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the priorities of a user in this object (lazy loading)
-	 * @return  array   item_id => priority
+	 * @param $a_user_id
+	 * @return array item_id => priority
 	 */
 	public function getPrioritiesOfUser($a_user_id)
 	{
@@ -599,7 +635,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the priorities of all users regarding an item
-	 * @return  array   user_id => priority
+	 * @param $a_item_id
+	 * @return array user_id => priority
 	 */
 	public function getPrioritiesOfItem($a_item_id)
 	{
@@ -686,6 +723,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Get an alphabetic label for a run index
 	 * @param $index
+	 * @return string
 	 */
 	public function getRunLabel($index)
 	{
@@ -720,8 +758,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the assignments of a user in a certain run (lazy loading)
-	 * @param integer    user_id
-	 * @param integer    run_id (default 0 for the chosen assignments)
+	 * @param integer    $a_user_id
+	 * @param integer    $a_run_id (default 0 for the chosen assignments)
 	 * @return array     item_id => assign_id
 	 */
 	public function getAssignmentsOfUser($a_user_id, $a_run_id = 0)
@@ -737,8 +775,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the assignments of an item user in a certain run (lazy loading)
-	 * @param integer    item_id
-	 * @param integer    run_id (default 0 for the chosen assignments)
+	 * @param integer    $a_item_id
+	 * @param integer    $a_run_id (default 0 for the chosen assignments)
 	 * @return array     user_id => assign_id
 	 */
 	public function getAssignmentsOfItem($a_item_id, $a_run_id = 0)
@@ -769,7 +807,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the sum of assignments for an item
-	 * @param integer   run_id (default 0 for the chosen assignments)
+	 * @param integer   $a_run_id (default 0 for the chosen assignments)
 	 * @return array   	item_id => sum of assignments
 	 */
 	public function getAssignmentsSums($a_run_id = 0)
@@ -798,6 +836,35 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 
 		return $sums;
+	}
+
+	/**
+	 * Copy the assignments from a run to another run
+	 *
+	 * @param int	$a_source_run
+	 * @param int 	$a_target_run
+	 */
+	public function copyAssignments($a_source_run, $a_target_run)
+	{
+		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
+		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run);
+
+		$assignments = $this->getAssignments();
+		if (is_array($assignments[$a_source_run]))
+		{
+			foreach ($assignments[$a_source_run] as $user_id => $items)
+			{
+				foreach ($items as $item_id => $assign_id)
+				{
+					$assign = new ilCoSubAssign;
+					$assign->obj_id = $this->getId();
+					$assign->run_id = $a_target_run;
+					$assign->user_id = $user_id;
+					$assign->item_id = $item_id;
+					$assign->save();
+				}
+			}
+		}
 	}
 
 	# endregion
@@ -857,4 +924,3 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	# endregion
 }
-?>

@@ -68,17 +68,17 @@ method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
 assignment#:#Zuteilung
 assignments#:#Zuteilungen
-save_assignments#:#Zuteilungen speichern
-msg_assignments_saved#:#Die Zuteilungen wurden gespeichert.
+save_assignments#:#Speichern
+msg_assignments_saved#:#Die aktuellen Zuteilungen wurden gespeichert.
 satisfaction#:#Erfüllung
 satisfied_not#:#Nicht erfüllt
 satisfied_medium#:#Ausreichend erfüllt
 satisfied_full#:#Voll erfüllt
-new_calculation#:#Neue Berechnung
-msg_calculation_started#:#Die Berechnung wurde gestartet. Wenn sie abgeschlossen ist, wird ihr Ergebnis hier gelistet.
-msg_calculation_finished#:#Die Berechnung wurde durchgeführt.
-set_run_assignments#:#Zuteilungen aus Berechnung übernehmen
-msg_run_assignments_set#:#Die Zuteilungen der Berechnung wurden übernommen
+calculate_assignments#:#Zuteilungen berechnen
+msg_calculation_started#:#Die Berechnung wurde gestartet. Wenn sie abgeschlossen ist, ist ihr Ergebnis unter den gespeicherten Zuteilungen verfügbar.
+msg_calculation_finished#:#Die Berechnung wurde durchgeführt (%s: %s) und als aktuelle Zuteilungen übernommen.
+set_assignments#:#Als aktuelle übernehmen
+msg_assignments_set#:#Die gespeicherten Zuteilungen wurde als aktuelle Zuteilungen übernommen.
 subscription_period#:#Anmeldezeitraum
 sub_limit_from_to#:#%s bis %s Teilnehmer
 sub_limit_from#:#Min. %s Teilnehmer
@@ -98,16 +98,16 @@ satisfied#:#Erfüllt
 users_assigned#:#Zugeteilte Nutzer
 users_satisfied#:#Erfüllte Nutzer-Prioritäten
 items_satisfied#:#Erfüllte Einheits-Bedingungen
-delete_calculations#:#Berechnungen löschen
+delete_assignments#:#Zuteilungen löschen
 not_finished#:#nicht beendet
-confirm_delete_calculations#:#Möchten Sie die folgenden Berechungen löschen?
-msg_calculations_deleted#:#Die Berechnungen wurden gelöscht.
+confirm_delete_assignments#:#Möchten Sie die folgenden Zuteilungen löschen?
+msg_assignments_deleted#:#Die Zuteilungen wurden gelöscht.
 msg_calculation_start_failed#:#Die Berechnung konnte nicht gestartet werden.
 msg_calculation_finished2#:#Die Berechnung wurde beendet:
 msg_calculation_failed#:#Die Berechnung schlug fehl:
 msg_check_for_result_failed#:#Das Berechnungsergebnis konnte nicht abgefragt werden:
-save_assignments_as_run#:#Als neue Berechnung speichern
-msg_assignments_saved_as_run#:#Die Zuteilungen wurden als neue Berechnung gespeichert.
+save_assignments_as_run#:#Mit Datum speichern
+msg_assignments_saved_as_run#:#Die Zuteilungen wurden mit dem Datum "%s" gespeichert. Dieser Stand wird mit dem Buchstaben "%s" angezeigt und kann später wieder übernommen werden.
 run_details_manual#:#Manuelle Speicherung durch %s
 calc_properties#:#Methoden-Einstellungen
 basic_configuration#:#Basis-Konfiguration
@@ -152,7 +152,7 @@ mail_notify_assignments#:#Sie haben die folgenden Zuteilungen erhalten:
 mail_registration_subject#:#Anmeldung bei "%s"
 mail_registration_no_choice#:#Sie haben keine Auswahl getroffen.
 mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getroffen:
-transfer_assignments#:#Zuteilungen übertragen
+transfer_assignments#:#Auf Kurse/Gruppen übertragen
 transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
 notify_assignments#:#Nutzer benachrichtigen
@@ -162,9 +162,24 @@ no_target_objects#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
 min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
 min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
+export_mode#:#Tabellen-Format
 export_mode_reg_by_item#:#Anmeldungen nach Einheiten
-export_type_excel#:#MS Excel
+export_mode_reg_by_item_info#:#Die Zeilen entsprechen den Teilnehmern, die Spalten den Auswahl-Einheiten (Kurse, Gruppen). Die gewählten Prioritäten sind in den Zellen eingetragen..
+export_mode_reg_by_prio#:#Anmeldungen nach Prioritäten
+export_mode_reg_by_prio_info#:#Die Zeilen entsprechen den Teilnehmern, die Spalten den Prioritäten. Die ausgewählten Einheiten (Kurse/Gruppen) sind in den Zellen eingetragen.
+export_type#:#Datei-Format
+export_type_excel#:#MS Excel 2007
 export_type_csv#:#CSV
 export_failed#:#Die Export-Datei konnte nicht erzeugt werden.
 multiple_choice_alert#:#Sie können eine Priorität nicht mehrfach auswählen!
 empty_choice_alert#:#Sie müssen für jede Priorität eine Auswahl treffen!
+current_assignment#:#Aktuelle Zuteilungen
+saved_assignments#:#Gespeicherte Zuteilungen
+export_data#:#Daten-Export
+import_data#:#Daten-Import
+do_export#:#Exportieren
+method_duration#:#%s (Dauer: %s s)
+calculated#:#Berechnet
+index#:#Index
+saved_label#:#Gespeichert
+registrations#:#Anmeldungen

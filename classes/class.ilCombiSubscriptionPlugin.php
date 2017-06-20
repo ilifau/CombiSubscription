@@ -48,7 +48,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 * @param   string  $a_class
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
-	 * @return array	value
+	 * @return string	value
 	 */
 	public static function _getClassSetting($a_class, $a_key, $a_default_value = '')
 	{

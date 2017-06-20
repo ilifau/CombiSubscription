@@ -127,6 +127,20 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->ctrl->forwardCommand(new ilCoSubRunsGUI($this));
 					return;
 
+				case 'ilcosubexportgui':
+					$this->checkPermission('write');
+					$this->setSubTabs('assignments','export');
+					$this->plugin->includeClass('guis/class.ilCoSubExportGUI.php');
+					$this->ctrl->forwardCommand(new ilCoSubExportGUI($this));
+					return;
+
+				case 'ilcosubimportgui':
+					$this->checkPermission('write');
+					$this->setSubTabs('assignments','import');
+					$this->plugin->includeClass('guis/class.ilCoSubImportGUI.php');
+					$this->ctrl->forwardCommand(new ilCoSubImportGUI($this));
+					return;
+
 				default:
 					// properties gui of method
 					if ($method = $this->object->getMethodObject()
@@ -271,8 +285,10 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				break;
 
 			case 'assignments':
-				$this->tabs_gui->addSubTab('assignments', $this->plugin->txt('assignment'), $this->ctrl->getLinkTargetByClass('ilCoSubAssignmentsGUI'));
-				$this->tabs_gui->addSubTab('runs', $this->plugin->txt('calculations'), $this->ctrl->getLinkTargetByClass('ilCoSubRunsGUI'));
+				$this->tabs_gui->addSubTab('assignments', $this->plugin->txt('current_assignment'), $this->ctrl->getLinkTargetByClass('ilCoSubAssignmentsGUI'));
+				$this->tabs_gui->addSubTab('runs', $this->plugin->txt('saved_assignments'), $this->ctrl->getLinkTargetByClass('ilCoSubRunsGUI'));
+				$this->tabs_gui->addSubTab('export', $this->plugin->txt('export_data'), $this->ctrl->getLinkTargetByClass('ilCoSubExportGUI'));
+				$this->tabs_gui->addSubTab('import', $this->plugin->txt('import_data'), $this->ctrl->getLinkTargetByClass('ilCoSubImportGUI'));
 				break;
 		}
 
@@ -286,6 +302,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	 * Get the url of a satisfaction image
 	 * @param $a_satisfaction
+	 * @return string
 	 */
 	public function getSatisfactionImageUrl($a_satisfaction)
 	{
@@ -323,7 +340,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 
 	/**
-	 * Check the unfinished runs if results are avaulable
+	 * Check the unfinished runs if results are available
 	 */
 	public function checkUnfinishedRuns()
 	{

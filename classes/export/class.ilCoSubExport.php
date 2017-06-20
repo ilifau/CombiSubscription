@@ -75,6 +75,7 @@ class ilCoSubExport
 	 */
 	protected $with_studydata = false;
 
+
 	/**
 	 * Constructor.
 	 * @param ilCombiSubscriptionPlugin		$plugin
@@ -116,16 +117,17 @@ class ilCoSubExport
 		//Creating Files with Charts using PHPExcel
 		require_once $this->plugin->getDirectory(). '/lib/PHPExcel-1.8/Classes/PHPExcel.php';
 		$excelObj = new PHPExcel();
-
+		$excelObj->setActiveSheetIndex(0);
 
 		switch($this->mode)
 		{
 			case self::MODE_REG_BY_ITEM:
 				$this->fillRegistrationsByItem($excelObj->getActiveSheet());
 				break;
+			case self::MODE_REG_BY_PRIO:
+				$this->fillRegistrationsByPrio($excelObj->getActiveSheet());
+				break;
 		}
-
-		$excelObj->setActiveSheetIndex(0);
 
 		// Save the file
 		ilUtil::makeDirParents(dirname($path));
@@ -153,8 +155,111 @@ class ilCoSubExport
 	 */
 	protected function fillRegistrationsByItem($worksheet)
 	{
-		$mapping = array();
+		// Column definition and header
+		$columns = $this->getUserColumns();
+		$basecols = count($columns);
+		foreach ($this->object->getItems() as $item)
+		{
+			$columns['item'.$item->item_id] = !empty($item->identifier) ? $item->identifier : $item->title;
+		}
+		$mapping = $this->fillHeaderRow($worksheet, $columns);
 
+		// get the priority names
+		$prio_names = $this->object->getMethodObject()->getPriorities();
+
+		// query for users
+		$user_query_result = $this->getUserQueryResult();
+
+		$row = 2;
+		foreach ($user_query_result['set'] as $user)
+		{
+			$data = $this->getUserColumnData($user);
+
+			// registrations values
+			foreach ($this->object->getPrioritiesOfUser($user['usr_id']) as $item_id => $value)
+			{
+				$data['item'.$item_id] = $prio_names[$value];
+			}
+
+			foreach ($data as $key => $value)
+			{
+				$coordinate = $mapping[$key].(string) $row;
+				$cell = $worksheet->getCell($coordinate);
+				$cell->setValue($value);
+				$cell->getStyle()->getAlignment()->setWrapText(true);
+			}
+
+			$row++;
+		}
+
+		$worksheet->setTitle($this->plugin->txt('registrations'));
+		$worksheet->freezePane('D2');
+		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+	}
+
+
+	/**
+	 * Fill the sheet with user registrations
+	 * Priorities are columns, the items are listed as values
+	 * @param PHPExcel_Worksheet $worksheet
+	 */
+	protected function fillRegistrationsByPrio($worksheet)
+	{
+		// Column definition and header
+		$columns = $this->getUserColumns();
+		$basecols = count($columns);
+		$prio_names = $this->object->getMethodObject()->getPriorities();
+		foreach ($prio_names as $index => $name)
+		{
+			$columns['prio'.$index] = $name;
+		}
+		$mapping = $this->fillHeaderRow($worksheet, $columns);
+
+		// get the item names
+		$item_names = array();
+		foreach ($this->object->getItems() as $item)
+		{
+			$item_names[$item->item_id] = !empty($item->identifier) ? $item->identifier : $item->title;
+		}
+
+		// query for users
+		$user_query_result = $this->getUserQueryResult();
+
+		$row = 2;
+		foreach ($user_query_result['set'] as $user)
+		{
+			$data = $this->getUserColumnData($user);
+
+			// registrations values
+			foreach ($this->object->getPrioritiesOfUser($user['usr_id']) as $item_id => $value)
+			{
+				$data['prio'.$value] = empty($data['prio'.$value]) ? '' : $data['prio'.$value] . ', ';
+				$data['prio'.$value] .= $item_names[$item_id];
+			}
+
+			foreach ($data as $key => $value)
+			{
+				$coordinate = $mapping[$key].(string) $row;
+				$cell = $worksheet->getCell($coordinate);
+				$cell->setValue($value);
+				$cell->getStyle()->getAlignment()->setWrapText(true);
+			}
+
+			$row++;
+		}
+
+		$worksheet->setTitle($this->plugin->txt('registrations'));
+		$worksheet->freezePane('D2');
+		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+	}
+
+
+	/**
+	 * Get the definition of the user columns
+	 * @return array
+	 */
+	protected function getUserColumns()
+	{
 		// basic user header
 		$columns = array(
 			'lastname' => $this->lng->txt('lastname'),
@@ -177,16 +282,82 @@ class ilCoSubExport
 			}
 		}
 
-		$basecols = count($columns);
+		return $columns;
+	}
 
-		// registrations header
-		foreach ($this->object->getItems() as $item)
+	/**
+	 * Get the result of hte user quers
+	 * @see ilUserQuery::query()
+	 *
+	 * @return array ('cnt', 'set')
+	 */
+	protected function getUserQueryResult()
+	{
+		// query for users
+		include_once("Services/User/classes/class.ilUserQuery.php");
+		$user_query = new ilUserQuery();
+		$user_query->setUserFilter(array_keys($this->object->getPriorities()));
+		$user_query->setAdditionalFields(array('gender','matriculation'));
+		$user_query->setLimit(0);
+		$user_query->setOrderField('lastname');
+
+		return $user_query->query();
+	}
+
+	/**
+	 * Get the data of the user columns for a row
+	 *
+	 * @param array 	$user 	(single user part of getUserQueryResult())
+	 * @return array 	data for the user columns of a row
+	 */
+	protected function getUserColumnData($user)
+	{
+		$data = array();
+
+		// basic user values
+		$data['login'] = $user['login'];
+		$data['lastname'] = $user['lastname'];
+		$data['firstname'] = $user['firstname'];
+
+		// extended user values
+		if ($this->extended)
 		{
-			$columns['item'.$item->item_id] = $item->title;
+			$data['gender'] = $user['gender'];
+			$data['email'] = $user['email'];
+			$data['matriculation'] = $user['matriculation'];
+
+			if ($this->with_studydata)
+			{
+				$studydata = ilStudyData::_getStudyDataText($user['usr_id']);
+
+				if ($this->type == self::TYPE_CSV)
+				{
+					$studydata = str_replace('"','',$studydata);
+					$studydata = str_replace("'",'',$studydata);
+					$studydata = str_replace("'",'',$studydata);
+					$studydata = str_replace(",",' ',$studydata);
+					$studydata = str_replace(";",' ',$studydata);
+					$studydata = str_replace("\n",' / ',$studydata);
+				}
+
+				$data['studydata'] = $studydata;
+			}
 		}
 
+		return $data;
+	}
 
+
+	/**
+	 * Fill the header Row of a sheet
+	 * @param PHPExcel_Worksheet	$worksheet
+	 * @param array	$columns
+	 * @return array	column key => column letter
+	 */
+	protected function fillHeaderRow($worksheet, $columns)
+	{
 		$col = 0;
+		$mapping = array();
 		foreach ($columns as $key => $value)
 		{
 			$letter = PHPExcel_Cell::stringFromColumnIndex($col++);
@@ -197,77 +368,8 @@ class ilCoSubExport
 			$cell->getStyle()->applyFromArray($this->headerStyle);
 			$cell->getStyle()->getAlignment()->setWrapText(true);
 		}
-
-
-		// query for users
-		include_once("Services/User/classes/class.ilUserQuery.php");
-		$user_query = new ilUserQuery();
-		$user_query->setUserFilter(array_keys($this->object->getPriorities()));
-		$user_query->setAdditionalFields(array('gender','matriculation'));
-		$user_query->setLimit(0);
-		$user_query->setOrderField('lastname');
-		$user_query_result = $user_query->query();
-
-		$prio_names = $this->object->getMethodObject()->getPriorities();
-
-		$row = 2;
-		foreach ($user_query_result['set'] as $user)
-		{
-
-			$data = array();
-
-			// basic user values
-			$data['login'] = $user['login'];
-			$data['lastname'] = $user['lastname'];
-			$data['firstname'] = $user['firstname'];
-
-			// extended user values
-			if ($this->extended)
-			{
-				$data['gender'] = $user['gender'];
-				$data['email'] = $user['email'];
-				$data['matriculation'] = $user['matriculation'];
-
-				if ($this->with_studydata)
-				{
-					$studydata = ilStudyData::_getStudyDataText($user['usr_id']);
-
-					if ($this->type == self::TYPE_CSV)
-					{
-						$studydata = str_replace('"','',$studydata);
-						$studydata = str_replace("'",'',$studydata);
-						$studydata = str_replace("'",'',$studydata);
-						$studydata = str_replace(",",' ',$studydata);
-						$studydata = str_replace(";",' ',$studydata);
-						$studydata = str_replace("\n",' / ',$studydata);
-					}
-
-					$data['studydata'] = $studydata;
-				}
-			}
-
-			// registrations values
-			foreach ($this->object->getPrioritiesOfUser($user['usr_id']) as $item_id => $value)
-			{
-				$data['item'.$item_id] = $prio_names[$value];
-			}
-
-			foreach ($data as $key => $value)
-			{
-				$coordinate = $mapping[$key].(string) $row;
-				$cell = $worksheet->getCell($coordinate);
-				$cell->setValue($value);
-				$cell->getStyle()->getAlignment()->setWrapText(true);
-			}
-
-			$row++;
-		}
-
-		$worksheet->setTitle($this->lng->txt('registrations'));
-		$worksheet->freezePane('D2');
-		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+		return $mapping;
 	}
-
 
 
 	/**
