@@ -109,6 +109,7 @@ msg_check_for_result_failed#:#The calculation result could not be queried:
 save_assignments_as_run#:#Save as New Calculation
 msg_assignments_saved_as_run#:#The assignments were saved as a new calculation.
 run_details_manual#:#Manual saving by %s
+run_details_import#:#Imported by %
 calc_properties#:#Method Properties
 basic_configuration#:#Basic Configuration
 ilcosubmethodeatts_title#:#EATTS
@@ -142,10 +143,8 @@ ilcosubmethodrandom_number_assignments#:#Number of Assignments
 ilcosubmethodrandom_number_assignments_info#:#Number of items that will be assigned per user. If it is higher then the default one, please increase the number of selectable items and adapt the explanation text.
 ilcosubmethodrandom_one_per_priority#:#Unique Choice
 ilcosubmethodrandom_one_per_priority_info#:#A user must choose exactly one item per priority. This replaced the general setting 'minimum choices'. Please provide enough items and adapt the explanation text.
-add_as_members#:#Add Members
-msg_users_added_as_members#:#The assigned users were added as members to the target objects.
-add_as_members#:#Add Subscribers
-msg_users_added_as_members#:#The non assigned users were added as subscribers to the target objects.
+show_bars#:#Show Bars
+show_bars_info#:#The registration screen shows bars with the mumber of existing registrations for each priority. The users will see how popular an item is.
 mail_to_users#:#Send E-Mail
 mail_signature#:#This message relates to the following combined subscription:
 mail_notify_subject#:#Assignment for '%s'
@@ -164,9 +163,46 @@ no_target_objects#:#No target object found!
 min_choices#:#Minimum Choices
 min_choices_info#:#Minimum number of chosen items to save a subscription
 min_choices_alert#:#You must select at least %s items to get your subscription saved.
-export_mode_reg_by_item#:#Subscriptions by Items
-export_type_excel#:#MS Excel
-export_type_csv#:#CSV
-export_failed#:#The export file coudn't be written.
 multiple_choice_alert#:#You can't choose a priority multiple times!
 empty_choice_alert#:#You must take a choice for each priority!
+current_assignment#:#Current Assignments
+saved_assignments#:#Saved Assignments
+export_data#:#Export Data
+import_data#:#Import Data
+do_export#:#Export
+do_import#:#Import
+export_mode#:#Table Format
+export_mode_reg_by_item#:#Registrations by Items
+export_mode_reg_by_item_info#:#Each user has a row, each item (course, group) has a column. The chosen priorities are entered in the cells.
+export_mode_reg_by_prio#:#Registrations by Priorities
+export_mode_reg_by_prio_info#:#Each user has a row, each priority has a column. Die chosen items are listed in the cells.
+export_type#:#File Type
+export_type_excel#:#MS Excel 2007
+export_type_csv#:#CSV
+export_failed#:#The export file couldn't be created.
+import_file#:#Import File
+method_duration#:#%s (Duration: %s s)
+calculated#:#Calculated
+index#:#Index
+saved_label#:#Saved
+registrations#:#Registrations
+import_mode#:#Teble Format
+import_mode_ass_by_item#:#Assignments by Iterms
+import_mode_ass_by_item_info#:#The first row contains the column titles: one 'ID' for the user and the internal identifier or the title for each item. Other columns are ignored. Each following row is dedicated to a person. The 'ID' column has the username (login). The column of an item is filled (e.g. with '1' or 'x') if the item should be assigned. This is similar to the format 'Rgistrations by Items'.
+import_mode_ass_by_col#:#Assignments as List
+import_mode_ass_by_col_info#:#The first row contains the column titles: one 'ID' for the user and the numbers '1', '2' etc. for the assignments. Other columns are ignored. Each following row is dedicated to a person. The 'ID' column has the username (login). The assignment columns are filled with the identifiers or titles of the assigned items (one per cell). It is possible to leave assignment columns empty.
+import_file_not_readable#:#The import file can't be read!
+import_error_mode#:#The selected row format isn't supported.
+import_error_format#:#the imported file has an unsupported file type.
+import_error_id_missing#:#There must be a column named 'ID' in the first row , having the login names in the following rows.
+import_error_empty_colname#:#The first row must provide a name for each column.
+import_error_rows_missing#:#The table must have at least one row with the column names and one with the data of a user.
+import_error_multiple_colname#:#The column names i nthe first row must be unique.
+import_error_no_ass_col#:#There is no assignment column named with a number in the first row.
+import_error_user_not_found#:#The user "%s" hasn't registered in this object!
+import_error_item_not_found#:#The entry "%s" doesn't correspond to an item with this title or identifier.
+import_error_multi_ass_columns#:#This object allows only one assignment column.
+import_error_multi_ass_entries#:#This object allows only one assignment per user.
+import_error_items_missing#:#Each item must have a column named with its identifier or title.
+import_assignments_finished#:#The assignments are imported and chisen as current assignments.
+import_assignments_failed#:#The assignments can't be imported.

@@ -86,7 +86,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		if (!$this->form->checkInput())
 		{
 			$this->showExportForm();
-			exit;
+			return;
 		}
 
 		$this->object->setPreference('ilCoSubExport', 'export_mode', $this->form->getInput('export_mode'));

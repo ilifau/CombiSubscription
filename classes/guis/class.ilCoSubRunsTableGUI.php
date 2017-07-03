@@ -62,10 +62,9 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 				continue;
 			}
 
-			if ($run->method != 'manual')
+			/** @var ilCoSubMethodBase $method */
+			if ($method = $this->parent->object->getMethodObjectByClass($row['method']))
 			{
-				/** @var ilCoSubMethodBase $method */
-				$method = $this->parent->object->getMethodObjectByClass($row['method']);
 				$title = isset($method) ? $method->getTitle() : $this->plugin->txt('calculated');
 				$duration = $run->run_end->get(IL_CAL_UNIX) - $run->run_start->get(IL_CAL_UNIX);
 				$row['details'] = sprintf($this->plugin->txt('method_duration'), $title, $duration) . "\n" . $row['details'];

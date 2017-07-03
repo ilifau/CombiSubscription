@@ -15,7 +15,7 @@ class ilCoSubExport
 	const MODE_REG_BY_ITEM = 'reg_by_item';
 	const MODE_REG_BY_PRIO = 'reg_by_prio';
 	const MODE_ASS_BY_ITEM = 'ass_by_item';
-	const MODE_ASS_BY_PRIO = 'ass_by_prio';
+	const MODE_ASS_BY_COL = 'ass_by_col';
 
 
 	protected $headerStyle = array(
@@ -262,9 +262,9 @@ class ilCoSubExport
 	{
 		// basic user header
 		$columns = array(
+			'login' => 'ID',
 			'lastname' => $this->lng->txt('lastname'),
-			'firstname' => $this->lng->txt('firstname'),
-			'login' => $this->lng->txt('login')
+			'firstname' => $this->lng->txt('firstname')
 		);
 
 		// extended user header

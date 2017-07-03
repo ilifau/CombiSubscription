@@ -495,17 +495,16 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 
 	/**
-	 * Get an assignment method object by cnassname
+	 * Get an assignment method object by classname
 	 * @param $a_classname
 	 * @return null
 	 */
 	public function getMethodObjectByClass($a_classname)
 	{
-		$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
-
 		$classfile = $this->plugin->getDirectory().'/classes/methods/class.'.$a_classname.'.php';
 		if (is_file($classfile))
 		{
+			$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
 			require_once($classfile);
 			return new $a_classname($this, $this->plugin);
 		}

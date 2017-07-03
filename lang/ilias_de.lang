@@ -109,6 +109,7 @@ msg_check_for_result_failed#:#Das Berechnungsergebnis konnte nicht abgefragt wer
 save_assignments_as_run#:#Mit Datum speichern
 msg_assignments_saved_as_run#:#Die Zuteilungen wurden mit dem Datum "%s" gespeichert. Dieser Stand wird mit dem Buchstaben "%s" angezeigt und kann später wieder übernommen werden.
 run_details_manual#:#Manuelle Speicherung durch %s
+run_details_import#:#Importiert von %s
 calc_properties#:#Methoden-Einstellungen
 basic_configuration#:#Basis-Konfiguration
 ilcosubmethodeatts_title#:#EATTS
@@ -162,15 +163,6 @@ no_target_objects#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
 min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
 min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
-export_mode#:#Tabellen-Format
-export_mode_reg_by_item#:#Anmeldungen nach Einheiten
-export_mode_reg_by_item_info#:#Die Zeilen entsprechen den Teilnehmern, die Spalten den Auswahl-Einheiten (Kurse, Gruppen). Die gewählten Prioritäten sind in den Zellen eingetragen..
-export_mode_reg_by_prio#:#Anmeldungen nach Prioritäten
-export_mode_reg_by_prio_info#:#Die Zeilen entsprechen den Teilnehmern, die Spalten den Prioritäten. Die ausgewählten Einheiten (Kurse/Gruppen) sind in den Zellen eingetragen.
-export_type#:#Datei-Format
-export_type_excel#:#MS Excel 2007
-export_type_csv#:#CSV
-export_failed#:#Die Export-Datei konnte nicht erzeugt werden.
 multiple_choice_alert#:#Sie können eine Priorität nicht mehrfach auswählen!
 empty_choice_alert#:#Sie müssen für jede Priorität eine Auswahl treffen!
 current_assignment#:#Aktuelle Zuteilungen
@@ -178,8 +170,39 @@ saved_assignments#:#Gespeicherte Zuteilungen
 export_data#:#Daten-Export
 import_data#:#Daten-Import
 do_export#:#Exportieren
+do_import#:#Importieren
+export_mode#:#Tabellen-Format
+export_mode_reg_by_item#:#Anmeldungen nach Einheiten
+export_mode_reg_by_item_info#:#Die Zeilen entsprechen den Personen, die Spalten den Auswahl-Einheiten (Kurse, Gruppen). Die gewählten Prioritäten sind in den Zellen eingetragen.
+export_mode_reg_by_prio#:#Anmeldungen nach Prioritäten
+export_mode_reg_by_prio_info#:#Die Zeilen entsprechen den Personen, die Spalten den Prioritäten. Die ausgewählten Einheiten (Kurse/Gruppen) sind in den Zellen eingetragen.
+export_type#:#Datei-Format
+export_type_excel#:#MS Excel 2007
+export_type_csv#:#CSV
+export_failed#:#Die Export-Datei konnte nicht erzeugt werden.
+import_file#:#Import-Datei
 method_duration#:#%s (Dauer: %s s)
 calculated#:#Berechnet
 index#:#Index
 saved_label#:#Gespeichert
 registrations#:#Anmeldungen
+import_mode#:#Tabellen-Format
+import_mode_ass_by_item#:#Zuteilungen nach Einheiten
+import_mode_ass_by_item_info#:#Die erste Zeile enthält die Spaltentitel mit einer Spalte "ID" und den internen Kennungen oder Titeln der Auswahl-Einheiten. Andere Spalten werden ignoriert. Jede Zeile darunter entspricht einer Person. In der Spalte "ID" steht die Benutzerkennung (Login). Bei Zuteilung ist die Zelle einer Auswahl-Einheit belegt (z.B. "1" oder "x"). Das entspricht dem Export-Format "Anmeldungen nach Einheiten".
+import_mode_ass_by_col#:#Zuteilungen aufgelistet
+import_mode_ass_by_col_info#:#Die erste Zeile enthält die Spaltentitel mit einer Spalte "ID" und den Zahlen "1", "2", usw. für die Zuteilungen. Andere Spalten werden ignoriert. Jede Zeile darunter entspricht einer Person. In der Spalte "ID" steht die Benutzerkennung (Login). In den Zuteilungs-Spalten stehen die internen Kennungen oder Titel der Auswahl-Einheiten. Mehrere Zuteilungen pro Person stehen nebeneinander, es können auch Zuteilungs-Spalten leer bleiben.
+import_file_not_readable#:#Die Importdatei konnte nicht gelesen werden!
+import_error_mode#:#Das angegebene Tabellenformat wird nicht unterstützt!
+import_error_format#:#Die inportierte Datei hat ein ungültiges Datei-Format.
+import_error_id_missing#:#Es muss eine Spalte geben, die in der ersten Zeile mit "ID" benannt ist und in den weiteren die Benutzerkennungen enthält.
+import_error_empty_colname#:#Die Tabelle muss in der ersten Zeile für jede Spalte einen Namen enthalten!
+import_error_rows_missing#:#Die Tabelle muss mindestens eine Zeile mit den Spaltentiteln und eine Datenzeile enthalten!
+import_error_multiple_colname#:#Die Spaltennamen in der ersten Zeile müssen eindeutig sein!
+import_error_no_ass_col#:#Es wurde keine mit Zahl benannte Zuteilungsspalte gefunden!
+import_error_user_not_found#:#Zur Benutzerkennung "%s" wurde keine Anmeldung gefunden!
+import_error_item_not_found#:#Zum Eintrag "%s" wurde keine Auswahl-Einheit mit entsprechender Kennung oder entsprechendem Titel gefunden!
+import_error_multi_ass_columns#:#Bei dieser Anmeldung kann es maximal eine Zuteilungsspalte geben!
+import_error_multi_ass_entries#:#Bei dieser Anmeldung kann jede Person maximal eine Zuteilung haben!
+import_error_items_missing#:#Es muss zu jeder Auswahl-Einheit eine Spalte geben, die mit der internen Kennung oder dem Titel benannt ist!
+import_assignments_finished#:#Die Zuteilungen wurden importiert und als aktuelle Zuteilungen übernommen.
+import_assignments_failed#:#Die Zuteilungen konnten nicht importiert werden.
