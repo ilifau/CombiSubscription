@@ -67,8 +67,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	 * Handles all commmands of this class, centralizes permission checks
 	 *
-	 * @param	string		command to be executed
-	 * @param	string		(optional) class that should handle the command
+	 * @param	string		$cmd 	command to be executed
+	 * @param	string		$class	(optional) class that should handle the command
 	 */
 	function performCommand($cmd, $class = '')
 	{
@@ -103,13 +103,13 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->ctrl->forwardCommand(new ilCoSubRegistrationGUI($this));
 					return;
 
-				case 'ilcosubpeersgui':
-					$this->checkPermission('read');
-					$this->checkMethodAvailable();
-					$this->setSubTabs('registration','peers');
-					$this->plugin->includeClass('guis/class.ilCoSubPeersGUI.php');
-					$this->ctrl->forwardCommand(new ilCoSubPeersGUI($this));
-					return;
+//				case 'ilcosubpeersgui':
+//					$this->checkPermission('read');
+//					$this->checkMethodAvailable();
+//					$this->setSubTabs('registration','peers');
+//					$this->plugin->includeClass('guis/class.ilCoSubPeersGUI.php');
+//					$this->ctrl->forwardCommand(new ilCoSubPeersGUI($this));
+//					return;
 
 				case 'ilcosubassignmentsgui':
 					$this->checkPermission('write');
@@ -320,8 +320,9 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	}
 
 	/**
-	 * Get the url of a satisfaction image
+	 * Get the satisfaction title
 	 * @param $a_satisfaction
+	 * @return string
 	 */
 	public function getSatisfactionTitle($a_satisfaction)
 	{
@@ -383,4 +384,3 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	}
 
 }
-?>

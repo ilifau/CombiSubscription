@@ -103,8 +103,23 @@ class ilCoSubItem
 	}
 
 	/**
+	 * Clone the item for a new object
+	 * @param int	$a_obj_id
+	 * @return self
+	 */
+	public function saveClone($a_obj_id)
+	{
+		$clone = clone $this;
+		$clone->obj_id = $a_obj_id;
+		$clone->item_id = null;
+		$clone->save();
+		return $clone;
+	}
+
+
+	/**
 	 * Fill the properties with data from an array
-	 * @param array assoc data
+	 * @param array $data assoc data
 	 */
 	protected function fillData($data)
 	{

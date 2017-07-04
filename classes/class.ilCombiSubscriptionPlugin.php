@@ -44,7 +44,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 
 	/**
-	 * Get a global setting for a class
+	 * Get a global setting for a class (maintained in administration)
 	 * @param   string  $a_class
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
@@ -58,7 +58,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
-	 * Set a global setting for a class
+	 * Set a global setting for a class (maintained in administration)
 	 * @param string  $a_class
 	 * @param string  $a_key
 	 * @param string  $a_value
@@ -71,7 +71,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 
 	/**
-	 * Read the global settings for this method
+	 * Read the global settings for a class
 	 * @param   string  $a_class
 	 */
 	protected static function _readClassSettings($a_class)

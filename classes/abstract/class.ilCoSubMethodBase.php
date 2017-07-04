@@ -280,7 +280,7 @@ abstract class ilCoSubMethodBase
 	 * Get a global setting for this method
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
-	 * @return array	value
+	 * @return string	value
 	 */
 	public static function _getSetting($a_key, $a_default_value = '')
 	{
@@ -301,7 +301,7 @@ abstract class ilCoSubMethodBase
 	 * Get an object property of this method
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
-	 * @return array	value
+	 * @return string	value
 	 */
 	protected function getProperty($a_key, $a_default_value)
 	{

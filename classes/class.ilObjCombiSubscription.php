@@ -164,13 +164,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	
 	/**
 	 * Do Cloning
-	 * @var integer $a_target_id
-	 * @var integer $a_copy_id
-	 * @var ilObjCombiSubscription $new_obj
+	 * @param self $new_obj
+	 * @param integer $a_target_id
+	 * @param int	$a_copy_id
 	 */
-	function doClone($a_target_id,$a_copy_id,$new_obj)
+	function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
 	{
-		$new_obj->setOnline($this->getOnline());
+		$new_obj->setOnline(false);
 		$new_obj->setExplanation($this->getExplanation());
 		$new_obj->setSubscriptionStart($this->getSubscriptionStart());
 		$new_obj->setSubscriptionEnd($this->getSubscriptionEnd());
@@ -178,6 +178,15 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$new_obj->setMinChoices($this->getMinChoices());
 		$new_obj->setMethod($this->getMethod());
 		$new_obj->update();
+
+		// clone the properties of methods etc.
+		$this->cloneProperties($new_obj->getId());
+
+		// clone the items
+		foreach ($this->getItems() as $item)
+		{
+			$item->saveClone($new_obj->getId());
+		}
 	}
 
 	#endregion
@@ -431,6 +440,23 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				$this->class_properties[$a_class][$row['property']] = $row['value'];
 			}
 		}
+	}
+
+	/**
+	 * Clone all properties for classes of this object
+	 * @param int	$a_obj_id	new object id
+	 */
+	private function cloneProperties($a_obj_id)
+	{
+		/** @var ilDB $ilDB */
+		global $ilDB;
+
+		$query = "
+			INSERT INTO rep_robj_xcos_prop(obj_id, class, property, value)
+			SELECT ". $ilDB->quote($a_obj_id, 'integer'). ", class, property, value FROM rep_robj_xcos_prop
+			WHERE obj_id =" . $ilDB->quote($this->getId(), 'integer');
+
+		$ilDB->manipulate($query);
 	}
 
 	/**
