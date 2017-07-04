@@ -154,7 +154,7 @@ mail_registration_subject#:#Registration for "%s"
 mail_registration_no_choice#:#You made no selection.
 mail_registration_choices#:#You selected the following items (with priorities):
 transfer_assignments#:#Transfer Assignments
-transfer_assignments_confirmation#:#The assigned users will get members of the following courses/groups. Not assigned users will be set on the waiting list if possible.
+transfer_assignments_confirmation#:#Shall the assigned users become members of the following objects and their parents? Not assigned users will be set on the waiting list if possible.
 transfer_assignments_time#:#The assignments are transferred (%s).
 notify_assignments#:#Notify Users
 notify_assignments_confirmation#:#The users will get an e-mail notification about their assignment result.

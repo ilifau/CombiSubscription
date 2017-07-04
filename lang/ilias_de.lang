@@ -154,7 +154,7 @@ mail_registration_subject#:#Anmeldung bei "%s"
 mail_registration_no_choice#:#Sie haben keine Auswahl getroffen.
 mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getroffen:
 transfer_assignments#:#Auf Kurse/Gruppen übertragen
-transfer_assignments_confirmation#:#Die zugeteilten Nutzer werden als Mitglieder in die folgenden Kurse/Gruppen aufgenommen. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
+transfer_assignments_confirmation#:#Sollen die zugeteilten Nutzer als Mitglieder in die folgenden Objekte und ihre übergeordneten Objekte aufgenommen werden?. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
 notify_assignments#:#Nutzer benachrichtigen
 notify_assignments_confirmation#:#Die Nutzer werden über ihre Zuteilung per E-Mail informiert.
