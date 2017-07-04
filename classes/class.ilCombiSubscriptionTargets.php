@@ -28,30 +28,52 @@ class ilCombiSubscriptionTargets
 	 */
 	public function addAssignedUsersAsMembers()
 	{
+		global $tree;
+
 		include_once('./Modules/Group/classes/class.ilGroupParticipants.php');
 		include_once('./Modules/Group/classes/class.ilGroupMembershipMailNotification.php');
 
 		include_once('./Modules/Course/classes/class.ilCourseParticipants.php');
 		include_once('./Modules/Course/classes/class.ilCourseMembershipMailNotification.php');
-		require_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
+		include_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
 
-		// collect the actions to be done
+		// collect the assigning actions to be done
 		$actions = array();
 		foreach ($this->object->getItems() as $item)
 		{
 			if (!empty($item->target_ref_id))
 			{
-				$actions[] = array(
-					'ref_id' => $item->target_ref_id,
-					'obj_id' => ilObject::_lookupObjId($item->target_ref_id),
-					'type' => ilObject::_lookupType($item->target_ref_id, true),
-					'users' => array_keys($this->object->getAssignmentsOfItem($item->item_id))
-				);
+				// get the users to be assigned
+				$users = array_keys($this->object->getAssignmentsOfItem($item->item_id));
+
+				// prepare the actions for an object and its parents
+				foreach($tree->getNodePath($item->target_ref_id) as $node)
+				{
+					$ref_id = $node['child'];
+					$obj_id = $node['obj_id'];
+					$type = $node['type'];
+
+					// index actions by ref_id to treat each object only once
+					// parent objects are added first
+					if (isset($actions[$ref_id]))
+					{
+						$actions[$ref_id]['users'] = array_unique(array_merge($actions[$ref_id]['users'], $users));
+					}
+					else
+					{
+						$actions[$node['child']] = array(
+							'ref_id' => $ref_id,
+							'obj_id' => $obj_id,
+							'type' => $type,
+							'users' => $users
+						);
+					}
+				}
 			}
 		}
 
 		// do the actions
-		foreach ($actions as $action)
+		foreach ($actions as $ref_id => $action)
 		{
 			// get membership limitation conditions
 			$conditions = self::_getGroupingConditions($action['obj_id'], $action['type']);
@@ -65,15 +87,22 @@ class ilCombiSubscriptionTargets
 					break;
 
 				case 'crs':
-				default:
 					$part_obj = ilCourseParticipants::_getInstanceByObjId($action['obj_id']);
 					$role = IL_CRS_MEMBER;
 					$notification_type = $part_obj->NOTIFY_ACCEPT_SUBSCRIBER;
 					break;
+
+				default:
+					continue 2;	// next action
 			}
 
 			foreach ($action['users'] as $user_id)
 			{
+				// check if user is already a member (relevant for parent course)
+				if ($part_obj->isMember($user_id))
+				{
+					continue;
+				}
 				// check if user is already member in one of the other groups/course
 				if (self::_findGroupingMembership($user_id, $action['type'], $conditions))
 				{
