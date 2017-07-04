@@ -31,7 +31,9 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 		$this->addColumn($this->plugin->txt('index'),'start');
 		$this->addColumn($this->lng->txt('details'), '','30%');
 		$this->addColumn($this->plugin->txt('users_assigned'), 'users_assigned');
-		$this->addColumn($this->plugin->txt('users_satisfied'), 'users_satisfied');
+		$this->addColumn($this->plugin->txt('satisfied_full'), 'users_satisfied_full');
+		$this->addColumn($this->plugin->txt('satisfied_medium'), 'users_satisfied_medium');
+		$this->addColumn($this->plugin->txt('satisfied_not'), 'users_satisfied_not');
 		$this->addColumn($this->plugin->txt('items_satisfied'), 'items_status');
 
 		$this->addMultiCommand('confirmDeleteRuns', $this->plugin->txt('delete_assignments'));
@@ -132,33 +134,43 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('USERS_ASSIGNED', $a_set['users_assigned']);
 		$this->tpl->setVariable('USERS_SATISFIED', $a_set['users_satisfied']);
 
+		if ($a_set['users_satisfied_full'] > 0)
+		{
+			$this->tpl->setCurrentBlock('users_satisfied_full');
+			$this->tpl->setVariable('IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_FULL));
+			$this->tpl->setVariable('STATUS', $this->plugin->txt('satisfied_full'));
+			$this->tpl->setVariable('COUNT', $a_set['users_satisfied_full']);
+			$this->tpl->parseCurrentBlock();
+		}
+		if ($a_set['users_satisfied_medium'] > 0)
+		{
+			$this->tpl->setCurrentBlock('users_satisfied_medium');
+			$this->tpl->setVariable('IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_MEDIUM));
+			$this->tpl->setVariable('STATUS', $this->plugin->txt('satisfied_medium'));
+			$this->tpl->setVariable('COUNT', $a_set['users_satisfied_medium']);
+			$this->tpl->parseCurrentBlock();
+		}
 		if ($a_set['users_satisfied_not'] > 0)
 		{
-			$this->tpl->setVariable('USERS_SATISFIED_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
-			$this->tpl->setVariable('USERS_SATISFIED_STATUS', $this->plugin->txt('satisfied_not').': '.$a_set['users_satisfied_not']);
-
-		}
-		elseif ($a_set['users_satisfied_medium'] > 0)
-		{
-			$this->tpl->setVariable('USERS_SATISFIED_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_MEDIUM));
-			$this->tpl->setVariable('USERS_SATISFIED_STATUS', $this->plugin->txt('satisfied_medium').': '.$a_set['users_satisfied_medium']);
-		}
-		else
-		{
-			$this->tpl->setVariable('USERS_SATISFIED_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_FULL));
-			$this->tpl->setVariable('USERS_SATISFIED_STATUS', $this->plugin->txt('satisfied_full').': '.$a_set['users_satisfied_full']);
+			$this->tpl->setCurrentBlock('users_satisfied_not');
+			$this->tpl->setVariable('IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
+			$this->tpl->setVariable('STATUS', $this->plugin->txt('satisfied_not'));
+			$this->tpl->setVariable('COUNT', $a_set['users_satisfied_not']);
+			$this->tpl->parseCurrentBlock();
 		}
 
-		$this->tpl->setVariable('ITEMS_SATISFIED', $a_set['items_satisfied']);
+		$this->tpl->setCurrentBlock('items_satisfied');
+		$this->tpl->setVariable('COUNT', sprintf($this->plugin->txt('x_of_y'), $a_set['items_satisfied'] , $a_set['all_items']));
 		if ($a_set['items_satisfied_not'] > 0)
 		{
-			$this->tpl->setVariable('ITEMS_SATISFIED_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
-			$this->tpl->setVariable('ITEMS_SATISFIED_STATUS', $this->plugin->txt('satisfied_not').': '.$a_set['items_satisfied_not']);
+			$this->tpl->setVariable('IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
+			$this->tpl->setVariable('STATUS', $this->plugin->txt('satisfied_not').': '.$a_set['items_satisfied_not']);
 		}
 		else
 		{
-			$this->tpl->setVariable('ITEMS_SATISFIED_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_FULL));
-			$this->tpl->setVariable('ITEMS_SATISFIED_STATUS', $this->plugin->txt('satisfied').': '.$a_set['items_satisfied']);
+			$this->tpl->setVariable('IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_FULL));
+			$this->tpl->setVariable('STATUS', $this->plugin->txt('satisfied').': '.$a_set['items_satisfied']);
 		}
+		$this->tpl->parseCurrentBlock();
 	}
 }

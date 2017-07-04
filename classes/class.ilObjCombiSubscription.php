@@ -909,26 +909,24 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$priorities = $this->getPrioritiesOfUser($a_user_id);
 		$assignments = $this->getAssignmentsOfUser($a_user_id, $a_run_id);
 
-		// there should be maximum one assignments, so return directly
+		if (count($assignments) < $this->getMethodObject()->getNumberAssignments())
+		{
+			return self::SATISFIED_NOT;			// not enough assignments
+		}
+
 		foreach ($assignments as $item_id => $assign_id)
 		{
-			if (isset($priorities[$item_id]))
+			if (!isset($priorities[$item_id]))
 			{
-				if ($priorities[$item_id] == 0)
-				{
-					return self::SATISFIED_FULL; // assigned to item with highest priority
-				}
-				else
-				{
-					return self::SATISFIED_MEDIUM; // assigned to item with lower priority
-				}
+				return self::SATISFIED_NOT;		// assigned to an item without priority
 			}
-			else
+			elseif ($priorities[$item_id] > 0)
 			{
-				return self::SATISFIED_NOT; // assigned to a not selected item
+				return self::SATISFIED_MEDIUM; 	// assigned to item with lower priority
 			}
 		}
-		return self::SATISFIED_NOT; // no assignment at all
+
+		return self::SATISFIED_FULL;			// all assignments are highest priority
 	}
 
 

@@ -206,3 +206,4 @@ import_error_multi_ass_entries#:#Bei dieser Anmeldung kann jede Person maximal e
 import_error_items_missing#:#Es muss zu jeder Auswahl-Einheit eine Spalte geben, die mit der internen Kennung oder dem Titel benannt ist!
 import_assignments_finished#:#Die Zuteilungen wurden importiert und als aktuelle Zuteilungen übernommen.
 import_assignments_failed#:#Die Zuteilungen konnten nicht importiert werden.
+x_of_y#:#%s von %s

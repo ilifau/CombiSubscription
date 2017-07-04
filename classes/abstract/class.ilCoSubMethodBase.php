@@ -160,6 +160,15 @@ abstract class ilCoSubMethodBase
 	}
 
 	/**
+	 * Get the number of assignments that are done by this method
+	 * @return int	(default: 1)
+	 */
+	public function getNumberAssignments()
+	{
+		return 1;
+	}
+
+	/**
 	 * This method allows multiple assignments of items to a user
 	 */
 	public function hasMultipleAssignments()

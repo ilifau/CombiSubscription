@@ -206,3 +206,4 @@ import_error_multi_ass_entries#:#This object allows only one assignment per user
 import_error_items_missing#:#Each item must have a column named with its identifier or title.
 import_assignments_finished#:#The assignments are imported and chisen as current assignments.
 import_assignments_failed#:#The assignments can't be imported.
+x_of_y#:#%s of %s

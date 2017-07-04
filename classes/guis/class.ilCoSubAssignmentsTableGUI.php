@@ -113,7 +113,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_limits_satisfied'));
 			}
 
-			$this->addColumn($tpl->get(),'','',false,'',$item->description);
+			$this->addColumn($tpl->get(), 'priority'. $item->item_id);
 		}
 
 		if (!$this->object->getMethodObject()->hasMultipleAssignments())
@@ -147,11 +147,19 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		// all other data will only be calculated for the shown rows
 		foreach ($user_query_result['set'] as $user)
 		{
-			$data[] = array(
-				'user_id' => $user['usr_id'],
+			$user_id = $user['usr_id'];
+			$row = array(
+				'user_id' => $user_id,
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
-				'result' => $this->object->getSatisfaction($user['usr_id'], 0)
+				'result' => $this->object->getSatisfaction($user_id, 0)
 			);
+
+			foreach ($this->item_ids as $item_id)
+			{
+				$row['priority'.$item_id] = isset($this->priorities[$user_id][$item_id]) ? $this->priorities[$user_id][$item_id] : 999999999;
+				$row['assigned'.$item_id] = isset($this->assignments[0][$user_id][$item_id]);
+			}
+			$data[] = $row;
 		}
 
 		$this->setMaxCount($user_query_result['cnt']);
@@ -178,9 +186,9 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$this->tpl->setCurrentBlock('item');
 
 			// priority background
-			if (isset($this->priorities[$user_id][$item_id]))
+			if (isset($a_set['priority'.$item_id]))
 			{
-				$color = $this->object->getMethodObject()->getPriorityBackgroundColor($this->priorities[$user_id][$item_id]);
+				$color = $this->object->getMethodObject()->getPriorityBackgroundColor($a_set['priority'.$item_id]);
 				$this->tpl->setVariable('PRIO_COLOR', 'background-color:'.$color.';');
 			}
 
@@ -188,7 +196,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$this->tpl->setVariable('USER_ID', $user_id);
 			$this->tpl->setVariable('ITEM_ID', $item_id);
 			$this->tpl->setVariable('TYPE', $multiple_assignments ? 'checkbox' : 'radio');
-			if (isset($this->assignments[0][$user_id][$item_id]))
+			$this->tpl->setVariable('CHECKED', $a_set['item'.$item_id] ? 'checked="checked"' : '');
+			if ($a_set['assigned'.$item_id])
 			{
 				$this->tpl->setVariable('CHECKED', 'checked="checked"');
 				$assigned = true;

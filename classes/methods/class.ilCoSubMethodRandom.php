@@ -104,6 +104,16 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		return $this->txt('select_not');
 	}
 
+
+	/**
+	 * Get the number of assignments that are done by this method
+	 * @return int	(default: 1)
+	 */
+	public function getNumberAssignments()
+	{
+		return $this->number_assignments;
+	}
+
 	/**
 	 * This method allows multiple assignments of items to a user
 	 */
