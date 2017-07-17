@@ -58,6 +58,9 @@ class ilCoSubImport
 	/** @var array login => user_id */
 	protected $users_by_login = array();
 
+	/** @var array login => user_id */
+	protected $new_users_by_login = array();
+
 	/**
 	 * Constructor.
 	 * @param ilCombiSubscriptionPlugin		$plugin
@@ -146,6 +149,11 @@ class ilCoSubImport
 			{
 				ilCoSubAssign::_deleteForObject($this->object->getId(), $this->run->run_id);
 				ilCoSubRun::_deleteById($this->run->run_id);
+
+				foreach ($this->new_users_by_login as $login => $user_id)
+				{
+					ilCoSubChoice::_deleteForObject($this->object->getId(), $user_id);
+				}
 			}
 
 			return false;
@@ -232,12 +240,19 @@ class ilCoSubImport
 		$this->createRun();
 		foreach ($this->rows as $rowdata)
 		{
+			$added = false;
 			$user_id = $this->users_by_login[$rowdata['ID']];
+			if (empty($user_id))
+			{
+				$user_id = $this->adddUserByLogin($rowdata['ID']);
+				$added = true;
+			}
 			if (empty($user_id))
 			{
 				throw new Exception(sprintf($this->plugin->txt('import_error_user_not_found'), $rowdata['ID']));
 			}
 
+			$assignments = array();
 			foreach ($assign_columns as $colname)
 			{
 				$entry = $rowdata[$colname];
@@ -264,7 +279,15 @@ class ilCoSubImport
 					$ass->user_id = $user_id;
 					$ass->item_id = $item_id;
 					$ass->save();
+
+					$assignments[] = $ass;
 				}
+			}
+
+			if ($added)
+			{
+				// user is added, so create dummy choices
+				$this->createChoicesForAssignments($assignments);
 			}
 		}
 	}
@@ -307,13 +330,19 @@ class ilCoSubImport
 		$this->createRun();
 		foreach ($this->rows as $rowdata)
 		{
+			$added = false;
 			$user_id = $this->users_by_login[$rowdata['ID']];
+			if (empty($user_id))
+			{
+				$user_id = $this->adddUserByLogin($rowdata['ID']);
+				$added = true;
+			}
 			if (empty($user_id))
 			{
 				throw new Exception(sprintf($this->plugin->txt('import_error_user_not_found'), $rowdata['ID']));
 			}
 
-			$ass_count = 0;
+			$assignments = array();
 			foreach ($items_by_columns as $colname => $item_id)
 			{
 				if (!empty($rowdata[$colname]))
@@ -325,12 +354,18 @@ class ilCoSubImport
 					$ass->item_id = $item_id;
 					$ass->save();
 
-					$ass_count++;
+					$assignments[] = $ass;
 				}
 			}
-			if ($ass_count > 1 && !$this->object->getMethodObject()->hasMultipleAssignments())
+			if (count($assignments) > 1 && !$this->object->getMethodObject()->hasMultipleAssignments())
 			{
 				throw new Exception($this->plugin->txt('import_error_multi_ass_entries'));
+			}
+
+			if ($added)
+			{
+				// user is added, so create dummy choices
+				$this->createChoicesForAssignments($assignments);
 			}
 		}
 	}
@@ -349,6 +384,57 @@ class ilCoSubImport
 		$this->run->method = 'import';
 		$this->run->details = sprintf($this->plugin->txt('run_details_import'), $ilUser->getFullname());
 		$this->run->save();
+	}
+
+	/**
+	 * Create choices for assignments
+	 * This is done for users who don't have an assignment
+	 * @param ilCoSubAssign[] $a_assignments
+	 */
+	public function createChoicesForAssignments($a_assignments)
+	{
+		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
+		$method = $this->object->getMethodObject();
+		$has_mc = $method->hasMultipleChoice();
+		$max_prio = count($method->getPriorities()) -1;
+
+		$prio = 0;
+		foreach ($a_assignments as $ass)
+		{
+			$choice = new ilCoSubChoice();
+			$choice->item_id = $ass->item_id;
+			$choice->user_id = $ass->user_id;
+			$choice->obj_id = $ass->obj_id;
+			$choice->priority = $prio;
+			$choice->save();
+
+			if (!$has_mc)
+			{
+				$prio++;
+			}
+
+			if ($prio >= $max_prio)
+			{
+				break;
+			}
+		}
+	}
+
+	/**
+	 * search for the user id of a user by login
+	 * and add it to the list of new users
+	 * @param $a_login
+	 * @return array|bool
+	 */
+	public function adddUserByLogin($a_login)
+	{
+		$user_id = ilObjUser::_lookupId($a_login);
+		if (!empty($user_id))
+		{
+			$this->new_users_by_login[$a_login] = $user_id;
+			return $user_id;
+		}
+		return false;
 	}
 
 
@@ -391,10 +477,16 @@ class ilCoSubImport
 	 */
 	protected function loadUserData()
 	{
+		$user_ids = array_keys($this->object->getPriorities());
+		if (empty($user_ids))
+		{
+			return;
+		}
+
 		// query for users
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
-		$user_query->setUserFilter(array_keys($this->object->getPriorities()));
+		$user_query->setUserFilter($user_ids);
 		$user_query->setLimit(0);
 
 		$user_query_result = $user_query->query();

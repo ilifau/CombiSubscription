@@ -293,10 +293,16 @@ class ilCoSubExport
 	 */
 	protected function getUserQueryResult()
 	{
+		$user_ids = array_keys($this->object->getPriorities());
+		if (empty($user_ids))
+		{
+			return array('cnt' => 0, 'set'=> array());
+		}
+
 		// query for users
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
-		$user_query->setUserFilter(array_keys($this->object->getPriorities()));
+		$user_query->setUserFilter($user_ids);
 		$user_query->setAdditionalFields(array('gender','matriculation'));
 		$user_query->setLimit(0);
 		$user_query->setOrderField('lastname');
