@@ -52,8 +52,9 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 			}
 
 			$this->tpl->setAlertProperties($alerts);
-		}
+			$this->tpl->addCss($this->object->plugin->getStyleSheetLocation('ilObjCombiSubscription.css'));
 
+		}
 	}
 	
 	/**

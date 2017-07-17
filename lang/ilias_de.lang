@@ -207,3 +207,34 @@ import_error_items_missing#:#Es muss zu jeder Auswahl-Einheit eine Spalte geben,
 import_assignments_finished#:#Die Zuteilungen wurden importiert und als aktuelle Zuteilungen übernommen.
 import_assignments_failed#:#Die Zuteilungen konnten nicht importiert werden.
 x_of_y#:#%s von %s
+configure_targets#:#Kurse/Gruppen konfigurieren
+targets_not_defined#:#Es sind noch keine Kurse oder Gruppen als Ziel-Objekte definiert!
+targets_not_writable#:#Sie haben nicht in allen verknüpften Kursen oder Gruppen Schreibrecht!
+set_sub_type#:#Beitrittsverfahren einstellen
+set_sub_type_info#:#Solange die kombinierte Anmeldung läuft, sollten Sie diese als Beitrittsverfahren wählen. Die Anmeldeseiten verlinken dann auf die kombinierte Anmeldung. Nach dem Übertrag der Zuteilungen können Sie in den Kursen/Gruppen eine Anmeldung für Nachzügler freigeben.
+sub_type#:#Beitrittsverfahren
+sub_type_combi#:#Link auf die kombinierte Anmeldung
+sub_type_direct#:#Direkter Beitritt
+sub_type_confirm#:#Beitritt nach Bestätigung
+sub_type_none#:#Kein direkter Beitritt
+set_sub_period#:#Anmeldezeitraum einstellen
+set_sub_period_info#:#Stellen Sie nur einen Anmeldezeitraum ein, wenn die Anmeldung in den Kursen/Gruppen direkt erfolgen soll (z.B. nach dem Übertrag). Solange die kombinierten Anmeldung als Beitrittsverfahren eingestellt ist, gilt der Anmeldezeitraum dieser.
+sub_period#:#Anmeldezeitraum
+sub_period_start#:#Start
+sub_period_end#:#Ende
+set_sub_min#:#Minimale Mitgliederzahl einstellen
+set_sub_min_info#:#Die in der Auswahl-Einheit festgelegte Mindestzahl wird im Kurs oder der Gruppe eingestellt.
+set_sub_max#:#Maximale Mitgliederzahl einstellen
+set_sub_max_info#:#Die in der Auswahl-Einheit festgelegte Maximalzahl wird im Kurs oder der Gruppe eingestellt.
+set_sub_wait#:#Warteliste einstellen
+set_sub_wait_info#:#Die Einstellungen zur Warteliste werden einheitlich vorgenommen.
+sub_wait#:#Verfahren
+sub_wait_auto#:#Mit automatischem Aufrücken
+sub_wait_manu#:#Ohne automatisches Aufrücken
+sub_wait_none#:#Abweisung
+save_target_config#:#Einstellungen übertragen
+target_config_saved#:#Die ausgewählten Einstellungen wurden auf die Ziel-Objekte übertragen.
+target_config_failed#:#Die Einstellungen konnten nicht übertragen werden!
+target_object_not_found#:#Das Ziel-Objekt der Einheit "%s" wurde nicht gefunden!
+target_object_wrong_type#:#Das Ziel-Objekt der Einheit "%s" ist kein Kurs und keine Gruppe!
+target_object_not_writable#:#Das Ziel-Objekt der Einheit "%s" kann nicht bearbeitet werden!

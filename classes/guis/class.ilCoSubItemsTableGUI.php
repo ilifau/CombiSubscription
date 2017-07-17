@@ -1,6 +1,9 @@
 <?php
 
 require_once('Services/Table/classes/class.ilTable2GUI.php');
+require_once('Services/Locator/classes/class.ilLocatorGUI.php');
+require_once('Modules/Course/classes/class.ilObjCourseListGUI.php');
+require_once('Modules/Group/classes/class.ilObjGroupListGUI.php');
 /**
  * Table GUI for registration items
  */
@@ -43,6 +46,8 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->addColumn($this->plugin->txt('target_object'));
 		$this->addColumn('');
 
+		$this->setSelectAllCheckbox('item_ids');
+		//$this->addMultiCommand('configureTargets', $this->plugin->txt('configure_targets'));
 		$this->addMultiCommand('confirmDeleteItems', $this->plugin->txt('delete_items'));
 		$this->addCommandButton('saveSorting',  $this->lng->txt('sorting_save'));
 	}
@@ -96,17 +101,43 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 			$this->tpl->parseCurrentBlock();
 		}
 
-		$this->tpl->setCurrentBlock('column');
-		$content = '';
+		// target info
 		if (!empty($a_set['target_ref_id']))
 		{
-			require_once('Services/Locator/classes/class.ilLocatorGUI.php');
+			$ref_id = $a_set['target_ref_id'];
+			$type = ilObject::_lookupType($ref_id, true);
+			$props = array();
+			if ($type == 'crs')
+			{
+				$list = new ilObjCourseListGUI();
+				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
+				$props = $list->getProperties();
+			}
+			elseif ($type == 'grp')
+			{
+				$list = new ilObjGroupListGUI();
+				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
+				$props = $list->getProperties();
+			}
+
+			foreach ($props as $prop)
+			{
+				$this->tpl->setCurrentBlock('info');
+				if ($prop['alert'])
+				{
+					$this->tpl->setVariable('CLASS', 'il_ItemAlertProperty');
+				}
+				$this->tpl->setVariable('INFO', ($prop['property'] ? $prop['property']. ': ' : '') . $prop['value']);
+				$this->tpl->parseCurrentBlock();
+			}
+
 			$locator = new ilLocatorGUI();
-			$locator->addContextItems($a_set['target_ref_id']);
-			$content = $locator->getHTML();
+			$locator->addContextItems($ref_id);
+			$this->tpl->setCurrentBlock('target');
+			$this->tpl->setVariable('PATH',  $locator->getHTML());
+			$this->tpl->parseCurrentBlock();
 		}
-		$this->tpl->setVariable('CONTENT', $content.' ');
-		$this->tpl->parseCurrentBlock();
+
 
 		$this->tpl->setCurrentBlock('link');
 		$this->ctrl->setParameter($this->parent,'item_id', $a_set['item_id']);

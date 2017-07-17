@@ -6,11 +6,24 @@
  */
 class ilCombiSubscriptionTargets
 {
+	const SUB_TYPE_COMBI = 'combi';
+	const SUB_TYPE_DIRECT = 'direct';
+	const SUB_TYPE_CONFIRM = 'confirm';
+	const SUB_TYPE_NONE = 'none';
+
+	const SUB_WAIT_MANU = 'manu';
+	const SUB_WAIT_AUTO = 'auto';
+	const SUB_WAIT_NONE = 'none';
+
+
 	/** @var  ilObjCombiSubscription */
 	protected $object;
 
 	/** @var ilCombiSubscriptionPlugin  */
 	protected $plugin;
+
+	/** @var  ilCoSubItem[] */
+	protected $items = array();
 
 	/**
 	 * Constructor
@@ -21,6 +34,8 @@ class ilCombiSubscriptionTargets
 	{
 		$this->object = $a_object;
 		$this->plugin = $a_plugin;
+
+		$this->items = $this->object->getItems();
 	}
 
 	/**
@@ -39,7 +54,7 @@ class ilCombiSubscriptionTargets
 
 		// collect the assigning actions to be done
 		$actions = array();
-		foreach ($this->object->getItems() as $item)
+		foreach ($this->items as $item)
 		{
 			if (!empty($item->target_ref_id))
 			{
@@ -128,7 +143,7 @@ class ilCombiSubscriptionTargets
 
 		// collect the actions to be done
 		$actions = array();
-		foreach ($this->object->getItems() as $item)
+		foreach ($this->items as $item)
 		{
 			if (!empty($item->target_ref_id))
 			{
@@ -282,5 +297,186 @@ class ilCombiSubscriptionTargets
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Check if items with targets exist
+	 */
+	public function targetsExist()
+	{
+		$ref_ids = $this->getTargetRefIds();
+		return !empty($ref_ids);
+	}
+
+	/**
+	 * Check if all existing targets are writable
+	 */
+	public function targetsWritable()
+	{
+		/** @var ilAccessHandler  $ilAccess*/
+		global $ilAccess;
+
+		foreach ($this->getTargetRefIds() as $ref_id)
+		{
+			if (!$ilAccess->checkAccess('write', '', $ref_id))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Get the ref_ids of all targets
+	 * @return int[]
+	 */
+	public function getTargetRefIds()
+	{
+		$ref_ids = array();
+		foreach($this->items as $item)
+		{
+			if (!empty($item->target_ref_id))
+			{
+				$ref_ids[] = $item->target_ref_id;
+			}
+		}
+		return $ref_ids;
+	}
+
+	/**
+	 * Set the items by an array of item_ids
+	 * @var int[]
+	 */
+	public function setItemsByIds($a_item_ids)
+	{
+		$this->items = array();
+		foreach ($this->object->getItems() as $item)
+		{
+			if (in_array($item->item_id, $a_item_ids))
+			{
+				$this->items[] = $item;
+			}
+		}
+	}
+
+	/**
+	 * Set the target configurations
+	 * @param string $sub_type
+	 * @param int $sub_start
+	 * @param int $sub_end
+	 * @param bool $set_min
+	 * @param bool $set_max
+	 * @param string $sub_wait
+	 * @throws Exception
+	 */
+	public function setTargetsConfig($sub_type = null, $sub_start = null, $sub_end = null, $set_min = null, $set_max = null, $sub_wait = null)
+	{
+		/** @var ilAccessHandler  $ilAccess*/
+		global $ilAccess;
+
+		require_once('Services/Object/classes/class.ilObjectFactory.php');
+
+		$items = array();
+		$targets = array();
+		foreach($this->items as $item)
+		{
+			if (!empty($item->target_ref_id))
+			{
+				$target = ilObjectFactory::getInstanceByRefId($item->target_ref_id, false);
+				if (!is_object($target))
+				{
+					throw new Exception(sprintf($this->plugin->txt('target_object_not_found'), $item->title));
+				}
+				if ($target->getType() != 'crs' && $target->getType() != 'grp')
+				{
+					throw new Exception(sprintf($this->plugin->txt('target_object_wrong_type'), $item->title));
+				}
+				if (!$ilAccess->checkAccess('write', '', $item->target_ref_id))
+				{
+					throw new Exception(sprintf($this->plugin->txt('target_object_not_writable'), $item->title));
+				}
+
+				$items[$item->item_id] = $item;
+				$targets[$item->item_id] = $target;
+			}
+		}
+
+		foreach ($targets as $item_id => $target)
+		{
+			$item = $items[$item_id];
+			switch ($target->getType())
+			{
+				case 'crs':
+					/** @var ilObjCourse $target */
+					switch ($sub_type)
+					{
+						case self::SUB_TYPE_COMBI:
+							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_OBJECT);
+							$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
+							$target->setSubscriptionRefId($this->object->getRefId());
+							$target->setSubscriptionStart($this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
+							$target->setSubscriptionEnd($this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
+
+							break;
+						case self::SUB_TYPE_CONFIRM:
+							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_CONFIRMATION);
+							break;
+						case self::SUB_TYPE_DIRECT:
+							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DIRECT);
+							break;
+						case self::SUB_TYPE_NONE:
+							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DEACTIVATED);
+							break;
+					}
+
+					if (isset($sub_start))
+					{
+						$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
+						$target->setSubscriptionStart($sub_start);
+					}
+
+					if (isset($sub_end))
+					{
+						$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
+						$target->setSubscriptionEnd($sub_end);
+					}
+
+					if ($set_min)
+					{
+						$target->enableSubscriptionMembershipLimitation(true);
+						$target->setSubscriptionMinMembers($item->sub_min);
+					}
+					if ($set_max)
+					{
+						$target->enableSubscriptionMembershipLimitation(true);
+						$target->setSubscriptionMaxMembers($item->sub_max);
+					}
+
+					switch($sub_wait)
+					{
+						case self::SUB_WAIT_AUTO:
+							$target->enableWaitingList(true);
+							$target->setWaitingListAutoFill(true);
+							break;
+						case self::SUB_WAIT_MANU:
+							$target->enableWaitingList(true);
+							$target->setWaitingListAutoFill(false);
+							break;
+						case self::SUB_WAIT_NONE:
+							$target->enableWaitingList(false);
+							break;
+					}
+
+					$target->update();
+					break;
+
+				case 'grp':
+					/** @var ilObjGroup $target */
+
+
+					$target->update();
+					break;
+			}
+		}
 	}
 }
