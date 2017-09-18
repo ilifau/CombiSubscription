@@ -38,6 +38,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
 		$this->setRowTemplate("tpl.il_xcos_registration_row.html", $this->plugin->getDirectory());
 		$this->setEnableNumInfo(false);
+		$this->setExternalSegmentation(true);
 
 		$this->addColumn($this->plugin->txt('registration_header_item'),'','40%');
 
