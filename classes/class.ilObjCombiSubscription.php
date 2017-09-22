@@ -10,13 +10,14 @@ include_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 */
 class ilObjCombiSubscription extends ilObjectPlugin
 {
-	# region constants
+	# region class constants
 	const SATISFIED_NOT = 0;
 	const SATISFIED_MEDIUM = 1;
 	const SATISFIED_FULL = 2;
 	# endregion
 
-	# region properties
+	# region class variables
+
 	protected $online = false;
 	protected $explanation = '';
 	protected $sub_start = null;
@@ -25,9 +26,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	protected $min_choices = 0;
 	protected $method = 'ilCoSubMethodRandom';
 	protected $class_properties = array();
-	#endregion
-
-	# region class variables
 
 	/** @var  ilCombiSubscriptionPlugin */
 	public $plugin;
@@ -52,9 +50,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	# endregion
 
-	#########################
-	# region object functions
-	#########################
 
 	/**
 	 * Constructor
@@ -188,12 +183,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$item->saveClone($new_obj->getId());
 		}
 	}
-
-	#endregion
-
-	########################
-	# region getters/setters
-	########################
 
 	/**
 	* Set online
@@ -482,11 +471,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$_SESSION['CombiSubscription'][$a_class][$a_key] = $a_value;
 	}
 
-	# endregion
-
-	###########################
-	# region calculation method
-	###########################
 
 	/**
 	 * Set the Assignment Method
@@ -563,12 +547,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $methods;
 	}
 
-	# endregion
-
-	##############
-	# region items
-	##############
-
 	/**
 	 * Get the items assigned to this object (lazy loading)
 	 * @return ilCoSubItem[]
@@ -614,12 +592,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 		return $item;
 	}
-
-	# endregion
-
-	########################
-	# region user priorities
-	########################
 
 	/**
 	 * Get the priorities of all users
@@ -691,12 +663,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return ilCoSubChoice::_getPriorityCounts($this->getId());
 	}
 
-	# endregion
-
-	#############
-	# region runs
-	#############
-
 	/**
 	 * Get the runs done for this object
 	 * @return ilCoSubRun[]
@@ -759,11 +725,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $label;
 	}
 
-	# endregion
-
-	####################
-	# region assignments
-	####################
 
 	/**
 	 * Get the assignments (lazy loading)
@@ -892,11 +853,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 	}
 
-	# endregion
-
-	######################
-	# region miscellaneous
-	######################
 
 	/**
 	 * Get the satisfaction of a user's choices by a certain run
@@ -943,7 +899,4 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		ilCoSubChoice::_deleteForObject($this->getId());
 		ilCoSubRun::_deleteForObject($this->getId());
 	}
-
-
-	# endregion
 }

@@ -5,10 +5,7 @@
  */
 class ilCoSubMethodEATTS extends ilCoSubMethodBase
 {
-	##################
-	# region constants
-	##################
-
+	# region class constants
 	const STATUS_OK = 200;
 	const STATUS_NO_CONTENT = 204;
 	const STATUS_BAD_REQUEST = 400;
@@ -17,9 +14,8 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	# endregion
 
-	########################
-	# region global settings
-	########################
+
+	# region class variables
 
 	/** @var string eatts server url */
 	public $server_url;
@@ -32,12 +28,6 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/** @var string  */
 	public $log_level;
-
-	# endregion
-
-	##########################
-	# region object properties
-	##########################
 
 	/** @var int maximum iterations */
 	public $max_iterations;
@@ -57,16 +47,11 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	/** @var float weight peer selections */
 	public $peers_weight;
 
-	# endregion
-
 
 	/** @var  ilCoSubRun */
 	protected $run;
 
-
-	#####################
-	# region API (object)
-	#####################
+	# endregion
 
 	/**
 	 * Constructor
@@ -301,14 +286,10 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 		}
 	}
 
-	# endregion
-
-
-	##################################
-	# region Method specific functions
-	##################################
-
-
+	/**
+	 * Get details of the calculation parameters
+	 * @return string
+	 */
 	protected function getParameterDetails()
 	{
 		require_once('Services/Utilities/classes/class.ilFormat.php');
@@ -420,7 +401,5 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 			}
 		}
 	}
-
-	# endregion
 
 }
