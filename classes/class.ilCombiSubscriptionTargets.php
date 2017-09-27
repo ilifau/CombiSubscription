@@ -327,6 +327,28 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
+	 * get the common type of the targets
+	 * @return string|null		type or null if they have different types
+	 */
+	public function getCommonType()
+	{
+		$type = null;
+		foreach ($this->getTargetRefIds() as $ref_id)
+		{
+			$newtype = ilObject::_lookupType($ref_id, true);
+			if (empty($type))
+			{
+				$type = $newtype;
+			}
+			elseif ($type != $newtype)
+			{
+				return null;
+			}
+		}
+		return $type;
+	}
+
+	/**
 	 * Get the ref_ids of all targets
 	 * @return int[]
 	 */
@@ -472,7 +494,63 @@ class ilCombiSubscriptionTargets
 
 				case 'grp':
 					/** @var ilObjGroup $target */
+					switch ($sub_type)
+					{
+						case self::SUB_TYPE_COMBI:
+							$target->setRegistrationType(GRP_REGISTRATION_OBJECT);
+							$target->setRegistrationRefId($this->object->getRefId());
+							$target->setRegistrationStart($this->object->getSubscriptionStart());
+							$target->setRegistrationEnd($this->object->getSubscriptionEnd());
 
+							break;
+						case self::SUB_TYPE_CONFIRM:
+							$target->setRegistrationType(GRP_REGISTRATION_REQUEST);
+							break;
+						case self::SUB_TYPE_DIRECT:
+							$target->setRegistrationType(GRP_REGISTRATION_DIRECT);
+							break;
+						case self::SUB_TYPE_NONE:
+							$target->setRegistrationType(GRP_REGISTRATION_DEACTIVATED);
+							break;
+					}
+
+					if (isset($sub_start))
+					{
+						$target->enableUnlimitedRegistration(false);
+						$target->setRegistrationStart(new ilDateTime($sub_start, IL_CAL_UNIX));
+					}
+
+					if (isset($sub_end))
+					{
+						$target->enableUnlimitedRegistration(false);
+						$target->setRegistrationEnd(new ilDateTime($sub_end, IL_CAL_UNIX));
+					}
+
+					if ($set_min)
+					{
+						$target->enableMembershipLimitation(true);
+						$target->setMinMembers($item->sub_min);
+					}
+					if ($set_max)
+					{
+						$target->enableMembershipLimitation(true);
+						$target->setMaxMembers($item->sub_max);
+					}
+
+					switch($sub_wait)
+					{
+						case self::SUB_WAIT_AUTO:
+							$target->enableWaitingList(true);
+							$target->setWaitingListAutoFill(true);
+							break;
+						case self::SUB_WAIT_MANU:
+							$target->enableWaitingList(true);
+							$target->setWaitingListAutoFill(false);
+							break;
+						case self::SUB_WAIT_NONE:
+							$target->enableWaitingList(false);
+							break;
+					}
 
 					$target->update();
 					break;

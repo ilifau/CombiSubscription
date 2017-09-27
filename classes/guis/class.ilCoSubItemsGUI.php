@@ -358,13 +358,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Initialize the form to configure the targets commonly
 	 */
-	protected function initTargetsForm()
+	protected function initTargetsForm($a_type)
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 
 		$this->form = new ilPropertyFormGUI();
-		$this->form->setTitle($this->plugin->txt('configure_targets'));
+		$this->form->setTitle($this->plugin->txt('configure_targets_'.$a_type));
 
 		$set_type = new ilCheckboxInputGUI($this->plugin->txt('set_sub_type'), 'set_sub_type');
 		$set_type->setInfo($this->plugin->txt('set_sub_type_info'));
@@ -428,6 +428,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		$this->form->addCommandButton('saveTargetsConfig', $this->plugin->txt('save_target_config'));
 		$this->form->addCommandButton('listItems', $this->lng->txt('cancel'));
+
+		$this->ctrl->setParameter($this, 'type', $a_type);
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 	}
 
@@ -502,7 +504,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
-		$this->initTargetsForm();
+		$type = $targets->getCommonType();
+		if (empty($type))
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_different_type'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
+
+		$this->initTargetsForm($type);
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
@@ -511,7 +520,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveTargetsConfig()
 	{
-		$this->initTargetsForm();
+		$this->initTargetsForm($_GET['type']);
 		$this->form->checkInput();
 
 		$set_sub_type = (bool) $this->form->getInput('set_sub_type');

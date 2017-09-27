@@ -207,25 +207,29 @@ import_error_items_missing#:#Es muss zu jeder Auswahl-Einheit eine Spalte geben,
 import_assignments_finished#:#Die Zuteilungen wurden importiert und als aktuelle Zuteilungen übernommen.
 import_assignments_failed#:#Die Zuteilungen konnten nicht importiert werden.
 x_of_y#:#%s von %s
-configure_targets#:#Kurse/Gruppen konfigurieren
+configure_targets#:#Ziel-Objekte konfigurieren
+configure_targets_crs#:#Kurse konfigurieren
+configure_targets_grp#:#Gruppen konfigurieren
+configure_targets_sess#:#Sitzungen konfigurieren
 targets_not_defined#:#Es sind noch keine Kurse oder Gruppen als Ziel-Objekte definiert!
 targets_not_writable#:#Sie haben nicht in allen verknüpften Kursen oder Gruppen Schreibrecht!
+targets_different_type#:#Die Zielobjekte müssen vom selben Typ (Kurs oder Gruppe) sein, um gemeinsam konfiguriert zu werden!
 set_sub_type#:#Beitrittsverfahren einstellen
-set_sub_type_info#:#Solange die kombinierte Anmeldung läuft, sollten Sie diese als Beitrittsverfahren wählen. Die Anmeldeseiten verlinken dann auf die kombinierte Anmeldung. Nach dem Übertrag der Zuteilungen können Sie in den Kursen/Gruppen eine Anmeldung für Nachzügler freigeben.
+set_sub_type_info#:#Solange die kombinierte Anmeldung läuft, sollten Sie diese als Beitrittsverfahren wählen. Die Anmeldungen der Ziel-Objekte verlinken dann auf die kombinierte Anmeldung. Nach dem Übertrag der Zuteilungen können Sie eine Anmeldung für Nachzügler freigeben.
 sub_type#:#Beitrittsverfahren
 sub_type_combi#:#Link auf die kombinierte Anmeldung
 sub_type_direct#:#Direkter Beitritt
 sub_type_confirm#:#Beitritt nach Bestätigung
 sub_type_none#:#Kein direkter Beitritt
 set_sub_period#:#Anmeldezeitraum einstellen
-set_sub_period_info#:#Stellen Sie nur einen Anmeldezeitraum ein, wenn die Anmeldung in den Kursen/Gruppen direkt erfolgen soll (z.B. nach dem Übertrag). Solange die kombinierten Anmeldung als Beitrittsverfahren eingestellt ist, gilt der Anmeldezeitraum dieser.
+set_sub_period_info#:#Stellen Sie nur einen Anmeldezeitraum ein, wenn die Anmeldung in den Ziel-Objekten direkt erfolgen soll (z.B. nach dem Übertrag). Solange die kombinierten Anmeldung als Beitrittsverfahren eingestellt ist, gilt der Anmeldezeitraum dieser.
 sub_period#:#Anmeldezeitraum
 sub_period_start#:#Start
 sub_period_end#:#Ende
 set_sub_min#:#Minimale Mitgliederzahl einstellen
-set_sub_min_info#:#Die in der Auswahl-Einheit festgelegte Mindestzahl wird im Kurs oder der Gruppe eingestellt.
+set_sub_min_info#:#Die in der Auswahl-Einheit festgelegte Mindestzahl wird auch im Ziel-Objekt eingestellt.
 set_sub_max#:#Maximale Mitgliederzahl einstellen
-set_sub_max_info#:#Die in der Auswahl-Einheit festgelegte Maximalzahl wird im Kurs oder der Gruppe eingestellt.
+set_sub_max_info#:#Die in der Auswahl-Einheit festgelegte Maximalzahl wird auch im Ziel-Objekt eingestellt.
 set_sub_wait#:#Warteliste einstellen
 set_sub_wait_info#:#Die Einstellungen zur Warteliste werden einheitlich vorgenommen.
 sub_wait#:#Verfahren

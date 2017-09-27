@@ -47,7 +47,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->addColumn('');
 
 		$this->setSelectAllCheckbox('item_ids');
-		//$this->addMultiCommand('configureTargets', $this->plugin->txt('configure_targets'));
+		$this->addMultiCommand('configureTargets', $this->plugin->txt('configure_targets'));
 		$this->addMultiCommand('confirmDeleteItems', $this->plugin->txt('delete_items'));
 		$this->addCommandButton('saveSorting',  $this->lng->txt('sorting_save'));
 	}

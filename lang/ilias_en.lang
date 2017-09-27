@@ -207,3 +207,38 @@ import_error_items_missing#:#Each item must have a column named with its identif
 import_assignments_finished#:#The assignments are imported and chisen as current assignments.
 import_assignments_failed#:#The assignments can't be imported.
 x_of_y#:#%s of %s
+configure_targets#:#Configure Targer Objects
+configure_targets_crs#:#Configure Courses
+configure_targets_grp#:#Configure Groups
+configure_targets_sess#:#Configure Events
+targets_not_defined#:#There are no target objects defined!
+targets_not_writable#:#You don't have write access in all target objects!
+targets_different_type#:#The target objects mast have the same type (Course, Grpoup) to be commonly configured!
+set_sub_type#:#Registration Settings
+set_sub_type_info#:#Please use this combined subscription in their subscription period. The registration pages of the target objects will then link to thhe combined subscription. You may open the registration in the target objects after the assignments are transfered.
+sub_type#:#Registration Procedure
+sub_type_combi#:#Link to the Combined Subscription
+sub_type_direct#:#Join Directly
+sub_type_confirm#:#Request Membership
+sub_type_none#:#No Self-enrolment
+set_sub_period#:#Limited Registration Period
+set_sub_period_info#:#Please choose only registration period only when the registration is done in the target object (e.g. after transmission). When the combined subscription is linked, then their subscription period is relevant.
+sub_period#:#Period
+sub_period_start#:#Star
+sub_period_end#:#End
+set_sub_min#:#Set Minimum Number of Members
+set_sub_min_info#:#The minimum number of members configured in the item will be set in the target object.
+set_sub_max#:#Set Maximum Number of Members
+set_sub_max_info#:#The maximum number of members configured in the item will be set in the target object.
+set_sub_wait#:#Set Waiting List
+set_sub_wait_info#:#The waiting list settings will be commonly set for all target objects
+sub_wait#:#Procedure
+sub_wait_auto#:#With Auto-Fill
+sub_wait_manu#:#Without Auto-Fill
+sub_wait_none#:#No Waiting List
+save_target_config#:#Apply Settings
+target_config_saved#:#The selected settings are applied to the target objects.
+target_config_failed#:#The selected settings can't be applied!
+target_object_not_found#:#The target object of item '%s' is not found.
+target_object_wrong_type#:#The target object of item '%s' is no course or group.
+target_object_not_writable#:#You don't have write access to the target object of item  '%s'.
