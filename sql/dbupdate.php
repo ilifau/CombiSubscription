@@ -62,11 +62,6 @@
 			'length' => 2000,
 			'notnull' => false
 		),
-		'position' => array(
-			'type' => 'integer',
-			'length' => 4,
-			'notnull' => false
-		),
 		'sub_min' => array(
 			'type' => 'integer',
 			'length' => 4,
@@ -277,3 +272,66 @@
         );
     }
 ?>
+<#12>
+<?php
+    $fields = array(
+        'cat_id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true
+        ),
+        'obj_id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true
+        ),
+        'title' => array(
+            'type' => 'text',
+            'length' => 255,
+            'notnull' => true
+        ),
+        'description' => array(
+            'type' => 'text',
+            'length' => 2000,
+            'notnull' => false
+        ),
+        'sort_position' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => false
+        ),
+        'min_choices' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => false
+        ),
+        'max_choices' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => false
+        ),
+		'assignments' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => false
+		)
+    );
+
+    $ilDB->createTable('rep_robj_xcos_cats', $fields);
+    $ilDB->addPrimaryKey('rep_robj_xcos_cats', array('cat_id'));
+    $ilDB->addIndex('rep_robj_xcos_cats', array('obj_id'), 'i1');
+    $ilDB->createSequence('rep_robj_xcos_cats');
+?>
+<#13>
+<?php
+if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'cat_id'))
+{
+	$ilDB->addTableColumn('rep_robj_xcos_items', 'cat_id', array(
+			'type'    => 'integer',
+			'length'  => 4,
+			'notnull' => false,
+			'default' => null)
+	);
+}
+?>
+

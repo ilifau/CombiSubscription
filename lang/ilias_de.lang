@@ -40,6 +40,9 @@ assignment_method#:#Zuteilungs-Methode
 assignment_methods#:#Zuteilungs-Methoden
 registration#:#Anmeldung
 registration_items#:#Auswahl-Einheiten
+items_description#:#Auswahl-Einheiten entsprechen Kursen, Gruppen, Modulen oder anderen Dingen, unter denen bei der Anmeldung eine Auswahl getroffen wird oder Prioritäten vergeben werden.
+items_description_targets#:#Kurse oder Gruppen können direkt hinzugefügt oder nachträglich mit Einheiten verknüpft werden. Dabei wird die maximale Mitgliederzahl als maximale Zuteilungen übernommen.
+items_description_transfer#:#Wenn die endgültige Zuteilung feststeht, können die zugeteilten Nutzer automatisch als Mitglieder eingetragen werden.
 create_item#:#Neue Einheit erstellen
 add_repository_items#:#Kurse/Gruppen als Einheiten hinzufügen
 sub_min#:#Minimale Zuteilungen
@@ -68,6 +71,8 @@ method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
 assignment#:#Zuteilung
 assignments#:#Zuteilungen
+assignments_description#:#In dieser Matrix können Sie festlegen welche Auswahl-Einheit welchem Nutzer zugeteilt ist. Sie sehen die Prioritäten aus der Anmeldung farbig hinterlegt.
+assignments_description_runs#:#Wenn Sie Zuteilungen berechnen lassen, werden sie hier eingetragen und zusätzlich mit einen Datum gespeichert. Sie sehen die Verteilung gespeicherter Zuteilungen mit Buchstaben eingeblendet und können diese auch wieder als aktuelle übernehmen.
 save_assignments#:#Speichern
 msg_assignments_saved#:#Die aktuellen Zuteilungen wurden gespeichert.
 satisfaction#:#Erfüllung
@@ -114,6 +119,7 @@ calc_properties#:#Methoden-Einstellungen
 basic_configuration#:#Basis-Konfiguration
 ilcosubmethodeatts_title#:#EATTS
 ilcosubmethodeatts_description#:#Erlangen Advanced Time Tabling System
+ilcosubmethodeatts_properties_description#:#Hier liegen Sie Einstellungen fest, die speziell von der Zuteilungsmethode "EATTS" unterstützt werden.
 ilcosubmethodeatts_select_preferred#:#bevorzugt
 ilcosubmethodeatts_select_alternative#:#alternativ
 ilcosubmethodeatts_select_not#:#nicht gewählt
@@ -131,6 +137,7 @@ ilcosubmethodeatts_log_level#:#Log-Level
 ilcosubmethodeatts_log_level_info#:#Info
 ilcosubmethodrandom_title#:#Zufallsauswahl
 ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufall aus.
+ilcosubmethodrandom_properties_description#:#Hier liegen Sie Einstellungen fest, die speziell von der Zuteilungsmethode "Zufallsauswahl" unterstützt werden.
 ilcosubmethodrandom_select_yes#:#gewählt
 ilcosubmethodrandom_select_not#:#nicht gewählt
 ilcosubmethodrandom_select_preferred#:#bevorzugt
@@ -242,3 +249,18 @@ target_config_failed#:#Die Einstellungen konnten nicht übertragen werden!
 target_object_not_found#:#Das Ziel-Objekt der Einheit "%s" wurde nicht gefunden!
 target_object_wrong_type#:#Das Ziel-Objekt der Einheit "%s" ist kein Kurs und keine Gruppe!
 target_object_not_writable#:#Das Ziel-Objekt der Einheit "%s" kann nicht bearbeitet werden!
+registration_categories#:#Auswahl-Kategorien
+categories_description#:#Kategorien gliedern auf der Anmeldeseite die Auswahl-Einheiten in Form aufklappbarer Bereiche. Sie können zudem festlegen, dass in jeder Kategorie eine bestimmte Anzahl an Auswahlen getroffen werden muss. Sie können Kategorien verwenden, müssen es aber nicht.
+create_category#:#Kategorie erstellen
+edit_category#:#Kategorie bearbeiten
+delete_categories#:#Kategorien löschen
+msg_category_created#:#Die Kategorie wurde erstellt.
+msg_category_updated#:#Die Kategorie wurde aktualisiert.
+msg_category_deleted#:#Die Kategorie wurde gelöscht.
+msg_categories_deleted#:#Die Kategorien wurden gelöscht.
+confirm_delete_categories#:#Möchten Sie die folgenden Kategorien löschen?
+confirm_delete_categories_info#:#Falls diesen Kategorien Auswahl-Einheiten zugeordnet sind, verbleiben die Einheiten ohne Kategorien-Zuordnung.
+cat_assignments#:#Zuteilungen
+cat_assignments_info#:#Bei der Berechnung der Zuteilungen werden jedem Teilnehmer so viele an Einheiten aus dieser Kategorie zugeteilt. Lassen Sie das Feld leer, wenn Sie diese Bedingung nicht setzen möchten.
+no_category_selected#:#Keine Kategorie ausgewählt
+category#:#Kategorie

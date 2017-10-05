@@ -53,7 +53,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 
 		if ($this->object->getExplanation())
 		{
-			$intro = '<p>'.$this->object->getExplanation().'</p>';
+			$intro = $this->pageInfo($this->object->getExplanation());
 		}
 
 		// take the current priorities of hte user if none are posted

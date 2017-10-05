@@ -12,9 +12,18 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 	/** @var  ilCtrl */
 	protected $ctrl;
 
+	/** @var ilCoSubItemsGUI  */
+	protected $parent;
+
+	/** @var ilCombiSubscriptionPlugin  */
+	protected $plugin;
+
+	/** @var  ilCoSubCategory[]	indexed by cat_id */
+	protected $categories;
+
 	/**
 	 * ilCoSubItemsTableGUI constructor.
-	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
+	 * @param ilCoSubItemsGUI 			$a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
 	function __construct($a_parent_gui, $a_parent_cmd)
@@ -24,6 +33,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 
 		$this->parent = $a_parent_gui;
 		$this->plugin = $a_parent_gui->plugin;
+		$this->categories = $this->parent->object->getCategories();
 		$this->ctrl = $ilCtrl;
 
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
@@ -32,6 +42,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 
 		$this->addColumn('', '', '1%', true);
 		$this->addColumn($this->lng->txt('sorting_header'), '', '1%');
+		$this->addColumn($this->plugin->txt('category'));
 		$this->addColumn($this->plugin->txt('identifier'));
 		$this->addColumn($this->lng->txt('title'));
 		$this->addColumn($this->lng->txt('description'));
@@ -64,6 +75,9 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		{
 			$row =  get_object_vars($item);
 			$row['sort'] = $sort;
+			if (!empty($row['cat_id'])) {
+				$row['category'] = $this->categories[$row['cat_id']]->title;
+			}
 			$data[] = $row;
 			$sort += 10;
 		}
@@ -85,7 +99,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->tpl->parseCurrentBlock();
 
 
-		$columns = array('identifier', 'title', 'description');
+		$columns = array('identifier', 'category', 'title', 'description');
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
 			$column[] = 'sub_min';
@@ -137,7 +151,10 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 			$this->tpl->setVariable('PATH',  $locator->getHTML());
 			$this->tpl->parseCurrentBlock();
 		}
-
+		else
+		{
+			$this->tpl->touchBlock('target');
+		}
 
 		$this->tpl->setCurrentBlock('link');
 		$this->ctrl->setParameter($this->parent,'item_id', $a_set['item_id']);

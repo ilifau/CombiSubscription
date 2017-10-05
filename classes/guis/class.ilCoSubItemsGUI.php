@@ -95,7 +95,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$this->plugin->includeClass('guis/class.ilCoSubItemsTableGUI.php');
 		$table_gui = new ilCoSubItemsTableGUI($this, 'listItems');
 		$table_gui->prepareData($this->object->getItems());
-		$this->tpl->setContent($table_gui->getHTML());
+
+		$description = implode(' ', array(
+			$this->plugin->txt('items_description'),
+			$this->plugin->txt('items_description_targets'),
+			$this->plugin->txt('items_description_transfer')));
+
+		$this->tpl->setContent($this->pageInfo($description).$table_gui->getHTML());
 	}
 
 	/**
@@ -317,6 +323,16 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$ti->setRequired(false);
 		$this->form->addItem($ti);
 
+		// category
+		$cat_options = array('0' => $this->plugin->txt('no_category_selected'));
+		foreach($this->object->getCategories() as $category)
+		{
+			$cat_options[$category->cat_id] = $category->title;
+		}
+		$si = new ilSelectInputGUI($this->plugin->txt('category'), 'cat_id');
+		$si->setOptions($cat_options);
+		$this->form->addItem($si);
+
 		if ($this->object->getMethodObject()->hasMinSubscription())
 		{
 			// minimum subscriptions
@@ -465,6 +481,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$a_item->title = $this->form->getInput('title');
 		$a_item->description = $this->form->getInput('description');
 		$a_item->target_ref_id = $this->form->getInput('target_ref_id');
+		$a_item->cat_id = $this->form->getInput('cat_id');
+		$a_item->cat_id = empty($a_item->cat_id) ? null : $a_item->cat_id;
 		if ($this->object->getMethodObject()->hasMinSubscription())
 		{
 			$sub_min = $this->form->getInput('sub_min');

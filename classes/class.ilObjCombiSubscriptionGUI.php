@@ -88,6 +88,14 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->ctrl->forwardCommand(new ilCoSubPropertiesGUI($this));
 					return;
 
+				case 'ilcosubcategoriesgui':
+					$this->checkPermission("write");
+					$this->checkMethodAvailable();
+					$this->setSubTabs('settings', 'categories');
+					$this->plugin->includeClass('guis/class.ilCoSubCategoriesGUI.php');
+					$this->ctrl->forwardCommand(new ilCoSubCategoriesGUI($this));
+					return;
+
 				case 'ilcosubitemsgui':
 					$this->checkPermission("write");
 					$this->checkMethodAvailable();
@@ -281,6 +289,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				{
 					$this->tabs_gui->addSubTab('calc', $this->txt('calc_properties'), $this->ctrl->getLinkTargetByClass($classname));
 				}
+
+				$this->tabs_gui->addSubTab('categories', $this->txt('registration_categories'), $this->ctrl->getLinkTargetByClass('ilCoSubCategoriesGUI'));
 
 				$this->tabs_gui->addSubTab('items', $this->txt('registration_items'), $this->ctrl->getLinkTargetByClass('ilCoSubItemsGUI'));
 				break;

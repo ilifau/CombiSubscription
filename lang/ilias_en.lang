@@ -40,6 +40,9 @@ assignment_method#:#Assignment Method
 assignment_methods#:#Assignment Methods
 registration#:#Registration
 registration_items#:#Registration Items
+items_description#:##Registration Items are courses, groups or other things that can be selected or priorized at registration.
+items_description_targets#:#Courses or groups can directly be added or linked to items later. The maximum number of members is taken as maximum number of assignments.
+items_description_transfer#:#When the final assignments are done, the users can automatically be added as members.
 create_item#:#Create New Item
 add_repository_items#:#Add Courses/Groups as Items
 sub_min#:#Minimum Assingments
@@ -68,6 +71,8 @@ method_not_defined#:#This object has not assignment method defined!
 msg_registration_saved#:#The choices where saved.
 assignment#:#Assigment
 assignments#:#Assignments
+assignments_description#:#This matrix allows you to assign items to users. The priorities chosen by the users are shown as background colors.
+assignments_description_runs#:#Calculated assignments are set here and additinally saved with a date. You see these assignments with letters and eingeblendet and you can take them as the actual ones.
 save_assignments#:#Save Assignments
 msg_assignments_saved#:#The assignments were saved.
 satisfaction#:#Satisfaction
@@ -114,6 +119,7 @@ calc_properties#:#Method Properties
 basic_configuration#:#Basic Configuration
 ilcosubmethodeatts_title#:#EATTS
 ilcosubmethodeatts_description#:Erlangen Advanced Time Tabling System
+ilcosubmethodeatts_properties_description#:#The following properties are specially supported by the 'EATTS' assignment method.
 ilcosubmethodeatts_select_preferred#:#preferred
 ilcosubmethodeatts_select_alternative#:#alternative
 ilcosubmethodeatts_select_not#:#not selected
@@ -129,8 +135,9 @@ ilcosubmethodeatts_license_url#:#Lizenz Server Url
 ilcosubmethodeatts_license#:#Lizenz
 ilcosubmethodeatts_log_level#:#Log Level
 ilcosubmethodeatts_log_level_info#:#Info
-ilcosubmethodrandom_title#:#Random selections
+ilcosubmethodrandom_title#:#Random Selections
 ilcosubmethodrandom_description#:Selects the assignments randomly per priority
+ilcosubmethodrandom_properties_description#:#The following properties are specially supported by the 'Random elections' assignment method.
 ilcosubmethodrandom_select_yes#:#selected
 ilcosubmethodrandom_select_not#:#not selected
 ilcosubmethodrandom_select_preferred#:#preferred
@@ -242,3 +249,18 @@ target_config_failed#:#The selected settings can't be applied!
 target_object_not_found#:#The target object of item '%s' is not found.
 target_object_wrong_type#:#The target object of item '%s' is no course or group.
 target_object_not_writable#:#You don't have write access to the target object of item  '%s'.
+registration_categories#:#Registration Categories
+categories_description#:#Registration Categories are used to show the registration items in an accordeon. You can define how much items have to be chosen per category. You may use categories, but don't need to.
+create_category#:#Create Category
+edit_category#:#Edit Category
+delete_categories#:#Delete Category
+msg_category_created#:#The category is created.
+msg_category_updated#:#The category is saved.
+msg_category_deleted#:#The category is deleted.
+msg_categories_deleted#:#The categories are deleted.
+confirm_delete_categories#:#Do you like to delete the following categories?
+confirm_delete_categories_info#:#Registration items having these categories will remain without category.
+cat_assignments#:#Assignments
+cat_assignments_info#:#The calculation will assign this mumber of items from this category to a user. Leave the field empty if you don't want to set this condition.
+no_category_selected#:#No category selected
+category#:#Category

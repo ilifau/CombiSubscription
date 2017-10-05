@@ -1,24 +1,15 @@
 <?php
 
 /**
- * Item of a combined subscription
+ * Category of a combined subscription
  */
-class ilCoSubItem
+class ilCoSubCategory
 {
-	/** @var  integer */
-	public $item_id;
-
-	/** @var  integer */
-	public $obj_id;
-
 	/** @var  integer */
 	public $cat_id;
 
 	/** @var  integer */
-	public $target_ref_id;
-
-	/** @var  string */
-	public $identifier;
+	public $obj_id;
 
 	/** @var  string */
 	public $title;
@@ -30,28 +21,28 @@ class ilCoSubItem
 	public $sort_position;
 
 	/** @var  integer|null */
-	public $sub_min;
+	public $min_choices;
 
 	/** @var  integer|null */
-	public $sub_max;
+	public $assignments;
 
 
 	/**
-	 * Get item by id
+	 * Get category by id
 	 * @param integer  $a_id
-	 * @return ilCoSubItem or null if not exists
+	 * @return ilCoSubCategory or null if not exists
 	 */
 	public static function _getById($a_id)
 	{
 		global $ilDB;
 
-		$query = 'SELECT * FROM rep_robj_xcos_items'
-			.' WHERE item_id = '. $ilDB->quote($a_id,'integer');
+		$query = 'SELECT * FROM rep_robj_xcos_cats'
+			.' WHERE cat_id = '. $ilDB->quote($a_id,'integer');
 
 		$res = $ilDB->query($query);
 		if ($row = $ilDB->fetchAssoc($res))
 		{
-			$obj = new ilCoSubItem;
+			$obj = new ilCoSubCategory;
 			$obj->fillData($row);
 			return $obj;
 		}
@@ -62,25 +53,26 @@ class ilCoSubItem
 	}
 
 	/**
-	 * Delete an item by its id
+	 * Delete a category by its id
 	 * @param integer $a_id
 	 */
 	public static function _deleteById($a_id)
 	{
 		global $ilDB;
-		$ilDB->manipulate('DELETE FROM rep_robj_xcos_items WHERE item_id = ' . $ilDB->quote($a_id,'integer'));
+		$ilDB->manipulate('DELETE FROM rep_robj_xcos_cats WHERE cat_id = ' . $ilDB->quote($a_id,'integer'));
+		$ilDB->manipulate('UPDATE rep_robj_xcos_items SET cat_id = NULL WHERE cat_id = ' . $ilDB->quote($a_id,'integer'));
 	}
 
 	/**
-	 * Get items by parent object id
+	 * Get categories by parent object id
 	 * @param integer   object id
-	 * @return ilCoSubItem[]
+	 * @return ilCoSubCategory[]	indexed by cat_id
 	 */
 	public static function _getForObject($a_obj_id)
 	{
 		global $ilDB;
 
-		$query = 'SELECT * FROM rep_robj_xcos_items'
+		$query = 'SELECT * FROM rep_robj_xcos_cats'
 			.' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
 			.' ORDER BY sort_position ASC';
 
@@ -88,21 +80,21 @@ class ilCoSubItem
 		$res = $ilDB->query($query);
 		while ($row = $ilDB->fetchAssoc($res))
 		{
-			$obj = new ilCoSubItem;
+			$obj = new ilCoSubCategory;
 			$obj->fillData($row);
-			$objects[] = $obj;
+			$objects[$obj->cat_id] = $obj;
 		}
 		return $objects;
 	}
 
 	/**
-	 * Delete all items for a parent object id
+	 * Delete all categories for a parent object id
 	 * @param integer object id
 	 */
 	public static function _deleteForObject($a_obj_id)
 	{
 		global $ilDB;
-		$ilDB->manipulate('DELETE FROM rep_robj_xcos_items WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer'));
+		$ilDB->manipulate('DELETE FROM rep_robj_xcos_cats WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer'));
 	}
 
 	/**
@@ -114,7 +106,7 @@ class ilCoSubItem
 	{
 		$clone = clone $this;
 		$clone->obj_id = $a_obj_id;
-		$clone->item_id = null;
+		$clone->cat_id = null;
 		$clone->save();
 		return $clone;
 	}
@@ -126,16 +118,13 @@ class ilCoSubItem
 	 */
 	protected function fillData($data)
 	{
-		$this->item_id = $data['item_id'];
-		$this->obj_id = $data['obj_id'];
 		$this->cat_id = $data['cat_id'];
-		$this->target_ref_id = $data['target_ref_id'];
-		$this->identifier = $data['identifier'];
+		$this->obj_id = $data['obj_id'];
 		$this->title = $data['title'];
 		$this->description = $data['description'];
 		$this->sort_position = $data['sort_position'];
-		$this->sub_min = $data['sub_min'];
-		$this->sub_max = $data['sub_max'];
+		$this->min_choices = $data['min_choices'];
+		$this->assignments = $data['assignments'];
 	}
 
 	/**
@@ -150,31 +139,28 @@ class ilCoSubItem
 		{
 			return false;
 		}
-		if (empty($this->item_id))
+		if (empty($this->cat_id))
 		{
-			$this->item_id = $ilDB->nextId('rep_robj_xcos_items');
+			$this->cat_id = $ilDB->nextId('rep_robj_xcos_cats');
 		}
 		if (empty($this->sort_position))
 		{
-			$query = "SELECT MAX(sort_position) pos FROM rep_robj_xcos_items WHERE obj_id= ". $ilDB->quote($this->obj_id,'integer');
+			$query = "SELECT MAX(sort_position) pos FROM rep_robj_xcos_cats WHERE obj_id= ". $ilDB->quote($this->obj_id,'integer');
 			$res = $ilDB->query($query);
 			$row = $ilDB->fetchAssoc($res);
 			$this->sort_position = (int) $row['pos'] + 1;
 		}
-		$rows = $ilDB->replace('rep_robj_xcos_items',
+		$rows = $ilDB->replace('rep_robj_xcos_cats',
 			array(
-				'item_id' => array('integer', $this->item_id)
+				'cat_id' => array('integer', $this->cat_id)
 			),
 			array(
 				'obj_id' => array('integer', $this->obj_id),
-				'cat_id' => array('integer', $this->cat_id),
-				'target_ref_id' => array('integer', $this->target_ref_id),
-				'identifier' => array('text', $this->identifier),
 				'title' => array('text', $this->title),
 				'description' => array('text', $this->description),
 				'sort_position' => array('integer', $this->sort_position),
-				'sub_min' => array('integer', $this->sub_min),
-				'sub_max' => array('integer', $this->sub_max)
+				'min_choices' => array('integer', $this->min_choices),
+				'assignments' => array('integer', $this->assignments),
 			)
 		);
 		return $rows > 0;

@@ -43,8 +43,9 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	{
 		$this->initPropertiesForm();
 		$this->loadPropertiesValues();
-		$this->tpl->setContent($this->form->getHTML());
 
+		$description = $this->method->txt('properties_description');
+		$this->tpl->setContent($this->pageInfo($description).$this->form->getHTML());
 	}
 
 	/**

@@ -63,4 +63,14 @@ abstract class ilCoSubBaseGUI
 				return;
 		}
 	}
+
+	/**
+	 * Design a text as page info below toolbar
+	 * @param $text
+	 * @return string
+	 */
+	public function pageInfo($text)
+	{
+		return '<div class="ilHeaderDesc">'.$text.'</div>';
+	}
 }

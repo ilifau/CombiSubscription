@@ -105,7 +105,9 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
 		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
 		$table_gui->prepareData();
-		$this->tpl->setContent($table_gui->getHTML());
+
+		$description = $this->plugin->txt('assignments_description'). ' '. $this->plugin->txt('assignments_description_runs');
+		$this->tpl->setContent($this->pageInfo($description).$table_gui->getHTML());
 
 		$this->showInfo();
 	}

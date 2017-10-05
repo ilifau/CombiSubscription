@@ -36,6 +36,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/** @var ilCoSubItem[] | null */
 	protected $items;
 
+	/** @var ilCoSubCategory[] | null */
+	protected $categories;
+
 	/** @var  ilCoSubRun[] | null  (numerically indexed) */
 	protected $runs;
 
@@ -545,6 +548,20 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			}
 		}
 		return $methods;
+	}
+
+	/**
+	 * Get the categories defined in this object (lazy loading)
+	 * @return ilCoSubCategory[]	indexed by cat_id
+	 */
+	public function getCategories()
+	{
+		if (!isset($this->categories))
+		{
+			$this->plugin->includeClass('models/class.ilCoSubCategory.php');
+			$this->categories = ilCoSubCategory::_getForObject($this->getId());
+		}
+		return $this->categories;
 	}
 
 	/**
