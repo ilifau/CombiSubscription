@@ -264,3 +264,6 @@ cat_assignments#:#Zuteilungen
 cat_assignments_info#:#Bei der Berechnung der Zuteilungen werden jedem Teilnehmer so viele an Einheiten aus dieser Kategorie zugeteilt. Lassen Sie das Feld leer, wenn Sie diese Bedingung nicht setzen möchten.
 no_category_selected#:#Keine Kategorie ausgewählt
 category#:#Kategorie
+cat_choose_min_one_info#:#Sie müssen hier mindesten eine Auswahl treffen.
+cat_choose_min_more_info#:#Sie müssen hier mindesten %s Auswahlen treffen.
+cat_choose_low_mess#:#Sie haben unter "%s" zu wenig Auswahlen getroffen!

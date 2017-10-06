@@ -99,7 +99,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->tpl->parseCurrentBlock();
 
 
-		$columns = array('identifier', 'category', 'title', 'description');
+		$columns = array('category', 'identifier', 'title', 'description');
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
 			$column[] = 'sub_min';

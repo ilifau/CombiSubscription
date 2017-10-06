@@ -579,6 +579,28 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	}
 
 	/**
+	 * Get the items grouped by category
+	 * @return array	cat_id => item_id => ilCoSubItem
+	 */
+	public function getItemsByCategory()
+	{
+		$items = array(
+			0 => array()	// index for items without category
+		);
+		foreach ($this->getCategories() as $category)
+		{
+			$items[$category->cat_id] = array();
+		}
+
+		foreach ($this->getItems()as $item)
+		{
+			$items[(int) $item->cat_id][$item->item_id] = $item;
+		}
+
+		return $items;
+	}
+
+	/**
 	 * Get a new (unsaved) item for a target reference
 	 * @param $a_ref_id
 	 * @return ilCoSubItem

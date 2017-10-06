@@ -35,7 +35,9 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 
 		$this->ctrl = $ilCtrl;
 
-		$this->setFormAction($this->ctrl->getFormAction($this->parent));
+		$this->setOpenFormTag(false);
+		$this->setCloseFormTag(false);
+
 		$this->setRowTemplate("tpl.il_xcos_registration_row.html", $this->plugin->getDirectory());
 		$this->setEnableNumInfo(false);
 		$this->setExternalSegmentation(true);
@@ -48,28 +50,13 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		{
 			$header_choices .= '<br /><span class="text-muted small">' .$this->plugin->txt('registration_header_bars_info') . '</span>';
 		}
-		$this->addColumn($header_choices,'','60%');
+		$this->addColumn($header_choices,'','40%');
 
 		// respecting subscription period
 		if ($this->object->isBeforeSubscription() || $this->object->isAfterSubscription())
 		{
 			$this->disabled = true;
 		}
-		else
-		{
-			$this->addCommandButton('saveRegistration', $this->plugin->txt('save_registration'));
-			$this->addCommandButton('cancelRegistration', $this->lng->txt('cancel'));
-		}
-
-		// color coding of priorities
-		global $tpl;
-		$tpl->addJavaScript($this->plugin->getDirectory().'/js/ilCombiSubscription.js');
-		$colors = array();
-		foreach ($this->object->getMethodObject()->getPriorities() as $index => $priority)
-		{
-			$colors[$index] = $this->object->getMethodObject()->getPriorityBackgroundColor($index);
-		}
-		$tpl->addOnLoadCode('il.CombiSubscription.init('.json_encode($colors).')');
 	}
 
 	/**

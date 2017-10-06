@@ -71,6 +71,6 @@ abstract class ilCoSubBaseGUI
 	 */
 	public function pageInfo($text)
 	{
-		return '<div class="ilHeaderDesc">'.$text.'</div>';
+		return '<div class="ilHeaderDesc">'.$text.'</div><br />';
 	}
 }
