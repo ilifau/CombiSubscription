@@ -143,7 +143,7 @@ class ilCoSubCategory
 		{
 			$this->cat_id = $ilDB->nextId('rep_robj_xcos_cats');
 		}
-		if (empty($this->sort_position))
+		if (!isset($this->sort_position))
 		{
 			$query = "SELECT MAX(sort_position) pos FROM rep_robj_xcos_cats WHERE obj_id= ". $ilDB->quote($this->obj_id,'integer');
 			$res = $ilDB->query($query);

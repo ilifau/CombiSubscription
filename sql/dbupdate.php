@@ -324,14 +324,26 @@
 ?>
 <#13>
 <?php
-if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'cat_id'))
-{
-	$ilDB->addTableColumn('rep_robj_xcos_items', 'cat_id', array(
-			'type'    => 'integer',
-			'length'  => 4,
-			'notnull' => false,
-			'default' => null)
-	);
-}
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'cat_id'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_items', 'cat_id', array(
+                'type'    => 'integer',
+                'length'  => 4,
+                'notnull' => false,
+                'default' => null)
+        );
+    }
+?>
+<#14>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_data', 'pre_select'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_data', 'pre_select', array(
+                'type'    => 'integer',
+                'length'  => 4,
+                'notnull' => true,
+                'default' => 0)
+        );
+    }
 ?>
 

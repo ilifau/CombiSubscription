@@ -68,8 +68,15 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		if (!isset($priorities))
 		{
 			$priorities = $this->object->getPrioritiesOfUser($ilUser->getId());
+			if (empty($priorities) && $this->object->getPreSelect())
+			{
+				ilUtil::sendInfo($this->plugin->txt('pre_select_message'));
+				foreach ($this->object->getItems() as $item)
+				{
+					$priorities[$item->item_id] = '0';
+				}
+			}
 		}
-
 
 
 		$this->plugin->includeClass('guis/class.ilCoSubFormGUI.php');
@@ -125,6 +132,8 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		include_once('Services/Accordion/classes/class.ilAccordionGUI.php');
 		$acc_gui = new ilAccordionGUI();
 		$acc_gui->setAllowMultiOpened(true);
+		$acc_gui->setActiveHeaderClass('ilCoSubRegAccHeaderActive');
+		$acc_gui->head_class_set = true;	// workaround
 
 		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 
@@ -239,7 +248,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		$catmess = array();
 		foreach($this->categories as $cat_id => $category)
 		{
-			if ($cat_counts[$cat_id] < $category->min_choices)
+			if (!empty($category->min_choices) && $cat_counts[$cat_id] < $category->min_choices)
 			{
 				$catmess[] = sprintf($this->plugin->txt('cat_choose_low_mess'), $category->title);
 			}
@@ -262,8 +271,9 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		$notification->setObject($this->object);
 		$notification->sendRegistration($ilUser->getId());
 
-		ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'), true);
-		$this->ctrl->redirect($this,'editRegistration');
+		// don't redirect because this may show the pre-select
+		ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'));
+		$this->editRegistration($posted);
 	}
 
 	/**

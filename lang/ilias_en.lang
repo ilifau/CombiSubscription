@@ -264,3 +264,9 @@ cat_assignments#:#Assignments
 cat_assignments_info#:#The calculation will assign this mumber of items from this category to a user. Leave the field empty if you don't want to set this condition.
 no_category_selected#:#No category selected
 category#:#Category
+cat_choose_min_one_info#:#Please choose at least one item here.
+cat_choose_min_more_info#:#Please choose at least %s items here.
+cat_choose_low_mess#:#You selected too few items for '%s'!
+pre_select#:#Pre-Select
+pre_select_info#:#All Items will be pre-selected when viewing the registration screen for the first time.
+pre_select_message#:#You haven't taken a choice, so all items are pre-selected. Please unselect those that don't fit for you.

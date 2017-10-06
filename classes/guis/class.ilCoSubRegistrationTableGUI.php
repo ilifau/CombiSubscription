@@ -160,10 +160,10 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 			{
 				$this->tpl->setCurrentBlock('option_progress');
 			}
-			elseif(count($this->options) <= 3)
-			{
-				$this->tpl->setCurrentBlock('option_vertical');
-			}
+//			elseif(count($this->options) <= 3)
+//			{
+//				$this->tpl->setCurrentBlock('option_vertical');
+//			}
 			else
 			{
 				$this->tpl->setCurrentBlock('option_horizontal');

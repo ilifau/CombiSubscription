@@ -267,3 +267,6 @@ category#:#Kategorie
 cat_choose_min_one_info#:#Sie müssen hier mindesten eine Auswahl treffen.
 cat_choose_min_more_info#:#Sie müssen hier mindesten %s Auswahlen treffen.
 cat_choose_low_mess#:#Sie haben unter "%s" zu wenig Auswahlen getroffen!
+pre_select#:#Vorauswahl
+pre_select_info#:#Bei der erstmaligen Anmeldung sollen alle Einheiten vorausgewählt sein.
+pre_select_message#:#Sie haben (noch) keine Auswahl getroffen, daher wurden alle Einheiten vorausgewählt. Bitte wählen Sie diejenigen ab, die für Sie nicht in Frage kommen.

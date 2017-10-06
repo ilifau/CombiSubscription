@@ -251,16 +251,16 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 		// standard info screen tab
 		$this->addInfoTab();
 
-		// assignment management
-		if ($this->checkPermissionBool('write', '',  $this->getType(), $this->object->getRefId()))
-		{
-			$this->tabs_gui->addTab('assignments', $this->plugin->txt('assignment'), $this->ctrl->getLinkTargetByClass('ilCoSubAssignmentsGUI'));
-		}
-
 		// object settings
 		if ($this->checkPermissionBool('write', '',  $this->getType(), $this->object->getRefId()))
 		{
 			$this->tabs_gui->addTab('settings', $this->lng->txt('settings'), $this->ctrl->getLinkTarget($this, 'editProperties'));
+		}
+
+		// assignment management
+		if ($this->checkPermissionBool('write', '',  $this->getType(), $this->object->getRefId()))
+		{
+			$this->tabs_gui->addTab('assignments', $this->plugin->txt('assignment'), $this->ctrl->getLinkTargetByClass('ilCoSubAssignmentsGUI'));
 		}
 
 		// standard permission tab
