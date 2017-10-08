@@ -353,6 +353,27 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$this->form->addItem($sm);
 		}
 
+		// period
+		$period = new ilCheckboxInputGUI($this->plugin->txt('period'), 'period');
+		$period->setInfo($this->plugin->txt('period_info'));
+		$this->form->addItem($period);
+
+		// period start
+		$start = new ilDateTimeInputGUI($this->plugin->txt('period_start'),'period_start');
+		$start->setInfo($this->plugin->txt('period_start_info'));
+		$start->setDate(new ilDateTime(date('Y-m-d').' 08:00:00',IL_CAL_DATETIME));
+		$start->setRequired(true);
+		$start->setShowTime(true);
+		$period->addSubItem($start);
+
+		// period end
+		$end = new ilDateTimeInputGUI($this->plugin->txt('period_end'),'period_end');
+		$end->setInfo($this->plugin->txt('period_end_info'));
+		$end->setDate(new ilDateTime(date('Y-m-d').' 16:00:00',IL_CAL_DATETIME));
+		$end->setRequired(true);
+		$end->setShowTime(true);
+		$period->addSubItem($end);
+
 		switch ($a_mode)
 		{
 			case 'create':
@@ -463,10 +484,30 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				'title' => $a_item->title,
 				'description' => $a_item->description,
 				'target_ref_id' => $a_item->target_ref_id,
+				'cat_id' => $a_item->cat_id,
 				'sub_min' => $a_item->sub_min,
 				'sub_max' => $a_item->sub_max
 			)
 		);
+
+		/** @var ilCheckboxInputGUI $period */
+		$period = $this->form->getItemByPostVar('period');
+		if (empty($a_item->period_start) || empty($a_item->period_end))
+		{
+			$period->setChecked(false);
+		}
+		else
+		{
+			$period->setChecked(true);
+
+			/** @var ilDateTimeInputGUI $start */
+			$start = $this->form->getItemByPostVar('period_start');
+			$start->setDate(new ilDateTime($a_item->period_start, IL_CAL_UNIX));
+
+			/** @var ilDateTimeInputGUI $end */
+			$end = $this->form->getItemByPostVar('period_end');
+			$end->setDate(new ilDateTime($a_item->period_end, IL_CAL_UNIX));
+		}
 	}
 
 	/**
@@ -493,6 +534,23 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$sub_max = $this->form->getInput('sub_max');
 			$a_item->sub_max = empty($sub_max) ? null : $sub_max;
 		}
+
+		if ($this->form->getInput('period'))
+		{
+			/** @var ilDateTimeInputGUI $start */
+			$start = $this->form->getItemByPostVar('period_start');
+			$a_item->period_start = $start->getDate()->get(IL_CAL_UNIX);
+
+			/** @var ilDateTimeInputGUI $end */
+			$end = $this->form->getItemByPostVar('period_end');
+			$a_item->period_end = $end->getDate()->get(IL_CAL_UNIX);
+		}
+		else
+		{
+			$a_item->period_start = null;
+			$a_item->period_end = null;
+		}
+
 		return $a_item->save();
 	}
 

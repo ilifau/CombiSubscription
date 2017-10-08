@@ -346,4 +346,25 @@
         );
     }
 ?>
+<#15>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'period_start'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_items', 'period_start', array(
+				'type'    => 'integer',
+				'length'  => 4,
+				'notnull' => false,
+				'default' => null)
+        );
+    }
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'period_end'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_items', 'period_end', array(
+				'type'    => 'integer',
+				'length'  => 4,
+				'notnull' => false,
+				'default' => null)
+        );
+    }
+?>
 

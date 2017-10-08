@@ -89,6 +89,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 			{
 				$row['counts'] = $a_counts[$item->item_id];
 			}
+			$row['period'] = $item->getPeriodInfo();
 			$data[] = $row;
 
 			$this->max_choices = max($this->max_choices, $item->sub_max);
@@ -117,6 +118,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 
 		$this->tpl->setVariable('TITLE', $a_set['title']);
 		$this->tpl->setVariable('DESCRIPTION', $a_set['description']);
+		$this->tpl->setVariable('PERIOD', $a_set['period']);
 
 		if (!empty($a_set['target_ref_id']) && $ilAccess->checkAccess('visible','', $a_set['target_ref_id']))
 		{
