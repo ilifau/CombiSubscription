@@ -12,6 +12,7 @@ class ilCoSubImport
 	const TYPE_EXCEL = 'excel';
 	const TYPE_CSV = 'csv';
 
+	const MODE_ITEMS = 'items';
 	const MODE_REG_BY_ITEM = 'reg_by_item';
 	const MODE_REG_BY_PRIO = 'reg_by_prio';
 	const MODE_ASS_BY_ITEM = 'ass_by_item';
@@ -126,6 +127,11 @@ class ilCoSubImport
 			// analyze the read data
 			switch ($this->mode)
 			{
+				case self::MODE_ITEMS:
+					$this->readData($sheet);
+					$this->readItems();
+					break;
+
 				case self::MODE_ASS_BY_ITEM:
 					$this->readData($sheet);
 					$this->readAssignmentsByItems();
@@ -370,6 +376,41 @@ class ilCoSubImport
 		}
 	}
 
+	public function readItems()
+	{
+		$this->plugin->includeClass('models/class.ilCoSubItem.php');
+
+		$categories = array();
+		foreach ($this->object->getCategories() as $cat_id => $category)
+		{
+			$categories[$category->title] = $category->cat_id;
+		}
+
+		foreach ($this->rows as $rowdata)
+		{
+			$item = new ilCoSubItem();
+			$item->obj_id = $this->object->getId();
+			$item->title = $rowdata['title'];
+			$item->identifier = $rowdata['ID'];
+			if ($categories[$rowdata['category']])
+			{
+				$item->cat_id = $categories[$rowdata['category']];
+			}
+
+			$item->sub_min = $rowdata['sub_min'];
+			$item->sub_max = $rowdata['sub_max'];
+
+			$start = new ilDateTime($rowdata['start'], IL_CAL_DATETIME);
+			$item->period_start = $start->get(IL_CAL_UNIX);
+
+			$end = new ilDateTime($rowdata['end'], IL_CAL_DATETIME);
+			$item->period_end = $end->get(IL_CAL_UNIX);
+
+			$item->save();
+		}
+	}
+
+
 	/**
 	 * Create the run to which the assignments should be related
 	 */
@@ -494,5 +535,11 @@ class ilCoSubImport
 		{
 			$this->users_by_login[$user['login']] = $user['usr_id'];
 		}
+	}
+
+
+	protected function excelTimeToUnix($time)
+	{
+		return (int) (($time - 25569) * 86400);
 	}
 }

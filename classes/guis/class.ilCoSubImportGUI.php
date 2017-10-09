@@ -54,6 +54,11 @@ class ilCoSubImportGUI extends ilCoSubBaseGUI
 		// import mode
 		$this->plugin->includeClass('export/class.ilCoSubImport.php');
 		$export_mode = new ilRadioGroupInputGUI($this->plugin->txt('import_mode'), 'import_mode');
+
+		$option = new ilRadioOption($this->plugin->txt('import_mode_items'), ilCoSubImport::MODE_ITEMS);
+		$option->setInfo($this->plugin->txt('import_mode_items_info'));
+		$export_mode->addOption($option);
+
 		$option = new ilRadioOption($this->plugin->txt('import_mode_ass_by_item'), ilCoSubImport::MODE_ASS_BY_ITEM);
 		$option->setInfo($this->plugin->txt('import_mode_ass_by_item_info'));
 		$export_mode->addOption($option);
@@ -95,6 +100,20 @@ class ilCoSubImportGUI extends ilCoSubBaseGUI
 
 		$this->plugin->includeClass("export/class.ilCoSubImport.php");
 		$import = new ilCoSubImport($this->plugin, $this->object, $mode);
+
+		if ($mode = ilCOSubImport::MODE_ITEMS)
+		{
+			if ($import->ImportFile($file['tmp_name']))
+			{
+				ilUtil::sendSuccess($this->plugin->txt('import_items_finished'), true);
+				$this->ctrl->redirectByClass('ilCoSubAssignmentsGUI', 'editAssignments');
+			} else
+			{
+				ilUtil::sendFailure($this->plugin->txt('import_items_failed') . '<br />' . $import->getMessage(), true);
+				$this->ctrl->redirect($this);
+			}
+		}
+
 		if ($import->ImportFile($file['tmp_name']))
 		{
 			// copy the imported assignments to the current ones
