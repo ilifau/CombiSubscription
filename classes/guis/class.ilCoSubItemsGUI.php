@@ -330,6 +330,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$cat_options[$category->cat_id] = $category->title;
 		}
 		$si = new ilSelectInputGUI($this->plugin->txt('category'), 'cat_id');
+		$si->setInfo($this->plugin->txt('category_info'));
 		$si->setOptions($cat_options);
 		$this->form->addItem($si);
 
@@ -337,6 +338,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		{
 			// minimum subscriptions
 			$sm = new ilNumberInputGUI($this->plugin->txt('sub_min'), 'sub_min');
+			$sm->setInfo($this->object->getMethodObject()->txt('sub_min_info'));
 			$sm->setDecimals(0);
 			$sm->setSize(4);
 			$sm->setRequired(false);
@@ -347,6 +349,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		{
 			// maximum subscriptions
 			$sm = new ilNumberInputGUI($this->plugin->txt('sub_max'), 'sub_max');
+			$sm->setInfo($this->object->getMethodObject()->txt('sub_max_info'));
 			$sm->setDecimals(0);
 			$sm->setSize(4);
 			$sm->setRequired(false);

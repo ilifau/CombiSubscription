@@ -135,6 +135,8 @@ ilcosubmethodeatts_license_url#:#Lizenz-Server-Url
 ilcosubmethodeatts_license#:#Lizenz
 ilcosubmethodeatts_log_level#:#Log-Level
 ilcosubmethodeatts_log_level_info#:#Info
+ilcosubmethodeatts_sub_min_info#:#Die Berechnung versucht, nicht weniger als diese Anmeldungen zuzuteilen (siehe Methoden-Einstellungen)
+ilcosubmethodeattssub_max_info#:#Die Berechnung versucht, nicht mehr als diese Anmeldungen zuzuteilen (siehe Methoden-Einstellungen)
 ilcosubmethodrandom_title#:#Zufallsauswahl
 ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufall aus.
 ilcosubmethodrandom_properties_description#:#Hier liegen Sie Einstellungen fest, die speziell von der Zuteilungsmethode "Zufallsauswahl" unterstützt werden.
@@ -150,6 +152,8 @@ ilcosubmethodrandom_number_assignments#:#Anzahl Zuteilungen
 ilcosubmethodrandom_number_assignments_info#:#Anzahl der zugeteilten Einheiten in der Berechnung. Falls höher als eine (Standard) gwünscht ist, setzen Sie bitte auch die Mindestzahl auszuwählender Einheiten entsprechend hoch und passen Sie den Erklärungstext an.
 ilcosubmethodrandom_one_per_priority#:#Eindeutige Auswahl
 ilcosubmethodrandom_one_per_priority_info#:#Bei der Anmeldung muss für jede Priorität genau eine Auswahl getroffen werden. Dies ersetzt die allgemeine Einstellung "Minimale Auswahlen". Bitte sehen Sie mindestens so viele Auswahl-Einheiten vor, wie es Prioritäten gibt und passen Sie den Erklärungstext für die Anmeldeseite an.
+ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen, wird sie als nicht erfüllt angezeigt.
+ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 show_bars#:#Balken zeigen
 show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben
@@ -264,6 +268,7 @@ cat_assignments#:#Zuteilungen
 cat_assignments_info#:#Bei der Berechnung der Zuteilungen werden jedem Teilnehmer so viele an Einheiten aus dieser Kategorie zugeteilt. Lassen Sie das Feld leer, wenn Sie diese Bedingung nicht setzen möchten.
 no_category_selected#:#Keine Kategorie ausgewählt
 category#:#Kategorie
+category_info#:#Die Einheit wird bei der Anmeldung unter dieser Kategorie angezeigt.
 cat_choose_min_one_info#:#Sie müssen hier mindesten eine Auswahl treffen.
 cat_choose_min_more_info#:#Sie müssen hier mindesten %s Auswahlen treffen.
 cat_choose_low_mess#:#Sie haben unter "%s" zu wenig Auswahlen getroffen!
@@ -271,7 +276,7 @@ pre_select#:#Vorauswahl
 pre_select_info#:#Bei der erstmaligen Anmeldung sollen alle Einheiten vorausgewählt sein.
 pre_select_message#:#Sie haben (noch) keine Auswahl getroffen, daher wurden alle Einheiten vorausgewählt. Bitte wählen Sie diejenigen ab, die für Sie nicht in Frage kommen.
 period#:#Termin
-period_info#:#Die Anmelde-Einheit entspricht einer Veranstaltung mit festem Termin
+period_info#:#Die Anmelde-Einheit entspricht einer Veranstaltung mit festem Termin.
 period_start#:#Start
 period_start_info#:#Start-Zeitpunkt
 period_end#:#Ende

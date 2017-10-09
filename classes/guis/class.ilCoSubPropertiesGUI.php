@@ -85,7 +85,6 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$ex = new ilTextAreaInputGUI($this->plugin->txt('explanation'), 'explanation');
 		$this->form->addItem($ex);
 
-
 		// subscription start
 		$start = new ilDateTimeInputGUI($this->plugin->txt('sub_start'),'sub_start');
 		$start->setRequired(true);

@@ -135,6 +135,8 @@ ilcosubmethodeatts_license_url#:#Lizenz Server Url
 ilcosubmethodeatts_license#:#Lizenz
 ilcosubmethodeatts_log_level#:#Log Level
 ilcosubmethodeatts_log_level_info#:#Info
+ilcosubmethodeatts_sub_min_info#:#The calculation will try to not assign fewer than these subscriptions (see method settings)
+ilcosubmethodeatts_sub_max_info#:#The calculation will try to not assign more than these subscriptions (see method settings)
 ilcosubmethodrandom_title#:#Random Selections
 ilcosubmethodrandom_description#:Selects the assignments randomly per priority
 ilcosubmethodrandom_properties_description#:#The following properties are specially supported by the 'Random elections' assignment method.
@@ -150,6 +152,8 @@ ilcosubmethodrandom_number_assignments#:#Number of Assignments
 ilcosubmethodrandom_number_assignments_info#:#Number of items that will be assigned per user. If it is higher then the default one, please increase the number of selectable items and adapt the explanation text.
 ilcosubmethodrandom_one_per_priority#:#Unique Choice
 ilcosubmethodrandom_one_per_priority_info#:#A user must choose exactly one item per priority. This replaced the general setting 'minimum choices'. Please provide enough items and adapt the explanation text.
+ilcosubmethodrandom_sub_min_info#:#Items with fewer assignments will be indicated as not satisfied.
+ilcosubmethodrandom_sub_max_info#:#The calculation will not assign more than these subscriptions.
 show_bars#:#Show Bars
 show_bars_info#:#The registration screen shows bars with the mumber of existing registrations for each priority. The users will see how popular an item is.
 mail_to_users#:#Send E-Mail
@@ -264,9 +268,16 @@ cat_assignments#:#Assignments
 cat_assignments_info#:#The calculation will assign this mumber of items from this category to a user. Leave the field empty if you don't want to set this condition.
 no_category_selected#:#No category selected
 category#:#Category
+category_info#:#The item will be shown under this category on the registration screen.
 cat_choose_min_one_info#:#Please choose at least one item here.
 cat_choose_min_more_info#:#Please choose at least %s items here.
 cat_choose_low_mess#:#You selected too few items for '%s'!
 pre_select#:#Pre-Select
 pre_select_info#:#All Items will be pre-selected when viewing the registration screen for the first time.
 pre_select_message#:#You haven't taken a choice, so all items are pre-selected. Please unselect those that don't fit for you.
+period#:#Appointment
+period_info#:#This itel represents an appointment with fixed date and time.
+period_start#:#Start
+period_start_info#:#Start Time
+period_end#:#End
+period_end_info#:#End Time

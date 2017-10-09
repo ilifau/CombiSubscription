@@ -161,7 +161,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	public function hasMinSubscription()
 	{
-		return false;
+		return true;
 	}
 
 	/**

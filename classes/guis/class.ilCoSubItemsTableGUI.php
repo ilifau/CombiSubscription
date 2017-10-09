@@ -104,7 +104,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$columns = array('category', 'identifier', 'title', 'description', 'period');
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
-			$column[] = 'sub_min';
+			$columns[] = 'sub_min';
 		}
 		if ($this->parent->object->getMethodObject()->hasMaxSubscription())
 		{
