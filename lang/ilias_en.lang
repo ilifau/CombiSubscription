@@ -197,7 +197,7 @@ calculated#:#Calculated
 index#:#Index
 saved_label#:#Saved
 registrations#:#Registrations
-import_mode#:#Teble Format
+import_mode#:#Table Format
 import_mode_ass_by_item#:#Assignments by Iterms
 import_mode_ass_by_item_info#:#The first row contains the column titles: one 'ID' for the user and the internal identifier or the title for each item. Other columns are ignored. Each following row is dedicated to a person. The 'ID' column has the username (login). The column of an item is filled (e.g. with '1' or 'x') if the item should be assigned. This is similar to the format 'Rgistrations by Items'.
 import_mode_ass_by_col#:#Assignments as List
@@ -281,3 +281,9 @@ period_start#:#Start
 period_start_info#:#Start Time
 period_end#:#End
 period_end_info#:#End Time
+other_items#:#Weitere
+import_items#:#Import Items
+import_mode_items#:#Registration Items
+import_mode_items_info#:#The first row contains the column headers for the data foelds of a registration item. Each subsequent row represents a registration item. The following data fields are recognized:<br />title - title of the item. Must be set<br />description - description of the item<br />identifier - internal identifier of the item. An existingitem with this identifier is updated.<br />category - title of a registration caategory to which this item should belong<br />sub_min - Minimum assignments<br />sub_max - Maximum assignments<br />period_start - Start time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in Excel<br />period_end - Start time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in Excel
+import_items_finished#:#The registration items were imported.
+import_items_failed#:#The registration items can't be imported.

@@ -34,10 +34,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/** @var  ilCoSubMethodBase | null */
 	protected $method_object;
 
-	/** @var ilCoSubItem[] | null */
+	/** @var ilCoSubItem[] | null (indexed by item_id) */
 	protected $items;
 
-	/** @var ilCoSubCategory[] | null */
+	/** @var ilCoSubCategory[] | null  (indexed by cat_id) */
 	protected $categories;
 
 	/** @var  ilCoSubRun[] | null  (numerically indexed) */
@@ -591,7 +591,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the items assigned to this object (lazy loading)
-	 * @return ilCoSubItem[]
+	 * @return ilCoSubItem[]	indexed by item_id
 	 */
 	public function getItems()
 	{

@@ -143,13 +143,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->ctrl->forwardCommand(new ilCoSubExportGUI($this));
 					return;
 
-				case 'ilcosubimportgui':
-					$this->checkPermission('write');
-					$this->setSubTabs('assignments','import');
-					$this->plugin->includeClass('guis/class.ilCoSubImportGUI.php');
-					$this->ctrl->forwardCommand(new ilCoSubImportGUI($this));
-					return;
-
 				default:
 					// properties gui of method
 					if ($method = $this->object->getMethodObject()
@@ -291,7 +284,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				}
 
 				$this->tabs_gui->addSubTab('categories', $this->txt('registration_categories'), $this->ctrl->getLinkTargetByClass('ilCoSubCategoriesGUI'));
-
 				$this->tabs_gui->addSubTab('items', $this->txt('registration_items'), $this->ctrl->getLinkTargetByClass('ilCoSubItemsGUI'));
 				break;
 
@@ -299,7 +291,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				$this->tabs_gui->addSubTab('assignments', $this->plugin->txt('current_assignment'), $this->ctrl->getLinkTargetByClass('ilCoSubAssignmentsGUI'));
 				$this->tabs_gui->addSubTab('runs', $this->plugin->txt('saved_assignments'), $this->ctrl->getLinkTargetByClass('ilCoSubRunsGUI'));
 				$this->tabs_gui->addSubTab('export', $this->plugin->txt('export_data'), $this->ctrl->getLinkTargetByClass('ilCoSubExportGUI'));
-				$this->tabs_gui->addSubTab('import', $this->plugin->txt('import_data'), $this->ctrl->getLinkTargetByClass('ilCoSubImportGUI'));
+				$this->tabs_gui->addSubTab('import', $this->plugin->txt('import_data'), $this->ctrl->getLinkTargetByClass(array('ilCoSubAssignmentsGUI','ilCoSubAssignmentsImportGUI')));
 				break;
 		}
 

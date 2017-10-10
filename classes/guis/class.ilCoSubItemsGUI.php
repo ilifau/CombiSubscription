@@ -44,6 +44,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$next_class = $this->ctrl->getNextClass();
 		switch ($next_class)
 		{
+			// items import
+			case 'ilcosubitemsimportgui':
+				$this->plugin->includeClass('abstract/class.ilCoSubImportBaseGUI.php');
+				$this->plugin->includeClass('guis/class.ilCoSubItemsImportGUI.php');
+				$this->ctrl->setReturn($this, 'listItems');
+				$this->ctrl->forwardCommand(new ilCoSubItemsImportGUI($this->parent));
+				return;
+
 			// repository item selection
 			case "ilpropertyformgui":
 				$this->initItemForm(empty($_GET['item_id']) ? 'create' : 'edit');
@@ -91,6 +99,12 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$ilToolbar->addFormButton($this->plugin->txt('create_item'), 'createItem');
 		$ilToolbar->addSeparator();
 		$ilToolbar->addFormButton($this->plugin->txt('add_repository_items'),'addRepositoryItems');
+
+		require_once('Services/UIComponent/Button/classes/class.ilLinkButton.php');
+		$button = ilLinkButton::getInstance();
+		$button->setCaption($this->plugin->txt('import_items'), false);
+		$button->setUrl($this->ctrl->getLinkTargetByClass('ilCoSubItemsImportGUI', 'showImportForm'));
+		$ilToolbar->addButtonInstance($button);
 
 		$this->plugin->includeClass('guis/class.ilCoSubItemsTableGUI.php');
 		$table_gui = new ilCoSubItemsTableGUI($this, 'listItems');

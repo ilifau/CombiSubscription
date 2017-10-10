@@ -16,6 +16,19 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	 */
 	public function executeCommand()
 	{
+		$next_class = $this->ctrl->getNextClass();
+		switch ($next_class)
+		{
+			// assignments import
+			case 'ilcosubassignmentsimportgui':
+				$this->plugin->includeClass('abstract/class.ilCoSubImportBaseGUI.php');
+				$this->plugin->includeClass('guis/class.ilCoSubAssignmentsImportGUI.php');
+				$this->ctrl->setReturn($this, 'editAssignments');
+				$this->tabs->activateSubTab('import');
+				$this->ctrl->forwardCommand(new ilCoSubAssignmentsImportGUI($this->parent));
+				return;
+		}
+
 		$cmd = $this->ctrl->getCmd('editAssignments');
 		switch ($cmd)
 		{

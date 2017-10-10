@@ -71,8 +71,8 @@ method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
 assignment#:#Zuteilung
 assignments#:#Zuteilungen
-assignments_description#:#In dieser Matrix können Sie festlegen welche Auswahl-Einheit welchem Nutzer zugeteilt ist. Sie sehen die Prioritäten aus der Anmeldung farbig hinterlegt.
-assignments_description_runs#:#Wenn Sie Zuteilungen berechnen lassen, werden sie hier eingetragen und zusätzlich mit einen Datum gespeichert. Sie sehen die Verteilung gespeicherter Zuteilungen mit Buchstaben eingeblendet und können diese auch wieder als aktuelle übernehmen.
+assignments_description#:#In dieser Matrix können Sie festlegen, welche Auswahl-Einheit welchem Nutzer zugeteilt ist. Sie sehen die Prioritäten aus der Anmeldung farbig hinterlegt.
+assignments_description_runs#:#Wenn Sie Zuteilungen berechnen lassen, werden sie hier eingetragen und zusätzlich mit einem Datum gespeichert. Sie sehen die Verteilung gespeicherter Zuteilungen mit Buchstaben eingeblendet und können diese auch wieder als aktuelle übernehmen.
 save_assignments#:#Speichern
 msg_assignments_saved#:#Die aktuellen Zuteilungen wurden gespeichert.
 satisfaction#:#Erfüllung
@@ -281,3 +281,9 @@ period_start#:#Start
 period_start_info#:#Start-Zeitpunkt
 period_end#:#Ende
 period_end_info#:#End-Zeitpunkt
+other_items#:#Weitere
+import_items#:#Auswahl-Einheiten importieren
+import_mode_items#:#Auswahl-Einheiten
+import_mode_items_info#:#Die erste Zeile enthält als Spaltentitel die Namen der Datenfelder einer Auswahl-Einheit.Die folgenden Zeilen entsprechen je einer zu importierenden Einheit. Die folgenden Felder werden beim Import erkannt:<br />title - Titel der Einheit. Muss vorhanden sein<br />description - Beschreibung der Einheit<br />identifier - Kennung der Einheit. Ist eine Einheit mit dieser Kennung vorhanden, wird sie aktualisiert.<br />category - Titel einer Auswahl-Kategorie, der die Einheit zugeordnet werden soll.<br />sub_min - Minimale Zuteilungen<br />sub_max - Maximale Zuteilungen<br />period_start - Start-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in Excel<br />period_end - End-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in Excel
+import_items_finished#:#Die Auswahl-Einheiten wurden importiert.
+import_items_failed#:#Die Auswahl-Einheiten konnten nicht importiert werden.

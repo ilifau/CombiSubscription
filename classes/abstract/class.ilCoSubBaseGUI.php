@@ -16,6 +16,9 @@ abstract class ilCoSubBaseGUI
 	/** @var  ilCtrl */
 	public $ctrl;
 
+	/** @var  ilTabsGUI */
+	public $tabs;
+
 	/** @var ilTemplate */
 	public $tpl;
 
@@ -31,12 +34,13 @@ abstract class ilCoSubBaseGUI
 	 */
 	public function __construct($a_parent_gui)
 	{
-		global $ilCtrl, $tpl, $lng;
+		global $ilCtrl, $ilTabs, $tpl, $lng;
 
 		$this->parent = $a_parent_gui;
 		$this->object = $this->parent->object;
 		$this->plugin = $this->parent->plugin;
 		$this->ctrl = $ilCtrl;
+		$this->tabs = $ilTabs;
 		$this->tpl = $tpl;
 		$this->lng = $lng;
 	}

@@ -79,7 +79,7 @@ class ilCoSubItem
 	/**
 	 * Get items by parent object id
 	 * @param integer   object id
-	 * @return ilCoSubItem[]
+	 * @return ilCoSubItem[]	indexed by item_id
 	 */
 	public static function _getForObject($a_obj_id)
 	{
@@ -95,7 +95,7 @@ class ilCoSubItem
 		{
 			$obj = new ilCoSubItem;
 			$obj->fillData($row);
-			$objects[] = $obj;
+			$objects[$obj->item_id] = $obj;
 		}
 		return $objects;
 	}

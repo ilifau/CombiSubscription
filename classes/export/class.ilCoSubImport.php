@@ -50,6 +50,9 @@ class ilCoSubImport
 	/** @var  ilCoSubRun */
 	protected $run;
 
+	/** @var ilCoSubItem[] | null (indexed by item_id) */
+	protected $items = array();
+
 	/** @var array title => item_id */
 	protected $items_by_title = array();
 
@@ -107,6 +110,7 @@ class ilCoSubImport
 					/** @var PHPExcel_Reader_Excel2007 $reader */
 					$reader = PHPExcel_IOFactory::createReader($type);
 					$reader->setReadDataOnly(true);
+					$this->type = self::TYPE_EXCEL;
 					break;
 
 				case 'CSV':
@@ -114,6 +118,7 @@ class ilCoSubImport
 					$reader = PHPExcel_IOFactory::createReader($type);
 					$reader->setDelimiter(';');
 					$reader->setEnclosure('"');
+					$this->type = self::TYPE_CSV;
 					break;
 
 				default:
@@ -165,6 +170,12 @@ class ilCoSubImport
 			return false;
 		}
 
+		// copy the imported assignments as current ones if a run has been created
+		if (isset($this->run) && isset($this->run->run_id))
+		{
+			$this->object->copyAssignments($this->run->run_id, 0);
+		}
+
 		return true;
 	}
 
@@ -178,7 +189,8 @@ class ilCoSubImport
 	 */
 	protected function readData($sheet)
 	{
-		$data = $sheet->toArray(null, false, false, false);
+
+		$data = $sheet->toArray(null, true, false, false);
 		$this->columns = $data[0];
 
 		if (count($data) < 2)
@@ -192,10 +204,6 @@ class ilCoSubImport
 		if (count(array_unique($this->columns)) < count($this->columns))
 		{
 			throw new Exception($this->plugin->txt('import_error_multiple_colname'));
-		}
-		if (!in_array('ID', $this->columns))
-		{
-			throw new Exception($this->plugin->txt('import_error_id_missing'));
 		}
 
 		for ($row = 1; $row < count($data); $row++)
@@ -221,6 +229,11 @@ class ilCoSubImport
 	 */
 	public function readAssignmentsByColumns()
 	{
+		if (!in_array('ID', $this->columns))
+		{
+			throw new Exception($this->plugin->txt('import_error_id_missing'));
+		}
+
 		$this->loadItemData();
 		$this->loadUserData();
 		$assign_columns = array();
@@ -305,6 +318,11 @@ class ilCoSubImport
 	 */
 	public function readAssignmentsByItems()
 	{
+		if (!in_array('ID', $this->columns))
+		{
+			throw new Exception($this->plugin->txt('import_error_id_missing'));
+		}
+
 		$this->loadItemData();
 		$this->loadUserData();
 		$items_by_columns = array();
@@ -378,6 +396,13 @@ class ilCoSubImport
 
 	public function readItems()
 	{
+		$this->loadItemData();
+
+		if (!in_array('title', $this->columns))
+		{
+			throw new Exception($this->plugin->txt('import_error_title_missing'));
+		}
+
 		$this->plugin->includeClass('models/class.ilCoSubItem.php');
 
 		$categories = array();
@@ -388,23 +413,68 @@ class ilCoSubImport
 
 		foreach ($this->rows as $rowdata)
 		{
-			$item = new ilCoSubItem();
-			$item->obj_id = $this->object->getId();
+			if (!empty($rowdata['identifier']) && !empty($this->items_by_identifier[$rowdata['identifier']]))
+			{
+				$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			}
+			else
+			{
+				$item = new ilCoSubItem();
+				$item->obj_id = $this->object->getId();
+			}
+
 			$item->title = $rowdata['title'];
-			$item->identifier = $rowdata['ID'];
-			if ($categories[$rowdata['category']])
+
+			if (!empty($rowdata['description']))
+			{
+				$item->identifier = $rowdata['description'];
+			}
+
+			if (!empty($rowdata['identifier']))
+			{
+				$item->identifier = $rowdata['identifier'];
+			}
+
+			if (!empty($rowdata['category']) && !empty($categories[$rowdata['category']]))
 			{
 				$item->cat_id = $categories[$rowdata['category']];
 			}
 
-			$item->sub_min = $rowdata['sub_min'];
-			$item->sub_max = $rowdata['sub_max'];
+			if (!empty($rowdata['sub_min']))
+			{
+				$item->sub_min = $rowdata['sub_min'];
+			}
 
-			$start = new ilDateTime($rowdata['start'], IL_CAL_DATETIME);
-			$item->period_start = $start->get(IL_CAL_UNIX);
+			if (!empty($rowdata['sub_max']))
+			{
+				$item->sub_max = $rowdata['sub_max'];
+			}
 
-			$end = new ilDateTime($rowdata['end'], IL_CAL_DATETIME);
-			$item->period_end = $end->get(IL_CAL_UNIX);
+			if (!empty($rowdata['period_start']))
+			{
+				if (is_float($rowdata['period_start']))
+				{
+					$item->period_start = $this->excelTimeToUnix($rowdata['period_start']);
+				}
+				else
+				{
+					$start = new ilDateTime($rowdata['period_start'], IL_CAL_DATETIME);
+					$item->period_start = $start->get(IL_CAL_UNIX);
+				}
+			}
+
+			if (!empty($rowdata['period_end']))
+			{
+				if (is_float($rowdata['period_end']))
+				{
+					$item->period_end = $this->excelTimeToUnix($rowdata['period_end']);
+				}
+				else
+				{
+					$end = new ilDateTime($rowdata['period_end'], IL_CAL_DATETIME);
+					$item->period_end = $end->get(IL_CAL_UNIX);
+				}
+			}
 
 			$item->save();
 		}
@@ -502,7 +572,8 @@ class ilCoSubImport
 	 */
 	protected function loadItemData()
 	{
-		foreach ($this->object->getItems() as $item)
+		$this->items = $this->object->getItems();
+		foreach ($this->object->getItems() as $item_id => $item)
 		{
 			if (!empty($item->identifier))
 			{
@@ -537,9 +608,23 @@ class ilCoSubImport
 		}
 	}
 
-
+	/**
+	 * Convert an excel time to unix
+	 * todo: check the ugly workaround
+	 *
+	 * @param $time
+	 * @return int
+	 */
 	protected function excelTimeToUnix($time)
 	{
-		return (int) (($time - 25569) * 86400);
+		global $ilUser;
+
+		$date = (int) $time;
+		$time = round(($time - $date) * 86400) - 3600;
+
+		$date = PHPExcel_Shared_Date::ExcelToPHP($date);
+		$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
+
+		return $dateTime->get(IL_CAL_UNIX);
 	}
 }

@@ -14,7 +14,6 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	var $categories = array();
 
 
-
 	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
