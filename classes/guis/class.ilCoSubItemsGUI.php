@@ -156,9 +156,12 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveRepositoryItems()
 	{
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+
 		foreach ($_POST['ref_id'] as $ref_id)
 		{
-			$item = $this->object->getItemForTarget($ref_id);
+			$item = $targets->getItemForTarget($ref_id);
 			$item->save();
 		}
 		ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
@@ -294,13 +297,59 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function setTargetObject()
 	{
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+
 		$this->ctrl->saveParameter($this, 'item_id');
 		$this->initItemForm(empty($_GET['item_id']) ? 'create' : 'edit');
 
-		$input = $this->form->getItemByPostVar('target_ref_id');
-		$input->readFromSession();
-		$item = $this->object->getItemForTarget($input->	getValue());
-		$this->loadItemProperties($item);
+		// get the existing properties
+		if (!empty($_GET['item_id']))
+		{
+			$item = ilCoSubItem::_getById($_GET['item_id']);
+			$this->loadItemProperties($item);
+		}
+
+		/** @var ilRepositorySelectorInputGUI $target_ref_id */
+		$target_input = $this->form->getItemByPostVar('target_ref_id');
+		$target_input->readFromSession();
+
+		$target_ref_id = $target_input->getValue();
+
+		// unsaved item with values generated from the target object
+		$values = $targets->getItemForTarget($target_ref_id);
+
+		if (!empty($values->title))
+		{
+			$this->form->getItemByPostVar('title')->setValue($values->title);
+		}
+		if (!empty($values->description))
+		{
+			$this->form->getItemByPostVar('description')->setValue($values->description);
+		}
+		if (!empty($values->sub_min))
+		{
+			$this->form->getItemByPostVar('sub_min')->setValue($values->sub_min);
+		}
+		if (!empty($values->sub_max))
+		{
+			$this->form->getItemByPostVar('sub_max')->setValue($values->sub_max);
+		}
+
+		if (!empty($values->period_start) &&  !empty($values->period_end))
+		{
+			/** @var ilCheckboxInputGUI $period */
+			$period = $this->form->getItemByPostVar('period');
+			$period->setChecked(true);
+
+			/** @var ilDateTimeInputGUI $start */
+			$start = $this->form->getItemByPostVar('period_start');
+			$start->setDate(new ilDateTime($values->period_start, IL_CAL_UNIX));
+
+			/** @var ilDateTimeInputGUI $end */
+			$end = $this->form->getItemByPostVar('period_end');
+			$end->setDate(new ilDateTime($values->period_end, IL_CAL_UNIX));
+		}
 
 		$this->tpl->setContent($this->form->getHTML());
 	}
@@ -416,6 +465,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setTitle($this->plugin->txt('configure_targets_'.$a_type));
@@ -437,21 +487,25 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$sub_type->setValue($this->object->getPreference('ilCoSubItemsGUI', 'sub_type', ilCombiSubscriptionTargets::SUB_TYPE_COMBI));
 		$set_type->addSubItem($sub_type);
 
-		$set_sub_period = new ilCheckboxInputGUI($this->plugin->txt('set_sub_period'), 'set_sub_period');
-		$set_sub_period->setInfo($this->plugin->txt('set_sub_period_info'));
-		$set_sub_period->setChecked($this->object->getPreference('ilCoSubItemsGUI', 'set_sub_period', false));
-		$this->form->addItem($set_sub_period);
+		if ($targets->hasSubscriptionPeriod($a_type))
+		{
+			$set_sub_period = new ilCheckboxInputGUI($this->plugin->txt('set_sub_period'), 'set_sub_period');
+			$set_sub_period->setInfo($this->plugin->txt('set_sub_period_info'));
+			$set_sub_period->setChecked($this->object->getPreference('ilCoSubItemsGUI', 'set_sub_period', false));
+			$this->form->addItem($set_sub_period);
 
-		include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
-		$sub_period = new ilDateDurationInputGUI($this->plugin->txt('sub_period'), "sub_period");
-		$sub_period->setShowTime(true);
-		$sub_period->setStart(new ilDateTime($this->object->getPreference('ilCoSubItemsGUI', 'sub_period_start', time()),IL_CAL_UNIX));
-		$sub_period->setStartText($this->plugin->txt('sub_period_start'));
-		$sub_period->setEnd(new ilDateTime($this->object->getPreference('ilCoSubItemsGUI', 'sub_period_end', time()),IL_CAL_UNIX));
-		$sub_period->setEndText($this->plugin->txt('sub_period_end'));
-		$set_sub_period->addSubItem($sub_period);
+			include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
+			$sub_period = new ilDateDurationInputGUI($this->plugin->txt('sub_period'), "sub_period");
+			$sub_period->setShowTime(true);
+			$sub_period->setStart(new ilDateTime($this->object->getPreference('ilCoSubItemsGUI', 'sub_period_start', time()),IL_CAL_UNIX));
+			$sub_period->setStartText($this->plugin->txt('sub_period_start'));
+			$sub_period->setEnd(new ilDateTime($this->object->getPreference('ilCoSubItemsGUI', 'sub_period_end', time()),IL_CAL_UNIX));
+			$sub_period->setEndText($this->plugin->txt('sub_period_end'));
+			$set_sub_period->addSubItem($sub_period);
+		}
 
-		if ($this->object->getMethodObject()->hasMinSubscription()) {
+		if ($this->object->getMethodObject()->hasMinSubscription() && $targets->hasMinSubscriptions($a_type))
+		{
 			$set_min = new ilCheckboxInputGUI($this->plugin->txt('set_sub_min'), 'set_sub_min');
 			$set_min->setInfo($this->plugin->txt('set_sub_min_info'));
 			$set_min->setChecked($this->object->getPreference('ilCoSubItemsGUI', 'set_sub_min', true));
@@ -503,7 +557,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				'target_ref_id' => $a_item->target_ref_id,
 				'cat_id' => $a_item->cat_id,
 				'sub_min' => $a_item->sub_min,
-				'sub_max' => $a_item->sub_max
+				'sub_max' => $a_item->sub_max,
 			)
 		);
 
@@ -526,6 +580,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$end->setDate(new ilDateTime($a_item->period_end, IL_CAL_UNIX));
 		}
 	}
+
 
 	/**
 	 * Save the properties from the form to an item
@@ -613,7 +668,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveTargetsConfig()
 	{
-		$this->initTargetsForm($_GET['type']);
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$type = $_GET['type'];
+
+		$this->initTargetsForm($type);
 		$this->form->checkInput();
 
 		$set_sub_type = (bool) $this->form->getInput('set_sub_type');
@@ -622,17 +681,27 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$sub_type = (string) $this->form->getInput('sub_type');
 		$this->object->setPreference('ilCoSubItemsGUI', 'sub_type', $sub_type);
 
-		$set_sub_period = (bool) $this->form->getInput('set_sub_period');
-		$this->object->setPreference('ilCoSubItemsGUI', 'set_sub_period', $set_sub_period);
 
-		/** @var ilDateDurationInputGUI $sub_period */
-		$sub_period = $this->form->getItemByPostVar('sub_period');
-		$sub_period_start = (int) $sub_period->getStart()->get(IL_CAL_UNIX);
-		$this->object->setPreference('ilCoSubItemsGUI', 'sub_period_start', $sub_period_start);
-		$sub_period_end = (int) $sub_period->getEnd()->get(IL_CAL_UNIX);
-		$this->object->setPreference('ilCoSubItemsGUI', 'sub_period_end', $sub_period_end);
+		if ($targets->hasSubscriptionPeriod($type))
+		{
+			$set_sub_period = (bool) $this->form->getInput('set_sub_period');
+			$this->object->setPreference('ilCoSubItemsGUI', 'set_sub_period', $set_sub_period);
 
-		if ($this->object->getMethodObject()->hasMinSubscription())
+			/** @var ilDateDurationInputGUI $sub_period */
+			$sub_period = $this->form->getItemByPostVar('sub_period');
+			$sub_period_start = (int) $sub_period->getStart()->get(IL_CAL_UNIX);
+			$this->object->setPreference('ilCoSubItemsGUI', 'sub_period_start', $sub_period_start);
+			$sub_period_end = (int) $sub_period->getEnd()->get(IL_CAL_UNIX);
+			$this->object->setPreference('ilCoSubItemsGUI', 'sub_period_end', $sub_period_end);
+		}
+		else
+		{
+			$set_sub_period = false;
+			$sub_period_start = null;
+			$sub_period_end = null;
+		}
+
+		if ($this->object->getMethodObject()->hasMinSubscription() && $targets->hasMinSubscriptions($type))
 		{
 			$set_sub_min = (bool) $this->form->getInput('set_sub_min');
 			$this->object->setPreference('ilCoSubItemsGUI', 'set_sub_min', $set_sub_min);
@@ -659,9 +728,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		try
 		{
-			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
-			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-
 			$targets->setTargetsConfig(
 				$set_sub_type ? $sub_type : null,
 				$set_sub_period ? $sub_period_start : null,

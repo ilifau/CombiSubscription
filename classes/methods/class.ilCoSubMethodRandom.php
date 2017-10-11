@@ -9,7 +9,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var  ilCoSubRun */
 	protected $run;
 
-	/** @var ilCoSubItem[] | null */
+	/** @var ilCoSubItem[] | null (indexed by item_id) */
 	protected $items = array();
 
 	/** @var  array     user_id => item_id => priority */
@@ -262,19 +262,18 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	protected function getSortedItemsForPriority($a_priority)
 	{
 		$indexed = array();
-		$i_count = count($this->items);
-
-		for ($i = 0; $i < $i_count; $i++)
+		$position = count($this->items);
+		foreach($this->items as $item_id => $item)
 		{
-			$item = $this->items[$i];
-			$p_count = (int) $this->priority_counts[$item->item_id][$a_priority];
+			$p_count = (int) $this->priority_counts[$item_id][$a_priority];
 
 			// will go into reverse sorting
 			$key1 = ((isset($item->sub_max) && $p_count > $item->sub_max) ? '0' : '1');		// satisfiable
 			$key2 = sprintf('%06d', $p_count);										// number of choices in this priority
-			$key3 = sprintf('%06d', $i_count - $i);								// reverse position
+			$key3 = sprintf('%06d', $position);										// reverse position
 
 			$indexed[$key1.$key2.$key3] = $item;
+			$position--;
 		}
 
 		krsort($indexed);

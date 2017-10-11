@@ -26,7 +26,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	function getAvailableTargetTypes()
 	{
-		return array('crs','grp');
+		return array('crs','grp','sess');
 	}
 
 

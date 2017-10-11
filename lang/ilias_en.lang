@@ -40,11 +40,11 @@ assignment_method#:#Assignment Method
 assignment_methods#:#Assignment Methods
 registration#:#Registration
 registration_items#:#Registration Items
-items_description#:##Registration Items are courses, groups or other things that can be selected or priorized at registration.
-items_description_targets#:#Courses or groups can directly be added or linked to items later. The maximum number of members is taken as maximum number of assignments.
+items_description#:##Registration Items are courses, groups, sessions or other things that can be selected or priorized at registration.
+items_description_targets#:#Courses, groups or sessions can directly be added or linked to items later. The maximum number of members is taken as maximum number of assignments.
 items_description_transfer#:#When the final assignments are done, the users can automatically be added as members.
 create_item#:#Create New Item
-add_repository_items#:#Add Courses/Groups as Items
+add_repository_items#:#Add Courses/Groups/Sessions as Items
 sub_min#:#Minimum Assingments
 sub_min_short#:#Minimum
 sub_max#:#Maximum Assignments
@@ -58,7 +58,7 @@ edit_item#:#Edit Item
 msg_item_updated#:#The item was updated.
 msg_items_deleted#:#The items were deleted.
 msg_item_deleted#:#The item was deleted.
-target_object_info#:#Course or Group which is connected to this item. A selection will update the properties title, description and max members.
+target_object_info#:#Course, group or session which is connected to this item. A selection will update the properties title, description and max members.
 select_target_object#:#Please select the targt object:
 ilcosubmethodsafre_title#:#Three Priorities
 ilcosubmethodsafre_description#:#Heuristics with Three Priorities
@@ -184,7 +184,7 @@ do_export#:#Export
 do_import#:#Import
 export_mode#:#Table Format
 export_mode_reg_by_item#:#Registrations by Items
-export_mode_reg_by_item_info#:#Each user has a row, each item (course, group) has a column. The chosen priorities are entered in the cells.
+export_mode_reg_by_item_info#:#Each user has a row, each item (course/group/session) has a column. The chosen priorities are entered in the cells.
 export_mode_reg_by_prio#:#Registrations by Priorities
 export_mode_reg_by_prio_info#:#Each user has a row, each priority has a column. Die chosen items are listed in the cells.
 export_type#:#File Type
@@ -224,7 +224,7 @@ configure_targets_grp#:#Configure Groups
 configure_targets_sess#:#Configure Events
 targets_not_defined#:#There are no target objects defined!
 targets_not_writable#:#You don't have write access in all target objects!
-targets_different_type#:#The target objects mast have the same type (Course, Grpoup) to be commonly configured!
+targets_different_type#:#The target objects mast have the same type (course/group/session) to be commonly configured!
 set_sub_type#:#Registration Settings
 set_sub_type_info#:#Please use this combined subscription in their subscription period. The registration pages of the target objects will then link to thhe combined subscription. You may open the registration in the target objects after the assignments are transfered.
 sub_type#:#Registration Procedure
@@ -251,7 +251,7 @@ save_target_config#:#Apply Settings
 target_config_saved#:#The selected settings are applied to the target objects.
 target_config_failed#:#The selected settings can't be applied!
 target_object_not_found#:#The target object of item '%s' is not found.
-target_object_wrong_type#:#The target object of item '%s' is no course or group.
+target_object_wrong_type#:#The target object of item '%s' is not a course, group or session.
 target_object_not_writable#:#You don't have write access to the target object of item  '%s'.
 registration_categories#:#Registration Categories
 categories_description#:#Registration Categories are used to show the registration items in an accordeon. You can define how much items have to be chosen per category. You may use categories, but don't need to.
@@ -284,6 +284,6 @@ period_end_info#:#End Time
 other_items#:#Weitere
 import_items#:#Import Items
 import_mode_items#:#Registration Items
-import_mode_items_info#:#The first row contains the column headers for the data foelds of a registration item. Each subsequent row represents a registration item. The following data fields are recognized:<br />title - title of the item. Must be set<br />description - description of the item<br />identifier - internal identifier of the item. An existingitem with this identifier is updated.<br />category - title of a registration caategory to which this item should belong<br />sub_min - Minimum assignments<br />sub_max - Maximum assignments<br />period_start - Start time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in Excel<br />period_end - Start time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in Excel
+import_mode_items_info#:#The first row contains the column headers for the data foelds of a registration item. Each subsequent row represents a registration item. The following data fields are recognized:<br />title - title of the item. Must be set<br />description - description of the item<br />identifier - internal identifier of the item. An existingitem with this identifier is updated.<br />category - title of a registration caategory to which this item should belong<br />sub_min - minimum assignments<br />sub_max - maximum assignments<br />period_start - start time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in MS Excel<br />period_end - end time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in MS Excel
 import_items_finished#:#The registration items were imported.
 import_items_failed#:#The registration items can't be imported.

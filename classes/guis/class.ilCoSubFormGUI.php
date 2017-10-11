@@ -25,6 +25,11 @@ class ilCoSubFormGUI extends ilFormGUI
 		$this->content = $a_content;
 	}
 
+	public function addSeparator()
+	{
+		$this->toolbar->addSeparator();
+	}
+
 	public function addCommandButton($a_cmd, $a_txt)
 	{
 		$button = ilSubmitButton::getInstance();

@@ -40,11 +40,11 @@ assignment_method#:#Zuteilungs-Methode
 assignment_methods#:#Zuteilungs-Methoden
 registration#:#Anmeldung
 registration_items#:#Auswahl-Einheiten
-items_description#:#Auswahl-Einheiten entsprechen Kursen, Gruppen, Modulen oder anderen Dingen, unter denen bei der Anmeldung eine Auswahl getroffen wird oder Prioritäten vergeben werden.
-items_description_targets#:#Kurse oder Gruppen können direkt hinzugefügt oder nachträglich mit Einheiten verknüpft werden. Dabei wird die maximale Mitgliederzahl als maximale Zuteilungen übernommen.
+items_description#:#Auswahl-Einheiten entsprechen Kursen, Gruppen, Sitzungen oder anderen Dingen, unter denen bei der Anmeldung eine Auswahl getroffen wird oder Prioritäten vergeben werden.
+items_description_targets#:#Kurse, Gruppen oder Sitzungen können direkt hinzugefügt oder nachträglich mit Einheiten verknüpft werden. Dabei wird die maximale Mitgliederzahl als maximale Zuteilungen übernommen.
 items_description_transfer#:#Wenn die endgültige Zuteilung feststeht, können die zugeteilten Nutzer automatisch als Mitglieder eingetragen werden.
 create_item#:#Neue Einheit erstellen
-add_repository_items#:#Kurse/Gruppen als Einheiten hinzufügen
+add_repository_items#:#Kurse/Gruppen/Sitzungen als Einheiten hinzufügen
 sub_min#:#Minimale Zuteilungen
 sub_min_short#:#Minimal
 sub_max#:#Maximale Zuteilungen
@@ -58,7 +58,7 @@ edit_item#:#Einheit bearbeiten
 msg_item_updated#:#Die Einheit wurde aktualisiert.
 msg_items_deleted#:#Die Einheiten wurden gelöscht.
 msg_item_deleted#:#Die Einheit wurde gelöscht.
-target_object_info#:#Kurs oder Gruppe, mit der diese Einheit verbunden ist. Bei der Auswahl werden Titel, Beschreibung und maximale Mitgliederzahl übernommen.
+target_object_info#:#Kurs, Gruppe oder Sitzung, mit der diese Einheit verbunden ist. Bei der Auswahl werden Titel, Beschreibung und maximale Mitgliederzahl übernommen.
 select_target_object#:#Bitte wählen Sie das Ziel-Objekt:
 ilcosubmethodsafre_title#:#Drei Prioritäten
 ilcosubmethodsafre_description#:#Heuristik mit drei Prioritäten
@@ -67,6 +67,9 @@ registration_header_choices#:#Auswahl
 registration_header_priorities#:#Priorität (1 = höchste)
 registration_header_bars_info#:#Die Balken zeigen die Anzahl bisheriger Auswahlen
 save_registration#:#Anmeldung speichern
+delete_registration#:#Anmeldung löschen
+delete_registration_question#:#Sind Sie sicher, dass Sie Ihre Auswahlen komplett löschen möchten?
+registration_deleted#:#Ihre Anmeldung wurde gelöscht.
 method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
 assignment#:#Zuteilung
@@ -164,7 +167,7 @@ mail_notify_assignments#:#Sie haben die folgenden Zuteilungen erhalten:
 mail_registration_subject#:#Anmeldung bei "%s"
 mail_registration_no_choice#:#Sie haben keine Auswahl getroffen.
 mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getroffen:
-transfer_assignments#:#Auf Kurse/Gruppen übertragen
+transfer_assignments#:#Auf Kurse/Gruppen/Sitzungen übertragen
 transfer_assignments_confirmation#:#Sollen die zugeteilten Nutzer als Mitglieder in die folgenden Objekte und ihre übergeordneten Objekte aufgenommen werden?. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
 notify_assignments#:#Nutzer benachrichtigen
@@ -184,9 +187,9 @@ do_export#:#Exportieren
 do_import#:#Importieren
 export_mode#:#Tabellen-Format
 export_mode_reg_by_item#:#Anmeldungen nach Einheiten
-export_mode_reg_by_item_info#:#Die Zeilen entsprechen den Personen, die Spalten den Auswahl-Einheiten (Kurse, Gruppen). Die gewählten Prioritäten sind in den Zellen eingetragen.
+export_mode_reg_by_item_info#:#Die Zeilen entsprechen den Personen, die Spalten den Auswahl-Einheiten (Kurs/Gruppen/Sitzungen). Die gewählten Prioritäten sind in den Zellen eingetragen.
 export_mode_reg_by_prio#:#Anmeldungen nach Prioritäten
-export_mode_reg_by_prio_info#:#Die Zeilen entsprechen den Personen, die Spalten den Prioritäten. Die ausgewählten Einheiten (Kurse/Gruppen) sind in den Zellen eingetragen.
+export_mode_reg_by_prio_info#:#Die Zeilen entsprechen den Personen, die Spalten den Prioritäten. Die ausgewählten Einheiten (Kurse/Gruppen/Sitzungen) sind in den Zellen eingetragen.
 export_type#:#Datei-Format
 export_type_excel#:#MS Excel 2007
 export_type_csv#:#CSV
@@ -222,9 +225,9 @@ configure_targets#:#Ziel-Objekte konfigurieren
 configure_targets_crs#:#Kurse konfigurieren
 configure_targets_grp#:#Gruppen konfigurieren
 configure_targets_sess#:#Sitzungen konfigurieren
-targets_not_defined#:#Es sind noch keine Kurse oder Gruppen als Ziel-Objekte definiert!
-targets_not_writable#:#Sie haben nicht in allen verknüpften Kursen oder Gruppen Schreibrecht!
-targets_different_type#:#Die Zielobjekte müssen vom selben Typ (Kurs oder Gruppe) sein, um gemeinsam konfiguriert zu werden!
+targets_not_defined#:#Es sind noch keine Kurse, Gruppen oder Sitzungen als Ziel-Objekte definiert!
+targets_not_writable#:#Sie haben nicht in allen verknüpften Ziel-Objekten Schreibrecht!
+targets_different_type#:#Die Zielobjekte müssen vom selben Typ (Kurs/Gruppe/Sitzung) sein, um gemeinsam konfiguriert zu werden!
 set_sub_type#:#Beitrittsverfahren einstellen
 set_sub_type_info#:#Solange die kombinierte Anmeldung läuft, sollten Sie diese als Beitrittsverfahren wählen. Die Anmeldungen der Ziel-Objekte verlinken dann auf die kombinierte Anmeldung. Nach dem Übertrag der Zuteilungen können Sie eine Anmeldung für Nachzügler freigeben.
 sub_type#:#Beitrittsverfahren
@@ -251,7 +254,7 @@ save_target_config#:#Einstellungen übertragen
 target_config_saved#:#Die ausgewählten Einstellungen wurden auf die Ziel-Objekte übertragen.
 target_config_failed#:#Die Einstellungen konnten nicht übertragen werden!
 target_object_not_found#:#Das Ziel-Objekt der Einheit "%s" wurde nicht gefunden!
-target_object_wrong_type#:#Das Ziel-Objekt der Einheit "%s" ist kein Kurs und keine Gruppe!
+target_object_wrong_type#:#Das Ziel-Objekt der Einheit "%s" ist kein Kurs, keine Gruppe oder Sitzung!
 target_object_not_writable#:#Das Ziel-Objekt der Einheit "%s" kann nicht bearbeitet werden!
 registration_categories#:#Auswahl-Kategorien
 categories_description#:#Kategorien gliedern auf der Anmeldeseite die Auswahl-Einheiten in Form aufklappbarer Bereiche. Sie können zudem festlegen, dass in jeder Kategorie eine bestimmte Anzahl an Auswahlen getroffen werden muss. Sie können Kategorien verwenden, müssen es aber nicht.
@@ -284,6 +287,6 @@ period_end_info#:#End-Zeitpunkt
 other_items#:#Weitere
 import_items#:#Auswahl-Einheiten importieren
 import_mode_items#:#Auswahl-Einheiten
-import_mode_items_info#:#Die erste Zeile enthält als Spaltentitel die Namen der Datenfelder einer Auswahl-Einheit.Die folgenden Zeilen entsprechen je einer zu importierenden Einheit. Die folgenden Felder werden beim Import erkannt:<br />title - Titel der Einheit. Muss vorhanden sein<br />description - Beschreibung der Einheit<br />identifier - Kennung der Einheit. Ist eine Einheit mit dieser Kennung vorhanden, wird sie aktualisiert.<br />category - Titel einer Auswahl-Kategorie, der die Einheit zugeordnet werden soll.<br />sub_min - Minimale Zuteilungen<br />sub_max - Maximale Zuteilungen<br />period_start - Start-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in Excel<br />period_end - End-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in Excel
+import_mode_items_info#:#Die erste Zeile enthält als Spaltentitel die Namen der Datenfelder einer Auswahl-Einheit.Die folgenden Zeilen entsprechen je einer zu importierenden Einheit. Die folgenden Felder werden beim Import erkannt:<br />title - Titel der Einheit. Muss vorhanden sein<br />description - Beschreibung der Einheit<br />identifier - Kennung der Einheit. Ist eine Einheit mit dieser Kennung vorhanden, wird sie aktualisiert.<br />category - Titel einer Auswahl-Kategorie, der die Einheit zugeordnet werden soll.<br />sub_min - Minimale Zuteilungen<br />sub_max - Maximale Zuteilungen<br />period_start - Start-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in MS Excel<br />period_end - End-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in MS Excel
 import_items_finished#:#Die Auswahl-Einheiten wurden importiert.
 import_items_failed#:#Die Auswahl-Einheiten konnten nicht importiert werden.

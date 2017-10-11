@@ -27,6 +27,8 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		{
 			case 'editRegistration':
 			case 'saveRegistration':
+			case 'confirmDeleteRegistration':
+			case 'deleteRegistration':
 			case 'cancelRegistration':
 				$this->$cmd();
 				return;
@@ -63,11 +65,13 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			$intro = $this->pageInfo($this->object->getExplanation());
 		}
 
+		$saved_priorities = $this->object->getPrioritiesOfUser($ilUser->getId());
+
 		// take the current priorities of the user if none are posted
 		if (!isset($priorities))
 		{
-			$priorities = $this->object->getPrioritiesOfUser($ilUser->getId());
-			if (empty($priorities) && $this->object->getPreSelect())
+			// optionally pre-select all items if user has not yet registered
+			if (empty($saved_priorities) && $this->object->getPreSelect())
 			{
 				ilUtil::sendInfo($this->plugin->txt('pre_select_message'));
 				foreach ($this->object->getItems() as $item)
@@ -77,12 +81,17 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			}
 		}
 
-
 		$this->plugin->includeClass('guis/class.ilCoSubFormGUI.php');
 		$form = new ilCoSubFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->addCommandButton('saveRegistration', $this->plugin->txt('save_registration'));
 		$form->addCommandButton('cancelRegistration', $this->lng->txt('cancel'));
+		if (!empty($saved_priorities))
+		{
+			$form->addSeparator();
+			$form->addCommandButton('confirmDeleteRegistration', $this->plugin->txt('delete_registration'));
+		}
+
 
 		if (empty($this->categories))
 		{
@@ -273,6 +282,32 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		// don't redirect because this may show the pre-select
 		ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'));
 		$this->editRegistration($posted);
+	}
+
+	/**
+	 * Show the confirmation message for deleting the registration
+	 */
+	public function confirmDeleteRegistration()
+	{
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+		$gui = new ilConfirmationGUI();
+		$gui->setFormAction($this->ctrl->getFormAction($this));
+		$gui->setHeaderText($this->plugin->txt('delete_registration_question'));
+		$gui->setConfirm($this->plugin->txt('delete_registration'),'deleteRegistration');
+		$gui->setCancel($this->lng->txt('cancel'),'editRegistration');
+		$this->tpl->setContent($gui->getHTML());
+	}
+
+	/**
+	 * Delete the whole registration
+	 */
+	public function deleteRegistration()
+	{
+		global $ilUser;
+		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
+		ilCoSubChoice::_deleteForObject($this->object->getId(), $ilUser->getId());
+		ilUtil::sendSuccess('registration_deleted', true);
+		$this->parent->returnToContainer();
 	}
 
 	/**

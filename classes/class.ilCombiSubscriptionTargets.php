@@ -38,6 +38,99 @@ class ilCombiSubscriptionTargets
 		$this->items = $this->object->getItems();
 	}
 
+
+	/**
+	 * Check if a target type supports a subscriptionPeriod
+	 * @param string $a_type
+	 * @return bool
+	 */
+	public function hasSubscriptionPeriod($a_type)
+	{
+		return in_array($a_type, array('crs', 'grp'));
+	}
+
+	/**
+	 * Check if a target type supports minimum subscriptions
+	 * @param string $a_type
+	 * @return bool
+	 */
+	public function hasMinSubscriptions($a_type)
+	{
+		return in_array($a_type, array('crs', 'grp'));
+	}
+
+	/**
+	 * Check if a target type supports membership limitation groupings
+	 * @param string $a_type
+	 * @return bool
+	 */
+	public function hasMemLimitGrouping($a_type)
+	{
+		return in_array($a_type, array('crs', 'grp'));
+	}
+
+
+	/**
+	 * Get a new (unsaved) item for a target reference
+	 * @param $a_ref_id
+	 * @return ilCoSubItem
+	 */
+	public function getItemForTarget($a_ref_id)
+	{
+		$this->plugin->includeClass('models/class.ilCoSubItem.php');
+
+		$item = new ilCoSubItem;
+		$item->obj_id = $this->object->getId();
+		$item->target_ref_id = $a_ref_id;
+
+		switch (ilObject::_lookupType($a_ref_id, true))
+		{
+			case 'crs':
+				require_once('Modules/Course/classes/class.ilObjCourse.php');
+				$course = new ilObjCourse($a_ref_id, true);
+				$item->title = $course->getTitle();
+				$item->description = $course->getDescription();
+				if ($course->isSubscriptionMembershipLimited())
+				{
+					$item->sub_min = $course->getSubscriptionMinMembers();
+					$item->sub_max = $course->getSubscriptionMaxMembers();
+				}
+				break;
+
+			case 'grp':
+				require_once('Modules/Group/classes/class.ilObjGroup.php');
+				$group = new ilObjGroup($a_ref_id, true);
+				$item->title = $group->getTitle();
+				$item->description = $group->getDescription();
+				if($group->isMembershipLimited())
+				{
+					$item->sub_min = $group->getMinMembers();
+					$item->sub_max = $group->getMaxMembers();
+				}
+				break;
+
+			case 'sess':
+				require_once('Modules/Session/classes/class.ilObjSession.php');
+				$session = new ilObjSession($a_ref_id, true);
+				$item->title = $session->getTitle();
+				$item->description = $session->getDescription();
+				if ($session->isRegistrationUserLimitEnabled())
+				{
+					$item->sub_min = $session->getRegistrationMinUsers();
+					$item->sub_max = $session->getRegistrationMaxUsers();
+				}
+				if ($session->getAppointments())
+				{
+					/** @var ilSessionAppointment $app */
+					$app = $session->getFirstAppointment();
+					$item->period_start = $app->getStart()->get(IL_CAL_UNIX);
+					$item->period_end = $app->getEnd()->get(IL_CAL_UNIX);
+				}
+				break;
+		}
+		return $item;
+	}
+
 	/**
 	 * Add the assigned users as members to the target objects
 	 */
@@ -45,12 +138,15 @@ class ilCombiSubscriptionTargets
 	{
 		global $tree;
 
-		include_once('./Modules/Group/classes/class.ilGroupParticipants.php');
-		include_once('./Modules/Group/classes/class.ilGroupMembershipMailNotification.php');
-
 		include_once('./Modules/Course/classes/class.ilCourseParticipants.php');
 		include_once('./Modules/Course/classes/class.ilCourseMembershipMailNotification.php');
 		include_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
+
+		include_once('./Modules/Group/classes/class.ilGroupParticipants.php');
+		include_once('./Modules/Group/classes/class.ilGroupMembershipMailNotification.php');
+
+		include_once('./Modules/Session/classes/class.ilSessionParticipants.php');
+		include_once('./Modules/Session/classes/class.ilSessionMembershipMailNotification.php');
 
 		// collect the assigning actions to be done
 		$actions = array();
@@ -95,22 +191,38 @@ class ilCombiSubscriptionTargets
 
 			switch($action['type'])
 			{
-				case 'grp':
-					$part_obj = ilGroupParticipants::_getInstanceByObjId($action['obj_id']);
-					$role = IL_GRP_MEMBER;
-					$notification_type = ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER;
-					break;
-
 				case 'crs':
 					$part_obj = ilCourseParticipants::_getInstanceByObjId($action['obj_id']);
 					$role = IL_CRS_MEMBER;
-					$notification_type = $part_obj->NOTIFY_ACCEPT_SUBSCRIBER;
+					$mail_obj = new ilCourseMembershipMailNotification();
+					$mail_obj->setRefId($ref_id);
+					$mail_obj->setType(ilCourseMembershipMailNotification::TYPE_ADMISSION_MEMBER);
+					$mail_obj->setLangModules(array('crs','grp','sess'));
+					break;
+
+				case 'grp':
+					$part_obj = ilGroupParticipants::_getInstanceByObjId($action['obj_id']);
+					$role = IL_GRP_MEMBER;
+					$mail_obj = new ilGroupMembershipMailNotification();
+					$mail_obj->setRefId($ref_id);
+					$mail_obj->setType(ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER);
+					$mail_obj->setLangModules(array('crs','grp','sess'));
+					break;
+
+				case 'sess':
+					$part_obj = ilSessionParticipants::_getInstanceByObjId($action['obj_id']);
+					$role = null;
+					$mail_obj = new ilSessionMembershipMailNotification();
+					$mail_obj->setRefId($ref_id);
+					$mail_obj->setType(ilSessionMembershipMailNotification::TYPE_ADMISSION_MEMBER);
+					$mail_obj->setLangModules(array('crs','grp','sess'));
 					break;
 
 				default:
 					continue 2;	// next action
 			}
 
+			$added_members = array();
 			foreach ($action['users'] as $user_id)
 			{
 				// check if user is already a member (relevant for parent course)
@@ -125,20 +237,36 @@ class ilCombiSubscriptionTargets
 				}
 
 				// adding the user also deletes the user from the subscribers and from the waiting list
-				$part_obj->add($user_id,$role);
-				$part_obj->sendNotification($notification_type, $user_id);
+				if (isset($role))
+				{
+					$part_obj->add($user_id,$role);
+				}
+				else
+				{
+					$part_obj->add($user_id);
+				}
+				$added_members[] = $user_id;
+			}
+
+			if (!empty($added_members))
+			{
+				$mail_obj->setRecipients($added_members);
+				$mail_obj->send();
 			}
 		}
 	}
 
 	public function addNonAssignedUsersAsSubscribers()
 	{
-		include_once('./Modules/Group/classes/class.ilObjGroup.php');
-		include_once('./Modules/Group/classes/class.ilGroupWaitingList.php');
-
 		include_once('./Modules/Course/classes/class.ilObjCourse.php');
 		include_once('./Modules/Course/classes/class.ilCourseWaitingList.php');
 		require_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
+
+		include_once('./Modules/Group/classes/class.ilObjGroup.php');
+		include_once('./Modules/Group/classes/class.ilGroupWaitingList.php');
+
+		include_once('./Modules/Session/classes/class.ilObjSession.php');
+		include_once('./Modules/Session/classes/class.ilSessionWaitingList.php');
 
 
 		// collect the actions to be done
@@ -177,27 +305,17 @@ class ilCombiSubscriptionTargets
 			{
 				case 'grp':
 					$object = new ilObjGroup($action['ref_id'], true);
-					if ($object->isWaitingListEnabled())
-					{
-						$list_obj = new ilGroupWaitingList($action['obj_id']);
-					}
-					else
-					{
-						$list_obj = null;
-					}
+					$list_obj = $object->isWaitingListEnabled() ? new ilGroupWaitingList($action['obj_id']) : null;
 					break;
 
 				case 'crs':
 					$object = new ilObjCourse($action['ref_id'], true);
-					if ($object->enabledWaitingList())
-					{
-						$action['list'] = 'waiting_list';
-						$list_obj = new ilCourseWaitingList($action['obj_id']);
-					}
-					else
-					{
-						$list_obj = null;
-					}
+					$list_obj = $object->enabledWaitingList() ? new ilCourseWaitingList($action['obj_id']) : null;
+					break;
+
+				case 'sess':
+					$object = new ilObjSession($action['ref_id'], true);
+					$list_obj = $object->isRegistrationWaitingListEnabled() ? new ilSessionWaitingList($action['obj_id']) : null;
 					break;
 			}
 
@@ -227,6 +345,11 @@ class ilCombiSubscriptionTargets
 	function _getGroupingConditions($a_obj_id, $a_type)
 	{
 		global $tree;
+
+		if (!$this->hasMemLimitGrouping($a_type))
+		{
+			return array();
+		}
 
 		static $cached_conditions;
 		if (isset($cached_conditions[$a_obj_id]))
@@ -397,6 +520,7 @@ class ilCombiSubscriptionTargets
 		global $ilAccess;
 
 		require_once('Services/Object/classes/class.ilObjectFactory.php');
+		require_once('Services/Membership/classes/class.ilMembershipRegistrationSettings.php');
 
 		$items = array();
 		$targets = array();
@@ -409,7 +533,7 @@ class ilCombiSubscriptionTargets
 				{
 					throw new Exception(sprintf($this->plugin->txt('target_object_not_found'), $item->title));
 				}
-				if ($target->getType() != 'crs' && $target->getType() != 'grp')
+				if (!in_array($target->getType(), $this->plugin->getAvailableTargetTypes()))
 				{
 					throw new Exception(sprintf($this->plugin->txt('target_object_wrong_type'), $item->title));
 				}
@@ -549,6 +673,50 @@ class ilCombiSubscriptionTargets
 							break;
 						case self::SUB_WAIT_NONE:
 							$target->enableWaitingList(false);
+							break;
+					}
+
+					$target->update();
+					break;
+
+				case "sess";
+					/** @var ilObjSession $target */
+					switch ($sub_type)
+					{
+						case self::SUB_TYPE_COMBI:
+							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_OBJECT);
+							$target->setRegistrationRefId($this->object->getRefId());
+							break;
+						case self::SUB_TYPE_CONFIRM:
+							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_REQUEST);
+							break;
+						case self::SUB_TYPE_DIRECT:
+							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_DIRECT);
+							break;
+						case self::SUB_TYPE_NONE:
+							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_NONE);
+							break;
+					}
+
+					if ($set_max)
+					{
+						$target->enableRegistrationUserLimit(true);
+						$target->setRegistrationMaxUsers($item->sub_max);
+					}
+
+					switch($sub_wait)
+					{
+						case self::SUB_WAIT_AUTO:
+							$target->enableRegistrationWaitingList(true);
+							$target->setWaitingListAutoFill(true);
+							break;
+						case self::SUB_WAIT_MANU:
+							$target->enableRegistrationWaitingList(true);
+							$target->setWaitingListAutoFill(false);
+							break;
+						case self::SUB_WAIT_NONE:
+							$target->enableRegistrationWaitingList(false);
+							$target->setWaitingListAutoFill(false);
 							break;
 					}
 

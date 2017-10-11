@@ -625,37 +625,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $items;
 	}
 
-	/**
-	 * Get a new (unsaved) item for a target reference
-	 * @param $a_ref_id
-	 * @return ilCoSubItem
-	 */
-	public function getItemForTarget($a_ref_id)
-	{
-		$item = new ilCoSubItem;
-		$item->obj_id = $this->getId();
-		$item->target_ref_id = $a_ref_id;
-
-		switch (ilObject::_lookupType($a_ref_id, true))
-		{
-			case 'crs':
-				require_once('Modules/Course/classes/class.ilObjCourse.php');
-				$course = new ilObjCourse($a_ref_id, true);
-				$item->title = $course->getTitle();
-				$item->description = $course->getDescription();
-				$item->sub_max = $course->getSubscriptionMaxMembers();
-				break;
-
-			case 'grp':
-				require_once('Modules/Group/classes/class.ilObjGroup.php');
-				$group = new ilObjGroup($a_ref_id, true);
-				$item->title = $group->getTitle();
-				$item->description = $group->getDescription();
-				$item->sub_max = $group->getMaxMembers();
-				break;
-		}
-		return $item;
-	}
 
 	/**
 	 * Get the priorities of all users
