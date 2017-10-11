@@ -42,6 +42,15 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 		$ilDB->dropTable('rep_robj_xcos_prop');
 	}
 
+	/**
+	 * Check if the user has administrative access
+	 * @return bool
+	 */
+	public function hasAdminAccess()
+	{
+		global $rbacsystem;
+		return $rbacsystem->checkAccess("visible", SYSTEM_FOLDER_ID);
+	}
 
 	/**
 	 * Get a global setting for a class (maintained in administration)

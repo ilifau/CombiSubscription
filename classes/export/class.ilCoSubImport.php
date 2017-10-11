@@ -20,12 +20,12 @@ class ilCoSubImport
 
 
 	/**
-	 * @var ilExtendedTestStatisticsPlugin
+	 * @var ilCombiSubscriptionPlugin
 	 */
 	protected $plugin;
 
 	/**
-	 * @var ilExtendedTestStatistics
+	 * @var ilObjCombiSubscription
 	 */
 	protected $object;
 

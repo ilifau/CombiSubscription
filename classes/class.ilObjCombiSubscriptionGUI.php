@@ -143,6 +143,15 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->ctrl->forwardCommand(new ilCoSubExportGUI($this));
 					return;
 
+				case 'ilcosubscriptsgui':
+					if ($this->plugin->hasAdminAccess())
+					{
+						$this->setSubTabs('settings','scripts');
+						$this->plugin->includeClass('guis/class.ilCoSubScriptsGUI.php');
+						$this->ctrl->forwardCommand(new ilCoSubScriptsGUI($this));
+						return;
+					}
+
 				default:
 					// properties gui of method
 					if ($method = $this->object->getMethodObject()
@@ -285,6 +294,11 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 				$this->tabs_gui->addSubTab('categories', $this->txt('registration_categories'), $this->ctrl->getLinkTargetByClass('ilCoSubCategoriesGUI'));
 				$this->tabs_gui->addSubTab('items', $this->txt('registration_items'), $this->ctrl->getLinkTargetByClass('ilCoSubItemsGUI'));
+
+				if ($this->plugin->hasAdminAccess())
+				{
+					$this->tabs_gui->addSubTab('scripts', $this->plugin->txt('run_scripts'), $this->ctrl->getLinkTargetByClass('ilCoSubScriptsGUI'));
+				}
 				break;
 
 			case 'assignments':

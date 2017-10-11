@@ -287,3 +287,5 @@ import_mode_items#:#Registration Items
 import_mode_items_info#:#The first row contains the column headers for the data foelds of a registration item. Each subsequent row represents a registration item. The following data fields are recognized:<br />title - title of the item. Must be set<br />description - description of the item<br />identifier - internal identifier of the item. An existingitem with this identifier is updated.<br />category - title of a registration caategory to which this item should belong<br />sub_min - minimum assignments<br />sub_max - maximum assignments<br />period_start - start time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in MS Excel<br />period_end - end time of an appointment, format 'YYYY-MM-DD HH:MM:SS' or date field in MS Excel
 import_items_finished#:#The registration items were imported.
 import_items_failed#:#The registration items can't be imported.
+run_scripts#:#Run Scripts
+run#:#Run

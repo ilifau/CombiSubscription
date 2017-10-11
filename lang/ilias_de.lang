@@ -290,3 +290,5 @@ import_mode_items#:#Auswahl-Einheiten
 import_mode_items_info#:#Die erste Zeile enthält als Spaltentitel die Namen der Datenfelder einer Auswahl-Einheit.Die folgenden Zeilen entsprechen je einer zu importierenden Einheit. Die folgenden Felder werden beim Import erkannt:<br />title - Titel der Einheit. Muss vorhanden sein<br />description - Beschreibung der Einheit<br />identifier - Kennung der Einheit. Ist eine Einheit mit dieser Kennung vorhanden, wird sie aktualisiert.<br />category - Titel einer Auswahl-Kategorie, der die Einheit zugeordnet werden soll.<br />sub_min - Minimale Zuteilungen<br />sub_max - Maximale Zuteilungen<br />period_start - Start-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in MS Excel<br />period_end - End-Zeitpunkt eines Termins im Format "JJJJ-MM-TT HH:MM:SS" oder als Datums-Feld in MS Excel
 import_items_finished#:#Die Auswahl-Einheiten wurden importiert.
 import_items_failed#:#Die Auswahl-Einheiten konnten nicht importiert werden.
+run_scripts#:#Skripte ausführen
+run#:#Ausführen
