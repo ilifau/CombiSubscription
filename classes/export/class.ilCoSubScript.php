@@ -54,6 +54,12 @@ class ilCoSubScript
 	/** @var array identifier => item_id */
 	protected $items_by_identifier = array();
 
+	/** @var  ilLPObjSettings	 */
+	protected $obj_settings;
+
+	/** @var  ilObjectLP */
+	protected $obj_lp;
+
 	/**
 	 * Constructor.
 	 * @param ilCombiSubscriptionPlugin		$plugin
@@ -234,12 +240,18 @@ class ilCoSubScript
 		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
 		require_once('Services/AccessControl/classes/class.ilConditionHandler.php');
 
+		require_once('Services/Tracking/classes/class.ilLPObjSettings.php');
+		require_once('Services/Object/classes/class.ilObjectLP.php');
+		require_once('Services/Tracking/classes/class.ilLPStatusWrapper.php');
+
 		$this->loadItemData();
 		$this->checkFtpStructure();
 
 		ilDatePresentation::setUseRelativeDates(false);
 
-		$exercises = array();
+		$exercises = array(); 	// group_ref_id => ilObjExercise[]
+		$session_ids = array();  // group_ref_id => [session_ref_id => true]
+
 		foreach ($this->rows as $r => $rowdata)
 		{
 			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
@@ -255,6 +267,8 @@ class ilCoSubScript
 			//$newSession->enableRegistrationWaitingList(true);
 			//$newSession->setWaitingListAutoFill(false);
 			$newSession->update();
+
+			$session_ids[$rowdata['group_id']][$newSession->getRefId()] = true;
 
 			ilSessionAppointment::_deleteBySession($newSession->getId());
 			$appointment = new ilSessionAppointment();
@@ -289,6 +303,7 @@ class ilCoSubScript
 				{
 					$assignment->delete();
 				}
+
 				$exercises[$rowdata['group_id']] = $newExercise;
 
 				$cond = new ilConditionHandler();
@@ -309,7 +324,6 @@ class ilCoSubScript
 				$newExercise = $exercises[$rowdata['group_id']];
 			}
 
-
 			$start = $this->excelTimeToUnix($rowdata['period_start']);
 			$end = $this->excelTimeToUnix($rowdata['period_end']);
 			$deadline = $this->excelTimeToUnix($rowdata['ex_deadline']);
@@ -319,7 +333,7 @@ class ilCoSubScript
 			$ass->setId(null);
 			$ass->setExerciseId($newExercise->getId());
 			$ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
-			$ass->setTitle("Versuch ". ilDatePresentation::formatPeriod(new ilDateTime($start, IL_CAL_UNIX), new ilDateTime($end, IL_CAL_UNIX)));
+			$ass->setTitle($ass->getTitle() . ' ' .ilDatePresentation::formatPeriod(new ilDateTime($start, IL_CAL_UNIX), new ilDateTime($end, IL_CAL_UNIX)));
 			$ass->setStartTime($start);
 			$ass->setDeadline($deadline);
 			$ass->setMandatory(false);
@@ -332,6 +346,52 @@ class ilCoSubScript
 
 			$item->target_ref_id = $newSession->getRefId();
 			$item->save();
+		}
+
+		include_once 'include/inc.debug.php';
+
+		/** @var ilObjExercise $exercise */
+		foreach ($exercises as $group_ref_id => $exercise)
+		{
+			// init lp settings of the group
+			$group_obj_id = ilObject::_lookupObjId($group_ref_id);
+			$this->obj_settings = new ilLPObjSettings($group_obj_id);
+			$this->obj_lp = ilObjectLP::getInstance($group_obj_id);
+
+			// delete an old lp collection
+			if ($collection = $this->obj_lp->getCollectionInstance())
+			{
+				$collection->delete();
+			}
+
+			// save the new lp settings of the group
+			$this->obj_settings->setMode(ilLPObjSettings::LP_MODE_COLLECTION);
+			$this->obj_settings->update(true);
+
+			//important to read the new mode
+			$this->obj_lp->resetCaches();
+
+			/** @var ilLPCollectionOfRepositoryObjects $collection */
+			if ($collection = $this->obj_lp->getCollectionInstance())
+			{
+				log_line('got collection');
+
+				// take lp of exercise
+				$collection->activateEntries(array($exercise->getRefId()));
+				if (!empty($session_ids[$group_ref_id]))
+				{
+					log_var($session_ids[$group_ref_id],'$session_ids[$group_ref_id]');
+
+					// take lp of session group
+					$collection->createNewGrouping(array_keys($session_ids[$group_ref_id]), 1);
+				}
+			}
+
+			// must be done before refreshing
+			$this->obj_lp->resetCaches();
+
+			// refresh learning progress
+			ilLPStatusWrapper::_refreshStatus($group_obj_id);
 		}
 	}
 
@@ -400,7 +460,7 @@ class ilCoSubScript
 
 	/**
 	 * Convert an excel time to unix
-	 * todo: check the ugly workaround
+	 * todo: check the ugly workaround, especially the -3600
 	 *
 	 * @param $time
 	 * @return int
