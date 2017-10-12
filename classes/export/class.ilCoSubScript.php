@@ -179,8 +179,11 @@ class ilCoSubScript
 			}
 			for ($col = 0; $col < count($rowdata); $col++)
 			{
-				// use column names as
-				$this->rows[$row -1][$this->columns[$col]] = $rowdata[$col];
+				if (isset($rowdata[$col]))
+				{
+					// use column names as
+					$this->rows[$row -1][$this->columns[$col]] = $rowdata[$col];
+				}
 			}
 		}
 	}
@@ -223,10 +226,151 @@ class ilCoSubScript
 	}
 
 
-	public function createFtpStructure()
+	protected function createFtpStructure()
 	{
+		require_once('Modules/Group/classes/class.ilObjGroup.php');
+		require_once('Modules/Session/classes/class.ilObjSession.php');
+		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
+		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
+		require_once('Services/AccessControl/classes/class.ilConditionHandler.php');
 
+		$this->loadItemData();
+		$this->checkFtpStructure();
+
+		ilDatePresentation::setUseRelativeDates(false);
+
+		$exercises = array();
+		foreach ($this->rows as $r => $rowdata)
+		{
+			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+
+			/** @var ilObjSession $newSession */
+			$origSession = new ilObjSession($rowdata['sess_orig_id'], true);
+			$newSession = $origSession->cloneObject($rowdata['group_id']);
+			//$newSession->setTitle("Teilnahme ". $rowdata['title']);
+			$newSession->setRegistrationType(ilMembershipRegistrationSettings::TYPE_OBJECT);
+			$newSession->setRegistrationRefId($this->object->getRefId());
+			//$newSession->setRegistrationMaxUsers($rowdata['sub_max']);
+			//$newSession->enableRegistrationUserLimit(true);
+			//$newSession->enableRegistrationWaitingList(true);
+			//$newSession->setWaitingListAutoFill(false);
+			$newSession->update();
+
+			ilSessionAppointment::_deleteBySession($newSession->getId());
+			$appointment = new ilSessionAppointment();
+			$appointment->setSessionId($newSession->getId());
+			$appointment->toggleFullTime(false);
+			$appointment->setStart(new ilDateTime($this->excelTimeToUnix($rowdata['period_start']), IL_CAL_UNIX));
+			$appointment->setEnd(new ilDateTime($this->excelTimeToUnix($rowdata['period_end']), IL_CAL_UNIX));
+			$appointment->create();
+
+			$cond = new ilConditionHandler();
+			$cond->setTriggerRefId($rowdata['test_id']);
+			$cond->setTriggerObjId(ilObject::_lookupObjId($rowdata['test_id']));
+			$cond->setTriggerType('tst');
+			$cond->setOperator(ilConditionHandler::OPERATOR_PASSED);
+			$cond->setTargetRefId($newSession->getRefId());
+			$cond->setTargetObjId($newSession->getId());
+			$cond->setTargetType('sess');
+			$cond->setObligatory(true);
+			$cond->setHiddenStatus(false);
+			$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
+			$cond->storeCondition();
+
+			/** @var ilObjExercise $newExercise */
+			if (empty($exercises[$rowdata['group_id']]))
+			{
+				$origExercise = new ilObjExercise($rowdata['ex_orig_id'], true);
+				$newExercise = $origExercise->cloneObject($rowdata['group_id']);
+				//$newExercise->setTitle("Abgabe ". $rowdata['title']);
+				$newExercise->update();
+				/** @var ilExAssignment $assignment */
+				foreach (ilExAssignment::getInstancesByExercise($newExercise->getId()) as $assignment)
+				{
+					$assignment->delete();
+				}
+				$exercises[$rowdata['group_id']] = $newExercise;
+
+				$cond = new ilConditionHandler();
+				$cond->setTriggerRefId($rowdata['test_id']);
+				$cond->setTriggerObjId(ilObject::_lookupObjId($rowdata['test_id']));
+				$cond->setTriggerType('tst');
+				$cond->setOperator(ilConditionHandler::OPERATOR_PASSED);
+				$cond->setTargetRefId($newExercise->getRefId());
+				$cond->setTargetObjId($newExercise->getId());
+				$cond->setTargetType('exc');
+				$cond->setObligatory(true);
+				$cond->setHiddenStatus(false);
+				$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
+				$cond->storeCondition();
+			}
+			else
+			{
+				$newExercise = $exercises[$rowdata['group_id']];
+			}
+
+
+			$start = $this->excelTimeToUnix($rowdata['period_start']);
+			$end = $this->excelTimeToUnix($rowdata['period_end']);
+			$deadline = $this->excelTimeToUnix($rowdata['ex_deadline']);
+
+			/** @var ilExAssignment $ass */
+			$ass = current(ilExAssignment::getInstancesByExercise(ilObject::_lookupObjId($rowdata['ex_orig_id'])));
+			$ass->setId(null);
+			$ass->setExerciseId($newExercise->getId());
+			$ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
+			$ass->setTitle("Versuch ". ilDatePresentation::formatPeriod(new ilDateTime($start, IL_CAL_UNIX), new ilDateTime($end, IL_CAL_UNIX)));
+			$ass->setStartTime($start);
+			$ass->setDeadline($deadline);
+			$ass->setMandatory(false);
+			$ass->setTeamTutor(true);
+			$ass->save();
+
+			$this->rows[$r]['sess_id'] = $newSession->getRefId();
+			$this->rows[$r]['ex_id'] = $newExercise->getRefId();
+			$this->rows[$r]['ex_ass_id'] = $newExercise->getRefId();
+
+			$item->target_ref_id = $newSession->getRefId();
+			$item->save();
+		}
 	}
+
+	protected function checkFtpStructure()
+	{
+		foreach ($this->rows as $r => $rowdata)
+		{
+			if (empty($rowdata['identifier']) || empty($this->items_by_identifier[$rowdata['identifier']]))
+			{
+				throw new Exception("Kein Identifier oder Einheit nicht gefunden in Zeile $r");
+			}
+
+			$group_id = $rowdata['group_id'];
+			if (empty($group_id) || !ilObject::_exists($group_id,true, 'grp') || ilObject::_isInTrash($group_id))
+			{
+				throw new Exception("Gruppe $group_id nicht gefunden!");
+			}
+
+			$test_id = $rowdata['test_id'];
+			if (empty($test_id) || !ilObject::_exists($test_id,true, 'tst') || ilObject::_isInTrash($test_id))
+			{
+				throw new Exception("Test $test_id nicht gefunden!");
+			}
+
+			$sess_orig_id = $rowdata['sess_orig_id'];
+			if (empty($sess_orig_id) || !ilObject::_exists($sess_orig_id,true, 'sess') || ilObject::_isInTrash($sess_orig_id))
+			{
+				throw new Exception("Sitzung $sess_orig_id nicht gefunden!");
+			}
+
+			$ex_orig_id = $rowdata['ex_orig_id'];
+			if (empty($ex_orig_id) || !ilObject::_exists($ex_orig_id,true, 'exc') || ilObject::_isInTrash($ex_orig_id))
+			{
+				throw new Exception("Übung $ex_orig_id nicht gefunden!");
+			}
+		}
+	}
+
+
 
 	/**
 	 * Get import errors
