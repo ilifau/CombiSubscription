@@ -467,13 +467,18 @@ class ilCoSubScript
 	 */
 	protected function excelTimeToUnix($time)
 	{
-		global $ilUser;
+		if (is_numeric($time))
+		{
+			$date = (int) $time;
+			$time = round(($time - $date) * 86400) - 3600;
 
-		$date = (int) $time;
-		$time = round(($time - $date) * 86400) - 3600;
-
-		$date = PHPExcel_Shared_Date::ExcelToPHP($date);
-		$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
+			$date = PHPExcel_Shared_Date::ExcelToPHP($date);
+			$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
+		}
+		else
+		{
+			$dateTime = new ilDateTime($time, IL_CAL_DATETIME);
+		}
 
 		return $dateTime->get(IL_CAL_UNIX);
 	}
