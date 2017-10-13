@@ -71,13 +71,22 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		if (!isset($priorities))
 		{
 			// optionally pre-select all items if user has not yet registered
-			if (empty($saved_priorities) && $this->object->getPreSelect())
+			if (!empty($saved_priorities))
 			{
+				$priorities = $saved_priorities;
+			}
+			elseif ($this->object->getPreSelect())
+			{
+				$priorities = array();
 				ilUtil::sendInfo($this->plugin->txt('pre_select_message'));
 				foreach ($this->object->getItems() as $item)
 				{
 					$priorities[$item->item_id] = '0';
 				}
+			}
+			else
+			{
+				$priorities = array();
 			}
 		}
 
@@ -306,7 +315,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		global $ilUser;
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 		ilCoSubChoice::_deleteForObject($this->object->getId(), $ilUser->getId());
-		ilUtil::sendSuccess('registration_deleted', true);
+		ilUtil::sendSuccess($this->plugin->txt('registration_deleted'), true);
 		$this->parent->returnToContainer();
 	}
 
