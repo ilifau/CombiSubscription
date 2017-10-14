@@ -82,7 +82,7 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 			$row['users_satisfied_not'] = 0;
 			foreach (array_keys($priorities) as $user_id)
 			{
-				switch ($this->parent->object->getSatisfaction($user_id, $run->run_id))
+				switch ($this->parent->object->getUserSatisfaction($user_id, $run->run_id))
 				{
 					case ilObjCombiSubscription::SATISFIED_FULL:
 						$row['users_satisfied']++;

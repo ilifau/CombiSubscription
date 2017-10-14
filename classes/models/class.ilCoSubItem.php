@@ -111,6 +111,29 @@ class ilCoSubItem
 	}
 
 	/**
+	 * Check if two items have a period conflict
+	 * @param self $item1
+	 * @param self $item2
+	 * @return bool
+	 */
+	public static function _haveConflict($item1, $item2)
+	{
+		// no conflict if period is not fully defined
+		if (empty($item1->period_start) || empty($item1->period_end) || empty($item2->period_start) || empty($item2->period_end))
+		{
+			return false;
+		}
+
+		// check if start of one item is in the period of the other item
+		if (($item1->period_start >= $item2->period_start && $item1->period_start < $item2->period_end) ||
+			($item2->period_start >= $item1->period_start && $item2->period_start < $item1->period_end))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Clone the item for a new object
 	 * @param int	$a_obj_id
 	 * @return self

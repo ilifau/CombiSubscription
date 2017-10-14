@@ -230,13 +230,13 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 		$mc->setRequired(false);
 		$this->form->addItem($mc);
 
-//		// assignments
-//		$mc = new ilNumberInputGUI($this->plugin->txt('cat_assignments'), 'assignments');
-//		$mc->setInfo($this->plugin->txt('cat_assignments_info'));
-//		$mc->setDecimals(0);
-//		$mc->setSize(4);
-//		$mc->setRequired(false);
-//		$this->form->addItem($mc);
+		// max assignments
+		$ma = new ilNumberInputGUI($this->plugin->txt('cat_max_assignments'), 'max_assignments');
+		$ma->setInfo($this->plugin->txt('cat_max_assignments_info'));
+		$ma->setDecimals(0);
+		$ma->setSize(4);
+		$ma->setRequired(false);
+		$this->form->addItem($ma);
 
 
 		switch ($a_mode)
@@ -268,7 +268,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 				'title' => $a_category->title,
 				'description' => $a_category->description,
 				'min_choices' => $a_category->min_choices,
-				'assignments' => $a_category->assignments
+				'max_assignments' => $a_category->max_assignments
 			)
 		);
 	}
@@ -284,7 +284,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 		$a_category->title = $this->form->getInput('title');
 		$a_category->description = $this->form->getInput('description');
 		$a_category->min_choices = $this->form->getInput('min_choices');
-		$a_category->assignments = $this->form->getInput('assignments');
+		$a_category->max_assignments = $this->form->getInput('max_assignments');
 		return $a_category->save();
 	}
 }

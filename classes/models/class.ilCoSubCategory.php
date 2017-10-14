@@ -24,7 +24,7 @@ class ilCoSubCategory
 	public $min_choices;
 
 	/** @var  integer|null */
-	public $assignments;
+	public $max_assignments;
 
 
 	/**
@@ -124,7 +124,7 @@ class ilCoSubCategory
 		$this->description = $data['description'];
 		$this->sort_position = $data['sort_position'];
 		$this->min_choices = $data['min_choices'];
-		$this->assignments = $data['assignments'];
+		$this->max_assignments = $data['assignments'];
 	}
 
 	/**
@@ -160,7 +160,7 @@ class ilCoSubCategory
 				'description' => array('text', $this->description),
 				'sort_position' => array('integer', $this->sort_position),
 				'min_choices' => array('integer', $this->min_choices),
-				'assignments' => array('integer', $this->assignments),
+				'assignments' => array('integer', $this->max_assignments),
 			)
 		);
 		return $rows > 0;

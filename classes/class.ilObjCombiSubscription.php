@@ -14,6 +14,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	const SATISFIED_NOT = 0;
 	const SATISFIED_MEDIUM = 1;
 	const SATISFIED_FULL = 2;
+	const SATISFIED_OVER = 3;
+	const SATISFIED_CONFLICT = -1;
 	# endregion
 
 	# region class variables
@@ -45,6 +47,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/** @var  array     user_id => item_id => priority */
 	protected $priorities;
+
+	/** @var  array 	item_id => item_id[] */
+	protected $conflicts;
 
 	/** @var  bool      the priorities of all users are loaded */
 	protected $all_priorities_loaded = false;
@@ -590,6 +595,25 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	}
 
 	/**
+	 * Get the assignment limits of categories
+	 * Only categories with limits are included
+	 * @return array	$cat_id => $limit
+	 */
+	public function getCategoryLimits()
+	{
+		$limits = array();
+		foreach ($this->categories as $cat_id => $category)
+		{
+			if (!empty($category->max_assignments))
+			{
+				$limits[$cat_id] = $category->max_assignments;
+			}
+		}
+		return $limits;
+	}
+
+
+	/**
 	 * Get the items assigned to this object (lazy loading)
 	 * @return ilCoSubItem[]	indexed by item_id
 	 */
@@ -623,6 +647,51 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 
 		return $items;
+	}
+
+
+	/**
+	 * Get a list conflicting items
+	 * @return array	item_id => item_id[]
+	 */
+	public function getItemsConflicts()
+	{
+		if (!isset($this->conflicts))
+		{
+			$this->conflicts = array();
+			foreach ($this->getItems() as $item1_id => $item1)
+			{
+				$this->conflicts[$item1_id] = array();
+				foreach ($this->getItems() as $item2_id => $item2)
+				{
+					if ($item1_id != $item2_id && ilCoSubItem::_haveConflict($item1, $item2))
+					{
+						$this->conflicts[$item1_id][] = $item2_id;
+					}
+				}
+			}
+		}
+		return $this->conflicts;
+	}
+
+	/**
+	 * Check if items have mutual conflicts
+	 * @param $a_item_ids
+	 * @return bool
+	 */
+	public function itemsHaveConflicts($a_item_ids)
+	{
+		$conflicts = $this->getItemsConflicts();
+
+		foreach ($a_item_ids as $item_id)
+		{
+			$found = array_intersect($conflicts[$item_id], $a_item_ids);
+			if (!empty($found))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -893,7 +962,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param integer   $a_run_id (default 0 for the chosen assignments)
 	 * @return integer  satisfaction, e.g. self::SATISFIED_FULL
 	 */
-	public function getSatisfaction($a_user_id, $a_run_id = 0)
+	public function getUserSatisfaction($a_user_id, $a_run_id = 0)
 	{
 		$priorities = $this->getPrioritiesOfUser($a_user_id);
 		$assignments = $this->getAssignmentsOfUser($a_user_id, $a_run_id);
@@ -901,6 +970,14 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		if (count($assignments) < $this->getMethodObject()->getNumberAssignments())
 		{
 			return self::SATISFIED_NOT;			// not enough assignments
+		}
+		if (count($assignments) > $this->getMethodObject()->getNumberAssignments())
+		{
+			return self::SATISFIED_OVER;
+		}
+		if ($this->itemsHaveConflicts(array_keys($assignments)))
+		{
+			return self::SATISFIED_CONFLICT;
 		}
 
 		foreach ($assignments as $item_id => $assign_id)

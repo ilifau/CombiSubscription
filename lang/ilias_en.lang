@@ -264,8 +264,8 @@ msg_category_deleted#:#The category is deleted.
 msg_categories_deleted#:#The categories are deleted.
 confirm_delete_categories#:#Do you like to delete the following categories?
 confirm_delete_categories_info#:#Registration items having these categories will remain without category.
-cat_assignments#:#Assignments
-cat_assignments_info#:#The calculation will assign this mumber of items from this category to a user. Leave the field empty if you don't want to set this condition.
+cat_max_assignments#:#Assignments
+cat_max_assignments_info#:#The calculation will assign maximum this number of items from this category to a user. Leave the field empty if you don't want to set this condition.
 no_category_selected#:#No category selected
 category#:#Category
 category_info#:#The item will be shown under this category on the registration screen.

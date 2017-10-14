@@ -82,6 +82,8 @@ satisfaction#:#Erfüllung
 satisfied_not#:#Nicht erfüllt
 satisfied_medium#:#Ausreichend erfüllt
 satisfied_full#:#Voll erfüllt
+satisfied_over#:#Überfüllt
+satisfied_conflict#:#Beinhaltet Konflikt
 calculate_assignments#:#Zuteilungen berechnen
 msg_calculation_started#:#Die Berechnung wurde gestartet. Wenn sie abgeschlossen ist, ist ihr Ergebnis unter den gespeicherten Zuteilungen verfügbar.
 msg_calculation_finished#:#Die Berechnung wurde durchgeführt (%s: %s) und als aktuelle Zuteilungen übernommen.
@@ -139,7 +141,7 @@ ilcosubmethodeatts_license#:#Lizenz
 ilcosubmethodeatts_log_level#:#Log-Level
 ilcosubmethodeatts_log_level_info#:#Info
 ilcosubmethodeatts_sub_min_info#:#Die Berechnung versucht, nicht weniger als diese Anmeldungen zuzuteilen (siehe Methoden-Einstellungen)
-ilcosubmethodeattssub_max_info#:#Die Berechnung versucht, nicht mehr als diese Anmeldungen zuzuteilen (siehe Methoden-Einstellungen)
+ilcosubmethodeatts_sub_max_info#:#Die Berechnung versucht, nicht mehr als diese Anmeldungen zuzuteilen (siehe Methoden-Einstellungen)
 ilcosubmethodrandom_title#:#Zufallsauswahl
 ilcosubmethodrandom_description#:#Wählt die Zuteilungen je Priorität per Zufall aus.
 ilcosubmethodrandom_properties_description#:#Hier liegen Sie Einstellungen fest, die speziell von der Zuteilungsmethode "Zufallsauswahl" unterstützt werden.
@@ -267,8 +269,8 @@ msg_category_deleted#:#Die Kategorie wurde gelöscht.
 msg_categories_deleted#:#Die Kategorien wurden gelöscht.
 confirm_delete_categories#:#Möchten Sie die folgenden Kategorien löschen?
 confirm_delete_categories_info#:#Falls diesen Kategorien Auswahl-Einheiten zugeordnet sind, verbleiben die Einheiten ohne Kategorien-Zuordnung.
-cat_assignments#:#Zuteilungen
-cat_assignments_info#:#Bei der Berechnung der Zuteilungen werden jedem Teilnehmer so viele an Einheiten aus dieser Kategorie zugeteilt. Lassen Sie das Feld leer, wenn Sie diese Bedingung nicht setzen möchten.
+cat_max_assignments#:#Maximale Zuteilungen
+cat_max_assignments_info#:#Bei der Berechnung der Zuteilungen werden jedem Teilnehmer maximal so viele an Einheiten aus dieser Kategorie zugeteilt. Lassen Sie das Feld leer, wenn Sie diese Bedingung nicht setzen möchten.
 no_category_selected#:#Keine Kategorie ausgewählt
 category#:#Kategorie
 category_info#:#Die Einheit wird bei der Anmeldung unter dieser Kategorie angezeigt.

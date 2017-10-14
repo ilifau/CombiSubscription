@@ -6,24 +6,6 @@
 class ilCoSubMethodRandom extends ilCoSubMethodBase
 {
 	# region class variables
-	/** @var  ilCoSubRun */
-	protected $run;
-
-	/** @var ilCoSubItem[] | null (indexed by item_id) */
-	protected $items = array();
-
-	/** @var  array     user_id => item_id => priority */
-	protected $priorities = array();
-
-	/** @var array 		item_id => priority => count */
-	protected $priority_counts = array();
-
-	/** @var array  	item_id => count */
-	protected $assign_counts_item = array();
-	
-	/** @var array 		user_id => count */
-	protected $assign_counts_user = array();
-
 
 	/** @var int number of selectable priorities */
 	public $number_priorities = 2;
@@ -33,6 +15,32 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 	/** @var int number of items to assign in the calculation */
 	public $number_assignments = 1;
+
+
+
+	/** @var  ilCoSubRun */
+	protected $run;
+
+	/** @var ilCoSubItem[] (indexed by item_id) */
+	protected $items = array();
+
+	/** @var  array 	item_id => item_id[] */
+	protected $conflicts;
+	
+	/** @var array cat_id => (int) limit */
+	protected $category_limits = array();
+
+	/** @var  array     user_id => item_id => priority */
+	protected $priorities = array();
+
+	/** @var array 		item_id => priority => count */
+	protected $priority_counts_item = array();
+
+	/** @var array  	item_id => count */
+	protected $assign_counts_item = array();
+	
+	/** @var array 		user_id => count */
+	protected $assign_counts_user = array();
 
 	# endregion
 
@@ -190,8 +198,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	protected function initCalculationData()
 	{
 		$this->items = $this->object->getItems();
+		$this->conflicts = $this->object->getItemsConflicts();
+		$this->category_limits = $this->object->getCategoryLimits();
 		$this->priorities = $this->object->getPriorities();
-		$this->priority_counts = $this->object->getPriorityCounts();
+		$this->priority_counts_item = $this->object->getPriorityCounts();
 		$this->assign_counts_item = array();
 		foreach ($this->items as $item)
 		{
@@ -203,7 +213,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$this->assign_counts_user[$user_id] = 0;
 		}
 	}
-
 
 	/**
 	 * Calculate the assignments
@@ -223,6 +232,26 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 		$this->initCalculationData();
 
+		$this->calculateByUsers();
+
+		$this->run->details = '';
+		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
+		$this->run->save();
+
+		$this->error = '';
+		return true;
+
+	}
+
+	/**
+	 * Calculate the assignments primary by items
+	 * - support multiple assignments
+	 * - don't support category limits
+	 * - don't support period conflicts
+	 * - may leave partially assigned users
+	 */
+	protected function calculateByItems()
+	{
 		for ($priority = 0; $priority < $this->number_priorities; $priority++)
 		{
 			foreach ($this->getSortedItemsForPriority($priority) as $item)
@@ -239,13 +268,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				}
 			}
 		}
-
-		$this->run->details = '';
-		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
-		$this->run->save();
-
-		$this->error = '';
-		return true;
 	}
 
 
@@ -265,7 +287,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$position = count($this->items);
 		foreach($this->items as $item_id => $item)
 		{
-			$p_count = (int) $this->priority_counts[$item_id][$a_priority];
+			$p_count = (int) $this->priority_counts_item[$item_id][$a_priority];
 
 			// will go into reverse sorting
 			$key1 = ((isset($item->sub_max) && $p_count > $item->sub_max) ? '0' : '1');		// satisfiable
@@ -360,7 +382,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		// decrease the priority count for the chosen item
 		// remove the item choice from the user
 		 $priority = $this->priorities[$a_user_id][$a_item_id];
-		 $this->priority_counts[$a_item_id][$priority]--;
+		 $this->priority_counts_item[$a_item_id][$priority]--;
 		 unset($this->priorities[$a_user_id][$a_item_id]);
 
 		// this user has reached the number of assignments per user
@@ -369,11 +391,156 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			// decrease the priority counts for remaining items chosen by the user
 			foreach ($this->priorities[$a_user_id] as $item_id => $priority)
 			{
-				$this->priority_counts[$item_id][$priority]--;
+				$this->priority_counts_item[$item_id][$priority]--;
 			}
 
 			// then remove user from the list of priorities
 			unset($this->priorities[$a_user_id]);
 		}
+	}
+
+	/**
+	 * Calculate the assignments primary by users
+	 * - support multiple assignments
+	 * - support category limits
+	 * - support period conflicts
+	 * - leaves only fully or not assigned users
+	 */
+	protected function calculateByUsers()
+	{
+		for ($priority = 0; $priority < $this->number_priorities; $priority++)
+		{
+			foreach ($this->getSortedUsers() as $user_id)
+			{
+				$selected = array();
+				$available = $this->getSortedItemsForUser($user_id);
+				$catlimits = $this->category_limits;
+
+				$selected = $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits);
+
+				if (count($selected) == $this->number_assignments)
+				{
+					foreach ($selected as $item_id => $item)
+					{
+						$this->assignUser($user_id, $item_id);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get a randomly sorted list of users
+	 */
+	protected function getSortedUsers()
+	{
+		$users  = array_keys($this->priorities);
+		shuffle($users);
+		return $users;
+	}
+
+	/**
+	 *	Get a list of items sorted by sorted by some criteria
+	 *  1) the priority set by the user
+	 *  2) already existing assignments (try to fill groups)
+	 *
+	 * @param	int				$a_user_id
+	 * @return	ilCoSubItem[]	item_id => item
+	 */
+	protected function getSortedItemsForUser($a_user_id)
+	{
+		if (!is_array($this->priorities[$a_user_id]))
+		{
+			return array();
+		}
+
+		$indexed = array();
+		foreach ($this->priorities[$a_user_id] as $item_id => $priority)
+		{
+			$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
+			$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//reverse sort by existing assignments (highest first)
+			$key3 = $item_id;																	//for uniqueness
+			$indexed[$key1.$key2.$key3] = $item_id;
+		}
+		sort($indexed);
+
+		$items = array();
+		foreach ($indexed as $keys => $item_id)
+		{
+			$items[$item_id] = $this->items[$item_id];
+		}
+		return $items;
+	}
+
+	/**
+	 * @param $a_selected	ilCoSubItem[]	item_id => item		list of already selected items
+	 * @param $a_available	ilCoSubItem[]	item_id => item		list of still available items
+	 * @param $a_catlimits	int[]		 	item_id => limit	still available selections per category
+	 * @return 				ilCoSubItem[]	item_id => item		selected items
+	 */
+	protected function getRecursiveItemSelectionForUser($a_selected, $a_available, $a_catlimits)
+	{
+		// positive break condition
+		if (count($a_selected) >= $this->number_assignments)
+		{
+			return $a_selected;
+		}
+
+		// negative break condition - assignment not possible
+		if (count($a_selected) + count($a_available) < $this->number_assignments)
+		{
+			return array();
+		}
+
+		// try all items as next one
+		foreach ($a_available as $item_id => $item)
+		{
+			$selected = $a_selected;
+			$available = $a_available;
+			$catlimits = $a_catlimits;
+
+			// add item to the selected ones
+			$selected[$item_id] = $item;
+			unset($available[$item_id]);
+
+			// remove conflicting items from the available list
+			foreach ($this->conflicts[$item_id] as $conflict_item_id)
+			{
+				if (isset($available[$conflict_item_id]))
+				{
+					unset($available[$conflict_item_id]);
+				}
+			}
+
+			// check the category limit
+			if (!empty($item->cat_id) && isset($a_catlimits[$item->cat_id]))
+			{
+				$catlimits[$item->cat_id] --;
+
+				//category has rerached its limit
+				if ($catlimits[$item->cat_id] <= 0)
+				{
+					// remove items of this category from the available list
+					foreach ($available as $item2_id => $item2)
+					{
+						if ($item2->cat_id == $item->cat_id)
+						{
+							unset($available[$item2_id]);
+						}
+					}
+				}
+			}
+
+			// merge the recursively calculated selections
+			$selected = array_merge($selected, $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits));
+
+			// positive break condition
+			if (count($selected) >= $this->number_assignments)
+			{
+				return $selected;
+			}
+		}
+
+		return array();
 	}
 }

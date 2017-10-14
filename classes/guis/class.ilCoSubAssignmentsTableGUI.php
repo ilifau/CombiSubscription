@@ -151,7 +151,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$row = array(
 				'user_id' => $user_id,
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
-				'result' => $this->object->getSatisfaction($user_id, 0)
+				'result' => $this->object->getUserSatisfaction($user_id, 0)
 			);
 
 			foreach ($this->item_ids as $item_id)
