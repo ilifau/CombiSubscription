@@ -457,8 +457,15 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		}
 
 		$indexed = array();
-		foreach ($this->priorities[$a_user_id] as $item_id => $priority)
+
+		// get a random order of items as default
+		$item_ids = array_keys($this->priorities[$a_user_id]);
+		shuffle($item_ids);
+
+		foreach ($item_ids as $index => $item_id)
 		{
+			$priority = $this->priorities[$a_user_id][$item_id];
+
 			if (!empty($this->items[$item_id]))
 			{
 				$item = $this->items[$item_id];
@@ -467,8 +474,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				if (empty($item->sub_max) || $item->sub_max > $this->assign_counts_item[$item_id])
 				{
 					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
-					$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//reverse sort by existing assignments (highest first)
-					$key3 = $item_id;																	//for uniqueness
+					$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//then sort by existing assignments (highest first)
+					$key3 = sprintf('%06d', $index);												//then sort by random order
 					$indexed[$key1.$key2.$key3] = $item_id;
 				}
 			}
