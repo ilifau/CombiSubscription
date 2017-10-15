@@ -386,7 +386,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		 unset($this->priorities[$a_user_id][$a_item_id]);
 
 		// this user has reached the number of assignments per user
-		if ($this->assign_counts_user[$a_user_id] >= $this->number_assignments)
+		if ($this->assign_counts_user[$a_user_id] >= $this->number_assignments && !empty($this->priorities[$a_user_id]))
 		{
 			// decrease the priority counts for remaining items chosen by the user
 			foreach ($this->priorities[$a_user_id] as $item_id => $priority)
@@ -416,9 +416,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				$available = $this->getSortedItemsForUser($user_id);
 				$catlimits = $this->category_limits;
 
+				//log_line("<h2>calculate user $user_id</h2>");
+
 				$selected = $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits);
 
-				if (count($selected) == $this->number_assignments)
+				if (count($selected) >= $this->number_assignments)
 				{
 					foreach ($selected as $item_id => $item)
 					{
@@ -457,12 +459,21 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$indexed = array();
 		foreach ($this->priorities[$a_user_id] as $item_id => $priority)
 		{
-			$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
-			$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//reverse sort by existing assignments (highest first)
-			$key3 = $item_id;																	//for uniqueness
-			$indexed[$key1.$key2.$key3] = $item_id;
+			if (!empty($this->items[$item_id]))
+			{
+				$item = $this->items[$item_id];
+
+				// take only items that are not yet full
+				if (empty($item->sub_max) || $item->sub_max > $this->assign_counts_item[$item_id])
+				{
+					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
+					$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//reverse sort by existing assignments (highest first)
+					$key3 = $item_id;																	//for uniqueness
+					$indexed[$key1.$key2.$key3] = $item_id;
+				}
+			}
 		}
-		sort($indexed);
+		ksort($indexed);
 
 		$items = array();
 		foreach ($indexed as $keys => $item_id)
@@ -480,15 +491,19 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	protected function getRecursiveItemSelectionForUser($a_selected, $a_available, $a_catlimits)
 	{
-		// positive break condition
+		//log_line('getRecursiveItemSelectionForUser');
+
+		// positive break condition - required number of assignments reached
 		if (count($a_selected) >= $this->number_assignments)
 		{
+			//log_line('number assignments reached (start)');
 			return $a_selected;
 		}
 
 		// negative break condition - assignment not possible
 		if (count($a_selected) + count($a_available) < $this->number_assignments)
 		{
+			//log_line('number assignments not reachable (start)');
 			return array();
 		}
 
@@ -503,7 +518,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$selected[$item_id] = $item;
 			unset($available[$item_id]);
 
-			// remove conflicting items from the available list
+			//log_line("selected: ". implode(',', array_keys($selected)));
+			//log_line("available: ". implode(',', array_keys($available)));
+
+			// remove conflicting items from the current available list
 			foreach ($this->conflicts[$item_id] as $conflict_item_id)
 			{
 				if (isset($available[$conflict_item_id]))
@@ -512,15 +530,17 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				}
 			}
 
-			// check the category limit
+			//log_line("available: ". implode(',', array_keys($available)). " (no conflicts)");
+
+			// decrease and check the category limit of the chosen item
 			if (!empty($item->cat_id) && isset($a_catlimits[$item->cat_id]))
 			{
 				$catlimits[$item->cat_id] --;
 
-				//category has rerached its limit
+				//category has reached its limit
 				if ($catlimits[$item->cat_id] <= 0)
 				{
-					// remove items of this category from the available list
+					// remove all items of this category from the current available list
 					foreach ($available as $item2_id => $item2)
 					{
 						if ($item2->cat_id == $item->cat_id)
@@ -531,16 +551,27 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				}
 			}
 
-			// merge the recursively calculated selections
-			$selected = array_merge($selected, $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits));
+			//log_line("available: ". implode(',', array_keys($available)). "(no catlimits)");
 
-			// positive break condition
+			// append recursively calculated selections
+			foreach ($this->getRecursiveItemSelectionForUser($selected, $available, $catlimits) as $item2_id => $item2)
+			{
+				$selected[$item2_id] = $item2;
+			}
+
+			// positive break condition - required number of assignments reached
 			if (count($selected) >= $this->number_assignments)
 			{
+				//log_line('number assignments reached (after)');
 				return $selected;
 			}
+
+			// remove this item from the available list of this function
+			// it will not be an option for the other items, too
+			unset ($a_available[$item_id]);
 		}
 
+		//log_line('no item fits (after)');
 		return array();
 	}
 }

@@ -602,7 +602,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function getCategoryLimits()
 	{
 		$limits = array();
-		foreach ($this->categories as $cat_id => $category)
+		foreach ($this->getCategories() as $cat_id => $category)
 		{
 			if (!empty($category->max_assignments))
 			{
@@ -676,7 +676,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Check if items have mutual conflicts
-	 * @param $a_item_ids
+	 * @param int[] $a_item_ids
 	 * @return bool
 	 */
 	public function itemsHaveConflicts($a_item_ids)
@@ -687,6 +687,38 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		{
 			$found = array_intersect($conflicts[$item_id], $a_item_ids);
 			if (!empty($found))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check if a list of items exceeds the assignment limits defined by their categories
+	 * @param int[] $a_item_ids
+	 * @return bool
+	 */
+	public function itemsOverCategoryLimits($a_item_ids)
+	{
+		$items = $this->getItems();
+		$limits = $this->getCategoryLimits();
+
+		$catcounts = array();
+		foreach ($a_item_ids as $item_id)
+		{
+			if (!empty($items[$item_id]))
+			{
+				$item = $items[$item_id];
+				if (!empty($item->cat_id))
+				{
+					$catcounts[$item->cat_id]++;
+				}
+			}
+		}
+		foreach ($catcounts as $cat_id => $count)
+		{
+			if (isset($limits[$cat_id]) && $count > $limits[$cat_id])
 			{
 				return true;
 			}
@@ -972,6 +1004,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			return self::SATISFIED_NOT;			// not enough assignments
 		}
 		if (count($assignments) > $this->getMethodObject()->getNumberAssignments())
+		{
+			return self::SATISFIED_OVER;
+		}
+		if ($this->itemsOverCategoryLimits(array_keys($assignments)))
 		{
 			return self::SATISFIED_OVER;
 		}

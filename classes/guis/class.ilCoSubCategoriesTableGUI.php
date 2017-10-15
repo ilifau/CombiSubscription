@@ -33,7 +33,7 @@ class ilCoSubCategoriesTableGUI extends ilTable2GUI
 		$this->addColumn($this->lng->txt('title'));
 		$this->addColumn($this->lng->txt('description'));
 		$this->addColumn($this->plugin->txt('min_choices'));
-//		$this->addColumn($this->plugin->txt('assignments'));
+		$this->addColumn($this->plugin->txt('cat_max_assignments'));
 		$this->addColumn('');
 
 		$this->setSelectAllCheckbox('cat_ids');
@@ -73,9 +73,7 @@ class ilCoSubCategoriesTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('SORT',$a_set['sort']);
 		$this->tpl->parseCurrentBlock();
 
-
-		$columns = array('title', 'description', 'min_choices');
-//		$columns = array('title', 'description', 'min_choices', 'assignments');
+		$columns = array('title', 'description', 'min_choices', 'max_assignments');
 		foreach ($columns as $key)
 		{
 			$this->tpl->setCurrentBlock('column');
