@@ -52,6 +52,9 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		$option = new ilRadioOption($this->plugin->txt('export_mode_reg_by_prio'), ilCoSubExport::MODE_REG_BY_PRIO);
 		$option->setInfo($this->plugin->txt('export_mode_reg_by_prio_info'));
 		$export_mode->addOption($option);
+		$option = new ilRadioOption($this->plugin->txt('export_mode_ass_by_item'), ilCoSubExport::MODE_ASS_BY_ITEM);
+		$option->setInfo($this->plugin->txt('export_mode_ass_by_item_info'));
+		$export_mode->addOption($option);
 		$export_mode->setValue($this->object->getPreference('ilCoSubExport', 'export_mode', ilCoSubExport::MODE_REG_BY_ITEM));
 		$this->form->addItem($export_mode);
 

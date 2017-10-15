@@ -127,6 +127,10 @@ class ilCoSubExport
 			case self::MODE_REG_BY_PRIO:
 				$this->fillRegistrationsByPrio($excelObj->getActiveSheet());
 				break;
+			case self::MODE_ASS_BY_ITEM:
+				$this->fillAssignmentsByItem($excelObj->getActiveSheet());
+				break;
+
 		}
 
 		// Save the file
@@ -193,6 +197,56 @@ class ilCoSubExport
 		}
 
 		$worksheet->setTitle($this->plugin->txt('registrations'));
+		$worksheet->freezePane('D2');
+		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+	}
+
+
+	/**
+	 * Fill the sheet with assignments
+	 * Items are columns, assigned items will have a 1 in the cell
+	 * @param PHPExcel_Worksheet $worksheet
+	 */
+	protected function fillAssignmentsByItem($worksheet)
+	{
+		// Column definition and header
+		$columns = $this->getUserColumns();
+		$basecols = count($columns);
+		foreach ($this->object->getItems() as $item)
+		{
+			$columns['item'.$item->item_id] = !empty($item->identifier) ? $item->identifier : $item->title;
+		}
+		$mapping = $this->fillHeaderRow($worksheet, $columns);
+
+		// get the priority names
+		$prio_names = $this->object->getMethodObject()->getPriorities();
+
+		// query for users
+		$user_query_result = $this->getUserQueryResult();
+
+		$row = 2;
+		foreach ($user_query_result['set'] as $user)
+		{
+			$data = $this->getUserColumnData($user);
+
+			// registrations values
+			foreach ($this->object->getAssignmentsOfUser($user['usr_id']) as $item_id => $assign_id)
+			{
+				$data['item'.$item_id] = 1;
+			}
+
+			foreach ($data as $key => $value)
+			{
+				$coordinate = $mapping[$key].(string) $row;
+				$cell = $worksheet->getCell($coordinate);
+				$cell->setValue($value);
+				$cell->getStyle()->getAlignment()->setWrapText(true);
+			}
+
+			$row++;
+		}
+
+		$worksheet->setTitle($this->plugin->txt('assignments'));
 		$worksheet->freezePane('D2');
 		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
 	}

@@ -187,6 +187,8 @@ export_mode_reg_by_item#:#Registrations by Items
 export_mode_reg_by_item_info#:#Each user has a row, each item (course/group/session) has a column. The chosen priorities are entered in the cells.
 export_mode_reg_by_prio#:#Registrations by Priorities
 export_mode_reg_by_prio_info#:#Each user has a row, each priority has a column. Die chosen items are listed in the cells.
+export_mode_ass_by_item#:#Assignments by Items
+export_mode_reg_by_item_info#:#Each user has a row, each item (course/group/session) has a column. An assigned item is indicated by a '1' in the cell.
 export_type#:#File Type
 export_type_excel#:#MS Excel 2007
 export_type_csv#:#CSV
