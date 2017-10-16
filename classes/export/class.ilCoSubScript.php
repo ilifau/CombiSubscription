@@ -374,13 +374,13 @@ class ilCoSubScript
 			/** @var ilLPCollectionOfRepositoryObjects $collection */
 			if ($collection = $this->obj_lp->getCollectionInstance())
 			{
-				log_line('got collection');
+				//log_line('got collection');
 
 				// take lp of exercise
 				$collection->activateEntries(array($exercise->getRefId()));
 				if (!empty($session_ids[$group_ref_id]))
 				{
-					log_var($session_ids[$group_ref_id],'$session_ids[$group_ref_id]');
+					//log_var($session_ids[$group_ref_id],'$session_ids[$group_ref_id]');
 
 					// take lp of session group
 					$collection->createNewGrouping(array_keys($session_ids[$group_ref_id]), 1);

@@ -367,3 +367,47 @@
         );
     }
 ?>
+<#16>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_items', 'selectable'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_items', 'selectable', array(
+                'type'    => 'integer',
+                'length'  => 4,
+                'notnull' => true,
+                'default' => 1)
+        );
+    }
+?>
+<#17>
+<?php
+    $fields = array(
+        'obj_id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true
+        ),
+		'user_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		'is_fixed' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+            'default' => 0
+		),
+	);
+
+    $ilDB->createTable('rep_robj_xcos_users', $fields);
+    $ilDB->addPrimaryKey('rep_robj_xcos_users', array('obj_id', 'user_id'));
+    $ilDB->addIndex('rep_robj_xcos_users', array('obj_id'), 'i1');
+	$ilDB->addIndex('rep_robj_xcos_users', array('user_id'), 'i2');
+?>
+<#18>
+<?php
+    $query = "INSERT INTO rep_robj_xcos_users(obj_id, user_id, is_fixed) SELECT DISTINCT obj_id, user_id, 0 FROM rep_robj_xcos_choices";
+    $ilDB->manipulate($query);
+?>
+

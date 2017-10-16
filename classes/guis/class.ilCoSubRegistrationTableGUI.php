@@ -51,12 +51,15 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 			$header_choices .= '<br /><span class="text-muted small">' .$this->plugin->txt('registration_header_bars_info') . '</span>';
 		}
 		$this->addColumn($header_choices,'','40%');
+	}
 
-		// respecting subscription period
-		if ($this->object->isBeforeSubscription() || $this->object->isAfterSubscription())
-		{
-			$this->disabled = true;
-		}
+	/**
+	 * Set the disabled status
+	 * @param bool $a_disabled
+	 */
+	public function setDisabled($a_disabled)
+	{
+		$this->disabled = $a_disabled;
 	}
 
 	/**

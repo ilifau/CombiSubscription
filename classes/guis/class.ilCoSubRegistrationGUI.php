@@ -13,6 +13,8 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	/** @var ilCoSubCategory[] */
 	var $categories = array();
 
+	/** @var bool registration is disabled */
+	var $disabled = false;
 
 	/**
 	 * Execute a command
@@ -49,14 +51,24 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	{
 		global $ilUser;
 
+		// get the user for checking if it is fixed
+		$userObj = $this->object->getUser($ilUser->getId());
+
 		// check subscription period
 		if ($this->object->isBeforeSubscription())
 		{
 			ilUtil::sendInfo($this->plugin->txt('subscription_period_not_started'));
+			$this->disabled = true;
 		}
 		elseif ($this->object->isAfterSubscription())
 		{
 			ilUtil::sendInfo($this->plugin->txt('subscription_period_finished'));
+			$this->disabled = true;
+		}
+		elseif ($userObj->is_fixed)
+		{
+			ilUtil::sendInfo($this->plugin->txt('subscription_message_user_fixed'));
+			$this->disabled = true;
 		}
 
 		$intro = '';
@@ -93,9 +105,12 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		$this->plugin->includeClass('guis/class.ilCoSubFormGUI.php');
 		$form = new ilCoSubFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
-		$form->addCommandButton('saveRegistration', $this->plugin->txt('save_registration'));
+		if (!$this->disabled)
+		{
+			$form->addCommandButton('saveRegistration', $this->plugin->txt('save_registration'));
+		}
 		$form->addCommandButton('cancelRegistration', $this->lng->txt('cancel'));
-		if (!empty($saved_priorities))
+		if (!$this->disabled && !empty($saved_priorities))
 		{
 			$form->addSeparator();
 			$form->addCommandButton('confirmDeleteRegistration', $this->plugin->txt('delete_registration'));
@@ -131,8 +146,9 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	{
 		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 		$table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
+		$table_gui->setDisabled($this->disabled);
 		$table_gui->prepareData(
-			$this->object->getItems(),
+			$this->object->getItems('selectable'),
 			$priorities,
 			$this->object->getPriorityCounts());
 
@@ -154,7 +170,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 
 		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 
-		$items = $this->object->getItemsByCategory();
+		$items = $this->object->getItemsByCategory('selectable');
 		$counts = $this->object->getPriorityCounts();
 
 		$empty_cat = new ilCoSubCategory();
@@ -167,6 +183,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			if (!empty($items[$cat_id]))
 			{
 				$table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
+				$table_gui->setDisabled($this->disabled);
 				$table_gui->prepareData(
 					$items[$cat_id],
 					$priorities,
@@ -281,6 +298,8 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		{
 			$choice->save();
 		}
+		$user = $this->object->getUser($ilUser->getId());
+		$user->save();
 
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
@@ -314,7 +333,9 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	{
 		global $ilUser;
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
+		$this->plugin->includeClass('models/class.ilCoSubUser.php');
 		ilCoSubChoice::_deleteForObject($this->object->getId(), $ilUser->getId());
+		ilCoSubUser::_deleteForObject($this->object->getId(), $ilUser->getId());
 		ilUtil::sendSuccess($this->plugin->txt('registration_deleted'), true);
 		$this->parent->returnToContainer();
 	}

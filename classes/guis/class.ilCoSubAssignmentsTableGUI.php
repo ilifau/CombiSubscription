@@ -22,6 +22,12 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	protected $run_ids = array();
 
 	/**
+	 * List of users (indexed by user_id)
+	 * @var ilCoSubUser[];
+	 */
+	protected $users;
+
+	/**
 	 * User priorities
 	 * @var array  (user_id => item_id => priority)
 	 */
@@ -61,6 +67,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->setSelectAllCheckbox('id');
 
 		$this->addMultiCommand('mailToUsers', $this->plugin->txt('mail_to_users'));
+		$this->addMultiCommand('fixUsersConfirmation', $this->plugin->txt('fix_users'));
+		$this->addMultiCommand('unfixUsersConfirmation', $this->plugin->txt('unfix_users'));
 		$this->addCommandButton('saveAssignments', $this->plugin->txt('save_assignments'));
 		$this->addCommandButton('saveAssignmentsAsRun', $this->plugin->txt('save_assignments_as_run'));
 	}
@@ -125,11 +133,12 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		{
 			$this->run_ids[$this->object->getRunLabel($index)] = $run->run_id;
 		}
+
+		$this->users = $this->object->getUsers();
 		$this->priorities = $this->object->getPriorities();
 		$this->assignments = $this->object->getAssignments();
 
-
-		if (empty($this->priorities))
+		if (empty($this->users))
 		{
 			$this->setData(array());
 			return;
@@ -138,7 +147,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		// query for users
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
-		$user_query->setUserFilter(array_keys($this->priorities));
+		$user_query->setUserFilter(array_keys($this->users));
 		$user_query->setLimit(0);
 		$user_query_result = $user_query->query();
 
@@ -148,10 +157,13 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		foreach ($user_query_result['set'] as $user)
 		{
 			$user_id = $user['usr_id'];
+			$userObj = $this->users[$user_id];
+
 			$row = array(
 				'user_id' => $user_id,
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
-				'result' => $this->object->getUserSatisfaction($user_id, 0)
+				'result' => $this->object->getUserSatisfaction($user_id, 0),
+				'is_fixed' => $userObj->is_fixed
 			);
 
 			foreach ($this->item_ids as $item_id)
@@ -202,6 +214,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				$this->tpl->setVariable('CHECKED', 'checked="checked"');
 				$assigned = true;
 			}
+			if ($a_set['is_fixed'])
+			{
+				$this->tpl->setVariable('DISABLED', 'disabled="true"');
+			}
 
 			// run list
 			$runs = array();
@@ -226,13 +242,19 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			{
 				$this->tpl->setVariable('CHECKED', 'checked="checked"');
 			}
+			if ($a_set['is_fixed'])
+			{
+				$this->tpl->setVariable('DISABLED', 'disabled="true"');
+			}
+
 			$not_assigned_runs = array_diff(array_keys($this->run_ids), array_keys($assigned_runs));
 			$this->tpl->setVariable('RUNS', implode(' ', $not_assigned_runs));
 			$this->tpl->parseCurrentBlock();
 		}
 
 		$this->tpl->setVariable('ID', $a_set['user_id']);
-		$this->tpl->setVariable('USER', $a_set['user']);
+
+		$this->tpl->setVariable($a_set['is_fixed'] ? 'USER_FIXED' : 'USER', $a_set['user']);
 		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
 		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
 	}

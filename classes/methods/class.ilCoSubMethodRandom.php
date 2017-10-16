@@ -36,6 +36,9 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var array 		item_id => priority => count */
 	protected $priority_counts_item = array();
 
+	/**	@var ilCoSubUser[] (indexed by user_id) */
+	protected $users;
+
 	/** @var array  	item_id => count */
 	protected $assign_counts_item = array();
 	
@@ -200,17 +203,33 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->items = $this->object->getItems();
 		$this->conflicts = $this->object->getItemsConflicts();
 		$this->category_limits = $this->object->getCategoryLimits();
+		$this->users = $this->object->getUsers();
 		$this->priorities = $this->object->getPriorities();
 		$this->priority_counts_item = $this->object->getPriorityCounts();
+
 		$this->assign_counts_item = array();
 		foreach ($this->items as $item)
 		{
 			$this->assign_counts_item[$item->item_id] = 0;
 		}
+
 		$this->assign_counts_user = array();
 		foreach (array_keys($this->priorities) as $user_id)
 		{
 			$this->assign_counts_user[$user_id] = 0;
+		}
+
+		// count the fixed assignments
+		foreach ($this->users as $user_id => $user_obj)
+		{
+			if ($user_obj->is_fixed)
+			{
+				foreach ($this->object->getAssignmentsOfUser($user_id) as $item_id => $assign_id)
+				{
+					// assign also in the new run
+					$this->assignUser($user_id, $item_id);
+				}
+			}
 		}
 	}
 
@@ -231,7 +250,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->run->save();
 
 		$this->initCalculationData();
-
 		$this->calculateByUsers();
 
 		$this->run->details = '';

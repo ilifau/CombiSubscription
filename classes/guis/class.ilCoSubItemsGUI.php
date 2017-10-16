@@ -440,6 +440,12 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$end->setShowTime(true);
 		$period->addSubItem($end);
 
+		// selectable
+		$selectable = new ilCheckboxInputGUI($this->plugin->txt('item_selectable'), 'selectable');
+		$selectable->setInfo($this->plugin->txt('item_selectable_info'));
+		$this->form->addItem($selectable);
+
+
 		switch ($a_mode)
 		{
 			case 'create':
@@ -558,6 +564,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				'cat_id' => $a_item->cat_id,
 				'sub_min' => $a_item->sub_min,
 				'sub_max' => $a_item->sub_max,
+				'selectable' => $a_item->selectable
 			)
 		);
 
@@ -622,6 +629,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$a_item->period_start = null;
 			$a_item->period_end = null;
 		}
+		$a_item->selectable = $this->form->getInput('selectable');
 
 		return $a_item->save();
 	}

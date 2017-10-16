@@ -49,6 +49,8 @@ sub_min#:#Minimale Zuteilungen
 sub_min_short#:#Minimal
 sub_max#:#Maximale Zuteilungen
 sub_max_short#:#Maximal
+item_selectable#:#Auswählbar
+item_selectable_info#:#Die Auswahl-Einheit ist in der Registrierung auswählbar. Durch Abwählen können Sie bereits volle Einheiten in einer zweiten Runde blockieren.
 target_object#:#Ziel-Objekt
 msg_item_created#:#Die Einheit wurde erstellt.
 msg_items_created#:#Die Einheiten wurden erstellt.
@@ -85,6 +87,8 @@ satisfied_full#:#Voll erfüllt
 satisfied_over#:#Überfüllt
 satisfied_conflict#:#Beinhaltet Konflikt
 calculate_assignments#:#Zuteilungen berechnen
+calculate_assignments_confirmation#:#Möchten Sie eine neue Zuteilung berechnen lassen?
+calculate_assignments_confirmation_details#:#Die berechneten Zuteilungen werden mit einem Datum gespeichert und als aktuelle Zuteilungen übernommen. Sind aktuelle Zuteilungen bereits fixiert, bleiben diese erhalten.
 msg_calculation_started#:#Die Berechnung wurde gestartet. Wenn sie abgeschlossen ist, ist ihr Ergebnis unter den gespeicherten Zuteilungen verfügbar.
 msg_calculation_finished#:#Die Berechnung wurde durchgeführt (%s: %s) und als aktuelle Zuteilungen übernommen.
 set_assignments#:#Als aktuelle übernehmen
@@ -98,6 +102,7 @@ explanation#:#Erklärung
 default_explanation#:#Sie können für jede Priorität mehrere Auswahlen treffen. Nach dem Anmeldezeitraum werden die Zuteilungen durch ein automatisches Verfahren getroffen, das möglichst viele Prioritäten berücksichtigt. Pro Benutzer wird nur eine Option zugeteilt.
 subscription_period_not_started#:#Der Anmeldezeitraum hat noch nicht begonnen.
 subscription_period_finished#:#Der Anmeldezeitraum ist beeendet.
+subscription_message_user_fixed#:#Sie wurden bereits zugeteilt, daher können Sie Ihre Anmeldung nicht mehr ändern.
 sub_min_not_reached#:#Das Minimum an Zuteilungen wurde nicht erreicht.
 sub_max_exceeded#:#Das Maximum an Zuteilungen wurde überschritten.
 sub_limits_satisfied#:#Die Anzahl der Zuteilungen ist möglich.
@@ -296,3 +301,9 @@ import_items_finished#:#Die Auswahl-Einheiten wurden importiert.
 import_items_failed#:#Die Auswahl-Einheiten konnten nicht importiert werden.
 run_scripts#:#Skripte ausführen
 run#:#Ausführen
+fix_users#:#Zuteilungen fixieren
+fix_users_confirmation#:#Möchten Sie die Zuteilungen der folgenden Nutzer fixieren? Sie bleiben bei Berechnungen, Übernahme oder Import erhalten. Die Nutzer können ihre Anmeldung nicht mehr ändern.
+fix_users_done#:#Die Zuteilungen der Nutzer wurden fixiert.
+unfix_users#:#Fixierungen aufheben
+unfix_users_confirmation#:#Möchten Sie Fixierung der Zuteilungen für die folgenden Nutzer aufheben?
+unfix_users_done#:#Die Fixierung der Zuteilungen wurde aufgehoben.

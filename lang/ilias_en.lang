@@ -49,6 +49,8 @@ sub_min#:#Minimum Assingments
 sub_min_short#:#Minimum
 sub_max#:#Maximum Assignments
 sub_max_short#:#Maximum
+item_selectable#:#Selectable
+item_selectable_info#:#This item is selectable in the registration. Uncheck this if you want to block the item in a second registration round.
 target_object#:#Target Object
 msg_item_created#:#The item was created.
 msg_items_created#:#The items were created.
@@ -82,8 +84,8 @@ satisfied_full#:#Fully satisfied
 new_calculation#:#New Calculation
 msg_calculation_started#:#The calculation is started. Its results will be shown here when it is finished.
 msg_calculation_finished#:#The calculation is finished.
-set_run_assignments#:#Set Calculation Assignments
-msg_run_assignments_set#:#The calculation assignments were set
+set_assignments#:#Set Calculation Assignments
+msg_assignments_set#:#The calculation assignments were set
 subscription_period#:#Subscription Period
 sub_limit_from_to#:#%s to %s Participants
 sub_limit_from#:#Min. %s Participants
@@ -93,6 +95,7 @@ explanation#:#Explanation
 default_explanation#:#You can select a number of items for each priority. The assignments will be done automatically after the subscription period. It tries to respect as much priorities as possible. Each subscriber will get only one item assigned.
 subscription_period_not_started#:#The subscription period has not yet started.
 subscription_period_finished#:#The subscription period is finished.
+subscription_message_user_fixed#:#You are already assigned. Your subscription is not further changeable.
 sub_min_not_reached#:#The minimum of assignments is not reached.
 sub_max_exceeded#:#The maximum of assignments is exceeded.
 sub_limits_satisfied#:#The number of assignments is possible.
@@ -291,3 +294,9 @@ import_items_finished#:#The registration items were imported.
 import_items_failed#:#The registration items can't be imported.
 run_scripts#:#Run Scripts
 run#:#Run
+fix_users#:#Fix Assignments
+fix_users_confirmation#:#Do you like to fix the assignments of the following users. They will be kept when assignnemts are calculated, set or imported. The users won't be able to change their registration.
+fix_users_done#:#The assignments are fixed.
+unfix_users#:#Unfix Assignments
+unfix_users_confirmation#:#Do you like to revert the assignment fixation of the following users?
+unfix_users_done#:#The assignment fixations are reverted.

@@ -47,6 +47,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->addColumn($this->lng->txt('title'));
 		$this->addColumn($this->lng->txt('description'));
 		$this->addColumn($this->plugin->txt('period'));
+		$this->addColumn($this->plugin->txt('item_selectable'));
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
 			$this->addColumn($this->plugin->txt('sub_min_short'));
@@ -80,6 +81,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 				$row['category'] = $this->categories[$row['cat_id']]->title;
 			}
 			$row['period'] = $item->getPeriodInfo();
+			$row['selectable'] = $this->lng->txt($row['selectable'] ? 'yes' : 'no');
 			$data[] = $row;
 			$sort += 10;
 		}
@@ -101,7 +103,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->tpl->parseCurrentBlock();
 
 
-		$columns = array('category', 'identifier', 'title', 'description', 'period');
+		$columns = array('category', 'identifier', 'title', 'description', 'period', 'selectable');
 		if ($this->parent->object->getMethodObject()->hasMinSubscription())
 		{
 			$columns[] = 'sub_min';

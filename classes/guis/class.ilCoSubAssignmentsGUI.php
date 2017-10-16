@@ -34,6 +34,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		{
 			case 'editAssignments':
 			case 'calculateAssignments':
+			case 'calculateAssignmentsConfirmation':
 			case 'saveAssignments':
 			case 'saveAssignmentsAsRun':
 			case 'setRunAssignments':
@@ -42,6 +43,11 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'notifyAssignments':
 			case 'notifyAssignmentsConfirmation':
 			case 'mailToUsers':
+			case 'fixUsers':
+			case 'fixUsersConfirmation':
+			case 'unfixUsers':
+			case 'unfixUsersConfirmation':
+
 				$this->$cmd();
 				return;
 
@@ -67,7 +73,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		if ($this->object->getMethodObject()->isActive())
 		{
 			$button = ilSubmitButton::getInstance();
-			$button->setCommand('calculateAssignments');
+			$button->setCommand('calculateAssignmentsConfirmation');
 			$button->setCaption($this->plugin->txt('calculate_assignments'), false);
 			$ilToolbar->addButtonInstance($button);
 			$ilToolbar->addSeparator();
@@ -124,6 +130,25 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 		$this->showInfo();
 	}
+
+	/**
+	 * Confirm the transfer of assignments to target objects
+	 */
+	public function calculateAssignmentsConfirmation()
+	{
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+
+		$conf_gui = new ilConfirmationGUI();
+		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'calculateAssignments'));
+		$conf_gui->setHeaderText($this->plugin->txt('calculate_assignments_confirmation')
+			. $this->messageDetails($this->plugin->txt('calculate_assignments_confirmation_details')));
+		$conf_gui->setConfirm($this->plugin->txt('calculate_assignments'),'calculateAssignments');
+		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+		$this->tpl->setContent($conf_gui->getHTML());
+		$this->showInfo();
+	}
+
 
 	/**
 	 * Calculate new assignments
@@ -228,14 +253,16 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 				}
 			}
 
-			$to_add = array_diff($new_item_ids, $old_item_ids);
-			foreach ($to_add as $new_item_id)
+			foreach ($new_item_ids as $new_item_id)
 			{
-				$assign = new ilCoSubAssign;
-				$assign->obj_id = $this->object->getId();
-				$assign->user_id = $user_id;
-				$assign->item_id = $new_item_id;
-				$assign->save();
+				if (!empty((int) $new_item_id) && !in_array((int) $new_item_id, $old_item_ids))
+				{
+					$assign = new ilCoSubAssign;
+					$assign->obj_id = $this->object->getId();
+					$assign->user_id = $user_id;
+					$assign->item_id = $new_item_id;
+					$assign->save();
+				}
 			}
 		}
 	}
@@ -393,4 +420,104 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 		ilUtil::redirect($target);
 	}
+
+
+	/**
+	 * Confirm the fixation of users
+	 */
+	public function fixUsersConfirmation()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+
+		$conf_gui = new ilConfirmationGUI();
+		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'fixUsers'));
+		$conf_gui->setHeaderText($this->plugin->txt('fix_users_confirmation'));
+		$conf_gui->setConfirm($this->plugin->txt('fix_users'),'fixUsers');
+		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+		foreach ($this->object->getUserDetails($_POST['ids']) as $user_id => $details)
+		{
+			$conf_gui->addItem('ids[]', $user_id, $details['showname'], ilUtil::getImagePath('icon_usr.svg'));
+
+		}
+		$this->tpl->setContent($conf_gui->getHTML());
+		$this->showInfo();
+	}
+
+	/**
+	 * Fix the assignments of selected users
+	 */
+	public function fixUsers()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+
+		foreach($this->object->getUsers($_POST['ids']) as $user_id => $userObj)
+		{
+			$userObj->is_fixed = true;
+			$userObj->save();
+		}
+
+		ilUtil::sendSuccess($this->plugin->txt('fix_users_done'), true);
+		$this->ctrl->redirect($this, 'editAssignments');
+	}
+
+	/**
+	 * Confirm the fixation of users
+	 */
+	public function unfixUsersConfirmation()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+
+		$conf_gui = new ilConfirmationGUI();
+		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'unfixUsers'));
+		$conf_gui->setHeaderText($this->plugin->txt('unfix_users_confirmation'));
+		$conf_gui->setConfirm($this->plugin->txt('unfix_users'),'unfixUsers');
+		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+		foreach ($this->object->getUserDetails($_POST['ids']) as $user_id => $details)
+		{
+			$conf_gui->addItem('ids[]', $user_id, $details['showname'], ilUtil::getImagePath('icon_usr.svg'));
+
+		}
+		$this->tpl->setContent($conf_gui->getHTML());
+		$this->showInfo();
+	}
+
+	/**
+	 * Fix the assignments of selected users
+	 */
+	public function unfixUsers()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+
+		foreach($this->object->getUsers($_POST['ids']) as $user_id => $userObj)
+		{
+			$userObj->is_fixed = false;
+			$userObj->save();
+		}
+
+		ilUtil::sendSuccess($this->plugin->txt('unfix_users_done'), true);
+		$this->ctrl->redirect($this, 'editAssignments');
+	}
+
 }

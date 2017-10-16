@@ -42,6 +42,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/** @var ilCoSubCategory[] | null  (indexed by cat_id) */
 	protected $categories;
 
+	/** @var  ilCoSubUser[] | null  (indexed by user_id) */
+	protected $users;
+
 	/** @var  ilCoSubRun[] | null  (numerically indexed) */
 	protected $runs;
 
@@ -615,23 +618,41 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the items assigned to this object (lazy loading)
+	 * @var string $filter		'selectable'
 	 * @return ilCoSubItem[]	indexed by item_id
 	 */
-	public function getItems()
+	public function getItems($filter = '')
 	{
 		if (!isset($this->items))
 		{
 			$this->plugin->includeClass('models/class.ilCoSubItem.php');
 			$this->items = ilCoSubItem::_getForObject($this->getId());
 		}
-		return $this->items;
+
+		switch($filter)
+		{
+			case 'selectable':
+				$items = array();
+				foreach ($this->items as $item_id => $item)
+				{
+					if ($item->selectable)
+					{
+						$items[$item_id] = $item;
+					}
+				}
+				return $items;
+
+			default:
+				return $this->items;
+		}
 	}
 
 	/**
 	 * Get the items grouped by category
+	 * @var string $filter		'selectable'
 	 * @return array	cat_id => item_id => ilCoSubItem
 	 */
-	public function getItemsByCategory()
+	public function getItemsByCategory($filter = '')
 	{
 		$items = array(
 			0 => array()	// index for items without category
@@ -641,7 +662,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$items[$category->cat_id] = array();
 		}
 
-		foreach ($this->getItems()as $item)
+		foreach ($this->getItems($filter)as $item)
 		{
 			$items[(int) $item->cat_id][$item->item_id] = $item;
 		}
@@ -862,12 +883,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get the assignments (lazy loading)
+	 * @param bool		 $a_force 	force the reading of assignments
 	 * @return array     run_id => user_id => item_id => assign_id
 	 *                   (run_id is 0 for the chosen assignments)
 	 */
-	public function getAssignments()
+	public function getAssignments($a_force = false)
 	{
-		if (!isset($this->assignments))
+		if (!isset($this->assignments) || $a_force)
 		{
 			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 			$this->assignments = ilCoSubAssign::_getForObjectAsArray($this->getId());
@@ -960,20 +982,35 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Copy the assignments from a run to another run
+	 * Assignments of fixed users are kept
 	 *
 	 * @param int	$a_source_run
 	 * @param int 	$a_target_run
 	 */
 	public function copyAssignments($a_source_run, $a_target_run)
 	{
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run);
+		$fixed_ids = array();
+		foreach ($this->getUsers() as $user_id => $user_obj)
+		{
+			if ($user_obj->is_fixed)
+			{
+				$fixed_ids[] = $user_id;
+			}
+		}
 
-		$assignments = $this->getAssignments();
+		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
+		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run, $fixed_ids);
+
+		$assignments = $this->getAssignments(true);
 		if (is_array($assignments[$a_source_run]))
 		{
 			foreach ($assignments[$a_source_run] as $user_id => $items)
 			{
+				if (in_array($user_id, $fixed_ids))
+				{
+					continue;
+				}
+
 				foreach ($items as $item_id => $assign_id)
 				{
 					$assign = new ilCoSubAssign;
@@ -987,6 +1024,86 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 	}
 
+	/**
+	 * Get a single user object (may not be saved yet)
+	 * Used for registration
+	 * @param	int	$a_user_id
+	 * @return	ilCoSubUser
+	 */
+	public function getUser($a_user_id)
+	{
+		$this->plugin->includeClass('models/class.ilCoSubUser.php');
+
+		$userObj = ilCoSubUser::_getById($this->getId(), $a_user_id);
+		if (!isset($userObj))
+		{
+			$userObj = new ilCoSubUser();
+			$userObj->obj_id = $this->getId();
+			$userObj->user_id = $a_user_id;
+		}
+
+		return $userObj;
+	}
+
+	/**
+	 * Get a list of user objects (indexed by user_id)
+	 * @param	array	$a_user_ids (optional)
+	 * @return	ilCoSubUser[]
+	 */
+	public function getUsers($a_user_ids = array())
+	{
+		if (!isset($this->users))
+		{
+			$this->plugin->includeClass('models/class.ilCoSubUser.php');
+			$this->users = ilCoSubUser::_getForObject($this->getId());
+		}
+
+		if (!empty($a_user_ids))
+		{
+			$users = array();
+			foreach ($a_user_ids as $user_id)
+			{
+				if (isset($this->users[$user_id]))
+				{
+					$users[$user_id] = $this->users[$user_id];
+				}
+				else
+				{
+					$userObj = new ilCoSubUser;
+					$userObj->obj_id = $this->getId();
+					$userObj->user_id = $user_id;
+					$users[$user_id] = $userObj;
+				}
+			}
+			return $users;
+		}
+
+		return $this->users;
+	}
+
+
+	/**
+	 * Get details of seelcted users
+	 * @param $a_user_ids
+	 * @return array	user_id => assoc details
+	 */
+	public function getUserDetails($a_user_ids)
+	{
+		// query for users
+		include_once("Services/User/classes/class.ilUserQuery.php");
+		$user_query = new ilUserQuery();
+		$user_query->setUserFilter($a_user_ids);
+		$user_query->setLimit(0);
+		$user_query_result = $user_query->query();
+
+		$details = array();
+		foreach ($user_query_result['set'] as $user)
+		{
+			$user['showname'] = $user['lastname'] . ', ' . $user['firstname'];
+			$details[$user['usr_id']] = $user;
+		}
+		return $details;
+	}
 
 	/**
 	 * Get the satisfaction of a user's choices by a certain run

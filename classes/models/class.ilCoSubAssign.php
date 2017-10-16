@@ -85,8 +85,9 @@ class ilCoSubAssign
 	 * Delete all assignments for a parent object id
 	 * @param integer object id
 	 * @param integer|null      run id (optional, 0 is for the selected assignments)
+	 * @param integer[]|null	list of user_ids for which the assignments shoud be kept
 	 */
-	public static function _deleteForObject($a_obj_id, $a_run_id = null)
+	public static function _deleteForObject($a_obj_id, $a_run_id = null, $a_keep_user_ids = array())
 	{
 		global $ilDB;
 
@@ -103,6 +104,11 @@ class ilCoSubAssign
 			{
 				$query .= ' AND run_id = ' . $ilDB->quote($a_run_id, 'integer');
 			}
+		}
+
+		if (!empty($a_keep_user_ids))
+		{
+			$query .= ' AND '. $ilDB->in('user_id', $a_keep_user_ids, true, 'integer');
 		}
 		$ilDB->manipulate($query);
 	}

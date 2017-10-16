@@ -77,4 +77,14 @@ abstract class ilCoSubBaseGUI
 	{
 		return '<div class="ilHeaderDesc">'.$text.'</div><br />';
 	}
+
+	/**
+	 * render a text as messageDetails
+	 * @param $text
+	 * @return string
+	 */
+	public function messageDetails($text)
+	{
+		return '<p class="small">'.$text.'</p>';
+	}
 }

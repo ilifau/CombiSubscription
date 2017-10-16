@@ -41,6 +41,9 @@ class ilCoSubItem
 	/** @var  integer|null */
 	public $period_end;
 
+	/** @var  bool */
+	public $selectable = true;
+
 	/**
 	 * Get item by id
 	 * @param integer  $a_id
@@ -166,6 +169,7 @@ class ilCoSubItem
 		$this->sub_max = $data['sub_max'];
 		$this->period_start = $data['period_start'];
 		$this->period_end = $data['period_end'];
+		$this->selectable = (bool) $data['selectable'];
 	}
 
 	/**
@@ -207,6 +211,7 @@ class ilCoSubItem
 				'sub_max' => array('integer', $this->sub_max),
 				'period_start' => array('integer', $this->period_start),
 				'period_end' => array('integer', $this->period_end),
+				'selectable' => array('integer', $this->selectable)
 			)
 		);
 		return $rows > 0;

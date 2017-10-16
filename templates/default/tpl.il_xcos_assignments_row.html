@@ -4,7 +4,12 @@
     </td>
 
     <td class="std">
-         {USER}
+        <!-- BEGIN user_fixed -->
+            <strong>{USER_FIXED}</strong>
+        <!-- END user_fixed -->
+        <!-- BEGIN user -->
+            {USER}
+        <!-- END user -->
     </td>
     <td class="std">
         <!-- BEGIN user_result -->
@@ -13,12 +18,12 @@
     </td>
     <!-- BEGIN item -->
     <td class="std" style="{PRIO_COLOR}">
-        <input type="{TYPE}" name="assignment[{USER_ID}][]" value="{ITEM_ID}" {CHECKED} /> {RUNS}
+        <input type="{TYPE}" name="assignment[{USER_ID}][]" value="{ITEM_ID}" {CHECKED} {DISABLED} /> {RUNS}
      </td>
     <!-- END item -->
     <!-- BEGIN not_assigned -->
     <td class="std">
-        <input type="radio" name="assignment[{USER_ID}][]" value="not" {CHECKED} /> {RUNS}
+        <input type="radio" name="assignment[{USER_ID}][]" value="not" {CHECKED} {DISABLED} /> {RUNS}
     </td>
     <!-- END not_assigned -->
 </tr>
