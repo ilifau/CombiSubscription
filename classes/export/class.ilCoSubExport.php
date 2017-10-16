@@ -162,11 +162,17 @@ class ilCoSubExport
 		// Column definition and header
 		$columns = $this->getUserColumns();
 		$basecols = count($columns);
+		$row2 = array();
+		$row3 = array();
 		foreach ($this->object->getItems() as $item)
 		{
 			$columns['item'.$item->item_id] = !empty($item->identifier) ? $item->identifier : $item->title;
+			$row2['item'.$item->item_id] = $item->title;
+			$row3['item'.$item->item_id] = $item->getPeriodInfo();
 		}
 		$mapping = $this->fillHeaderRow($worksheet, $columns);
+		$this->fillRowData($worksheet, $row2, $mapping, 2);
+		$this->fillRowData($worksheet, $row3, $mapping, 3);
 
 		// get the priority names
 		$prio_names = $this->object->getMethodObject()->getPriorities();
@@ -174,7 +180,7 @@ class ilCoSubExport
 		// query for users
 		$user_query_result = $this->getUserQueryResult();
 
-		$row = 2;
+		$row = 4;
 		foreach ($user_query_result['set'] as $user)
 		{
 			$data = $this->getUserColumnData($user);
@@ -185,14 +191,7 @@ class ilCoSubExport
 				$data['item'.$item_id] = $prio_names[$value];
 			}
 
-			foreach ($data as $key => $value)
-			{
-				$coordinate = $mapping[$key].(string) $row;
-				$cell = $worksheet->getCell($coordinate);
-				$cell->setValue($value);
-				$cell->getStyle()->getAlignment()->setWrapText(true);
-			}
-
+			$this->fillRowData($worksheet, $data, $mapping, $row);
 			$row++;
 		}
 
@@ -212,11 +211,17 @@ class ilCoSubExport
 		// Column definition and header
 		$columns = $this->getUserColumns();
 		$basecols = count($columns);
+		$row2 = array();
+		$row3 = array();
 		foreach ($this->object->getItems() as $item)
 		{
 			$columns['item'.$item->item_id] = !empty($item->identifier) ? $item->identifier : $item->title;
+			$row2['item'.$item->item_id] = $item->title;
+			$row3['item'.$item->item_id] = $item->getPeriodInfo();
 		}
 		$mapping = $this->fillHeaderRow($worksheet, $columns);
+		$this->fillRowData($worksheet, $row2, $mapping, 2);
+		$this->fillRowData($worksheet, $row3, $mapping, 3);
 
 		// get the priority names
 		$prio_names = $this->object->getMethodObject()->getPriorities();
@@ -224,7 +229,7 @@ class ilCoSubExport
 		// query for users
 		$user_query_result = $this->getUserQueryResult();
 
-		$row = 2;
+		$row = 4;
 		foreach ($user_query_result['set'] as $user)
 		{
 			$data = $this->getUserColumnData($user);
@@ -235,14 +240,7 @@ class ilCoSubExport
 				$data['item'.$item_id] = 1;
 			}
 
-			foreach ($data as $key => $value)
-			{
-				$coordinate = $mapping[$key].(string) $row;
-				$cell = $worksheet->getCell($coordinate);
-				$cell->setValue($value);
-				$cell->getStyle()->getAlignment()->setWrapText(true);
-			}
-
+			$this->fillRowData($worksheet, $data, $mapping, $row);
 			$row++;
 		}
 
@@ -291,14 +289,7 @@ class ilCoSubExport
 				$data['prio'.$value] .= $item_names[$item_id];
 			}
 
-			foreach ($data as $key => $value)
-			{
-				$coordinate = $mapping[$key].(string) $row;
-				$cell = $worksheet->getCell($coordinate);
-				$cell->setValue($value);
-				$cell->getStyle()->getAlignment()->setWrapText(true);
-			}
-
+			$this->fillRowData($worksheet, $data, $mapping, $row);
 			$row++;
 		}
 
@@ -431,6 +422,23 @@ class ilCoSubExport
 		return $mapping;
 	}
 
+	/**
+	 * Fill a row of a sheet with data
+	 * @param PHPExcel_Worksheet	$worksheet
+	 * @param array 				$data		key => value
+	 * @param array					$mapping 	key => letter
+	 * @param int					$row 		row number
+	 */
+	protected function fillRowData($worksheet, $data, $mapping, $row)
+	{
+		foreach ($data as $key => $value)
+		{
+			$coordinate = $mapping[$key].(string) $row;
+			$cell = $worksheet->getCell($coordinate);
+			$cell->setValue($value);
+			$cell->getStyle()->getAlignment()->setWrapText(true);
+		}
+	}
 
 	/**
 	 * @param PHPExcel_Worksheet	$worksheet

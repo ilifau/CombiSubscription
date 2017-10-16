@@ -259,6 +259,12 @@ class ilCoSubImport
 		$this->createRun();
 		foreach ($this->rows as $rowdata)
 		{
+			if (empty($rowdata['ID']))
+			{
+				// no user row
+				continue;
+			}
+
 			$added = false;
 			$user_id = $this->users_by_login[$rowdata['ID']];
 			if (empty($user_id))
@@ -354,6 +360,12 @@ class ilCoSubImport
 		$this->createRun();
 		foreach ($this->rows as $rowdata)
 		{
+			if (empty($rowdata['ID']))
+			{
+				// no user row
+				continue;
+			}
+			
 			$added = false;
 			$user_id = $this->users_by_login[$rowdata['ID']];
 			if (empty($user_id))
