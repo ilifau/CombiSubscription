@@ -121,7 +121,11 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 				foreach ($assignments[0][$user_id] as $item_id => $assign_id)
 				{
 					$item = $items[$item_id];
-					$this->appendBody(' - '. $item->title . "\n");
+					$item_desc =  $item->title;
+					if ($item->getPeriodInfo()) {
+						$item_desc .= ' '. $item->getPeriodInfo();
+					}
+					$this->appendBody(' - '. $item_desc . "\n");
 				}
 				$this->appendBody("\n");
 			}
