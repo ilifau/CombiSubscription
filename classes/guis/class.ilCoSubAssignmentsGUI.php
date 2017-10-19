@@ -238,8 +238,13 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	 */
 	public function savePostedAssignments()
 	{
-		foreach (array_keys($this->object->getPriorities()) as $user_id)
+		foreach ($this->object->getUsers() as $user_id => $userObj)
 		{
+			if ($userObj->is_fixed)
+			{
+				continue;
+			}
+
 			$assignments = $this->object->getAssignmentsOfUser($user_id, 0);
 
 			$new_item_ids = (array) $_POST['assignment'][$user_id];

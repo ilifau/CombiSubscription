@@ -989,14 +989,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function copyAssignments($a_source_run, $a_target_run)
 	{
-		$fixed_ids = array();
-		foreach ($this->getUsers() as $user_id => $user_obj)
-		{
-			if ($user_obj->is_fixed)
-			{
-				$fixed_ids[] = $user_id;
-			}
-		}
+		$fixed_ids = $this->getFixedUserIds();
 
 		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run, $fixed_ids);
@@ -1148,6 +1141,23 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return self::SATISFIED_FULL;			// all assignments are highest priority
 	}
 
+
+	/**
+	 * Get the user ids of fixed users
+	 * @return int[]
+	 */
+	public function getFixedUserIds()
+	{
+		$fixed_ids = array();
+		foreach ($this->getUsers() as $user_id => $user_obj)
+		{
+			if ($user_obj->is_fixed)
+			{
+				$fixed_ids[] = $user_id;
+			}
+		}
+		return $fixed_ids;
+	}
 
 	/**
 	 * Remove all user related data choices, runs and assignments

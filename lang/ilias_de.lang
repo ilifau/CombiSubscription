@@ -155,7 +155,8 @@ ilcosubmethodrandom_select_not#:#nicht gewählt
 ilcosubmethodrandom_select_preferred#:#bevorzugt
 ilcosubmethodrandom_select_alternative#:#alternativ
 ilcosubmethodrandom_select_prio_x#:#%s.
-ilcosubmethodrandom_selection_properties#:#Auswahl-Einstellungen
+ilcosubmethodrandom_selection_properties#:#Einstellungen zur Anmeldung
+ilcosubmethodrandom_calculation_properties#:#Einstellungen zur Zuteilung
 ilcosubmethodrandom_number_priorities#:#Anzahl Prioritäten
 ilcosubmethodrandom_number_priorities_info#:#Anzahl der angebotenen Prioritäten zur Auswahl. Eine Priorität wird als "gewählt" benannt, zwei Prioritäten (Standard) als "bevorzugt" und "alternativ", ab drei werden die Prioritäten numeriert.
 ilcosubmethodrandom_number_assignments#:#Anzahl Zuteilungen

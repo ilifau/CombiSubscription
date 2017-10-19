@@ -61,6 +61,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->addColumn('','', 1, true);
 		$this->addColumn($this->lng->txt('user'), 'user');
 		$this->addColumn($this->plugin->txt('satisfaction'), 'result');
+		$this->addColumn($this->plugin->txt('assignments'), 'assignments');
 
 		$this->setDefaultOrderField('user');
 		$this->setDefaultOrderDirection('asc');
@@ -163,6 +164,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				'user_id' => $user_id,
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
 				'result' => $this->object->getUserSatisfaction($user_id, 0),
+				'assignments' => 0,
 				'is_fixed' => $userObj->is_fixed
 			);
 
@@ -170,6 +172,9 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			{
 				$row['priority'.$item_id] = isset($this->priorities[$user_id][$item_id]) ? $this->priorities[$user_id][$item_id] : 999999999;
 				$row['assigned'.$item_id] = isset($this->assignments[0][$user_id][$item_id]);
+				if ($row['assigned'.$item_id]) {
+					$row['assignments']++;
+				}
 			}
 			$data[] = $row;
 		}
@@ -257,5 +262,6 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->tpl->setVariable($a_set['is_fixed'] ? 'USER_FIXED' : 'USER', $a_set['user']);
 		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
 		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
+		$this->tpl->setVariable('ASSIGNMENTS', $a_set['assignments']);
 	}
 }
