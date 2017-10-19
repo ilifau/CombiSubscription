@@ -313,7 +313,6 @@ class ilCoSubScript
 			$ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
 			$ass->setStartTime($period_end);
 			$ass->setDeadline($deadline);
-			$ass->setMandatory(false);
 			$ass->setTeamTutor(true);
 			$ass->save();
 
@@ -459,25 +458,25 @@ class ilCoSubScript
 			$group_id = $rowdata['group_id'];
 			if (empty($group_id) || !ilObject::_exists($group_id,true, 'grp') || ilObject::_isInTrash($group_id))
 			{
-				throw new Exception("Gruppe $group_id nicht gefunden!");
+				throw new Exception("Gruppe $group_id nicht gefunden in Zeile $r!");
 			}
 
 			$test_orig_id = $rowdata['test_orig_id'];
 			if (empty($test_orig_id) || !ilObject::_exists($test_orig_id,true, 'tst') || ilObject::_isInTrash($test_orig_id))
 			{
-				throw new Exception("Test $test_orig_id nicht gefunden!");
+				throw new Exception("Test $test_orig_id nicht gefunden in Zeile $r!");
 			}
 
 			$sess_orig_id = $rowdata['sess_orig_id'];
 			if (empty($sess_orig_id) || !ilObject::_exists($sess_orig_id,true, 'sess') || ilObject::_isInTrash($sess_orig_id))
 			{
-				throw new Exception("Sitzung $sess_orig_id nicht gefunden!");
+				throw new Exception("Sitzung $sess_orig_id nicht gefunden in Zeile $r!");
 			}
 
 			$ex_orig_id = $rowdata['ex_orig_id'];
 			if (empty($ex_orig_id) || !ilObject::_exists($ex_orig_id,true, 'exc') || ilObject::_isInTrash($ex_orig_id))
 			{
-				throw new Exception("Übung $ex_orig_id nicht gefunden!");
+				throw new Exception("Übung $ex_orig_id nicht gefunden in Zeile $r!");
 			}
 		}
 	}
