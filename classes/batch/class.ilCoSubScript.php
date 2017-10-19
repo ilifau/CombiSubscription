@@ -235,7 +235,9 @@ class ilCoSubScript
 	protected function createFtpStructure()
 	{
 		require_once('Modules/Group/classes/class.ilObjGroup.php');
+		require_once('Modules/Test/classes/class.ilObjTest.php');
 		require_once('Modules/Session/classes/class.ilObjSession.php');
+		require_once('Modules/Session/classes/class.ilEventItems.php');
 		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
 		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
 		require_once('Services/AccessControl/classes/class.ilConditionHandler.php');
@@ -244,18 +246,96 @@ class ilCoSubScript
 		require_once('Services/Object/classes/class.ilObjectLP.php');
 		require_once('Services/Tracking/classes/class.ilLPStatusWrapper.php');
 
+		require_once('Services/Utilities/classes/class.ilFormat.php');
+
 		$this->loadItemData();
 		$this->checkFtpStructure();
 
 		ilDatePresentation::setUseRelativeDates(false);
 
-		$exercises = array(); 	// group_ref_id => ilObjExercise[]
-		$session_ids = array();  // group_ref_id => [session_ref_id => true]
+		$group_ids = array();		// group_ref_id => true;
+		$session_ids = array();  	// group_ref_id => [session_ref_id => true]
+		$exercise_ids = array(); 	// group_ref_id => [exercise_ref_id => true]
 
 		foreach ($this->rows as $r => $rowdata)
 		{
-			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			$period_start = $this->excelTimeToUnix($rowdata['period_start']);
+			$period_end = $this->excelTimeToUnix($rowdata['period_end']);
+			$deadline = $this->excelTimeToUnix($rowdata['deadline']);
 
+			$period_start_obj = new ilDateTime($period_start, IL_CAL_UNIX);
+			$period_end_obj = new ilDateTime($period_end, IL_CAL_UNIX);
+			$period_duration = ilDatePresentation::formatPeriod($period_start_obj, $period_end_obj);
+
+			$test_start_obj = new ilDateTime($period_start-(3*24*3600), IL_CAL_UNIX); 	// 3 days before
+			$test_end_obj = new ilDateTime($period_start, IL_CAL_UNIX);
+			$test_duration = ilDatePresentation::formatPeriod($test_start_obj, $test_end_obj);
+
+			/**
+			 * Copy Test
+			 */
+			$origTest = new ilObjTest($rowdata['test_orig_id'], true);
+			$origTest->setOnline(false);
+			$origTest->saveToDb();
+
+			$newTest = $origTest->cloneObject($rowdata['group_id']);
+
+			/** @var ilObjTest $newTest */
+			$newTest = new ilObjTest($newTest->getRefId(), true);
+			$newTest->setOnline(true);
+			$newTest->setDescription($test_duration);
+			$newTest->update();
+			$newTest->setStartingTimeEnabled(true);
+			$newTest->setStartingTime(ilFormat::dateDB2timestamp($test_start_obj->get(IL_CAL_DATETIME)));
+			$newTest->setEndingTimeEnabled(true);
+			$newTest->setEndingTime(ilFormat::dateDB2timestamp($test_end_obj->get(IL_CAL_DATETIME)));
+			$newTest->saveToDb();
+
+			/**
+			 * Copy Exercise
+			 */
+			/** @var ilObjExercise $newExercise */
+			$origExercise = new ilObjExercise($rowdata['ex_orig_id'], true);
+			$newExercise = $origExercise->cloneObject($rowdata['group_id']);
+			//$newExercise->setTitle("Abgabe ". $rowdata['title']);
+			$newExercise->update();
+
+			/** @var ilExAssignment $assignment */
+			foreach (ilExAssignment::getInstancesByExercise($newExercise->getId()) as $assignment)
+			{
+				$assignment->delete();
+			}
+			/** @var ilExAssignment $ass */
+			$ass = current(ilExAssignment::getInstancesByExercise(ilObject::_lookupObjId($rowdata['ex_orig_id'])));
+			$ass->setId(null);
+			$ass->setExerciseId($newExercise->getId());
+			$ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
+			$ass->setTitle($ass->getTitle() . ' ' . $period_duration);
+			$ass->setStartTime($period_start);
+			$ass->setDeadline($deadline);
+			$ass->setMandatory(false);
+			$ass->setTeamTutor(true);
+			$ass->save();
+
+			/**
+			 * Set Test as Precondition for Exercise
+			 */
+			$cond = new ilConditionHandler();
+			$cond->setTriggerRefId($newTest->getRefId());
+			$cond->setTriggerObjId($newTest->getId());
+			$cond->setTriggerType('tst');
+			$cond->setOperator(ilConditionHandler::OPERATOR_PASSED);
+			$cond->setTargetRefId($newExercise->getRefId());
+			$cond->setTargetObjId($newExercise->getId());
+			$cond->setTargetType('exc');
+			$cond->setObligatory(true);
+			$cond->setHiddenStatus(false);
+			$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
+			$cond->storeCondition();
+
+			/**
+			 * Create Sessison
+			 */
 			/** @var ilObjSession $newSession */
 			$origSession = new ilObjSession($rowdata['sess_orig_id'], true);
 			$newSession = $origSession->cloneObject($rowdata['group_id']);
@@ -268,19 +348,20 @@ class ilCoSubScript
 			//$newSession->setWaitingListAutoFill(false);
 			$newSession->update();
 
-			$session_ids[$rowdata['group_id']][$newSession->getRefId()] = true;
-
 			ilSessionAppointment::_deleteBySession($newSession->getId());
 			$appointment = new ilSessionAppointment();
 			$appointment->setSessionId($newSession->getId());
 			$appointment->toggleFullTime(false);
-			$appointment->setStart(new ilDateTime($this->excelTimeToUnix($rowdata['period_start']), IL_CAL_UNIX));
-			$appointment->setEnd(new ilDateTime($this->excelTimeToUnix($rowdata['period_end']), IL_CAL_UNIX));
+			$appointment->setStart(new ilDateTime($period_start, IL_CAL_UNIX));
+			$appointment->setEnd(new ilDateTime($period_end, IL_CAL_UNIX));
 			$appointment->create();
 
+			/**
+			 * Set Test as Precondition for Session
+			 */
 			$cond = new ilConditionHandler();
-			$cond->setTriggerRefId($rowdata['test_id']);
-			$cond->setTriggerObjId(ilObject::_lookupObjId($rowdata['test_id']));
+			$cond->setTriggerRefId($newTest->getRefId());
+			$cond->setTriggerObjId($newTest->getId());
 			$cond->setTriggerType('tst');
 			$cond->setOperator(ilConditionHandler::OPERATOR_PASSED);
 			$cond->setTargetRefId($newSession->getRefId());
@@ -291,67 +372,38 @@ class ilCoSubScript
 			$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
 			$cond->storeCondition();
 
-			/** @var ilObjExercise $newExercise */
-			if (empty($exercises[$rowdata['group_id']]))
-			{
-				$origExercise = new ilObjExercise($rowdata['ex_orig_id'], true);
-				$newExercise = $origExercise->cloneObject($rowdata['group_id']);
-				//$newExercise->setTitle("Abgabe ". $rowdata['title']);
-				$newExercise->update();
-				/** @var ilExAssignment $assignment */
-				foreach (ilExAssignment::getInstancesByExercise($newExercise->getId()) as $assignment)
-				{
-					$assignment->delete();
-				}
+			/**
+			 * Assign test and exercise as materials to the session
+			 */
+			$event_items = new ilEventItems($newSession->getId());
+			$event_items->addItem($newTest->getRefId());
+			$event_items->addItem($newExercise->getRefId());
+			$event_items->update();
 
-				$exercises[$rowdata['group_id']] = $newExercise;
+			/**
+			 * Assign the session to the item in the combined subscription
+			 */
+			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			$item->target_ref_id = $newSession->getRefId();
+			$item->save();
 
-				$cond = new ilConditionHandler();
-				$cond->setTriggerRefId($rowdata['test_id']);
-				$cond->setTriggerObjId(ilObject::_lookupObjId($rowdata['test_id']));
-				$cond->setTriggerType('tst');
-				$cond->setOperator(ilConditionHandler::OPERATOR_PASSED);
-				$cond->setTargetRefId($newExercise->getRefId());
-				$cond->setTargetObjId($newExercise->getId());
-				$cond->setTargetType('exc');
-				$cond->setObligatory(true);
-				$cond->setHiddenStatus(false);
-				$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
-				$cond->storeCondition();
-			}
-			else
-			{
-				$newExercise = $exercises[$rowdata['group_id']];
-			}
+			/**
+			 * Remember what is done
+			 */
+			$group_ids[$rowdata['group_id']] = true;
+			$session_ids[$rowdata['group_id']][$newSession->getRefId()] = true;
+			$exercise_ids[$rowdata['group_id']][$newExercise->getRefId()] = true;
 
-			$start = $this->excelTimeToUnix($rowdata['period_start']);
-			$end = $this->excelTimeToUnix($rowdata['period_end']);
-			$deadline = $this->excelTimeToUnix($rowdata['ex_deadline']);
-
-			/** @var ilExAssignment $ass */
-			$ass = current(ilExAssignment::getInstancesByExercise(ilObject::_lookupObjId($rowdata['ex_orig_id'])));
-			$ass->setId(null);
-			$ass->setExerciseId($newExercise->getId());
-			$ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
-			$ass->setTitle($ass->getTitle() . ' ' .ilDatePresentation::formatPeriod(new ilDateTime($start, IL_CAL_UNIX), new ilDateTime($end, IL_CAL_UNIX)));
-			$ass->setStartTime($start);
-			$ass->setDeadline($deadline);
-			$ass->setMandatory(false);
-			$ass->setTeamTutor(true);
-			$ass->save();
-
+			$this->rows[$r]['test_id'] = $newTest->getRefId();
 			$this->rows[$r]['sess_id'] = $newSession->getRefId();
 			$this->rows[$r]['ex_id'] = $newExercise->getRefId();
 			$this->rows[$r]['ex_ass_id'] = $newExercise->getRefId();
-
-			$item->target_ref_id = $newSession->getRefId();
-			$item->save();
 		}
 
 		include_once 'include/inc.debug.php';
 
-		/** @var ilObjExercise $exercise */
-		foreach ($exercises as $group_ref_id => $exercise)
+		// learning progress settings
+		foreach (array_keys($group_ids) as $group_ref_id)
 		{
 			// init lp settings of the group
 			$group_obj_id = ilObject::_lookupObjId($group_ref_id);
@@ -374,16 +426,16 @@ class ilCoSubScript
 			/** @var ilLPCollectionOfRepositoryObjects $collection */
 			if ($collection = $this->obj_lp->getCollectionInstance())
 			{
-				//log_line('got collection');
-
-				// take lp of exercise
-				$collection->activateEntries(array($exercise->getRefId()));
+				$collection->activateEntries(array());
 				if (!empty($session_ids[$group_ref_id]))
 				{
-					//log_var($session_ids[$group_ref_id],'$session_ids[$group_ref_id]');
-
-					// take lp of session group
+					// take lp of session grouping
 					$collection->createNewGrouping(array_keys($session_ids[$group_ref_id]), 1);
+				}
+				if (!empty($exercise_ids[$group_ref_id]))
+				{
+					// take lp of exercide grouping
+					$collection->createNewGrouping(array_keys($exercise_ids[$group_ref_id]), 1);
 				}
 			}
 
@@ -410,10 +462,10 @@ class ilCoSubScript
 				throw new Exception("Gruppe $group_id nicht gefunden!");
 			}
 
-			$test_id = $rowdata['test_id'];
-			if (empty($test_id) || !ilObject::_exists($test_id,true, 'tst') || ilObject::_isInTrash($test_id))
+			$test_orig_id = $rowdata['test_orig_id'];
+			if (empty($test_orig_id) || !ilObject::_exists($test_orig_id,true, 'tst') || ilObject::_isInTrash($test_orig_id))
 			{
-				throw new Exception("Test $test_id nicht gefunden!");
+				throw new Exception("Test $test_orig_id nicht gefunden!");
 			}
 
 			$sess_orig_id = $rowdata['sess_orig_id'];

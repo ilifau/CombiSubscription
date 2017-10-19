@@ -20,7 +20,7 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	public function __construct($a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
-		$this->plugin->includeClass("export/class.ilCoSubScript.php");
+		$this->plugin->includeClass("batch/class.ilCoSubScript.php");
 
 		$this->modes = array(
 			ilCoSubScript::MODE_FTP_STRUCTURE => array(

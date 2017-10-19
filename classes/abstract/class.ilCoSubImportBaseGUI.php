@@ -19,7 +19,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 	public function __construct($a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
-		$this->plugin->includeClass('export/class.ilCoSubImport.php');
+		$this->plugin->includeClass('batch/class.ilCoSubImport.php');
 	}
 
 
@@ -107,7 +107,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 		$file = $this->form->getFileUpload('import_file');
 		$mode = $this->form->getInput('import_mode');
 
-		$this->plugin->includeClass("export/class.ilCoSubImport.php");
+		$this->plugin->includeClass("batch/class.ilCoSubImport.php");
 		$import = new ilCoSubImport($this->plugin, $this->object, $mode);
 
 		if ($import->ImportFile($file['tmp_name']))
