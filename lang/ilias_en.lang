@@ -126,6 +126,7 @@ ilcosubmethodeatts_properties_description#:#The following properties are special
 ilcosubmethodeatts_select_preferred#:#preferred
 ilcosubmethodeatts_select_alternative#:#alternative
 ilcosubmethodeatts_select_not#:#not selected
+ilcosubmethodeatts_selection_properties#:#Registration Settings
 ilcosubmethodeatts_calculation_properties#:#Calculation Settings for EATTS
 ilcosubmethodeatts_time_limit#:#Maximum Duration
 ilcosubmethodeatts_max_iterations#:#Maximum Iterations
@@ -148,7 +149,8 @@ ilcosubmethodrandom_select_not#:#not selected
 ilcosubmethodrandom_select_preferred#:#preferred
 ilcosubmethodrandom_select_alternative#:#alternative
 ilcosubmethodrandom_select_prio_x#:#%s.
-ilcosubmethodrandom_selection_properties#:#Registration settings
+ilcosubmethodrandom_selection_properties#:#Registration Settings
+ilcosubmethodrandom_calculation_properties#:#Assignment Settings
 ilcosubmethodrandom_number_priorities#:#Number of Priorities
 ilcosubmethodrandom_number_priorities_info#:#Number of selection priorities. One priority will ba called 'chosen', two priorities (default) will be called 'preferred' and 'alternative', three priorities and higher will be numbered.
 ilcosubmethodrandom_number_assignments#:#Number of Assignments
@@ -157,6 +159,8 @@ ilcosubmethodrandom_one_per_priority#:#Unique Choice
 ilcosubmethodrandom_one_per_priority_info#:#A user must choose exactly one item per priority. This replaced the general setting 'minimum choices'. Please provide enough items and adapt the explanation text.
 ilcosubmethodrandom_sub_min_info#:#Items with fewer assignments will be indicated as not satisfied.
 ilcosubmethodrandom_sub_max_info#:#The calculation will not assign more than these subscriptions.
+ilcosubmethodrandom_out_of_conflict_time#:#Minimum Appointment Distance
+ilcosubmethodrandom_out_of_conflict_time_info#:#Minimum Time between Appointments that should not produce a conflict.
 show_bars#:#Show Bars
 show_bars_info#:#The registration screen shows bars with the mumber of existing registrations for each priority. The users will see how popular an item is.
 mail_to_users#:#Send E-Mail
@@ -167,6 +171,8 @@ mail_notify_assignments#:#You got the following assignments:
 mail_registration_subject#:#Registration for "%s"
 mail_registration_no_choice#:#You made no selection.
 mail_registration_choices#:#You selected the following items (with priorities):
+mail_removal_subject#:#Your Subscription for "%s"
+mail_removal_message#:#Your subscription is deleted.
 transfer_assignments#:#Transfer Assignments
 transfer_assignments_confirmation#:#Shall the assigned users become members of the following objects and their parents? Not assigned users will be set on the waiting list if possible.
 transfer_assignments_time#:#The assignments are transferred (%s).
@@ -300,3 +306,7 @@ fix_users_done#:#The assignments are fixed.
 unfix_users#:#Unfix Assignments
 unfix_users_confirmation#:#Do you like to revert the assignment fixation of the following users?
 unfix_users_done#:#The assignment fixations are reverted.
+remove_users#:#Remove Users
+remove_users_confirmation#:#Do you like to remove the following users?
+remove_users_confirmation_details#:#All registrations and assignments will be deleted. The users will be informed by e-mail.
+remove_users_done#:#The users are removed.

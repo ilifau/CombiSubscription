@@ -677,6 +677,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getItemsConflicts()
 	{
+		$buffer = $this->getMethodObject()->getOutOfConflictTime();
+
 		if (!isset($this->conflicts))
 		{
 			$this->conflicts = array();
@@ -685,7 +687,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				$this->conflicts[$item1_id] = array();
 				foreach ($this->getItems() as $item2_id => $item2)
 				{
-					if ($item1_id != $item2_id && ilCoSubItem::_haveConflict($item1, $item2))
+					if ($item1_id != $item2_id && ilCoSubItem::_haveConflict($item1, $item2, $buffer))
 					{
 						$this->conflicts[$item1_id][] = $item2_id;
 					}

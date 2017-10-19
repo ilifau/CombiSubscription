@@ -117,9 +117,10 @@ class ilCoSubItem
 	 * Check if two items have a period conflict
 	 * @param self $item1
 	 * @param self $item2
+	 * @param int $buffer
 	 * @return bool
 	 */
-	public static function _haveConflict($item1, $item2)
+	public static function _haveConflict($item1, $item2, $buffer = 3600)
 	{
 		// no conflict if period is not fully defined
 		if (empty($item1->period_start) || empty($item1->period_end) || empty($item2->period_start) || empty($item2->period_end))
@@ -128,8 +129,8 @@ class ilCoSubItem
 		}
 
 		// check if start of one item is in the period of the other item
-		if (($item1->period_start >= $item2->period_start && $item1->period_start < $item2->period_end) ||
-			($item2->period_start >= $item1->period_start && $item2->period_start < $item1->period_end))
+		if (($item1->period_start >= $item2->period_start && $item1->period_start < $item2->period_end + $buffer) ||
+			($item2->period_start >= $item1->period_start && $item2->period_start < $item1->period_end + $buffer))
 		{
 			return true;
 		}

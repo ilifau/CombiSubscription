@@ -133,6 +133,7 @@ ilcosubmethodeatts_properties_description#:#Hier liegen Sie Einstellungen fest, 
 ilcosubmethodeatts_select_preferred#:#bevorzugt
 ilcosubmethodeatts_select_alternative#:#alternativ
 ilcosubmethodeatts_select_not#:#nicht gewählt
+ilcosubmethodeatts_selection_properties#:#Einstellungen zur Anmeldung
 ilcosubmethodeatts_calculation_properties#:#Berechnungs-Einstellungen für EATTS
 ilcosubmethodeatts_time_limit#:#Maximale Rechendauer
 ilcosubmethodeatts_max_iterations#:#Maximale Iterationen
@@ -165,6 +166,8 @@ ilcosubmethodrandom_one_per_priority#:#Eindeutige Auswahl
 ilcosubmethodrandom_one_per_priority_info#:#Bei der Anmeldung muss für jede Priorität genau eine Auswahl getroffen werden. Dies ersetzt die allgemeine Einstellung "Minimale Auswahlen". Bitte sehen Sie mindestens so viele Auswahl-Einheiten vor, wie es Prioritäten gibt und passen Sie den Erklärungstext für die Anmeldeseite an.
 ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen, wird sie als nicht erfüllt angezeigt.
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
+ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
+ilcosubmethodrandom_out_of_conflict_time_info#:#Minimale Zeitspanne zwischen Terminen, die nicht als Konflikt erkannt werden sollen.
 show_bars#:#Balken zeigen
 show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben
@@ -175,6 +178,8 @@ mail_notify_assignments#:#Sie haben die folgenden Zuteilungen erhalten:
 mail_registration_subject#:#Anmeldung bei "%s"
 mail_registration_no_choice#:#Sie haben keine Auswahl getroffen.
 mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getroffen:
+mail_removal_subject#:#Ihre Anmeldung bei "%s"
+mail_removal_message#:#Ihre Anmeldung wurde gelöscht.
 transfer_assignments#:#Auf Kurse/Gruppen/Sitzungen übertragen
 transfer_assignments_confirmation#:#Sollen die zugeteilten Nutzer als Mitglieder in die folgenden Objekte und ihre übergeordneten Objekte aufgenommen werden?. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
@@ -308,3 +313,7 @@ fix_users_done#:#Die Zuteilungen der Nutzer wurden fixiert.
 unfix_users#:#Fixierungen aufheben
 unfix_users_confirmation#:#Möchten Sie Fixierung der Zuteilungen für die folgenden Nutzer aufheben?
 unfix_users_done#:#Die Fixierung der Zuteilungen wurde aufgehoben.
+remove_users#:#Nutzer entfernen
+remove_users_confirmation#:#Möchten Sie die folgenden Nutzer ganz aus der Anmeldung entfernen?
+remove_users_confirmation_details#:#Alle Auswahlen und Zuteilungen der Nutzer werden gelöscht. Die Nutzer werden über ihre Entfernung per E-Mail benachrichtigt.
+remove_users_done#:#Die Nutzer wurden entfernt.

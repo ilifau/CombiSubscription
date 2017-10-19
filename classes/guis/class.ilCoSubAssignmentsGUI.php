@@ -7,6 +7,7 @@
  * @version $Id$
  *
  * @ilCtrl_isCalledBy ilCoSubAssignmentsGUI: ilObjCombiSubscriptionGUI
+ * @ilCtrl_calls ilCoSubAssignmentsGUI: ilRepositorySearchGUI
  */
 class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 {
@@ -19,6 +20,15 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$next_class = $this->ctrl->getNextClass();
 		switch ($next_class)
 		{
+//			case 'ilrepositorysearchgui':
+//				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
+//				$rep_search = new ilRepositorySearchGUI();
+//				$rep_search->setTitle($this->plugin->txt("add_users"));
+//				$rep_search->setCallback($this,'addUsers');
+//				$this->ctrl->setReturn($this,'editAssignments');
+//				$this->ctrl->forwardCommand($rep_search);
+//				break;
+//
 			// assignments import
 			case 'ilcosubassignmentsimportgui':
 				$this->plugin->includeClass('abstract/class.ilCoSubImportBaseGUI.php');
@@ -47,6 +57,8 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 			case 'fixUsersConfirmation':
 			case 'unfixUsers':
 			case 'unfixUsersConfirmation':
+			case 'removeUsers':
+			case 'removeUsersConfirmation':
 
 				$this->$cmd();
 				return;
@@ -522,6 +534,68 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		}
 
 		ilUtil::sendSuccess($this->plugin->txt('unfix_users_done'), true);
+		$this->ctrl->redirect($this, 'editAssignments');
+	}
+
+	/**
+	 * Confirm the removing of users
+	 */
+	public function removeUsersConfirmation()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+
+		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+
+		$conf_gui = new ilConfirmationGUI();
+		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'removeUsers'));
+		$conf_gui->setHeaderText($this->plugin->txt('remove_users_confirmation')
+			.$this->messageDetails($this->plugin->txt('remove_users_confirmation_details')));
+		$conf_gui->setConfirm($this->plugin->txt('remove_users'),'removeUsers');
+		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+		foreach ($this->object->getUserDetails($_POST['ids']) as $user_id => $details)
+		{
+			$conf_gui->addItem('ids[]', $user_id, $details['showname'], ilUtil::getImagePath('icon_usr.svg'));
+
+		}
+		$this->tpl->setContent($conf_gui->getHTML());
+		$this->showInfo();
+	}
+
+	/**
+	 * Fix the assignments of selected users
+	 */
+	public function removeUsers()
+	{
+		if (empty($_POST['ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->ctrl->redirect($this, 'editAssignments');
+		}
+
+		$this->plugin->includeClass('models/class.ilCoSubUser.php');
+		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
+		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
+		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+
+
+		foreach($_POST['ids'] as $user_id)
+		{
+			ilCoSubUser::_deleteForObject($this->object->getId(), $user_id);
+			ilCoSubChoice::_deleteForObject($this->object->getId(), $user_id);
+			ilCoSubAssign::_deleteByObjectAndUser($this->object->getId(), $user_id);
+		}
+
+		$mail = new ilCombiSubscriptionMailNotification();
+		$mail->setObject($this->object);
+		$mail->setPlugin($this->plugin);
+		$mail->sendRemoval($_POST['ids']);
+
+		ilUtil::sendSuccess($this->plugin->txt('remove_users_done'), true);
 		$this->ctrl->redirect($this, 'editAssignments');
 	}
 

@@ -70,6 +70,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->addMultiCommand('mailToUsers', $this->plugin->txt('mail_to_users'));
 		$this->addMultiCommand('fixUsersConfirmation', $this->plugin->txt('fix_users'));
 		$this->addMultiCommand('unfixUsersConfirmation', $this->plugin->txt('unfix_users'));
+		$this->addMultiCommand('removeUsersConfirmation', $this->plugin->txt('remove_users'));
 		$this->addCommandButton('saveAssignments', $this->plugin->txt('save_assignments'));
 		$this->addCommandButton('saveAssignmentsAsRun', $this->plugin->txt('save_assignments_as_run'));
 	}
@@ -79,6 +80,9 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	 */
 	public function prepareData()
 	{
+		/** @var ilAccessHandler  $ilAccess*/
+		global $ilAccess;
+
 		$sums = $this->object->getAssignmentsSums();
 
 		// create the item column headers
@@ -165,7 +169,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
 				'result' => $this->object->getUserSatisfaction($user_id, 0),
 				'assignments' => 0,
-				'is_fixed' => $userObj->is_fixed
+				'is_fixed' => $userObj->is_fixed,
+				'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId())
 			);
 
 			foreach ($this->item_ids as $item_id)
@@ -260,6 +265,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('ID', $a_set['user_id']);
 
 		$this->tpl->setVariable($a_set['is_fixed'] ? 'USER_FIXED' : 'USER', $a_set['user']);
+		if (!$a_set['has_access'])
+		{
+			$this->tpl->setVariable('NO_ACCESS', $this->lng->txt('permission_denied'));
+		}
 		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
 		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
 		$this->tpl->setVariable('ASSIGNMENTS', $a_set['assignments']);

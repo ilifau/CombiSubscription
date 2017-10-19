@@ -139,6 +139,33 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 
 	}
 
+
+	/**
+	 * Send the notifications about being removed
+	 * Object and plugin must be set before
+	 * @param int[] $a_users
+	 */
+	public function sendRemoval($a_users)
+	{
+		foreach($a_users as $user_id)
+		{
+			$this->initLanguage($user_id);
+			$this->initMail();
+			$this->setSubject(
+				sprintf($this->txt('mail_removal_subject'),$this->getObjectTitle(true))
+			);
+			$this->setBody(ilMail::getSalutation($user_id, $this->getLanguage()));
+			$this->appendBody("\n\n");
+			$this->appendBody($this->txt('mail_removal_message')."\n\n");
+			$this->appendBody($this->txt('mail_signature')."\n");
+			$this->appendBody($this->createPermanentLink());
+
+			$this->getMail()->appendInstallationSignature(true);
+			$this->sendMail(array($user_id),array('system'));
+		}
+
+	}
+
 	/**
 	 * Init language
 	 * @param int $a_usr_id

@@ -9,6 +9,11 @@
  */
 abstract class ilCoSubMethodBase
 {
+
+	/** @var int minimum seconds between appointments without conflict */
+	public $out_of_conflict_time = 3600;
+
+
 	/** @var  ilObjCombiSubscription */
 	protected $object;
 
@@ -157,6 +162,16 @@ abstract class ilCoSubMethodBase
 	public function getNotSelected()
 	{
 		return $this->txt('select_not');
+	}
+
+
+	/**
+	 * Get the minimum seconds between appointments without conflict
+	 * @eturn int;
+	 */
+	public function getOutOfConflictTime()
+	{
+		return $this->out_of_conflict_time;
 	}
 
 	/**

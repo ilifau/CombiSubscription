@@ -108,11 +108,27 @@ class ilCoSubAssign
 
 		if (!empty($a_keep_user_ids))
 		{
+			//negated
 			$query .= ' AND '. $ilDB->in('user_id', $a_keep_user_ids, true, 'integer');
 		}
 		$ilDB->manipulate($query);
 	}
 
+
+	/**
+	 * Delete all assignments for a parent object id
+	 * @param integer object id
+	 * @param integer user id
+	 */
+	public static function _deleteByObjectAndUser($a_obj_id, $a_user_id)
+	{
+		global $ilDB;
+
+		$query = 'DELETE FROM rep_robj_xcos_ass'.
+			' WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer').
+			' AND user_id = ' . $ilDB->quote($a_user_id,'integer');
+		$ilDB->manipulate($query);
+	}
 
 	/**
 	 * Fill the properties with data from an array

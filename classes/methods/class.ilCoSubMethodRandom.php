@@ -59,6 +59,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->number_priorities = (int) $this->getProperty('number_priorities','2');
 		$this->one_per_priority = (bool) $this->getProperty('one_per_priority','0');
 		$this->number_assignments = (int) $this->getProperty('number_assignments','1');
+		$this->out_of_conflict_time = (int) $this->getProperty('out_of_conflict_time', '3600');
 	}
 
 
@@ -71,6 +72,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->setProperty('number_priorities', sprintf('%d', $this->number_priorities));
 		$this->setProperty('one_per_priority', sprintf('%d', (int) $this->one_per_priority));
 		$this->setProperty('number_assignments', sprintf('%d', (int) $this->number_assignments));
+		$this->setProperty('out_of_conflict_time', sprintf('%d', (int) $this->out_of_conflict_time));
 
 		if ($this->one_per_priority)
 		{
