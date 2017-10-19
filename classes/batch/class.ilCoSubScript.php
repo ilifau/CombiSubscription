@@ -261,7 +261,7 @@ class ilCoSubScript
 		{
 			$period_start = $this->excelTimeToUnix($rowdata['period_start']);
 			$period_end = $this->excelTimeToUnix($rowdata['period_end']);
-			$deadline = $this->excelTimeToUnix($rowdata['deadline']);
+			$deadline = $this->excelTimeToUnix($rowdata['ex_deadline']);
 			$deadline_obj = new ilDateTime($deadline, IL_CAL_UNIX);
 
 			$period_start_obj = new ilDateTime($period_start, IL_CAL_UNIX);
