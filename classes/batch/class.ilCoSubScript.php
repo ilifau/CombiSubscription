@@ -262,6 +262,7 @@ class ilCoSubScript
 			$period_start = $this->excelTimeToUnix($rowdata['period_start']);
 			$period_end = $this->excelTimeToUnix($rowdata['period_end']);
 			$deadline = $this->excelTimeToUnix($rowdata['deadline']);
+			$deadline_obj = new ilDateTime($deadline, IL_CAL_UNIX);
 
 			$period_start_obj = new ilDateTime($period_start, IL_CAL_UNIX);
 			$period_end_obj = new ilDateTime($period_end, IL_CAL_UNIX);
@@ -297,7 +298,7 @@ class ilCoSubScript
 			/** @var ilObjExercise $newExercise */
 			$origExercise = new ilObjExercise($rowdata['ex_orig_id'], true);
 			$newExercise = $origExercise->cloneObject($rowdata['group_id']);
-			//$newExercise->setTitle("Abgabe ". $rowdata['title']);
+			$newExercise->setDescription("Abgabe bis: " .ilDatePresentation::formatDate($deadline_obj));
 			$newExercise->update();
 
 			/** @var ilExAssignment $assignment */
@@ -310,8 +311,7 @@ class ilCoSubScript
 			$ass->setId(null);
 			$ass->setExerciseId($newExercise->getId());
 			$ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
-			$ass->setTitle($ass->getTitle() . ' ' . $period_duration);
-			$ass->setStartTime($period_start);
+			$ass->setStartTime($period_end);
 			$ass->setDeadline($deadline);
 			$ass->setMandatory(false);
 			$ass->setTeamTutor(true);
