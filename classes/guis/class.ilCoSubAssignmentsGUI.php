@@ -240,7 +240,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	{
 		foreach ($this->object->getUsers() as $user_id => $userObj)
 		{
-			if ($userObj->is_fixed)
+			if ($userObj->is_fixed || !in_array($user_id, (array) $_POST['page_ids']))
 			{
 				continue;
 			}
