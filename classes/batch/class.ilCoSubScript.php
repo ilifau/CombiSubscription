@@ -13,6 +13,7 @@ class ilCoSubScript
 	const TYPE_CSV = 'csv';
 
 	const MODE_FTP_STRUCTURE = 'ftp_structure';	/** Fertigungstechnisches Praktikum */
+	const MODE_FTP_ADJUST = 'ftp_adjust';
 
 	/**
 	 * @var ilCombiSubscriptionPlugin
@@ -122,6 +123,12 @@ class ilCoSubScript
 					$this->createFtpStructure();
 					$write = true;
 					break;
+
+				case self::MODE_FTP_ADJUST:
+					$this->adjustFtpTestEnds();
+					$write = true;
+					break;
+
 
 				default:
 					throw new Exception($this->plugin->txt('import_error_mode'));
@@ -445,6 +452,86 @@ class ilCoSubScript
 			ilLPStatusWrapper::_refreshStatus($group_obj_id);
 		}
 	}
+
+	protected function createFtpExerciseTeams()
+	{
+		require_once('Modules/Session/classes/class.ilEventItems.php');
+		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
+		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
+
+		$this->loadItemData();
+		$this->checkFtpStructure();
+
+		foreach ($this->rows as $r => $rowdata)
+		{
+			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			$sess_ref_id = $item->target_ref_id;
+			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
+
+			$sessItems = new ilEventItems($sess_obj_id);
+
+			$exAss = null;
+			foreach ($sessItems->getItems() as $ref_id)
+			{
+				if (ilObject::_lookupType($ref_id) == "exc")
+				{
+					$exObj = new ilObjExercise($ref_id, true);
+					$exAss = current(ilExAssignment::getInstancesByExercise($exObj->getId()));
+				}
+
+			}
+			if (!is_object($exAss))
+			{
+				throw new Exception("Übungseinheit nicht gefunden in Zeile $r!");
+			}
+		}
+	}
+
+
+	protected function adjustFtpTestEnds()
+	{
+		require_once('Modules/Session/classes/class.iObjSession.php');
+		require_once('Modules/Session/classes/class.ilEventItems.php');
+		require_once('Modules/Test/classes/class.ilObjTest.php');
+
+		$this->loadItemData();
+		$this->checkFtpStructure();
+
+		foreach ($this->rows as $r => $rowdata)
+		{
+			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+
+			if (empty($sess_ref_id))
+			{
+				continue;
+			}
+
+			$sess_ref_id = $item->target_ref_id;
+			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
+
+
+			$sessItems = new ilEventItems($sess_obj_id);
+			foreach ($sessItems->getItems() as $ref_id)
+			{
+				if (ilObject::_lookupType($ref_id) == "tst")
+				{
+					$tstObj = new ilObjTest($ref_id, true);
+
+					$old_end_time = new ilDateTime($tstObj->getEndingTime(),IL_CAL_TIMESTAMP);
+					$new_end_time = new ilDateTime($old_end_time->get(IL_CAL_UNIX)-3600, IL_CAL_UNIX);
+
+					$this->rows[$r]['old_end_time'] = $old_end_time->get(IL_CAL_DATETIME);
+					$this->rows[$r]['new_end_time'] = $new_end_time->get(IL_CAL_DATETIME);
+
+					//$tstObj->setEndingTime(ilFormat::dateDB2timestamp($new_end_time->get(IL_CAL_DATETIME)));
+				}
+			}
+		}
+		$this->columns[] = 'old_end_time';
+		$this->columns[] = 'new_end_time';
+	}
+
+
 
 	protected function checkFtpStructure()
 	{
