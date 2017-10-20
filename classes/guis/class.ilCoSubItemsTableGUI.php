@@ -4,6 +4,7 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
 require_once('Services/Locator/classes/class.ilLocatorGUI.php');
 require_once('Modules/Course/classes/class.ilObjCourseListGUI.php');
 require_once('Modules/Group/classes/class.ilObjGroupListGUI.php');
+require_once('Modules/Session/classes/class.ilObjSessionListGUI.php');
 /**
  * Table GUI for registration items
  */
@@ -134,6 +135,12 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 			elseif ($type == 'grp')
 			{
 				$list = new ilObjGroupListGUI();
+				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
+				$props = $list->getProperties();
+			}
+			elseif ($type == 'sess')
+			{
+				$list = new ilObjSessionListGUI();
 				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
 				$props = $list->getProperties();
 			}

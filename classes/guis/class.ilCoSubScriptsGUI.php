@@ -33,8 +33,8 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 			),
 			ilCoSubScript::MODE_FTP_ADJUST => array(
 				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
-				'info' => 'Passt das endedatum der Testobjekte an',
-				'success' => 'Die Struktur wurde angepassr.',
+				'info' => 'Passt das Ende-Datum der Testobjekte an',
+				'success' => 'Die Struktur wurde angepasst.',
 				'failure' => 'Die Struktur konnte nicht angepasst werden!',
 				'filename' => 'structure.xlsx',
 				'default' => true

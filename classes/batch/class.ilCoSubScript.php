@@ -276,7 +276,7 @@ class ilCoSubScript
 			$period_duration = ilDatePresentation::formatPeriod($period_start_obj, $period_end_obj);
 
 			$test_start_obj = new ilDateTime($period_start-(3*24*3600), IL_CAL_UNIX); 	// 3 days before
-			$test_end_obj = new ilDateTime($period_start, IL_CAL_UNIX);
+			$test_end_obj = new ilDateTime($period_start - 3600, IL_CAL_UNIX);			// 1 hour before
 			$test_duration = ilDatePresentation::formatPeriod($test_start_obj, $test_end_obj);
 
 			/**
@@ -473,7 +473,7 @@ class ilCoSubScript
 			$exAss = null;
 			foreach ($sessItems->getItems() as $ref_id)
 			{
-				if (ilObject::_lookupType($ref_id) == "exc")
+				if (ilObject::_lookupType($ref_id, true) == "exc")
 				{
 					$exObj = new ilObjExercise($ref_id, true);
 					$exAss = current(ilExAssignment::getInstancesByExercise($exObj->getId()));
@@ -490,9 +490,11 @@ class ilCoSubScript
 
 	protected function adjustFtpTestEnds()
 	{
-		require_once('Modules/Session/classes/class.iObjSession.php');
 		require_once('Modules/Session/classes/class.ilEventItems.php');
 		require_once('Modules/Test/classes/class.ilObjTest.php');
+
+		ilDatePresentation::setUseRelativeDates(false);
+
 
 		$this->loadItemData();
 		$this->checkFtpStructure();
@@ -500,35 +502,32 @@ class ilCoSubScript
 		foreach ($this->rows as $r => $rowdata)
 		{
 			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
-
-			if (empty($sess_ref_id))
-			{
-				continue;
-			}
-
 			$sess_ref_id = $item->target_ref_id;
 			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
-
 
 			$sessItems = new ilEventItems($sess_obj_id);
 			foreach ($sessItems->getItems() as $ref_id)
 			{
-				if (ilObject::_lookupType($ref_id) == "tst")
+				if (ilObject::_lookupType($ref_id, true) == "tst")
 				{
 					$tstObj = new ilObjTest($ref_id, true);
 
+					$start_time = new ilDateTime($tstObj->getStartingTime(),IL_CAL_TIMESTAMP);
 					$old_end_time = new ilDateTime($tstObj->getEndingTime(),IL_CAL_TIMESTAMP);
 					$new_end_time = new ilDateTime($old_end_time->get(IL_CAL_UNIX)-3600, IL_CAL_UNIX);
 
-					$this->rows[$r]['old_end_time'] = $old_end_time->get(IL_CAL_DATETIME);
-					$this->rows[$r]['new_end_time'] = $new_end_time->get(IL_CAL_DATETIME);
+					$this->rows[$r]['old_test_end'] = $old_end_time->get(IL_CAL_DATETIME);
+					$this->rows[$r]['new_test_end'] = $new_end_time->get(IL_CAL_DATETIME);
 
-					//$tstObj->setEndingTime(ilFormat::dateDB2timestamp($new_end_time->get(IL_CAL_DATETIME)));
+					$tstObj->setEndingTime(ilFormat::dateDB2timestamp($new_end_time->get(IL_CAL_DATETIME)));
+					$tstObj->saveToDb();
+
+					$tstObj->setDescription(ilDatePresentation::formatPeriod($start_time, $new_end_time));
+					$tstObj->update();
+
 				}
 			}
 		}
-		$this->columns[] = 'old_end_time';
-		$this->columns[] = 'new_end_time';
 	}
 
 
