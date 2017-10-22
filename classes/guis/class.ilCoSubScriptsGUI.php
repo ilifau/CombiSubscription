@@ -10,6 +10,9 @@
  */
 class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 {
+	/** @var  ilCoSubScript */
+	var $script;
+
 	/** @var array  mode => ['title' => string, 'info' => string, 'default' => bool] */
 	var $modes = array();
 
@@ -21,25 +24,8 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	{
 		parent::__construct($a_parent_gui);
 		$this->plugin->includeClass("batch/class.ilCoSubScript.php");
-
-		$this->modes = array(
-			ilCoSubScript::MODE_FTP_STRUCTURE => array(
-				'title' => 'Struktur für Fertigungstechnisches Praktikum anlegen',
-				'info' => 'Legt die Sitzungen und Übungseinheiten an, stellt Vorbedingungen und Lernfortschritt ein',
-				'success' => 'Die Struktur wurde angelegt.',
-				'failure' => 'Die Struktur konnte nicht anglegt werden!',
-				'filename' => 'structure.xlsx',
-				'default' => true
-			),
-			ilCoSubScript::MODE_FTP_ADJUST => array(
-				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
-				'info' => 'Passt das Ende-Datum der Testobjekte an',
-				'success' => 'Die Struktur wurde angepasst.',
-				'failure' => 'Die Struktur konnte nicht angepasst werden!',
-				'filename' => 'structure.xlsx',
-				'default' => true
-			)
-		);
+		$this->script = new ilCoSubScript($this->plugin, $this->object);
+		$this->modes = $this->script->getModes();
 	}
 
 
@@ -127,10 +113,10 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 		$file = $this->form->getFileUpload('import_file');
 		$mode = $this->form->getInput('import_mode');
 
-		$script = new ilCoSubScript($this->plugin, $this->object, $mode);
+		$this->script->setMode($mode);
 
 		$tempname = ilUtil::ilTempnam();
-		if ($script->processFile($file['tmp_name'], $tempname))
+		if ($this->script->processFile($file['tmp_name'], $tempname))
 		{
 			if (is_file($tempname))
 			{
@@ -144,7 +130,7 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 		}
 		else
 		{
-			ilUtil::sendFailure($this->modes[$mode]['failure'] . '<br />' . $script->getMessage(), true);
+			ilUtil::sendFailure($this->modes[$mode]['failure'] . '<br />' . $this->script->getMessage(), true);
 			$this->ctrl->redirect($this);
 		}
 	}

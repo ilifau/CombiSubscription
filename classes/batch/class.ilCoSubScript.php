@@ -14,6 +14,7 @@ class ilCoSubScript
 
 	const MODE_FTP_STRUCTURE = 'ftp_structure';	/** Fertigungstechnisches Praktikum */
 	const MODE_FTP_ADJUST = 'ftp_adjust';
+	const MODE_FTP_EX_MEM = 'ftp_ex_mem';
 
 	/**
 	 * @var ilCombiSubscriptionPlugin
@@ -27,6 +28,9 @@ class ilCoSubScript
 
 	/** @var  string Writer Type ('excel' or 'csv') */
 	protected $type;
+
+	/** @var array  list of mode definition (see constructor) */
+	protected $modes;
 
 	/** @var string import mode ('ass_by_item') */
 	protected $mode;
@@ -75,11 +79,58 @@ class ilCoSubScript
 		$this->plugin  = $plugin;
 		$this->mode = $mode;
 		$this->lng = $lng;
+
+		$this->modes = array(
+			ilCoSubScript::MODE_FTP_STRUCTURE => array(
+				'title' => 'Struktur für Fertigungstechnisches Praktikum anlegen',
+				'info' => 'Legt die Sitzungen und Übungen an, stellt Vorbedingungen und Lernfortschritt ein',
+				'success' => 'Die Struktur wurde angelegt.',
+				'failure' => 'Die Struktur konnte nicht anglegt werden!',
+				'filename' => 'structure.xlsx',
+				'default' => true
+			),
+//			ilCoSubScript::MODE_FTP_ADJUST => array(
+//				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
+//				'info' => 'Passt das Ende-Datum der Testobjekte an',
+//				'success' => 'Die Struktur wurde angepasst.',
+//				'failure' => 'Die Struktur konnte nicht angepasst werden!',
+//				'filename' => 'structure.xlsx',
+//				'default' => true
+//			)
+			ilCoSubScript::MODE_FTP_EX_MEM => array(
+				'title' => 'Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
+				'info' => 'Trägt die Übungsmitglieder ein und legt die Übungsteams an',
+				'success' => 'Die Teams wurden angelegt.',
+				'failure' => 'Die Teams konnten nicht anglegt werden!',
+				'filename' => 'structure.xlsx',
+				'default' => true
+			),
+
+		);
+
+	}
+
+	/**
+	 * Get the list of available modes
+	 */
+	public function getModes()
+	{
+		return $this->modes;
+	}
+
+	/**
+	 * Set the script mode
+	 * @param $mode
+	 */
+	public function setMode($mode)
+	{
+		$this->mode = $mode;
 	}
 
 	/**
 	 * Import a data file
-	 * @param string $file
+	 * @param string $inputFile
+	 * @param string $resultFile
 	 * @return bool
 	 */
 	public function ProcessFile($inputFile, $resultFile)
@@ -126,6 +177,11 @@ class ilCoSubScript
 
 				case self::MODE_FTP_ADJUST:
 					$this->adjustFtpTestEnds();
+					$write = true;
+					break;
+
+				case self::MODE_FTP_EX_MEM:
+					$this->createFtpExerciseTeams();
 					$write = true;
 					break;
 
@@ -458,6 +514,8 @@ class ilCoSubScript
 		require_once('Modules/Session/classes/class.ilEventItems.php');
 		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
 		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
+		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
+		require_once('Modules/Exercise/classes/class.ilExAssignmentTeam.php');
 
 		$this->loadItemData();
 		$this->checkFtpStructure();
@@ -465,24 +523,36 @@ class ilCoSubScript
 		foreach ($this->rows as $r => $rowdata)
 		{
 			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			$user_ids = array_keys($this->object->getAssignmentsOfItem($item->item_id));
+
 			$sess_ref_id = $item->target_ref_id;
 			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
-
 			$sessItems = new ilEventItems($sess_obj_id);
 
-			$exAss = null;
 			foreach ($sessItems->getItems() as $ref_id)
 			{
 				if (ilObject::_lookupType($ref_id, true) == "exc")
 				{
 					$exObj = new ilObjExercise($ref_id, true);
+					$exMem = new ilExerciseMembers($exObj);
+					/** @var ilExAssignment $exAss */
 					$exAss = current(ilExAssignment::getInstancesByExercise($exObj->getId()));
-				}
 
-			}
-			if (!is_object($exAss))
-			{
-				throw new Exception("Übungseinheit nicht gefunden in Zeile $r!");
+					if (!empty($user_ids))
+					{
+						$exMem->assignMembers($user_ids);
+
+						$first_user = array_shift($user_ids);
+						$team = ilExAssignmentTeam::getInstanceByUserId($exAss->getId(), $first_user, true);
+						if(sizeof($user_ids))
+						{
+							foreach($user_ids as $user_id)
+							{
+								$team->addTeamMember($user_id);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
