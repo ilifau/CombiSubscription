@@ -98,8 +98,8 @@ class ilCoSubScript
 //				'default' => true
 //			)
 			ilCoSubScript::MODE_FTP_EX_MEM => array(
-				'title' => 'Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
-				'info' => 'Trägt die Übungsmitglieder ein und legt die Übungsteams an',
+				'title' => 'Test-Teilnehmer und Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
+				'info' => 'Trägt die Testteilnehmer und Übungsmitglieder ein und legt die Übungsteams an',
 				'success' => 'Die Teams wurden angelegt.',
 				'failure' => 'Die Teams konnten nicht anglegt werden!',
 				'filename' => 'structure.xlsx',
@@ -516,6 +516,7 @@ class ilCoSubScript
 		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
 		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
 		require_once('Modules/Exercise/classes/class.ilExAssignmentTeam.php');
+		require_once('Modules/Test/classes/class.ilObjTest.php');
 
 		$this->loadItemData();
 		$this->checkFtpStructure();
@@ -531,6 +532,7 @@ class ilCoSubScript
 
 			foreach ($sessItems->getItems() as $ref_id)
 			{
+				// exercise
 				if (ilObject::_lookupType($ref_id, true) == "exc")
 				{
 					$exObj = new ilObjExercise($ref_id, true);
@@ -551,6 +553,20 @@ class ilCoSubScript
 								$team->addTeamMember($user_id);
 							}
 						}
+					}
+				}
+
+				// test
+				if (ilObject::_lookupType($ref_id, true) == "tst")
+				{
+					$tstObj = new ilObjTest($ref_id, true);
+
+					$tstObj->setFixedParticipants(1);
+					$tstObj->saveToDb();
+
+					foreach ($user_ids as $user_id)
+					{
+						$tstObj->inviteUser($user_id);
 					}
 				}
 			}
