@@ -91,12 +91,12 @@ class ilCoSubScript
 			),
 //			ilCoSubScript::MODE_FTP_ADJUST => array(
 //				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
-//				'info' => 'Passt das Ende-Datum der Testobjekte an',
+//				'info' => 'Passt Einstellungen der erstellen Objekte an',
 //				'success' => 'Die Struktur wurde angepasst.',
 //				'failure' => 'Die Struktur konnte nicht angepasst werden!',
 //				'filename' => 'structure.xlsx',
 //				'default' => true
-//			)
+//			),
 			ilCoSubScript::MODE_FTP_EX_MEM => array(
 				'title' => 'Test-Teilnehmer und Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
 				'info' => 'Trägt die Testteilnehmer und Übungsmitglieder ein und legt die Übungsteams an',
@@ -176,7 +176,7 @@ class ilCoSubScript
 					break;
 
 				case self::MODE_FTP_ADJUST:
-					$this->adjustFtpTestEnds();
+					$this->adjustFtpObjects();
 					$write = true;
 					break;
 
@@ -574,7 +574,7 @@ class ilCoSubScript
 	}
 
 
-	protected function adjustFtpTestEnds()
+	protected function adjustFtpObjects()
 	{
 		require_once('Modules/Session/classes/class.ilEventItems.php');
 		require_once('Modules/Test/classes/class.ilObjTest.php');
@@ -598,19 +598,20 @@ class ilCoSubScript
 				{
 					$tstObj = new ilObjTest($ref_id, true);
 
-					$start_time = new ilDateTime($tstObj->getStartingTime(),IL_CAL_TIMESTAMP);
-					$old_end_time = new ilDateTime($tstObj->getEndingTime(),IL_CAL_TIMESTAMP);
-					$new_end_time = new ilDateTime($old_end_time->get(IL_CAL_UNIX)-3600, IL_CAL_UNIX);
+					// adjust test end
+//					$start_time = new ilDateTime($tstObj->getStartingTime(),IL_CAL_TIMESTAMP);
+//					$old_end_time = new ilDateTime($tstObj->getEndingTime(),IL_CAL_TIMESTAMP);
+//					$new_end_time = new ilDateTime($old_end_time->get(IL_CAL_UNIX)-3600, IL_CAL_UNIX);
+//
+//					$this->rows[$r]['old_test_end'] = $old_end_time->get(IL_CAL_DATETIME);
+//					$this->rows[$r]['new_test_end'] = $new_end_time->get(IL_CAL_DATETIME);
+//
+//					$tstObj->setDescription(ilDatePresentation::formatPeriod($start_time, $new_end_time));
+//					$tstObj->update();
 
-					$this->rows[$r]['old_test_end'] = $old_end_time->get(IL_CAL_DATETIME);
-					$this->rows[$r]['new_test_end'] = $new_end_time->get(IL_CAL_DATETIME);
-
-					$tstObj->setEndingTime(ilFormat::dateDB2timestamp($new_end_time->get(IL_CAL_DATETIME)));
+					// reset processing time
+					$tstObj->setResetProcessingTime(1);
 					$tstObj->saveToDb();
-
-					$tstObj->setDescription(ilDatePresentation::formatPeriod($start_time, $new_end_time));
-					$tstObj->update();
-
 				}
 			}
 		}
