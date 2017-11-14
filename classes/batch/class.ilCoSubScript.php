@@ -89,14 +89,6 @@ class ilCoSubScript
 				'filename' => 'structure.xlsx',
 				'default' => true
 			),
-//			ilCoSubScript::MODE_FTP_ADJUST => array(
-//				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
-//				'info' => 'Passt Einstellungen der erstellen Objekte an',
-//				'success' => 'Die Struktur wurde angepasst.',
-//				'failure' => 'Die Struktur konnte nicht angepasst werden!',
-//				'filename' => 'structure.xlsx',
-//				'default' => true
-//			),
 			ilCoSubScript::MODE_FTP_EX_MEM => array(
 				'title' => 'Test-Teilnehmer und Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
 				'info' => 'Trägt die Testteilnehmer und Übungsmitglieder ein und legt die Übungsteams an',
@@ -105,7 +97,14 @@ class ilCoSubScript
 				'filename' => 'structure.xlsx',
 				'default' => true
 			),
-
+			ilCoSubScript::MODE_FTP_ADJUST => array(
+				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
+				'info' => 'Ersetzt das Antestat durch ein Übungsobjekt mit manuellem Lernfortschritt',
+				'success' => 'Die Struktur wurde angepasst.',
+				'failure' => 'Die Struktur konnte nicht angepasst werden!',
+				'filename' => 'structure.xlsx',
+				'default' => true
+			),
 		);
 
 	}
@@ -573,14 +572,17 @@ class ilCoSubScript
 		}
 	}
 
-
+	/**
+	 * Replace the 'Antestat' test by an exercise with manual LP setting
+	 */
 	protected function adjustFtpObjects()
 	{
 		require_once('Modules/Session/classes/class.ilEventItems.php');
+		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
+		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
 		require_once('Modules/Test/classes/class.ilObjTest.php');
-
-		ilDatePresentation::setUseRelativeDates(false);
-
+		require_once('Services/AccessControl/classes/class.ilConditionHandler.php');
+		require_once('Services/Tracking/classes/class.ilLPObjSettings.php');
 
 		$this->loadItemData();
 		$this->checkFtpStructure();
@@ -588,32 +590,71 @@ class ilCoSubScript
 		foreach ($this->rows as $r => $rowdata)
 		{
 			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			$user_ids = array_keys($this->object->getAssignmentsOfItem($item->item_id));
+
 			$sess_ref_id = $item->target_ref_id;
 			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
 
 			$sessItems = new ilEventItems($sess_obj_id);
+			$cleaned = array();
 			foreach ($sessItems->getItems() as $ref_id)
 			{
+				// Delete test 'Antestat'
 				if (ilObject::_lookupType($ref_id, true) == "tst")
 				{
 					$tstObj = new ilObjTest($ref_id, true);
-
-					// adjust test end
-//					$start_time = new ilDateTime($tstObj->getStartingTime(),IL_CAL_TIMESTAMP);
-//					$old_end_time = new ilDateTime($tstObj->getEndingTime(),IL_CAL_TIMESTAMP);
-//					$new_end_time = new ilDateTime($old_end_time->get(IL_CAL_UNIX)-3600, IL_CAL_UNIX);
-//
-//					$this->rows[$r]['old_test_end'] = $old_end_time->get(IL_CAL_DATETIME);
-//					$this->rows[$r]['new_test_end'] = $new_end_time->get(IL_CAL_DATETIME);
-//
-//					$tstObj->setDescription(ilDatePresentation::formatPeriod($start_time, $new_end_time));
-//					$tstObj->update();
-
-					// reset processing time
-					$tstObj->setResetProcessingTime(1);
-					$tstObj->saveToDb();
+					$tstObj->delete();
+				}
+				else
+				{
+					$cleaned[] = $ref_id;
 				}
 			}
+			$sessItems->setItems($cleaned);
+			$sessItems->update();
+
+			// Create Exercie 'Antestat'
+			$newExercise = new ilObjExercise();
+			$newExercise->setTitle('Antestat');
+			$newExercise->setDescription('Hier werden die Ergebnisse des Antestats eingetragen.');
+			$newExercise->setInstruction('Sie müssen diese Übung nicht direkt bearbeiten. In ihre werden die Ergebnisse des Tests eingetragen.');
+			$newExercise->create();
+			$newExercise->createReference();
+			$newExercise->putInTree($rowdata['group_id']);
+			$newExercise->setPermissions($rowdata['group_id']);
+			$newExercise->setPassMode('man');
+			$newExercise->saveData();
+
+			// set the exercise members
+			$exMem = new ilExerciseMembers($newExercise);
+			if (!empty($user_ids))
+			{
+				$exMem->assignMembers($user_ids);
+			}
+
+			//Set learning progress of exercise to 'manual'
+			$this->obj_settings = new ilLPObjSettings($newExercise->getId());
+			$this->obj_settings->setMode(ilLPObjSettings::LP_MODE_MANUAL_BY_TUTOR);
+			$this->obj_settings->update(true);
+
+			 //Set Exerrcise as precondition for session
+			$cond = new ilConditionHandler();
+			$cond->setTriggerRefId($newExercise->getRefId());
+			$cond->setTriggerObjId($newExercise->getId());
+			$cond->setTriggerType('exc');
+			$cond->setOperator(ilConditionHandler::OPERATOR_LP);
+			$cond->setTargetRefId($sess_ref_id);
+			$cond->setTargetObjId($sess_obj_id);
+			$cond->setTargetType('sess');
+			$cond->setObligatory(true);
+			$cond->setHiddenStatus(false);
+			$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
+			$cond->storeCondition();
+
+			// Assign the exercise as session material
+			$event_items = new ilEventItems($sess_obj_id);
+			$event_items->addItem($newExercise->getRefId());
+			$event_items->update();
 		}
 	}
 
