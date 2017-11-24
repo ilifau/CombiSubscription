@@ -15,6 +15,7 @@ class ilCoSubScript
 	const MODE_FTP_STRUCTURE = 'ftp_structure';	/** Fertigungstechnisches Praktikum */
 	const MODE_FTP_ADJUST = 'ftp_adjust';
 	const MODE_FTP_EX_MEM = 'ftp_ex_mem';
+	const MODE_FTP_EX_STATUS = 'ftp_ex_status';
 
 	/**
 	 * @var ilCombiSubscriptionPlugin
@@ -105,6 +106,15 @@ class ilCoSubScript
 				'filename' => 'structure.xlsx',
 				'default' => true
 			),
+			ilCoSubScript::MODE_FTP_EX_STATUS => array(
+				'title' => 'Ergebnisse der Antestate für Fertigungstechnisches Praktikum eintragen',
+				'info' => 'Trägt die externen Testergebnisse als Status in den Übungsobjekten der Antestate ein',
+				'success' => 'Die Ergebnisse wurden eingetragen.',
+				'failure' => 'Die Ergebnisse konnten nicht eingetragen werden!',
+				'filename' => 'structure.xlsx',
+				'default' => true
+			),
+
 		);
 
 	}
@@ -181,6 +191,11 @@ class ilCoSubScript
 
 				case self::MODE_FTP_EX_MEM:
 					$this->createFtpExerciseTeams();
+					$write = true;
+					break;
+
+				case self::MODE_FTP_EX_STATUS:
+					$this->insertFtpExStatus();
 					$write = true;
 					break;
 
@@ -572,6 +587,92 @@ class ilCoSubScript
 		}
 	}
 
+
+	/**
+	 * Insert the learning progress to exercises
+	 * The excel columss are: group_id, ex_title, matriculation, status
+	 * - status will be set for participants of exercises with ex_title in the group object with group_id as ref_id
+	 * - users are matched by matriculation numbers
+	 * - status can be 'notgraded', 'passed' or 'failed'
+	 */
+	protected function insertFtpExStatus()
+	{
+		/** ilTree $tree */
+		global $ilDB, $tree;
+
+		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
+		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
+		require_once('Services/Tracking/classes/class.ilLPObjSettings.php');
+
+		$group_id = null;
+		$ex_title = null;
+
+		// collect the status by matriculation
+		$stat_by_mat = array();
+		foreach ($this->rows as $r => $rowdata)
+		{
+			if (isset($rowdata['matriculation']))
+			{
+				// take only the first ones
+				$group_id = isset($group_id) ? $group_id : $rowdata['group_id'];
+				$ex_title = isset($ex_title) ? $ex_title : $rowdata['ex_title'];
+
+				$stat_by_mat[(string) $rowdata['matriculation']] = (string) $rowdata['status'];
+			}
+		}
+
+		//log_var($stat_by_mat, '$stat_by_mat');
+
+		if(empty($group_id) || empty($ex_title))
+		{
+			throw new Exception("Gruppe oder Ünbungstitel nich angegeben!");
+		}
+
+		// collect the status by user id
+		$query = "SELECT usr_id, matriculation FROM usr_data WHERE ".
+			$ilDB->in('matriculation', array_keys($stat_by_mat), false, 'text');
+		$result = $ilDB->query($query);
+
+		$stat_by_usr_id = array();
+		while ($user = $ilDB->fetchAssoc($result))
+		{
+			$stat_by_usr_id[$user['usr_id']] = $stat_by_mat[(string) $user['matriculation']];
+		}
+
+		//log_var($stat_by_usr_id, '$stat_by_usr_id');
+
+
+		// get the relevant exercises in the group
+		$gt_data = $tree->getNodeTreeData($group_id);
+		$et_data = $tree->getSubTree($gt_data, true, 'exc');
+
+		//log_var($et_data, '$et_data');
+
+		// write the learning progress of the exercise members
+		foreach ($et_data as $ex_data)
+		{
+			if ($ex_data['title'] == $ex_title)
+			{
+				$exObj = new ilObjExercise($ex_data['child'], true);
+
+				//Set learning progress of exercise
+				$this->obj_settings = new ilLPObjSettings($exObj->getId());
+				$this->obj_settings->setMode(ilLPObjSettings::LP_MODE_EXERCISE_RETURNED);
+				$this->obj_settings->update(true);
+
+				$exMem = new ilExerciseMembers($exObj);
+				foreach ($exMem->getMembers() as $user_id)
+				{
+					$status = $stat_by_usr_id[$user_id];
+					if ($status == 'passed' || $status == 'failed')
+					{
+						ilExerciseMembers::_writeStatus($exObj->getId(), $user_id, $status);
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Replace the 'Antestat' test by an exercise with manual LP setting
 	 */
@@ -632,9 +733,9 @@ class ilCoSubScript
 				$exMem->assignMembers($user_ids);
 			}
 
-			//Set learning progress of exercise to 'manual'
+			//Set learning progress of exercise
 			$this->obj_settings = new ilLPObjSettings($newExercise->getId());
-			$this->obj_settings->setMode(ilLPObjSettings::LP_MODE_MANUAL_BY_TUTOR);
+			$this->obj_settings->setMode(ilLPObjSettings::LP_MODE_EXERCISE_RETURNED);
 			$this->obj_settings->update(true);
 
 			 //Set Exerrcise as precondition for session
