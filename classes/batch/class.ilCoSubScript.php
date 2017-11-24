@@ -718,7 +718,7 @@ class ilCoSubScript
 			$newExercise = new ilObjExercise();
 			$newExercise->setTitle('Antestat');
 			$newExercise->setDescription('Hier werden die Ergebnisse des Antestats eingetragen.');
-			$newExercise->setInstruction('Sie müssen diese Übung nicht direkt bearbeiten. In ihre werden die Ergebnisse des Tests eingetragen.');
+			$newExercise->setInstruction('Sie müssen diese Übung nicht direkt bearbeiten. In ihr werden die Ergebnisse des Tests eingetragen.');
 			$newExercise->create();
 			$newExercise->createReference();
 			$newExercise->putInTree($rowdata['group_id']);
