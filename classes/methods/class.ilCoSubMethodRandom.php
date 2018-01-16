@@ -209,6 +209,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->priorities = $this->object->getPriorities();
 		$this->priority_counts_item = $this->object->getPriorityCounts();
 
+//		log_var($this->items, 'items');
+//		log_var($this->conflicts, 'conflicts');
+//		log_var($this->category_limits, 'category_limits');
+//		log_var($this->priorities, 'priorities');
+
 		$this->assign_counts_item = array();
 		foreach ($this->items as $item)
 		{
