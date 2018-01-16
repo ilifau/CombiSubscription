@@ -140,13 +140,17 @@ class ilCoSubItem
 	/**
 	 * Clone the item for a new object
 	 * @param int	$a_obj_id
+	 * @param array	$a_cat_map (old_cat_id => new_cat_id)
 	 * @return self
 	 */
-	public function saveClone($a_obj_id)
+	public function saveClone($a_obj_id, $a_cat_map)
 	{
 		$clone = clone $this;
 		$clone->obj_id = $a_obj_id;
 		$clone->item_id = null;
+		if (!empty($this->cat_id)) {
+			$clone->cat_id = $a_cat_map[$this->cat_id];
+		}
 		$clone->save();
 		return $clone;
 	}

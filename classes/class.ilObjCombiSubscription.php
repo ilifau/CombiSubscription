@@ -193,10 +193,19 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		// clone the properties of methods etc.
 		$this->cloneProperties($new_obj->getId());
 
+		// clone the categories
+		$cat_map = array();
+		foreach ($this->getCategories() as $category)
+		{
+			$cat_id = $category->cat_id;
+			$clone = $category->saveClone($new_obj->getId());
+			$cat_map[$cat_id] = $clone->cat_id;
+		}
+
 		// clone the items
 		foreach ($this->getItems() as $item)
 		{
-			$item->saveClone($new_obj->getId());
+			$item->saveClone($new_obj->getId(), $cat_map);
 		}
 	}
 
