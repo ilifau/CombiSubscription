@@ -71,16 +71,20 @@ class ilCombiSubscriptionTargets
 
 
 	/**
-	 * Get a new (unsaved) item for a target reference
+	 * Get an item for a target reference
 	 * @param $a_ref_id
+	 * @param ilCoSubItem $item	(an existing item that should be modified)
 	 * @return ilCoSubItem
 	 */
-	public function getItemForTarget($a_ref_id)
+	public function getItemForTarget($a_ref_id, $item = null)
 	{
 		$this->plugin->includeClass('models/class.ilCoSubItem.php');
 
-		$item = new ilCoSubItem;
-		$item->obj_id = $this->object->getId();
+		if (!isset($a_item))
+		{
+			$item = new ilCoSubItem;
+			$item->obj_id = $this->object->getId();
+		}
 		$item->target_ref_id = $a_ref_id;
 
 		switch (ilObject::_lookupType($a_ref_id, true))
@@ -129,6 +133,16 @@ class ilCombiSubscriptionTargets
 				break;
 		}
 		return $item;
+	}
+
+	/**
+	 * Get a list of unsaved schedules for a target object
+	 * @param $a_ref_id
+	 * @return ilCoSubSchedule[]
+	 */
+	public function getSchedulesForTarget($a_ref_id)
+	{
+		return array();
 	}
 
 	/**

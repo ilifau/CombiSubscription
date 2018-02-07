@@ -296,9 +296,15 @@ pre_select_message#:#Sie haben (noch) keine Auswahl getroffen, daher wurden alle
 period#:#Termin
 period_info#:#Die Anmelde-Einheit entspricht einer Veranstaltung mit festem Termin.
 period_start#:#Start
-period_start_info#:#Start-Zeitpunkt
 period_end#:#Ende
-period_end_info#:#End-Zeitpunkt
+period_first#:#Start
+period_last#:#Ende
+period_slots#:#Wiederholungen
+schedules#:#Termine
+schedule#:#Termin
+schedule_none#:#Kein Termin
+schedule_single#:#Einzeltermin
+schedule_multi#:#Terminreihe
 other_items#:#Weitere
 import_items#:#Auswahl-Einheiten importieren
 import_mode_items#:#Auswahl-Einheiten

@@ -410,4 +410,43 @@
     $query = "INSERT INTO rep_robj_xcos_users(obj_id, user_id, is_fixed) SELECT DISTINCT obj_id, user_id, 0 FROM rep_robj_xcos_choices";
     $ilDB->manipulate($query);
 ?>
+<#19>
+<?php
+    $fields = array(
+        'obj_id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true
+        ),
+        'schedule_id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true
+        ),
+		'item_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		'period_start' => array(
+			'type'    => 'integer',
+			'length'  => 4,
+			'notnull' => true
+        ),
+		'period_end' => array(
+			'type'    => 'integer',
+			'length'  => 4,
+			'notnull' => true
+        ),
+        'slots' => array (
+            'type'  => 'text',
+            'length'=> '4000',
+            'notnull' => true,
+        )
+    );
 
+    $ilDB->createTable('rep_robj_xcos_scheds', $fields);
+    $ilDB->addPrimaryKey('rep_robj_xcos_scheds', array('schedule_id'));
+    $ilDB->addIndex('rep_robj_xcos_scheds', array('obj_id'), 'i1');
+    $ilDB->createSequence('rep_robj_xcos_scheds');
+?>

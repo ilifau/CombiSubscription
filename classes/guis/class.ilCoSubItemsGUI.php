@@ -40,6 +40,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	public function executeCommand()
 	{
 		$this->plugin->includeClass('models/class.ilCoSubItem.php');
+		$this->plugin->includeClass('models/class.ilCoSubSchedule.php');
 
 		$next_class = $this->ctrl->getNextClass();
 		switch ($next_class)
@@ -174,7 +175,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function createItem()
 	{
-		$this->initItemForm('create');
+		$this->initItemForm();
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
@@ -183,11 +184,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveItem()
 	{
-		$this->initItemForm('create');
+		$this->initItemForm();
 		if ($this->form->checkInput())
 		{
 			$item = new ilCoSubItem();
 			$this->saveItemProperties($item);
+			$this->saveSchedulesProperties($item);
+
 			ilUtil::sendSuccess($this->plugin->txt('msg_item_created'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
@@ -205,8 +208,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		$this->ctrl->saveParameter($this, 'item_id');
 		$item = ilCoSubItem::_getById($_GET['item_id']);
-		$this->initItemForm('edit');
-		$this->loadItemProperties($item);
+		$schedules = ilCoSubSchedule::_getForObject($this->object->getId(), $_GET['item_id']);
+		$this->initItemForm($item, $schedules);
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
@@ -216,11 +219,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	protected function updateItem()
 	{
 		$this->ctrl->saveParameter($this, 'item_id');
-		$this->initItemForm('edit');
+		$item = ilCoSubItem::_getById($_GET['item_id']);
+		$schedules = ilCoSubSchedule::_getForObject($this->object->getId(), $_GET['item_id']);
+		$this->initItemForm($item, $schedules);
 		if ($this->form->checkInput())
 		{
 			$item = ilCoSubItem::_getById($_GET['item_id']);
 			$this->saveItemProperties($item);
+			$this->saveSchedulesProperties($item, $schedules);
 			ilUtil::sendSuccess($this->plugin->txt('msg_item_updated'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
@@ -301,13 +307,16 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 
 		$this->ctrl->saveParameter($this, 'item_id');
-		$this->initItemForm(empty($_GET['item_id']) ? 'create' : 'edit');
+
 
 		// get the existing properties
 		if (!empty($_GET['item_id']))
 		{
 			$item = ilCoSubItem::_getById($_GET['item_id']);
-			$this->loadItemProperties($item);
+		}
+		else
+		{
+			$item = new ilCoSubItem;
 		}
 
 		/** @var ilRepositorySelectorInputGUI $target_ref_id */
@@ -317,7 +326,10 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$target_ref_id = $target_input->getValue();
 
 		// unsaved item with values generated from the target object
-		$values = $targets->getItemForTarget($target_ref_id);
+		$item = $targets->getItemForTarget($target_ref_id, $item);
+		$schedules = $targets->getSchedulesForTarget($target_ref_id);
+
+		$this->initItemForm($item, $schedules);
 
 		if (!empty($values->title))
 		{
@@ -356,34 +368,45 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Init the Item form
-	 * @param string $a_mode    'edit' or 'create'
+	 * @param ilCoSubItem $a_item
+	 * @param ilCoSubSchedule[] $a_schedules
 	 */
-	protected function initItemForm($a_mode = 'edit')
+	protected function initItemForm($a_item = null, $a_schedules = array())
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		include_once('Services/Form/classes/class.ilRepositorySelectorInputGUI.php');
 		$this->form = new ilPropertyFormGUI();
+
+		if (!isset($a_item)) {
+			$a_item = new ilCoSubItem;
+		}
+		// add empty schedule to create a new schedule input
+		$a_schedules[] = new ilCoSubSchedule();
 
 		// target
 		$rs = new ilRepositorySelectorInputGUI($this->plugin->txt('target_object'), 'target_ref_id');
 		$rs->setClickableTypes($this->plugin->getAvailableTargetTypes());
 		$rs->setInfo($this->plugin->txt('target_object_info'));
 		$rs->setHeaderMessage($this->plugin->txt('select_target_object'));
+		$rs->setValue($a_item->target_ref_id);
 		$this->form->addItem($rs);
 
 		// title
 		$ti = new ilTextInputGUI($this->plugin->txt('title'), 'title');
 		$ti->setRequired(true);
+		$ti->setValue($a_item->title);
 		$this->form->addItem($ti);
 
 		// description
 		$ta = new ilTextAreaInputGUI($this->plugin->txt('description'), 'description');
+		$ta->setValue($a_item->description);
 		$this->form->addItem($ta);
 
 		// identifier
 		$ti = new ilTextInputGUI($this->plugin->txt('identifier'), 'identifier');
 		$ti->setInfo($this->plugin->txt('identifier_info'));
 		$ti->setRequired(false);
+		$ti->setValue($a_item->identifier);
 		$this->form->addItem($ti);
 
 		// category
@@ -395,6 +418,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$si = new ilSelectInputGUI($this->plugin->txt('category'), 'cat_id');
 		$si->setInfo($this->plugin->txt('category_info'));
 		$si->setOptions($cat_options);
+		$si->setValue($a_item->cat_id);
 		$this->form->addItem($si);
 
 		if ($this->object->getMethodObject()->hasMinSubscription())
@@ -405,6 +429,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$sm->setDecimals(0);
 			$sm->setSize(4);
 			$sm->setRequired(false);
+			$sm->setValue($a_item->sub_min);
 			$this->form->addItem($sm);
 		}
 
@@ -416,47 +441,113 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$sm->setDecimals(0);
 			$sm->setSize(4);
 			$sm->setRequired(false);
+			$sm->setValue($a_item->sub_max);
 			$this->form->addItem($sm);
 		}
-
-		// period
-		$period = new ilCheckboxInputGUI($this->plugin->txt('period'), 'period');
-		$period->setInfo($this->plugin->txt('period_info'));
-		$this->form->addItem($period);
-
-		// period start
-		$start = new ilDateTimeInputGUI($this->plugin->txt('period_start'),'period_start');
-		$start->setInfo($this->plugin->txt('period_start_info'));
-		$start->setDate(new ilDateTime(date('Y-m-d').' 08:00:00',IL_CAL_DATETIME));
-		$start->setRequired(true);
-		$start->setShowTime(true);
-		$period->addSubItem($start);
-
-		// period end
-		$end = new ilDateTimeInputGUI($this->plugin->txt('period_end'),'period_end');
-		$end->setInfo($this->plugin->txt('period_end_info'));
-		$end->setDate(new ilDateTime(date('Y-m-d').' 16:00:00',IL_CAL_DATETIME));
-		$end->setRequired(true);
-		$end->setShowTime(true);
-		$period->addSubItem($end);
 
 		// selectable
 		$selectable = new ilCheckboxInputGUI($this->plugin->txt('item_selectable'), 'selectable');
 		$selectable->setInfo($this->plugin->txt('item_selectable_info'));
+		$selectable->setChecked($a_item->selectable);
 		$this->form->addItem($selectable);
 
+		// schedules
+//		$sh = new ilFormSectionHeaderGUI();
+//		$sh->setTitle($this->plugin->txt('schedules'));
+//		$this->form->addItem($sh);
 
-		switch ($a_mode)
+		include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";
+		foreach ($a_schedules as $schedule)
 		{
-			case 'create':
-				$this->form->setTitle($this->plugin->txt('create_item'));
-				$this->form->addCommandButton('saveItem', $this->lng->txt('save'));
-				break;
+			$id = (int) $schedule->schedule_id;
 
-			case 'edit':
-				$this->form->setTitle($this->plugin->txt('edit_item'));
-				$this->form->addCommandButton('updateItem', $this->lng->txt('save'));
-				break;
+			$group = new ilRadioGroupInputGUI($this->plugin->txt('schedule'), 'schedule_' .$id);
+
+			$none = new ilRadioOption($this->plugin->txt('schedule_none'), 'none');
+			$group->addOption($none);
+
+			$single = new ilRadioOption($this->plugin->txt('schedule_single'), 'single');
+				//single start
+				$start = new ilDateTimeInputGUI($this->plugin->txt('period_start'),'period_start_'.$id);
+				if (isset($schedule->period_start)) {
+					$start->setDate(new ilDateTime($schedule->period_start, IL_CAL_UNIX));
+				}
+				else {
+					$start->setDate(new ilDateTime(date('Y-m-d').' 08:00:00',IL_CAL_DATETIME));
+				}
+				$start->setRequired(true);
+				$start->setShowTime(true);
+				$single->addSubItem($start);
+
+				// single end
+				$end = new ilDateTimeInputGUI($this->plugin->txt('period_end'),'period_end'.$id);
+				if (isset($schedule->period_end)) {
+					$end->setDate(new ilDateTime($schedule->period_end, IL_CAL_UNIX));
+				}
+				else {
+					$end->setDate(new ilDateTime(date('Y-m-d').' 16:00:00',IL_CAL_DATETIME));
+				}
+				$end->setRequired(true);
+				$end->setShowTime(true);
+				$single->addSubItem($end);
+
+			$group->addOption($single);
+
+			$multi = new ilRadioOption($this->plugin->txt('schedule_multi'), 'multi');
+
+				// multi first
+				$first = new ilDateTimeInputGUI($this->plugin->txt('period_first'),'period_first_'.$id);
+				if (isset($schedule->period_start)) {
+					$first->setDate(new ilDateTime($schedule->period_start, IL_CAL_UNIX));
+				}
+				else {
+					$first->setDate(new ilDateTime(date('Y-m-d').' 00:00:00',IL_CAL_DATETIME));
+				}
+				$first->setRequired(true);
+				$first->setShowTime(false);
+				$multi->addSubItem($first);
+
+				// multi last
+				$last = new ilDateTimeInputGUI($this->plugin->txt('period_last'),'period_last_'.$id);
+				if (isset($schedule->period_start)) {
+					$last->setDate(new ilDateTime($schedule->period_start, IL_CAL_UNIX));
+				}
+				else {
+					$last->setDate(new ilDateTime(date('Y-m-d').' 23:59:59',IL_CAL_DATETIME));
+				}
+				$last->setRequired(true);
+				$last->setShowTime(false);
+				$multi->addSubItem($last);
+
+
+				$slots = new ilScheduleInputGUI($this->plugin->txt("period_slots"), "slots_".$id);
+				$slots->setRequired(true);
+				$slots->setValue($schedule->getSlotsForInput());
+				$multi->addSubItem($slots);
+
+			$group->addOption($multi);
+
+			if (empty($id)) {
+				$group->setValue('none');
+			}
+			elseif (empty($schedule->slots)) {
+				$group->setValue('single');
+			}
+			else {
+				$group->setValue('multi');
+			}
+			$this->form->addItem($group);
+		}
+
+		if (empty($a_item->item_id))
+		{
+			$this->form->setTitle($this->plugin->txt('create_item'));
+			$this->form->addCommandButton('saveItem', $this->lng->txt('save'));
+		}
+		else
+		{
+			$this->form->setTitle($this->plugin->txt('edit_item'));
+			$this->form->addCommandButton('updateItem', $this->lng->txt('save'));
 		}
 
 		$this->form->addCommandButton('listItems', $this->lng->txt('cancel'));
@@ -613,25 +704,26 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$sub_max = $this->form->getInput('sub_max');
 			$a_item->sub_max = empty($sub_max) ? null : $sub_max;
 		}
-
-		if ($this->form->getInput('period'))
-		{
-			/** @var ilDateTimeInputGUI $start */
-			$start = $this->form->getItemByPostVar('period_start');
-			$a_item->period_start = $start->getDate()->get(IL_CAL_UNIX);
-
-			/** @var ilDateTimeInputGUI $end */
-			$end = $this->form->getItemByPostVar('period_end');
-			$a_item->period_end = $end->getDate()->get(IL_CAL_UNIX);
-		}
-		else
-		{
-			$a_item->period_start = null;
-			$a_item->period_end = null;
-		}
 		$a_item->selectable = $this->form->getInput('selectable');
 
 		return $a_item->save();
+	}
+
+	/**
+	 * Save the properties from the form to the schedules
+	 * @param ilCoSubItem $a_item
+	 * @param ilCoSubSchedule[] $a_schedules
+	 * @return  boolean       success
+	 */
+	protected function saveSchedulesProperties($a_item, $a_schedules = array())
+	{
+		// prepare a new schedule to be saved
+		$schedule = new ilCoSubSchedule();
+		$schedule->obj_id = $this->object->getId();
+		$schedule->item_id = $a_item->item_id;
+		$a_schedules[] = $schedule;
+
+
 	}
 
 	/**
