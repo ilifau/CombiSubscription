@@ -462,33 +462,40 @@ class ilCoSubImport
 				$item->sub_max = $rowdata['sub_max'];
 			}
 
-			if (!empty($rowdata['period_start']))
-			{
-				if (is_float($rowdata['period_start']))
-				{
-					$item->period_start = $this->excelTimeToUnix($rowdata['period_start']);
-				}
-				else
-				{
-					$start = new ilDateTime($rowdata['period_start'], IL_CAL_DATETIME);
-					$item->period_start = $start->get(IL_CAL_UNIX);
-				}
-			}
-
-			if (!empty($rowdata['period_end']))
-			{
-				if (is_float($rowdata['period_end']))
-				{
-					$item->period_end = $this->excelTimeToUnix($rowdata['period_end']);
-				}
-				else
-				{
-					$end = new ilDateTime($rowdata['period_end'], IL_CAL_DATETIME);
-					$item->period_end = $end->get(IL_CAL_UNIX);
-				}
-			}
-
 			$item->save();
+			$item->deleteSchedules();
+
+			if (empty($rowdata['period_start']) || empty ($rowdata['period_end']))
+			{
+				continue;
+			}
+
+			$this->plugin->includeClass('models/class.ilCoSubSchedule.php');
+			$schedule = new ilCoSubSchedule();
+			$schedule->obj_id = $item->obj_id;
+			$schedule->item_id = $item->item_id;
+
+			if (is_float($rowdata['period_start']))
+			{
+				$schedule->period_start = $this->excelTimeToUnix($rowdata['period_start']);
+			}
+			else
+			{
+				$start = new ilDateTime($rowdata['period_start'], IL_CAL_DATETIME);
+				$schedule->period_start = $start->get(IL_CAL_UNIX);
+			}
+
+			if (is_float($rowdata['period_end']))
+			{
+				$item->period_end = $this->excelTimeToUnix($rowdata['period_end']);
+			}
+			else
+			{
+				$end = new ilDateTime($rowdata['period_end'], IL_CAL_DATETIME);
+				$schedule->period_end = $end->get(IL_CAL_UNIX);
+			}
+
+			$schedule->save();
 		}
 	}
 

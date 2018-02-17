@@ -302,6 +302,7 @@ period_last#:#Ende
 period_slots#:#Wiederholungen
 schedules#:#Termine
 schedule#:#Termin
+schedule_x#:#Termin %s
 schedule_none#:#Kein Termin
 schedule_single#:#Einzeltermin
 schedule_multi#:#Terminreihe
@@ -323,3 +324,11 @@ remove_users#:#Nutzer entfernen
 remove_users_confirmation#:#Möchten Sie die folgenden Nutzer ganz aus der Anmeldung entfernen?
 remove_users_confirmation_details#:#Alle Auswahlen und Zuteilungen der Nutzer werden gelöscht. Die Nutzer werden über ihre Entfernung per E-Mail benachrichtigt.
 remove_users_done#:#Die Nutzer wurden entfernt.
+day_mo#:#Mo
+day_tu#:#Di
+day_we#:#Mi
+day_th#:#Do
+day_fr#:#Fr
+day_sa#:#Sa
+day_su#:#So
+slot_input_timezone#:#Die Zeitangaben der Terminreihe beziehen sich auf die Zeitzone "%s".

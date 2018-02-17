@@ -450,3 +450,15 @@
     $ilDB->addIndex('rep_robj_xcos_scheds', array('obj_id'), 'i1');
     $ilDB->createSequence('rep_robj_xcos_scheds');
 ?>
+<#20>
+<?php
+    if(!$ilDB->tableColumnExists('rep_robj_xcos_scheds', 'times'))
+    {
+        $ilDB->addTableColumn('rep_robj_xcos_scheds', 'times', array(
+                'type'    => 'text',
+                'length'  => 4000,
+                'notnull' => true,
+                'default' => 'a:0:{}')
+        );
+    }
+?>

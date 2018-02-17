@@ -123,13 +123,6 @@ class ilCombiSubscriptionTargets
 					$item->sub_min = $session->getRegistrationMinUsers();
 					$item->sub_max = $session->getRegistrationMaxUsers();
 				}
-				if ($session->getAppointments())
-				{
-					/** @var ilSessionAppointment $app */
-					$app = $session->getFirstAppointment();
-					$item->period_start = $app->getStart()->get(IL_CAL_UNIX);
-					$item->period_end = $app->getEnd()->get(IL_CAL_UNIX);
-				}
 				break;
 		}
 		return $item;
@@ -137,12 +130,32 @@ class ilCombiSubscriptionTargets
 
 	/**
 	 * Get a list of unsaved schedules for a target object
+	 *
 	 * @param $a_ref_id
 	 * @return ilCoSubSchedule[]
 	 */
 	public function getSchedulesForTarget($a_ref_id)
 	{
-		return array();
+		$this->plugin->includeClass('models/class.ilCoSubSchedule.php');
+
+		$schedules = array();
+		switch (ilObject::_lookupType($a_ref_id, true))
+		{
+			case 'sess':
+				require_once('Modules/Session/classes/class.ilObjSession.php');
+				$session = new ilObjSession($a_ref_id, true);
+				if ($session->getAppointments())
+				{
+					/** @var ilSessionAppointment $app */
+					$app = $session->getFirstAppointment();
+					$schedule = new ilCoSubSchedule();
+					$schedule->period_start = $app->getStart()->get(IL_CAL_UNIX);
+					$schedule->period_end = $app->getEnd()->get(IL_CAL_UNIX);
+					$schedules[] = $schedule;
+				}
+		}
+
+		return $schedules;
 	}
 
 	/**

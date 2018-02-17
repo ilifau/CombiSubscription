@@ -1,5 +1,7 @@
 <?php
 
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/CombiSubscription/classes/models/class.ilCoSubSchedule.php');
+
 /**
  * Item of a combined subscription
  */
@@ -35,14 +37,11 @@ class ilCoSubItem
 	/** @var  integer|null */
 	public $sub_max;
 
-	/** @var  integer|null */
-	public $period_start;
-
-	/** @var  integer|null */
-	public $period_end;
-
 	/** @var  bool */
 	public $selectable = true;
+
+	/** @var  ilCoSubSchedule[] */
+	public $schedules = null;
 
 	/**
 	 * Get item by id
@@ -172,8 +171,6 @@ class ilCoSubItem
 		$this->sort_position = $data['sort_position'];
 		$this->sub_min = $data['sub_min'];
 		$this->sub_max = $data['sub_max'];
-		$this->period_start = $data['period_start'];
-		$this->period_end = $data['period_end'];
 		$this->selectable = (bool) $data['selectable'];
 	}
 
@@ -214,8 +211,6 @@ class ilCoSubItem
 				'sort_position' => array('integer', $this->sort_position),
 				'sub_min' => array('integer', $this->sub_min),
 				'sub_max' => array('integer', $this->sub_max),
-				'period_start' => array('integer', $this->period_start),
-				'period_end' => array('integer', $this->period_end),
 				'selectable' => array('integer', $this->selectable)
 			)
 		);
@@ -223,21 +218,43 @@ class ilCoSubItem
 	}
 
 	/**
+	 * Get the schedules of the item
+	 * @return ilCoSubSchedule[]
+	 */
+	public function getSchedules()
+	{
+		if (!isset($this->schedules))
+		{
+			$this->schedules = ilCoSubSchedule::_getForObject($this->obj_id, $this->item_id);
+		}
+
+		return $this->schedules;
+	}
+
+
+	/**
+	 * Delete the schedules of the item
+	 */
+	public function deleteSchedules()
+	{
+		foreach ($this->getSchedules() as $schedule)
+		{
+			$schedule->delete();
+		}
+	}
+
+
+	/**
 	 * Get info about a period
 	 * @return string
 	 */
 	public function getPeriodInfo()
 	{
-		require_once('Services/Calendar/classes/class.ilDatePresentation.php');
-
-		if (empty($this->period_start) || empty($this->period_end))
+		$info = array();
+		foreach($this->getSchedules() as $schedule)
 		{
-			return '';
+			$info[] = $schedule->getPeriodInfo();
 		}
-
-		$start = new ilDateTime($this->period_start, IL_CAL_UNIX);
-		$end = new ilDateTime($this->period_end, IL_CAL_UNIX);
-
-		return ilDatePresentation::formatPeriod($start, $end);
+		return implode('; ', $info);
 	}
 }
