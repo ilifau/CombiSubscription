@@ -21,7 +21,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var  ilCoSubRun */
 	protected $run;
 
-	/** @var ilCoSubItem[] (indexed by item_id) */
+	/** @var array ilCoSubItem[] (indexed by item_id) */
 	protected $items = array();
 
 	/** @var  array 	item_id => item_id[] */
@@ -36,7 +36,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var array 		item_id => priority => count */
 	protected $priority_counts_item = array();
 
-	/**	@var ilCoSubUser[] (indexed by user_id) */
+	/**	@var array ilCoSubUser[] (indexed by user_id) */
 	protected $users;
 
 	/** @var array  	item_id => count */
@@ -205,7 +205,15 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->items = $this->object->getItems();
 		$this->conflicts = $this->object->getItemsConflicts();
 		$this->category_limits = $this->object->getCategoryLimits();
-		$this->users = $this->object->getUsers();
+		if ($this->plugin->withStudyCond())
+		{
+			$this->users = $this->object->getUsersForStudyCond();
+		}
+		else
+		{
+			$this->users = $this->object->getUsers();
+		}
+
 		$this->priorities = $this->object->getPriorities();
 		$this->priority_counts_item = $this->object->getPriorityCounts();
 
@@ -461,7 +469,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	protected function getSortedUsers()
 	{
-		$users  = array_keys($this->priorities);
+		$users  = array_keys($this->users);
 		shuffle($users);
 		return $users;
 	}

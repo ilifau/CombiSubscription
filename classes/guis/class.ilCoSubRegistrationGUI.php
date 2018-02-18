@@ -54,6 +54,29 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		// get the user for checking if it is fixed
 		$userObj = $this->object->getUser($ilUser->getId());
 
+		$intros = array();
+		if ($this->object->getExplanation())
+		{
+			$intros[] = $this->pageInfo($this->object->getExplanation());
+		}
+
+
+		// studydata conditions are avaiable
+		if ($this->plugin->withStudyCond())
+		{
+			require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
+
+			$intros[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
+
+			if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
+			{
+				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $ilUser->getId()))
+				{
+					ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
+				}
+			}
+		}
+
 		// check subscription period
 		if ($this->object->isBeforeSubscription())
 		{
@@ -71,11 +94,6 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			$this->disabled = true;
 		}
 
-		$intro = '';
-		if ($this->object->getExplanation())
-		{
-			$intro = $this->pageInfo($this->object->getExplanation());
-		}
 
 		$saved_priorities = $this->object->getPrioritiesOfUser($ilUser->getId());
 
@@ -125,7 +143,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		{
 			$form->setContent($this->getCatRegisterHTML($priorities));
 		}
-		$this->tpl->setContent($intro . $form->getHTML());
+		$this->tpl->setContent(implode('', $intros) . $form->getHTML());
 
 		// color coding of priorities
 		$this->tpl->addJavaScript($this->plugin->getDirectory().'/js/ilCombiSubscription.js');

@@ -54,6 +54,14 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
+	 * Check if study conditions are available
+	 */
+	public function withStudyCond()
+	{
+		return file_exists('Services/Membership/classes/class.ilSubscribersStudyCond.php');
+	}
+
+	/**
 	 * Get a global setting for a class (maintained in administration)
 	 * @param   string  $a_class
 	 * @param   string  $a_key

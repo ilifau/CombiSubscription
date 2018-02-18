@@ -27,6 +27,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	 */
 	protected $users;
 
+
 	/**
 	 * User priorities
 	 * @var array  (user_id => item_id => priority)
@@ -143,6 +144,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->priorities = $this->object->getPriorities();
 		$this->assignments = $this->object->getAssignments();
 
+		$users_for_studycond = $this->object->getUsersForStudyCond();
+
 		if (empty($this->users))
 		{
 			$this->setData(array());
@@ -170,7 +173,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				'result' => $this->object->getUserSatisfaction($user_id, 0),
 				'assignments' => 0,
 				'is_fixed' => $userObj->is_fixed,
-				'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId())
+				'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
+				'no_studycond' => !isset($users_for_studycond[$user_id])
 			);
 
 			foreach ($this->item_ids as $item_id)
@@ -268,6 +272,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		if (!$a_set['has_access'])
 		{
 			$this->tpl->setVariable('NO_ACCESS', $this->lng->txt('permission_denied'));
+		}
+		if ($a_set['no_studycond'])
+		{
+			$this->tpl->setVariable('NO_STUDYCOND', $this->plugin->txt('studycond_not_fulfilled'));
 		}
 		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
 		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));

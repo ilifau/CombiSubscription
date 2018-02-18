@@ -1085,6 +1085,41 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $this->users;
 	}
 
+	/**
+	 * Get a list of user objects (indexed by user_id) that satisfy the studidata condition
+	 * @return	array
+	 */
+	public function getUsersForStudyCond()
+	{
+		if (!$this->plugin->withStudyCond())
+		{
+			return $this->getUsers();
+		}
+
+		require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
+		$conditionsdata = ilSubscribersStudyCond::_getConditionsData($this->getId());
+		if (!count($conditionsdata))
+		{
+			return $this->getUsers();
+		}
+
+		$users = array();
+		foreach ($this->getUsers() as $user_id => $userObj)
+		{
+			$studydata = ilStudyAccess::_getStudyData($user_id);
+			if (!count($studydata))
+			{
+				continue;
+			}
+
+			if (ilStudyAccess::_checkConditions($conditionsdata, $studydata))
+			{
+				$users[$user_id] = $userObj;
+			}
+		}
+
+		return $users;
+	}
 
 	/**
 	 * Get details of seelcted users
