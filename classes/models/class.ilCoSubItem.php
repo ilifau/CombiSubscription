@@ -150,6 +150,12 @@ class ilCoSubItem
 			$clone->cat_id = $a_cat_map[$this->cat_id];
 		}
 		$clone->save();
+
+		// clone the schedules
+		foreach (ilCoSubSchedule::_getForObject($this->obj_id, $this->item_id) as $schedule) {
+			$schedule->saveClone($a_obj_id, array($this->item_id => $clone->item_id));
+		}
+
 		return $clone;
 	}
 

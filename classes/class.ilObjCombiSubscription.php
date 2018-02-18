@@ -207,6 +207,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		{
 			$item->saveClone($new_obj->getId(), $cat_map);
 		}
+
+		if ($this->plugin->withStudyCond())
+		{
+			require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
+			ilSubscribersStudyCond::_clone($this->getId(), $new_obj->getId());
+		}
 	}
 
 	/**
