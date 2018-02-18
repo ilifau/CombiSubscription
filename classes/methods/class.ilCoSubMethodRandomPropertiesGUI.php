@@ -114,8 +114,11 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->addItem($ni);
 
 		// out of conflict time
+		$global_seconds = (int) $this->plugin->getOutOfConflictTime();
+		$global_minutes = (int) ($global_seconds / 60);
+
 		$di = new ilDurationInputGUI($this->method->txt('out_of_conflict_time'), 'out_of_conflict_time');
-		$di->setInfo($this->method->txt('out_of_conflict_time_info'));
+		$di->setInfo(sprintf($this->method->txt('out_of_conflict_time_info'), $global_minutes));
 		$di->setShowMonths(false);
 		$di->setShowDays(false);
 		$di->setShowHours(true);
@@ -136,7 +139,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->getItemByPostVar('one_per_priority')->setChecked($this->method->one_per_priority);
 		$this->form->getItemByPostVar('number_assignments')->setValue($this->method->number_assignments);
 
-		$seconds = (int) $this->method->getOutOfConflictTime();
+		$seconds = (int) max($this->method->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
 		$hours = (int) ($seconds / 3600);
 		$seconds = $seconds % 3600;
 		$minutes = (int) ($seconds / 60);
@@ -156,7 +159,8 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 
 		/** @var ilDurationInputGUI $di */
 		$di = $this->form->getItemByPostVar('out_of_conflict_time');
-		$this->method->out_of_conflict_time = $di->getHours() * 3600 + $di->getMinutes() * 60;
+		$seconds = $di->getHours() * 3600 + $di->getMinutes() * 60;
+		$this->method->out_of_conflict_time = max($seconds, $this->plugin->getOutOfConflictTime());
 
 		$this->method->saveProperties();
 	}

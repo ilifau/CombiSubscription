@@ -457,8 +457,34 @@
         $ilDB->addTableColumn('rep_robj_xcos_scheds', 'times', array(
                 'type'    => 'text',
                 'length'  => 4000,
-                'notnull' => true,
-                'default' => 'a:0:{}')
+                'notnull' => false
+            )
         );
     }
+?>
+<#21>
+<?php
+    $query = "SELECT item_id, obj_id, period_start, period_end FROM rep_robj_xcos_items WHERE period_start IS NOT NULL";
+    $result = $ilDB->query($query);
+
+    while ($row = $ilDB->fetchAssoc($result))
+    {
+		$times = substr(sprintf('%010d',$row['period_start']). sprintf('%010d',$row['period_end']), 0, 20);
+
+        $schedule_id = $ilDB->nextId('rep_robj_xcos_scheds');
+        $ilDB->insert('rep_robj_xcos_scheds', array(
+            'schedule_id' => array('integer', $schedule_id),
+            'obj_id' => array('integer', $row['obj_id']),
+            'item_id' => array('integer', $row['item_id']),
+            'period_start' => array('integer', $row['period_start']),
+            'period_end' => array('integer', $row['period_end']),
+            'slots' => array('text', serialize(array())),
+            'times' => array('text', $times),
+        ));
+    }
+?>
+<#22>
+<?php
+    $ilDB->dropTableColumn('rep_robj_xcos_items', 'period_start');
+    $ilDB->dropTableColumn('rep_robj_xcos_items', 'period_end');
 ?>

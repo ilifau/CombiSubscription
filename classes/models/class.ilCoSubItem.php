@@ -116,23 +116,22 @@ class ilCoSubItem
 	 * Check if two items have a period conflict
 	 * @param self $item1
 	 * @param self $item2
-	 * @param int $buffer
+	 * @param int $buffer	needed free time between appointments in seconds
 	 * @return bool
 	 */
-	public static function _haveConflict($item1, $item2, $buffer = 3600)
+	public static function _haveConflict($item1, $item2, $buffer)
 	{
-		// no conflict if period is not fully defined
-		if (empty($item1->period_start) || empty($item1->period_end) || empty($item2->period_start) || empty($item2->period_end))
+		foreach ($item1->getSchedules() as $schedule1)
 		{
-			return false;
+			foreach ($item2->getSchedules() as $schedule2)
+			{
+				if (ilCoSubSchedule::_haveConflict($schedule1, $schedule2, $buffer))
+				{
+					return true;
+				}
+			}
 		}
 
-		// check if start of one item is in the period of the other item
-		if (($item1->period_start >= $item2->period_start && $item1->period_start < $item2->period_end + $buffer) ||
-			($item2->period_start >= $item1->period_start && $item2->period_start < $item1->period_end + $buffer))
-		{
-			return true;
-		}
 		return false;
 	}
 

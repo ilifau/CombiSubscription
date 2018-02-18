@@ -5,6 +5,7 @@
  */
 class ilCoSubSchedule
 {
+	const MAX_TIMES = 200;
 
 	/** @var  integer */
 	public $schedule_id;
@@ -24,7 +25,11 @@ class ilCoSubSchedule
 	/** @var array  '10:00-12:00' => ['mo', 'tu', ...] */
 	public $slots = array();
 
-	/** @var array  [[(int) start, (int) end], ... ] */
+	/**
+	 * Calculated times from the period and slots
+	 * 200 times can be stored per schedule
+	 * @var array  [[(int) start, (int) end], ... ]
+	 */
 	protected $times = array();
 
 	/**
@@ -133,10 +138,7 @@ class ilCoSubSchedule
 		if (is_array($slots)) {
 			$this->slots = $slots;
 		}
-		$times = @unserialize($data['times']);
-		if (is_array($times)) {
-			$this->times = $times;
-		}
+		$this->times = self::_timesFromString($data['times']);
 	}
 
 	/**
@@ -168,8 +170,7 @@ class ilCoSubSchedule
 				'period_start' => array('integer', $this->period_start),
 				'period_end' => array('integer', $this->period_end),
 				'slots' => array('text', serialize($this->slots)),
-				'times' => array('text', serialize($this->times))
-
+				'times' => array('text', self::_timesToString($this->times))
 			)
 		);
 		return $rows > 0;
@@ -199,6 +200,9 @@ class ilCoSubSchedule
 			return '';
 		}
 
+		// for debugging: show all single times
+		//return $this->getTimesInfo();
+
 		// single schedule
 		if (empty($this->slots))
 		{
@@ -207,14 +211,11 @@ class ilCoSubSchedule
 			return ilDatePresentation::formatPeriod($start, $end);
 		}
 
-		// for debugging: show all single times
-		// return $this->getTimesInfo();
-
 		// multiple schedule
 		$defZone = ilTimeZone::_getInstance(ilTimeZone::_getDefaultTimeZone());
 
-		$start = self::dayDate($this->period_start, $defZone);
-		$end =  self::dayDate($this->period_end, $defZone);
+		$start = self::_dayDate($this->period_start, $defZone);
+		$end =  self::_dayDate($this->period_end, $defZone);
 		$period = ilDatePresentation::formatPeriod($start, $end);
 
 		$slotinfo = array();
@@ -246,6 +247,14 @@ class ilCoSubSchedule
 			$info[] =  ilDatePresentation::formatPeriod($start, $end);
 		}
 		return implode("; ", $info);
+	}
+
+	/**
+	 * Get the number of calculated times
+	 */
+	public function getTimesCount()
+	{
+		return count($this->times);
 	}
 
 
@@ -286,8 +295,8 @@ class ilCoSubSchedule
 		$defZone = ilTimeZone::_getInstance(ilTimeZone::_getDefaultTimeZone());
 
 		// ensure that start and end date have 00:00:00 in the default timezone
-		$start = self::dayStart($this->period_start, $defZone->getIdentifier());
-		$end = self::dayStart($this->period_end, $defZone->getIdentifier());
+		$start = self::_dayStart($this->period_start, $defZone->getIdentifier());
+		$end = self::_dayStart($this->period_end, $defZone->getIdentifier());
 
 		// save the truncated start and end times
 		$this->period_start = $start->get(IL_CAL_UNIX);
@@ -352,7 +361,7 @@ class ilCoSubSchedule
 	 * @param string $tz timezone identifier
 	 * @return ilDateTime
 	 */
-	public static function dayStart($timestamp, $tz = '')
+	public static function _dayStart($timestamp, $tz = '')
 	{
 		$orig = new ilDateTime($timestamp, IL_CAL_UNIX);
 		return new ilDateTime($orig->get(IL_CAL_DATE, $tz). ' 00:00:00', IL_CAL_DATETIME, $tz);
@@ -367,9 +376,77 @@ class ilCoSubSchedule
 	 * @param string $tz timezone identifier
 	 * @return ilDate
 	 */
-	public static function dayDate($timestamp, $tz = '')
+	public static function _dayDate($timestamp, $tz = '')
 	{
 		$orig = new ilDateTime($timestamp, IL_CAL_UNIX);
 		return new ilDate($orig->get(IL_CAL_DATE, $tz), IL_CAL_DATE);
+	}
+
+	/**
+	 * Check if two schedules have a period conflict
+	 * @param self $schedule1
+	 * @param self $schedule2
+	 * @param int $buffer	needed free time between appointments in seconds
+	 * @return bool
+	 */
+	public static function _haveConflict($schedule1, $schedule2, $buffer)
+	{
+		foreach ($schedule1->times as $time1)
+		{
+			foreach ($schedule2->times as $time2)
+			{
+				// check if start of one timespan is in the period of the other
+				if (
+					// start of time1 is in period of times plus buffer
+					($time1[0] >= $time2[0] && $time1[0] < $time2[1] + $buffer) ||
+					// start of times2 is in period of times1 plus buffer
+					($time2[0] >= $time1[0] && $time2[0] < $time1[1] + $buffer))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get a string representation of times
+	 * (one timespan needs 20 characters)
+	 * @param array
+	 * @return string
+	 */
+	public static function _timesToString($times)
+	{
+		$string = '';
+		foreach ($times as $time)
+		{
+			$string .= substr(sprintf('%010d',$time[0]). sprintf('%010d',$time[1]), 0, 20);
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Get the times from a string representation
+	 * @param string
+	 * @return array
+	 */
+	public static function _timesFromString($string)
+	{
+		if (empty($string)) {
+			return array();
+		}
+
+		$times = array();
+		foreach (str_split($string, 20) as $chunk)
+		{
+			$times[] = array(
+				(int) substr($chunk, 0, 10),
+				(int) substr($chunk, 10, 10)
+			);
+		}
+
+		return $times;
 	}
 }

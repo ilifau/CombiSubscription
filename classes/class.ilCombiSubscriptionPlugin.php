@@ -36,6 +36,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 		$ilDB->dropTable('rep_robj_xcos_data');
 		$ilDB->dropTable('rep_robj_xcos_items');
+		$ilDB->dropTable('rep_robj_xcos_scheds');
 		$ilDB->dropTable('rep_robj_xcos_choices');
 		$ilDB->dropTable('rep_robj_xcos_runs');
 		$ilDB->dropTable('rep_robj_xcos_ass');
@@ -91,6 +92,37 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 			$settings_obj = new ilSetting($a_class);
 			self::$settings[$a_class] = new ilSetting($a_class);;
 		}
+	}
+
+	/**
+	 * Get a global setting for this method
+	 * @param   string  $a_key
+	 * @param   string  $a_default_value
+	 * @return string	value
+	 */
+	public static function _getSetting($a_key, $a_default_value = '')
+	{
+		return ilCombiSubscriptionPlugin::_getClassSetting('ilObjCombiSubscription', $a_key, $a_default_value);
+	}
+
+	/**
+	 * Set a global setting for this method
+	 * @param string  $a_key
+	 * @param string  $a_value
+	 */
+	public static function _setSetting($a_key, $a_value)
+	{
+		ilCombiSubscriptionPlugin::_setClassSetting('ilObjCombiSubscription', $a_key, $a_value);
+	}
+
+
+	/**
+	 * Get the configured time buffer for conflict recognition
+	 * @return int
+	 */
+	public function getOutOfConflictTime()
+	{
+		return (int) self::_getSetting('out_of_conflict_time');
 	}
 }
 ?>

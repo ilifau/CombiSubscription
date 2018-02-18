@@ -329,7 +329,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$item = $targets->getItemForTarget($target_ref_id, $item);
 
 		// unsaved schedules with values generated from the target object
-		// todo: form handling only support one unsaved schdule without schedule_id
+		// todo: form handling only support one unsaved schedule without schedule_id
 		$schedules = $targets->getSchedulesForTarget($target_ref_id);
 
 		$this->initItemForm($item, $schedules);
@@ -473,7 +473,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				// multi first
 				$first = new ilDateTimeInputGUI($this->plugin->txt('period_first'),'period_first_'.$id);
 				if (isset($schedule->period_start)) {
-					$first->setDate(ilCoSubSchedule::dayDate($schedule->period_start));
+					$first->setDate(ilCoSubSchedule::_dayDate($schedule->period_start));
 				}
 				else {
 					$first->setDate(new ilDate(date('Y-m-d'),IL_CAL_DATE));
@@ -485,7 +485,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				// multi last
 				$last = new ilDateTimeInputGUI($this->plugin->txt('period_last'),'period_last_'.$id);
 				if (isset($schedule->period_start)) {
-					$last->setDate(ilCoSubSchedule::dayDate($schedule->period_end));
+					$last->setDate(ilCoSubSchedule::_dayDate($schedule->period_end));
 				}
 				else {
 					$last->setDate(new ilDate(date('Y-m-d'),IL_CAL_DATE));
@@ -696,6 +696,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 					$schedule->period_end = $end->get(IL_CAL_UNIX);
 					$schedule->setSlotsFromInput(ilScheduleInputGUI::getPostData('slots_'.$id));
 					$schedule->save();
+
+					if ($schedule->getTimesCount() > ilCoSubSchedule::MAX_TIMES) {
+						ilUtil::sendInfo(sprintf($this->plugin->txt('message_too_many_schedule_times'),
+							$schedule->getPeriodInfo(), $schedule->getTimesCount(), ilCoSubSchedule::MAX_TIMES), true);
+					}
 					break;
 
 				case 'none':

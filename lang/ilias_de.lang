@@ -167,7 +167,7 @@ ilcosubmethodrandom_one_per_priority_info#:#Bei der Anmeldung muss für jede Pri
 ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen, wird sie als nicht erfüllt angezeigt.
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
-ilcosubmethodrandom_out_of_conflict_time_info#:#Minimale Zeitspanne zwischen Terminen, die nicht als Konflikt erkannt werden sollen.
+ilcosubmethodrandom_out_of_conflict_time_info#:#Minimale Zeitspanne zwischen Terminen, die nicht als Konflikt erkannt werden sollen. Sie muss größer oder gleich %s Minuten sein.
 show_bars#:#Balken zeigen
 show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben
@@ -332,3 +332,6 @@ day_fr#:#Fr
 day_sa#:#Sa
 day_su#:#So
 slot_input_timezone#:#Die Zeitangaben der Terminreihe beziehen sich auf die Zeitzone "%s".
+out_of_conflict_time#:#Mimimaler Termin-Abstand
+out_of_conflict_time_info#:#Minimale Zeitspanne (Sekunden) zwischen Terminen, die nicht als Konflikt erkannt werden sollen.
+message_too_many_schedule_times#:#Die Terminreihe "%s" erzeugt %s Termine. Zur Erkennung von Überschneidungen werden nur die ersten %s davon beachtet!

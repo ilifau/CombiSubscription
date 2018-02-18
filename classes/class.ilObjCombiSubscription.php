@@ -686,7 +686,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getItemsConflicts()
 	{
-		$buffer = $this->getMethodObject()->getOutOfConflictTime();
+		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
 
 		if (!isset($this->conflicts))
 		{

@@ -11,8 +11,22 @@ include_once('./Services/Component/classes/class.ilPluginConfigGUI.php');
  */
 class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 {
+
+	/** @var  ilCombiSubscriptionPlugin */
+	protected $plugin;
+
 	/** @var  ilCtrl */
 	protected $ctrl;
+
+	/** @var ilTemplate */
+	protected $tpl;
+
+	/** @var ilLanguage */
+	protected $lng;
+
+	/** @var ilPropertyFormGUI */
+	protected $form;
+
 
 
 	/**
@@ -20,8 +34,11 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	 */
 	public function __construct()
 	{
-		global $ilCtrl;
+		global $ilCtrl, $tpl, $lng;
+
 		$this->ctrl = $ilCtrl;
+		$this->tpl = $tpl;
+		$this->lng = $lng;
 	}
 
 	/**
@@ -29,21 +46,24 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	 */
 	function performCommand($cmd)
 	{
+		// now available
+		$this->plugin = $this->getPluginObject();
+
 		$this->setTabs();
 
-		$next_class = $class ? $class : $this->ctrl->getNextClass();
+		$next_class = $this->ctrl->getNextClass();
 		if (!empty($next_class))
 		{
-			$this->plugin_object->includeClass('abstract/class.ilCoSubMethodBaseConfigGUI.php');
+			$this->plugin->includeClass('abstract/class.ilCoSubMethodBaseConfigGUI.php');
 
 			switch ($next_class)
 			{
 				case 'ilcosubmethodeattsconfiggui':
 					$this->setSubTabs('methods','eatts');
-					$this->plugin_object->includeClass('abstract/class.ilCoSubMethodBase.php');
-					$this->plugin_object->includeClass('methods/class.ilCoSubMethodEATTS.php');
-					$this->plugin_object->includeClass('methods/class.ilCoSubMethodEATTSConfigGUI.php');
-					$this->ctrl->forwardCommand(new ilCoSubMethodEATTSConfigGUI($this->plugin_object));
+					$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
+					$this->plugin->includeClass('methods/class.ilCoSubMethodEATTS.php');
+					$this->plugin->includeClass('methods/class.ilCoSubMethodEATTSConfigGUI.php');
+					$this->ctrl->forwardCommand(new ilCoSubMethodEATTSConfigGUI($this->plugin));
 					return;
 
 				default:
@@ -64,6 +84,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 					break;
 
 				case "configure":
+				case "updateProperties":
 					$this->$cmd();
 					break;
 
@@ -83,8 +104,8 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	{
 		global $ilTabs;
 
-		$ilTabs->addTab('basic', $this->plugin_object->txt('basic_configuration'), $this->ctrl->getLinkTarget($this, 'configure'));
-		$ilTabs->addTab('methods', $this->plugin_object->txt('assignment_methods'), $this->ctrl->getLinkTarget($this, 'methods'));
+		$ilTabs->addTab('basic', $this->plugin->txt('basic_configuration'), $this->ctrl->getLinkTarget($this, 'configure'));
+		$ilTabs->addTab('methods', $this->plugin->txt('assignment_methods'), $this->ctrl->getLinkTarget($this, 'methods'));
 	}
 
 	/**
@@ -103,7 +124,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 				break;
 
 			case 'methods':
-				$ilTabs->addSubTab('eatts', $this->plugin_object->txt('ilcosubmethodeatts_title'), $this->ctrl->getLinkTargetByClass('ilCoSubMethodEATTSConfigGUI'));
+				$ilTabs->addSubTab('eatts', $this->plugin->txt('ilcosubmethodeatts_title'), $this->ctrl->getLinkTargetByClass('ilCoSubMethodEATTSConfigGUI'));
 				break;
 		}
 
@@ -120,11 +141,69 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	 */
 	function configure()
 	{
-		global $tpl;
-
-		$pl = $this->getPluginObject();
-		ilUtil::sendInfo($pl->txt("nothing_to_configure"), false);
-		return;
+		$this->initPropertiesForm();
+		$this->loadPropertiesValues();
+		$this->tpl->setContent($this->form->getHTML());
 	}
+
+
+	/**
+	 * Update the properties
+	 */
+	protected function updateProperties()
+	{
+		$this->initPropertiesForm();
+		if ($this->form->checkInput())
+		{
+			$this->savePropertiesValues();
+			ilUtil::sendSuccess($this->lng->txt('msg_obj_modified'), true);
+			$this->ctrl->redirect($this, 'configure');
+		}
+		else
+		{
+			$this->form->setValuesByPost();
+			$this->tpl->setContent($this->form->getHTML());
+		}
+	}
+
+	/**
+	 * Inot the properties form
+	 */
+	protected function initPropertiesForm()
+	{
+		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
+		$this->form = new ilPropertyFormGUI();
+		$this->form->setFormAction($this->ctrl->getFormAction($this));
+		$this->form->setTitle($this->plugin->txt('plugin_configuration'));
+
+
+
+		$ni = new ilNumberInputGUI($this->plugin->txt('out_of_conflict_time'),'out_of_conflict_time');
+		$ni->setInfo($this->plugin->txt('out_of_conflict_time_info'));
+		$ni->setRequired(true);
+		$ni->setSize(10);
+		$this->form->addItem($ni);
+
+		$this->form->addCommandButton('updateProperties', $this->lng->txt('save'));
+	}
+
+
+	/**
+	 * Load the properties values in the form
+	 */
+	protected function loadPropertiesValues()
+	{
+		$this->form->getItemByPostVar('out_of_conflict_time')->setValue(
+			ilCombiSubscriptionPlugin::_getSetting('out_of_conflict_time', 1200));
+	}
+
+	/**
+	 * Save the properties values from the form
+	 */
+	protected function savePropertiesValues()
+	{
+		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('out_of_conflict_time'));
+	}
+
 }
 ?>
