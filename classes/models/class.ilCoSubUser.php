@@ -67,6 +67,30 @@ class ilCoSubUser
 		return $users;
 	}
 
+	/**
+	 * Get all users for an user as an indexed array
+	 * @param integer       	$a_user_id
+	 * @return array        obj_id => ilCoSubUser
+	 */
+	public static function _getForUser($a_user_id)
+	{
+		global $ilDB;
+
+		$query = 'SELECT * FROM rep_robj_xcos_users'
+			.' WHERE user_id = '. $ilDB->quote($a_user_id,'integer');
+
+		$result = $ilDB->query($query);
+
+		$users = array();
+		while ($row = $ilDB->fetchAssoc($result))
+		{
+			$obj = new ilCoSubUser;
+			$obj->fillData($row);
+			$users[$obj->obj_id] = $obj;
+		}
+		return $users;
+	}
+
 
 	/**
 	 * Delete all users for an object

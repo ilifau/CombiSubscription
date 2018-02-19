@@ -43,6 +43,29 @@ class ilCoSubChoice
 
 
 	/**
+	 * Get all choices for an object and user as an indexed array
+	 * @param integer       $a_obj_id
+	 * @param integer		$a_user_id
+	 * @return array       item_id => choice_id
+	 */
+	public static function _getIdsByItem($a_obj_id, $a_user_id)
+	{
+		global $ilDB;
+
+		$query = 'SELECT * FROM rep_robj_xcos_choices'
+			.' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
+			.' AND user_id = ' . $ilDB->quote($a_user_id,'integer');
+
+		$choices = array();
+		$res = $ilDB->query($query);
+		while ($row = $ilDB->fetchAssoc($res))
+		{
+			$choices[$row['item_id']] = $row['choice_id'];
+		}
+		return $choices;
+	}
+
+	/**
 	 * Get the user priorities for an object as an indexed array
 	 * @param integer       object id
 	 * @param integer|null  user_id (optional)

@@ -80,6 +80,30 @@ class ilCoSubAssign
 		return $assignments;
 	}
 
+	/**
+	 * Get all assignment ids for an object and user as an indexed array
+	 * @param integer       $a_obj_id
+	 * @param integer		$a_user_id
+	 * @return array       item_id => run_id => assign_id (run_id = 0 for the chosen assignments)
+	 */
+	public static function _getIdsByItemAndRun($a_obj_id, $a_user_id)
+	{
+		global $ilDB;
+
+		$query = 'SELECT * FROM rep_robj_xcos_ass'
+			.' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
+			.' AND user_id = ' . $ilDB->quote($a_user_id,'integer');
+
+		$assignments = array();
+		$res = $ilDB->query($query);
+		while ($row = $ilDB->fetchAssoc($res))
+		{
+			$run_id = isset($row['run_id']) ? $row['run_id'] : 0;
+			$assignments[$row['item_id']][$run_id] = $row['assign_id'];
+		}
+		return $assignments;
+	}
+
 
 	/**
 	 * Delete all assignments for a parent object id
