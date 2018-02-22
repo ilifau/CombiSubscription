@@ -88,9 +88,15 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 	/**
 	 * Send the notifications about Assignments
 	 * Object and plugin must be set before
+	 * @param array 	$removedConflicts  user_id => obj_id => item
 	 */
-	public function sendAssignments()
+	public function sendAssignments($removedConflicts = array())
 	{
+		require_once('Services/Link/classes/class.ilLink.php');
+
+		/** @var ilAccessHandler $ilAccess */
+		global $ilAccess;
+
 		$users = array_keys($this->object->getPriorities());
 		$assignments = $this->object->getAssignments();
 
@@ -130,7 +136,32 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 				$this->appendBody("\n");
 			}
 
-			$this->appendBody($this->txt('mail_signature')."\n");
+			if(!empty($removedConflicts[$user_id]))
+			{
+				$this->appendBody($this->txt('mail_notify_removed_conflicts')."\n\n");
+
+				foreach($removedConflicts[$user_id] as $obj_id => $conflictItems)
+				{
+					$title = ilObject::_lookupTitle($obj_id);
+					foreach(ilObject::_getAllReferences($obj_id) as $ref_id)
+					{
+						if ($ilAccess->checkAccessOfUser($user_id, 'visible', '', $ref_id))
+						{
+							$title = '<a href="' . ilLink::_getStaticLink($ref_id, 'xcos') . '">' . $title .'/<a>';
+							break;
+						}
+					}
+					$this->appendBody($title."\n");
+
+					/** @var ilCoSubItem $conflictItem */
+					foreach ($conflictItems as $conflictItem)
+					{
+						$this->appendBody(' * ' . $conflictItem->title . ' '. $conflictItem->getPeriodInfo(). "\n");
+					}
+				}
+			}
+
+			$this->appendBody("\n\n" .$this->txt('mail_signature')."\n");
 			$this->appendBody($this->createPermanentLink());
 
 			$this->getMail()->appendInstallationSignature(true);

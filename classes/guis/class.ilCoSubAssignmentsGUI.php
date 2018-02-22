@@ -335,7 +335,9 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 
 	/**
-	 * Add the currently assigned users as members
+	 * Add the assigned users as members
+	 * This fixes the assigned users and removes their conflicting subscriptions in other objects
+	 * The assigned users are notified
 	 */
 	public function transferAssignments()
 	{
@@ -343,6 +345,15 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 		$targets_obj->addAssignedUsersAsMembers();
 		$targets_obj->addNonAssignedUsersAsSubscribers();
+
+		$this->object->fixAssignedUsers();
+		$removedConflicts = $this->object->removeConflicts();
+
+		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+		$notification = new ilCombiSubscriptionMailNotification();
+		$notification->setPlugin($this->plugin);
+		$notification->setObject($this->object);
+		$notification->sendAssignments($removedConflicts);
 
 		$this->object->setClassProperty(get_class($this), 'transfer_time', time());
 		$this->ctrl->redirect($this,'editAssignments');
@@ -368,14 +379,18 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Notify the users about their Assignments
+	 * This fixes the assigned users and removes their conflicting subscriptions in other objects
 	 */
 	public function notifyAssignments()
 	{
+		$this->object->fixAssignedUsers();
+		$removedConflicts = $this->object->removeConflicts();
+
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this->object);
-		$notification->sendAssignments();
+		$notification->sendAssignments($removedConflicts);
 
 		$this->object->setClassProperty(get_class($this), 'notify_time', time());
 		$this->ctrl->redirect($this,'editAssignments');

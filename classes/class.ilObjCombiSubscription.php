@@ -319,7 +319,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get if bars should be shown on the registratin screen
-	 * @return $bool
+	 * @return bool
 	 */
 	public function getShowBars()
 	{
@@ -1212,6 +1212,21 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	}
 
 	/**
+	 * Set all users with assignments to 'fixed'
+	 */
+	public function fixAssignedUsers()
+	{
+		foreach ($this->getUsers() as $subUser)
+		{
+			if ($this->getAssignmentsOfUser($subUser->user_id))
+			{
+				$subUser->is_fixed = true;
+				$subUser->save();
+			}
+		}
+	}
+
+	/**
 	 * Remove all user related data choices, runs and assignments
 	 */
 	public function removeUserData()
@@ -1226,67 +1241,100 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	}
 
 
-
+	/**
+	 * Remove conflicting choices and assignments from other combi subscriptions
+	 * @return array 	removed conflicts  user_id => obj_id => item
+	 */
 	public function removeConflicts()
 	{
+		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
+
 		$items[$this->getId()] = $this->getItems();
 
-		/** @var array local_item_id => external_item_id  => conflict (true/false) */
+		/** @var array other_item_id => local_item_id  => conflict (true|false|null) */
 		$conflicts = array();
+
+		/** @var array user_id => obj_id => item  */
+		$removedConflicts = array();
 
 		// loop over users in this object
 		foreach (array_keys($this->getUsers()) as $user_id)
 		{
-			$checkItems = array();
+			$localItems = array();
 			foreach (array_keys($this->getAssignmentsOfUser($user_id)) as $item_id)
 			{
 				/** @var ilCoSubItem $item */
 				$item = $items[$this->getId()][$item_id];
 				if (isset($item) && !empty($item->getSchedules()))
 				{
-					$checkItems[] = $item;
+					$localItems[$item_id] = $item;
 				}
 			}
 
  			// nothing to compare for the user
- 			if (empty($checkItems))
+ 			if (empty($localItems))
 			{
 				continue;
 			}
 
-			// loop over combi subscriptions for the user
-			/** @var ilCoSubUser $userObj */
-			foreach (ilCoSubUser::_getForUser($user_id) as $userObj)
+			// loop over  other combi subscriptions for the user
+			/** @var ilCoSubUser $subUser */
+			foreach (ilCoSubUser::_getForUser($user_id) as $subUser)
 			{
 				// object can be ignored
-				if ($userObj->obj_id == $this->getId() || $userObj->is_fixed)
+				if ($subUser->obj_id == $this->getId() || $subUser->is_fixed)
 				{
 					continue;
 				}
 
 				// load the items of the object (may already be loaded for another user)
-				if (!isset($items[$userObj->obj_id]))
+				if (!isset($items[$subUser->obj_id]))
 				{
-					$items[$userObj->obj_id] = ilCoSubItem::_getForObject($userObj->obj_id);
+					$items[$subUser->obj_id] = ilCoSubItem::_getForObject($subUser->obj_id);
 				}
 
-				$choice_ids = ilCoSubChoice::_getIdsByItem($userObj->obj_id, $userObj->user_id);
-				$assign_ids = ilCoSubAssign::_getIdsByItemAndRun($userObj->obj_id, $userObj->user_id);
+				$choice_ids = ilCoSubChoice::_getIdsByItem($subUser->obj_id, $subUser->user_id);
+				$assign_ids = ilCoSubAssign::_getIdsByItemAndRun($subUser->obj_id, $subUser->user_id);
 
-				/** @var  ilCoSubItem $item */
-				foreach ($items[$userObj->obj_id] as $item_id => $item)
+				/** @var  ilCoSubItem $otherItem */
+				foreach ($items[$subUser->obj_id] as $other_item_id => $otherItem)
 				{
 					// item can be ignored
-					if ((!isset($choice_ids[$item_id]) && !isset($assign_ids[$item_id])) || empty($item->getSchedules()))
+					if ((!isset($choice_ids[$other_item_id]) && !isset($assign_ids[$other_item_id])) || empty($otherItem->getSchedules()))
 					{
 						continue;
 					}
+
+					/** @var  ilCoSubItem $localItem */
+					foreach ($localItems as $local_item_id => $localItem)
+					{
+						if (!isset($conflicts[$other_item_id][$local_item_id]))
+						{
+							$conflicts[$other_item_id][$local_item_id] = ilCoSubItem::_haveConflict($otherItem, $localItem, $buffer);
+						}
+
+						if ($conflicts[$other_item_id][$local_item_id])
+						{
+							if (!empty($choice_ids[$other_item_id]))
+							{
+								ilCoSubChoice::_deleteById($choice_ids[$other_item_id]);
+							}
+
+							if (!empty($assign_ids[$other_item_id]))
+							{
+								foreach ($assign_ids[$other_item_id] as $run => $assign_id)
+								{
+									ilCoSubAssign::_deleteById($assign_ids[$other_item_id]);
+								}
+							}
+
+							$removedConflicts[$subUser->user_id][$subUser->obj_id][$other_item_id] = $otherItem;
+						}
+					}
 				}
-
 			}
-
 		}
 
-
+		return $removedConflicts;
 	}
 }

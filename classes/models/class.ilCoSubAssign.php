@@ -49,7 +49,7 @@ class ilCoSubAssign
 
 	/**
 	 * Delete an assignment by its id
-	 * @param integer assign_id
+	 * @param integer $a_id
 	 */
 	public static function _deleteById($a_id)
 	{

@@ -181,10 +181,10 @@ mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getrof
 mail_removal_subject#:#Ihre Anmeldung bei "%s"
 mail_removal_message#:#Ihre Anmeldung wurde gelöscht.
 transfer_assignments#:#Auf Kurse/Gruppen/Sitzungen übertragen
-transfer_assignments_confirmation#:#Sollen die zugeteilten Nutzer als Mitglieder in die folgenden Objekte und ihre übergeordneten Objekte aufgenommen werden?. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
+transfer_assignments_confirmation#:#Sollen die zugeteilten Nutzer als Mitglieder in die folgenden Objekte und ihre übergeordneten Objekte aufgenommen werden? Ihre Zuteilungen werden fixiert und Konflikte in anderen Anmeldungen entfernt. Die nicht zugeteilten Nutzer werden je nach Einstellung auf die Warteliste gesetzt.
 transfer_assignments_time#:#Die Zuteilungen sind übertragen (%s).
 notify_assignments#:#Nutzer benachrichtigen
-notify_assignments_confirmation#:#Die Nutzer werden über ihre Zuteilung per E-Mail informiert.
+notify_assignments_confirmation#:#Sollen die Nutzer über ihre Zuteilung per E-Mail informiert werden? Ihre Zuteilungen werden fixiert und Konflikte in anderen Anmeldungen entfernt.
 notify_assignments_time#:#Die Nutzer wurden über ihre Zuteilungen informiert (%s).
 no_target_objects#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
@@ -341,3 +341,4 @@ studycond_info#:#Studenten müssen eine der folgenden Bedingungen erfüllen, um 
 studycond_msg_not_fulfilled#:#Sie erfüllen leider nicht die notwendigen Studiengangbedingungen. Sie können sich zwar anmelden, werden aber bei der automatischen Zuteilung nicht berücksichtigt, sondern im Anschluss auf die Wartelisten der gewählten Kurse/Gruppen gesetzt.
 studycond_intro#:#Für diese Anmeldung gelten Studiengang-Bedingungen:<p class="small">%s</p>
 studycond_not_fulfilled#:#Studiengangs-Bedingung nicht erfüllt!
+mail_notify_removed_conflicts#:#Bei Ihrer Zuteilung wurden die folgenden Konflikte mit anderen Anmeldungen erkannt und die entsprechenden Auswahlen entfernt. Bitte überprüfen Sie diese und wählen Sie Alternativen.

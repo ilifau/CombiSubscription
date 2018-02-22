@@ -22,6 +22,16 @@ class ilCoSubChoice
 
 
 	/**
+	 * Delete a choice by its id
+	 * @param integer $a_id
+	 */
+	public static function _deleteById($a_id)
+	{
+		global $ilDB;
+		$ilDB->manipulate('DELETE FROM rep_robj_xcos_choices WHERE choice_id = ' . $ilDB->quote($a_id,'integer'));
+	}
+
+	/**
 	 * Delete all choices for a parent object id
 	 * @param integer object id
 	 * @param integer|null      user id (optional)
