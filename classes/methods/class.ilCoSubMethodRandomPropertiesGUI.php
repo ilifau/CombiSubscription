@@ -93,10 +93,21 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$ni->setRequired(true);
 		$this->form->addItem($ni);
 
-		// one per priority
-		$ci = new ilCheckboxInputGUI($this->method->txt('one_per_priority'), 'one_per_priority');
-		$ci->setInfo($this->method->txt('one_per_priority_info'));
-		$this->form->addItem($ci);
+		// priority_choices
+		$pc = new ilRadioGroupInputGUI($this->method->txt('prio_choices'), 'priority_choices');
+		$pc->addOption(new ilRadioOption(
+			$this->method->txt('prio_choices_free'),
+			ilCoSubMethodRandom::PRIO_CHOICES_FREE,
+			$this->method->txt('prio_choices_free_info')));
+		$pc->addOption(new ilRadioOption(
+			$this->method->txt('prio_choices_limited'),
+			ilCoSubMethodRandom::PRIO_CHOICES_LIMITED,
+			$this->method->txt('prio_choices_limited_info')));
+		$pc->addOption(new ilRadioOption(
+			$this->method->txt('prio_choices_unique'),
+			ilCoSubMethodRandom::PRIO_CHOICES_UNIQUE,
+			$this->method->txt('prio_choices_unique_info')));
+		$this->form->addItem($pc);
 
 		// calculation proerties
 		$sh = new ilFormSectionHeaderGUI();
@@ -136,7 +147,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	protected function loadPropertiesValues()
 	{
 		$this->form->getItemByPostVar('number_priorities')->setValue($this->method->number_priorities);
-		$this->form->getItemByPostVar('one_per_priority')->setChecked($this->method->one_per_priority);
+		$this->form->getItemByPostVar('priority_choices')->setValue($this->method->priority_choices);
 		$this->form->getItemByPostVar('number_assignments')->setValue($this->method->number_assignments);
 
 		$seconds = (int) max($this->method->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
@@ -154,7 +165,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	protected function savePropertiesValues()
 	{
 		$this->method->number_priorities = (int) $this->form->getInput('number_priorities');
-		$this->method->one_per_priority = (bool) $this->form->getInput('one_per_priority');
+		$this->method->priority_choices = (string) $this->form->getInput('priority_choices');
 		$this->method->number_assignments = (int) $this->form->getInput('number_assignments');
 
 		/** @var ilDurationInputGUI $di */

@@ -5,13 +5,17 @@
  */
 class ilCoSubMethodRandom extends ilCoSubMethodBase
 {
+	const PRIO_CHOICES_FREE = 'free';
+	const PRIO_CHOICES_LIMITED = 'limited';
+	const PRIO_CHOICES_UNIQUE = 'unique';
+
 	# region class variables
 
 	/** @var int number of selectable priorities */
 	public $number_priorities = 2;
 
-	/** @var bool force once selection per priority */
-	public $one_per_priority = false;
+	/** @var string mode of selecting priorities */
+	public $priority_choices = 'free';
 
 	/** @var int number of items to assign in the calculation */
 	public $number_assignments = 1;
@@ -57,7 +61,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		parent::__construct($a_object, $a_plugin);
 
 		$this->number_priorities = (int) $this->getProperty('number_priorities','2');
-		$this->one_per_priority = (bool) $this->getProperty('one_per_priority','0');
+		$this->priority_choices = (string) $this->getProperty('priority_choices','free');
 		$this->number_assignments = (int) $this->getProperty('number_assignments','1');
 		$this->out_of_conflict_time = (int) $this->getProperty('out_of_conflict_time', '3600');
 	}
@@ -70,13 +74,18 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	public function saveProperties()
 	{
 		$this->setProperty('number_priorities', sprintf('%d', $this->number_priorities));
-		$this->setProperty('one_per_priority', sprintf('%d', (int) $this->one_per_priority));
+		$this->setProperty('priority_choices', sprintf('%s', (string) $this->priority_choices));
 		$this->setProperty('number_assignments', sprintf('%d', (int) $this->number_assignments));
 		$this->setProperty('out_of_conflict_time', sprintf('%d', (int) $this->out_of_conflict_time));
 
-		if ($this->one_per_priority)
+		if ($this->priority_choices == self::PRIO_CHOICES_UNIQUE)
 		{
 			$this->object->setMinChoices(0);
+			$this->object->update();
+		}
+		elseif ($this->priority_choices == self::PRIO_CHOICES_LIMITED)
+		{
+			$this->object->setMinChoices(min($this->object->getMinChoices(), $this->number_priorities));
 			$this->object->update();
 		}
 	}
@@ -145,7 +154,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	public function hasMultipleChoice()
 	{
-		return $this->one_per_priority ? false : true;
+		return ($this->priority_choices == self::PRIO_CHOICES_FREE);
 	}
 
 
@@ -155,7 +164,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	public function hasEmptyChoice()
 	{
-		return $this->one_per_priority ? false : true;
+		return ($this->priority_choices != self::PRIO_CHOICES_UNIQUE);
 	}
 
 

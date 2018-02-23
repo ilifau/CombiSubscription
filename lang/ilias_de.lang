@@ -162,8 +162,13 @@ ilcosubmethodrandom_number_priorities#:#Anzahl Prioritäten
 ilcosubmethodrandom_number_priorities_info#:#Anzahl der angebotenen Prioritäten zur Auswahl. Eine Priorität wird als "gewählt" benannt, zwei Prioritäten (Standard) als "bevorzugt" und "alternativ", ab drei werden die Prioritäten numeriert.
 ilcosubmethodrandom_number_assignments#:#Anzahl Zuteilungen
 ilcosubmethodrandom_number_assignments_info#:#Anzahl der zugeteilten Einheiten in der Berechnung. Falls höher als eine (Standard) gwünscht ist, setzen Sie bitte auch die Mindestzahl auszuwählender Einheiten entsprechend hoch und passen Sie den Erklärungstext an.
-ilcosubmethodrandom_one_per_priority#:#Eindeutige Auswahl
-ilcosubmethodrandom_one_per_priority_info#:#Bei der Anmeldung muss für jede Priorität genau eine Auswahl getroffen werden. Dies ersetzt die allgemeine Einstellung "Minimale Auswahlen". Bitte sehen Sie mindestens so viele Auswahl-Einheiten vor, wie es Prioritäten gibt und passen Sie den Erklärungstext für die Anmeldeseite an.
+ilcosubmethodrandom_prio_choices#:#Prioritäts-Auswahl
+ilcosubmethodrandom_prio_choices_free#:#frei
+ilcosubmethodrandom_prio_choices_free_info#:#Bei der Anmeldung kann jede Priorität beliebig oft vergeben werden
+ilcosubmethodrandom_prio_choices_limited#:#begrenzt
+ilcosubmethodrandom_prio_choices_limited_info#:#Bei der Anmeldung kann jede Priorität maximal einmal vergeben werden. Dies begrenzt die allgemeine Einstellung "Minimale Auswahlen".
+ilcosubmethodrandom_prio_choices_unique#:#eindeutig
+ilcosubmethodrandom_prio_choices_unique_info#:#Bei der Anmeldung muss jede Priorität genau einmal vergeben werden. Dies ersetzt die allgemeine Einstellung "Minimale Auswahlen". Bitte sehen Sie mindestens so viele Auswahl-Einheiten vor, wie es Prioritäten gibt.
 ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen, wird sie als nicht erfüllt angezeigt.
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
@@ -190,8 +195,8 @@ no_target_objects#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
 min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
 min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
-multiple_choice_alert#:#Sie können eine Priorität nicht mehrfach auswählen!
-empty_choice_alert#:#Sie müssen für jede Priorität eine Auswahl treffen!
+multiple_choice_alert#:#Sie können eine Priorität nicht mehrfach vergeben!
+empty_choice_alert#:#Sie müssen jede Priorität einmal vergeben!
 current_assignment#:#Aktuelle Zuteilungen
 saved_assignments#:#Gespeicherte Zuteilungen
 export_data#:#Daten-Export
@@ -342,3 +347,4 @@ studycond_msg_not_fulfilled#:#Sie erfüllen leider nicht die notwendigen Studien
 studycond_intro#:#Für diese Anmeldung gelten Studiengang-Bedingungen:<p class="small">%s</p>
 studycond_not_fulfilled#:#Studiengangs-Bedingung nicht erfüllt!
 mail_notify_removed_conflicts#:#Bei Ihrer Zuteilung wurden die folgenden Konflikte mit anderen Anmeldungen erkannt und die entsprechenden Auswahlen entfernt. Bitte überprüfen Sie diese und wählen Sie Alternativen.
+explanation_info#:#Wenn Sie hier einen Text eingeben, ersetzt er die Standard-Erklärung zum Verfahren auf der Anmeldeseite

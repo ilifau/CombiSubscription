@@ -488,3 +488,8 @@
     $ilDB->dropTableColumn('rep_robj_xcos_items', 'period_start');
     $ilDB->dropTableColumn('rep_robj_xcos_items', 'period_end');
 ?>
+<#23>
+<?php
+    $ilDB->manipulate("UPDATE rep_robj_xcos_prop SET property='priority_choices', value='free' WHERE property = 'one_per_priority' AND value = '0'");
+    $ilDB->manipulate("UPDATE rep_robj_xcos_prop SET property='priority_choices', value='unique' WHERE property = 'one_per_priority' AND value = '1'");
+?>

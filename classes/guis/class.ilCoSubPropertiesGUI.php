@@ -81,8 +81,9 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$cb = new ilCheckboxInputGUI($this->lng->txt('online'), 'online');
 		$this->form->addItem($cb);
 
-		// description
+		// explanation
 		$ex = new ilTextAreaInputGUI($this->plugin->txt('explanation'), 'explanation');
+		$ex->setInfo($this->plugin->txt('explanation_info'));
 		$this->form->addItem($ex);
 
 		// subscription start

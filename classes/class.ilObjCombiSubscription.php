@@ -130,7 +130,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		else
 		{
 			$this->setOnline(false);
-			$this->setExplanation($this->plugin->txt('default_explanation'));
 			$this->setSubscriptionStart(new ilDateTime(time(), IL_CAL_UNIX));
 			$this->setSubscriptionEnd(new ilDateTime(time(), IL_CAL_UNIX));
 			$this->setShowBars(true);
