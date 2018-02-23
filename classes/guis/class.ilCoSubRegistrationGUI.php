@@ -54,29 +54,6 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		// get the user for checking if it is fixed
 		$userObj = $this->object->getUser($ilUser->getId());
 
-		$intros = array();
-		if ($this->object->getExplanation())
-		{
-			$intros[] = $this->pageInfo($this->object->getExplanation());
-		}
-
-
-		// studydata conditions are avaiable
-		if ($this->plugin->withStudyCond())
-		{
-			require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
-
-			if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
-			{
-				$intros[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
-
-				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $ilUser->getId()))
-				{
-					ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
-				}
-			}
-		}
-
 		// check subscription period
 		if ($this->object->isBeforeSubscription())
 		{
@@ -143,7 +120,9 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		{
 			$form->setContent($this->getCatRegisterHTML($priorities));
 		}
-		$this->tpl->setContent(implode('', $intros) . $form->getHTML());
+
+		$infos = $this->getRegistrationInfos($userObj);
+		$this->tpl->setContent(implode('', $infos) . $form->getHTML());
 
 		// color coding of priorities
 		$this->tpl->addJavaScript($this->plugin->getDirectory().'/js/ilCombiSubscription.js');
@@ -153,6 +132,96 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			$colors[$index] = $this->object->getMethodObject()->getPriorityBackgroundColor($index);
 		}
 		$this->tpl->addOnLoadCode('il.CombiSubscription.init('.json_encode($colors).')');
+	}
+
+	/**
+	 * @param ilObjUser $userObj
+	 */
+	public function getRegistrationInfos($userObj)
+	{
+
+		$infos = array();
+		if ($this->object->getExplanation())
+		{
+			$infos[] = $this->pageInfo($this->object->getExplanation());
+		}
+		else
+		{
+			$sentences = array();
+			$methodObj = $this->object->getMethodObject();
+
+			if ($methodObj->hasEmptyChoice())
+			{
+				$min = $this->object->getMinChoices();
+				if ($min == 1)
+				{
+					$sentences[] = $this->plugin->txt('min_choice_explanation');
+				}
+				elseif ($min > 0)
+				{
+					$sentences[] = sprintf($this->plugin->txt('min_choicess_explanation'),$min);
+				}
+			}
+
+			if ($methodObj instanceof ilCoSubMethodRandom)
+			{
+				switch($methodObj->priority_choices)
+				{
+					case ilCoSubMethodRandom::PRIO_CHOICES_UNIQUE:
+						$sentences[] = $methodObj->txt('prio_choices_unique_explanation');
+						break;
+					case ilCoSubMethodRandom::PRIO_CHOICES_LIMITED:
+						$sentences[] = $methodObj->txt('prio_choices_limited_explanation');
+						break;
+					case ilCoSubMethodRandom::PRIO_CHOICES_FREE:
+						$sentences[] = $methodObj->txt('prio_choices_free_explanation');
+						break;
+				}
+
+				$num = $methodObj->getNumberAssignments();
+				if ($num == 1)
+				{
+					$sentences[] = $this->plugin->txt('one_assignment_explanation');
+				}
+				elseif($num > 0)
+				{
+					$sentences[] = sprintf($this->plugin->txt('num_assignments_explanation'), $num);
+				}
+			}
+
+			if (!empty($sentences))
+			{
+				$infos[] = $this->pageInfo(implode(' ', $sentences));
+			}
+
+			foreach ($this->object->getItems() as $item)
+			{
+				if ($item->getSchedules())
+				{
+					$infos[] = $this->pageInfo($this->plugin->txt('conflict_explanation'));
+					break;
+				}
+			}
+		}
+
+
+		// studydata conditions are avaiable
+		if ($this->plugin->withStudyCond())
+		{
+			require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
+
+			if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
+			{
+				$info[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
+
+				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $userObj->getId()))
+				{
+					ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
+				}
+			}
+		}
+
+		return $infos;
 	}
 
 	/**

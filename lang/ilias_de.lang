@@ -99,7 +99,6 @@ sub_limit_from#:#Min. %s Teilnehmer
 sub_limit_to#:#Max. %s Teilnehmer
 peers#:#Freunde
 explanation#:#Erklärung
-default_explanation#:#Sie können für jede Priorität mehrere Auswahlen treffen. Nach dem Anmeldezeitraum werden die Zuteilungen durch ein automatisches Verfahren getroffen, das möglichst viele Prioritäten berücksichtigt. Pro Benutzer wird nur eine Option zugeteilt.
 subscription_period_not_started#:#Der Anmeldezeitraum hat noch nicht begonnen.
 subscription_period_finished#:#Der Anmeldezeitraum ist beeendet.
 subscription_message_user_fixed#:#Sie wurden bereits zugeteilt, daher können Sie Ihre Anmeldung nicht mehr ändern.
@@ -161,14 +160,17 @@ ilcosubmethodrandom_calculation_properties#:#Einstellungen zur Zuteilung
 ilcosubmethodrandom_number_priorities#:#Anzahl Prioritäten
 ilcosubmethodrandom_number_priorities_info#:#Anzahl der angebotenen Prioritäten zur Auswahl. Eine Priorität wird als "gewählt" benannt, zwei Prioritäten (Standard) als "bevorzugt" und "alternativ", ab drei werden die Prioritäten numeriert.
 ilcosubmethodrandom_number_assignments#:#Anzahl Zuteilungen
-ilcosubmethodrandom_number_assignments_info#:#Anzahl der zugeteilten Einheiten in der Berechnung. Falls höher als eine (Standard) gwünscht ist, setzen Sie bitte auch die Mindestzahl auszuwählender Einheiten entsprechend hoch und passen Sie den Erklärungstext an.
+ilcosubmethodrandom_number_assignments_info#:#Anzahl der zugeteilten Einheiten in der Berechnung. Falls höher als eine (Standard) gwünscht ist, setzen Sie bitte auch die Mindestzahl auszuwählender Einheiten entsprechend hoch.
 ilcosubmethodrandom_prio_choices#:#Prioritäts-Auswahl
 ilcosubmethodrandom_prio_choices_free#:#frei
 ilcosubmethodrandom_prio_choices_free_info#:#Bei der Anmeldung kann jede Priorität beliebig oft vergeben werden
+ilcosubmethodrandom_prio_choices_free_explanation#:#Sie können jede Priorität beliebig oft vergeben.
 ilcosubmethodrandom_prio_choices_limited#:#begrenzt
 ilcosubmethodrandom_prio_choices_limited_info#:#Bei der Anmeldung kann jede Priorität maximal einmal vergeben werden. Dies begrenzt die allgemeine Einstellung "Minimale Auswahlen".
+ilcosubmethodrandom_prio_choices_limited_explanation#:#Sie können jede Priorität maximal einmal vergeben.
 ilcosubmethodrandom_prio_choices_unique#:#eindeutig
 ilcosubmethodrandom_prio_choices_unique_info#:#Bei der Anmeldung muss jede Priorität genau einmal vergeben werden. Dies ersetzt die allgemeine Einstellung "Minimale Auswahlen". Bitte sehen Sie mindestens so viele Auswahl-Einheiten vor, wie es Prioritäten gibt.
+ilcosubmethodrandom_prio_choices_unique_explanation#:#Sie müssen jede Priorität genau einmal vergeben.
 ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen, wird sie als nicht erfüllt angezeigt.
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
@@ -195,8 +197,12 @@ no_target_objects#:#Es wurden keine Zielobjekte gefunden!
 min_choices#:#Minimale Auswahlen
 min_choices_info#:#Minimale Anzahl Einheiten die ausgewählt werden müssen, damit eine Anmeldung gespeichert wird.
 min_choices_alert#:#Sie müssen mindestens %s Auswahlen treffen, damit Ihre Anmeldung gespeichert wird.
+min_choice_explanation#:#Insgesamt müssen Sie mindestens eine Auswahl treffen.
+min_choices_explanation#:#Insgesamt müssen Sie mindestens %s Auswahlen treffen.
 multiple_choice_alert#:#Sie können eine Priorität nicht mehrfach vergeben!
 empty_choice_alert#:#Sie müssen jede Priorität einmal vergeben!
+one_assignment_explanation#:#Bei der Zuteilung wird Ihnen eine oder keine Option zugeteilt.
+num_assignments_explanation#:#Bei der Zuteilung werden Ihnen %s oder keine Optionen zugeteilt.
 current_assignment#:#Aktuelle Zuteilungen
 saved_assignments#:#Gespeicherte Zuteilungen
 export_data#:#Daten-Export
@@ -336,6 +342,7 @@ day_th#:#Do
 day_fr#:#Fr
 day_sa#:#Sa
 day_su#:#So
+schedule_input_exact#:#Damit Terminüberschneidungen korrekt erkannt werden, geben Sie bitte die exakten Zeiten (kein c.t.) ein.
 slot_input_timezone#:#Die Zeitangaben der Terminreihe beziehen sich auf die Zeitzone "%s".
 out_of_conflict_time#:#Mimimaler Termin-Abstand
 out_of_conflict_time_info#:#Minimale Zeitspanne (Sekunden) zwischen Terminen, die nicht als Konflikt erkannt werden sollen.
@@ -348,3 +355,4 @@ studycond_intro#:#Für diese Anmeldung gelten Studiengang-Bedingungen:<p class="
 studycond_not_fulfilled#:#Studiengangs-Bedingung nicht erfüllt!
 mail_notify_removed_conflicts#:#Bei Ihrer Zuteilung wurden die folgenden Konflikte mit anderen Anmeldungen erkannt und die entsprechenden Auswahlen entfernt. Bitte überprüfen Sie diese und wählen Sie Alternativen.
 explanation_info#:#Wenn Sie hier einen Text eingeben, ersetzt er die Standard-Erklärung zum Verfahren auf der Anmeldeseite
+conflict_explanation#:#Wenn Sie eine Option mit Termin zugeteilt bekommen, werden Termin-Überschneidungen in anderen kombinierten Anmeldungen erkannt und Ihre Auswahlen dort entfernt. Sie werden darüber nach der Zuteilung per E-Mail informiert.

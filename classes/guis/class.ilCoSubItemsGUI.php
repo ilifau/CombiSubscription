@@ -464,6 +464,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				}
 				$end->setRequired(true);
 				$end->setShowTime(true);
+				$end->setInfo($this->plugin->txt('schedule_input_exact'));
 				$single->addSubItem($end);
 
 			$group->addOption($single);
@@ -502,7 +503,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				require_once('Services/Calendar/classes/class.ilCalendarUtil.php');
 				$tz = ilTimeZone::_getDefaultTimeZone();
 				$tzlist = ilCalendarUtil::_getShortTimeZoneList();
-				$slots->setInfo(sprintf($this->plugin->txt('slot_input_timezone'), $tzlist[$tz]));
+				$slots->setInfo(sprintf($this->plugin->txt('slot_input_timezone'), $tzlist[$tz])
+				.' '.$this->plugin->txt('schedule_input_exact'));
 
 				$multi->addSubItem($slots);
 

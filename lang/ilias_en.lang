@@ -92,7 +92,6 @@ sub_limit_from#:#Min. %s Participants
 sub_limit_to#:#Max. %s Participants
 peers#:#Peers
 explanation#:#Explanation
-default_explanation#:#You can select a number of items for each priority. The assignments will be done automatically after the subscription period. It tries to respect as much priorities as possible. Each subscriber will get only one item assigned.
 subscription_period_not_started#:#The subscription period has not yet started.
 subscription_period_finished#:#The subscription period is finished.
 subscription_message_user_fixed#:#You are already assigned. Your subscription is not further changeable.
@@ -154,14 +153,17 @@ ilcosubmethodrandom_calculation_properties#:#Assignment Settings
 ilcosubmethodrandom_number_priorities#:#Number of Priorities
 ilcosubmethodrandom_number_priorities_info#:#Number of selection priorities. One priority will ba called 'chosen', two priorities (default) will be called 'preferred' and 'alternative', three priorities and higher will be numbered.
 ilcosubmethodrandom_number_assignments#:#Number of Assignments
-ilcosubmethodrandom_number_assignments_info#:#Number of items that will be assigned per user. If it is higher then the default one, please increase the number of selectable items and adapt the explanation text.
+ilcosubmethodrandom_number_assignments_info#:#Number of items that will be assigned per user. If it is higher then the default one, please increase the number of selectable items.
 ilcosubmethodrandom_prio_choices#:#Priority Selection
 ilcosubmethodrandom_prio_choices_free#:#free
 ilcosubmethodrandom_prio_choices_free_info#:#Each priority can be freely selected
+ilcosubmethodrandom_prio_choices_free_explanation#:#You may freely select each priority.
 ilcosubmethodrandom_prio_choices_limited#:#limited
 ilcosubmethodrandom_prio_choices_limited_info#:#Each prority can be selected only once. This limits the general setting "Minimum choices".
+ilcosubmethodrandom_prio_choices_limited_explanation#:#You may select each priority maximum once.
 ilcosubmethodrandom_prio_choices_unique#:#unique
 ilcosubmethodrandom_prio_choices_unique_info#:##Each prority must be selected once at registration. This replaced the general setting 'minimum choices'. Please provide enough selectaable items.
+ilcosubmethodrandom_prio_choices_unique_explanation#:#You should select each priority exactly once.
 ilcosubmethodrandom_sub_min_info#:#Items with fewer assignments will be indicated as not satisfied.
 ilcosubmethodrandom_sub_max_info#:#The calculation will not assign more than these subscriptions.
 ilcosubmethodrandom_out_of_conflict_time#:#Minimum Appointment Distance
@@ -188,8 +190,12 @@ no_target_objects#:#No target object found!
 min_choices#:#Minimum Choices
 min_choices_info#:#Minimum number of chosen items to save a subscription
 min_choices_alert#:#You must select at least %s items to get your subscription saved.
+min_choice_explanation#:#You must select at least one item.
+min_choices_explanation#:#You must select at least %s items.
 multiple_choice_alert#:#You can't select a priority multiple times!
 empty_choice_alert#:#You must take a choice for each priority!
+one_assignment_explanation#:#The calculation will assign you one or no item.
+num_assignments_explanation#:#The calculation will assign you %s items or none.
 current_assignment#:#Current Assignments
 saved_assignments#:#Saved Assignments
 export_data#:#Export Data
@@ -329,6 +335,7 @@ day_th#:#Th
 day_fr#:#Fr
 day_sa#:#Sa
 day_su#:#Su
+schedule_input_exact#:#For a correct recognition of conflicts, please enter the exact times (no c.t.).
 slot_input_timezone#:#The times of this schedule are related to the time zone "%s".
 out_of_conflict_time#:# Time Buffer
 out_of_conflict_time_info#:#Minimum time (seconds) between appointments that should not be recognized as conflict.
@@ -341,3 +348,4 @@ studycond_intro#:#This subsription has the following study conditions:<p class="
 studycond_not_fulfilled#:#Study conditions not satisfied!
 mail_notify_removed_conflicts#:#The folowing conflicts were recognized in other subscriptions and the choices were removed. Please check them and choose alternatives.
 explanation_info#:#A text entered here will replace the automatically generated explanation on the registration page.
+conflict_explanation#:#If the system assigns you an item with a schedule, then it will remove conflicting choices in other combined subscription. You will get an e-mail notification about this after the assignment.
