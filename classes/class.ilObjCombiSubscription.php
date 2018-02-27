@@ -98,7 +98,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			"(obj_id, is_online, explanation, sub_start, sub_end, show_bars, pre_select, min_choices, method, auto_process, last_process) VALUES (".
 			$ilDB->quote($this->getId(), 'integer').','.
 			$ilDB->quote(0, 'integer').','.
-			$ilDB->quote($this->plugin->txt('default_explanation'), 'text').','.
+			$ilDB->quote(null, 'text').','.
 			$ilDB->quote($dummyDate->get(IL_CAL_DATETIME), 'text').','.
 			$ilDB->quote($dummyDate->get(IL_CAL_DATETIME), 'text').','.
 			$ilDB->quote($this->getShowBars(), 'integer').','.
