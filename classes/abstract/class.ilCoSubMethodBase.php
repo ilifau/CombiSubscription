@@ -28,10 +28,6 @@ abstract class ilCoSubMethodBase
 	private $object_properties;
 
 
-	#####################
-	# region API (object)
-	#####################
-
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscription        $a_object
@@ -236,6 +232,13 @@ abstract class ilCoSubMethodBase
 		return true;
 	}
 
+	/**
+	 * This method provides the result of calculateAssignments instantly
+	 */
+	public function hasInstantResult()
+	{
+		return false;
+	}
 
 	/**
 	 * This method is active
@@ -245,6 +248,76 @@ abstract class ilCoSubMethodBase
 	{
 		return false;
 	}
+
+	/**
+	 * Calculate multiple assignment runs and get the best one
+	 * @param	integer		number of tries
+	 * @return 	ilCoSubRun|null
+	 */
+	public function getBestCalculationRun($a_tries)
+	{
+		if (!$this->hasInstantResult())
+		{
+			return null;
+		}
+
+		$this->plugin->includeClass('models/class.ilCoSubRun.php');
+		$runs = array();
+		for ($try = 1; $try <= $a_tries; $try++)
+		{
+			$run = new ilCoSubRun;
+			$run->obj_id = $this->object->getId();
+			$run->method = $this->getId();
+			$run->save();
+			$runs[$run->run_id] = $run;
+
+			$this->calculateAssignments($run);
+		}
+
+		// read all assignments of the newly calculated runs (needed for comparing)
+		$this->object->getAssignments(true);
+
+		$best_run_id = null;
+		$max_full_satisfied = 0;
+		$max_satisfied = 0;
+		foreach (array_keys($runs) as $run_id)
+		{
+			$satisfied = 0;
+			$full_satisfied = 0;
+			foreach (array_keys($this->object->getUsers()) as $user_id)
+			{
+				switch ($this->object->getUserSatisfaction($user_id, $run_id))
+				{
+					case ilObjCombiSubscription::SATISFIED_FULL:
+						$satisfied++;
+						$full_satisfied++;
+						break;
+
+					case ilObjCombiSubscription::SATISFIED_MEDIUM:
+						$satisfied++;
+						break;
+				}
+			}
+			if ($satisfied > $max_satisfied)
+			{
+				$best_run_id = $run_id;
+				$max_satisfied = $satisfied;
+			}
+			elseif ($satisfied == $max_satisfied && $full_satisfied > $max_full_satisfied)
+			{
+				$best_run_id = $run_id;
+				$max_full_satisfied = $full_satisfied;
+			}
+		}
+
+		if (isset($best_run_id))
+		{
+			return $runs[$best_run_id];
+		}
+
+		return null;
+	}
+
 
 	/**
 	 * Calculate the assignments
@@ -294,11 +367,6 @@ abstract class ilCoSubMethodBase
 		return $this->plugin->txt(strtolower($this->getId()).'_'.$a_langvar);
 	}
 
-	# endregion
-
-	##################################
-	# region methods for child classes
-	##################################
 
 	/**
 	 * Get a global setting for this method
@@ -342,5 +410,4 @@ abstract class ilCoSubMethodBase
 		$this->object->setClassProperty(get_class($this), $a_key, $a_value);
 	}
 
-	# endregion
 }

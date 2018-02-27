@@ -176,13 +176,17 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->setTitle($this->plugin->txt('plugin_configuration'));
 
-
-
 		$ni = new ilNumberInputGUI($this->plugin->txt('out_of_conflict_time'),'out_of_conflict_time');
 		$ni->setInfo($this->plugin->txt('out_of_conflict_time_info'));
 		$ni->setRequired(true);
 		$ni->setSize(10);
 		$this->form->addItem($ni);
+
+		$nt = new ilNumberInputGUI($this->plugin->txt('number_of_tries'),'number_of_tries');
+		$nt->setInfo($this->plugin->txt('number_of_tries_info'));
+		$nt->setRequired(true);
+		$nt->setSize(10);
+		$this->form->addItem($nt);
 
 		$this->form->addCommandButton('updateProperties', $this->lng->txt('save'));
 	}
@@ -194,7 +198,10 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	protected function loadPropertiesValues()
 	{
 		$this->form->getItemByPostVar('out_of_conflict_time')->setValue(
-			ilCombiSubscriptionPlugin::_getSetting('out_of_conflict_time', 1200));
+			ilCombiSubscriptionPlugin::_getSetting('out_of_conflict_time', 900));
+
+		$this->form->getItemByPostVar('number_of_tries')->setValue(
+			ilCombiSubscriptionPlugin::_getSetting('number_of_tries', 5));
 	}
 
 	/**
@@ -203,6 +210,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	protected function savePropertiesValues()
 	{
 		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('out_of_conflict_time'));
+		ilCombiSubscriptionPlugin::_setSetting('number_of_tries', $this->form->getInput('number_of_tries'));
 	}
 
 }

@@ -2,7 +2,7 @@
 
 require_once('Services/Table/classes/class.ilTable2GUI.php');
 /**
- * Table GUI for registration items
+ * Table GUI for calculation runs
  */
 class ilCoSubRunsTableGUI extends ilTable2GUI
 {

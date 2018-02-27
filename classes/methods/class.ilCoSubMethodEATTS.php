@@ -153,7 +153,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 */
 	public function isActive()
 	{
-		return true;
+		return false;
 	}
 
 	/**

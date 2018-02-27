@@ -256,6 +256,7 @@ targets_not_writable#:#Sie haben nicht in allen verknüpften Ziel-Objekten Schre
 targets_different_type#:#Die Zielobjekte müssen vom selben Typ (Kurs/Gruppe/Sitzung) sein, um gemeinsam konfiguriert zu werden!
 set_sub_type#:#Beitrittsverfahren einstellen
 set_sub_type_info#:#Solange die kombinierte Anmeldung läuft, sollten Sie diese als Beitrittsverfahren wählen. Die Anmeldungen der Ziel-Objekte verlinken dann auf die kombinierte Anmeldung. Nach dem Übertrag der Zuteilungen können Sie eine Anmeldung für Nachzügler freigeben.
+set_sub_type_info_auto#:#Dieses Beitrittsverfahren soll in den Kursen/Gruppen/Sitzungen nach der Zuteilung gelten, z.B. um Nachzüglern eine Anmeldung zu ermöglichen. Stellen Sie dann auch einen erweiterten Anmeldezeitraum ein.
 sub_type#:#Beitrittsverfahren
 sub_type_combi#:#Link auf die kombinierte Anmeldung
 sub_type_direct#:#Direkter Beitritt
@@ -263,6 +264,7 @@ sub_type_confirm#:#Beitritt nach Bestätigung
 sub_type_none#:#Kein direkter Beitritt
 set_sub_period#:#Anmeldezeitraum einstellen
 set_sub_period_info#:#Stellen Sie nur einen Anmeldezeitraum ein, wenn die Anmeldung in den Ziel-Objekten direkt erfolgen soll (z.B. nach dem Übertrag). Solange die kombinierten Anmeldung als Beitrittsverfahren eingestellt ist, gilt der Anmeldezeitraum dieser.
+set_sub_period_info_auto#:#Legen Sie einen erweiterten Anmeldezeitraum fest, wenn die Anmeldung nach der Zuteilung für Nachzügler möglich sein soll.
 sub_period#:#Anmeldezeitraum
 sub_period_start#:#Start
 sub_period_end#:#Ende
@@ -272,6 +274,7 @@ set_sub_max#:#Maximale Mitgliederzahl einstellen
 set_sub_max_info#:#Die in der Auswahl-Einheit festgelegte Maximalzahl wird auch im Ziel-Objekt eingestellt.
 set_sub_wait#:#Warteliste einstellen
 set_sub_wait_info#:#Die Einstellungen zur Warteliste werden einheitlich vorgenommen.
+set_sub_wait_info_auto#:#Stellen Sie hier ein, wie nach der Zuteilung die nicht zugeteilten Anmeldungen behandelt werden sollen.
 sub_wait#:#Verfahren
 sub_wait_auto#:#Mit automatischem Aufrücken
 sub_wait_manu#:#Ohne automatisches Aufrücken
@@ -344,7 +347,7 @@ day_sa#:#Sa
 day_su#:#So
 schedule_input_exact#:#Damit Terminüberschneidungen korrekt erkannt werden, geben Sie bitte die exakten Zeiten (kein c.t.) ein.
 slot_input_timezone#:#Die Zeitangaben der Terminreihe beziehen sich auf die Zeitzone "%s".
-out_of_conflict_time#:#Mimimaler Termin-Abstand
+out_of_conflict_time#:#Minimaler Termin-Abstand
 out_of_conflict_time_info#:#Minimale Zeitspanne (Sekunden) zwischen Terminen, die nicht als Konflikt erkannt werden sollen.
 message_too_many_schedule_times#:#Die Terminreihe "%s" erzeugt %s Termine. Zur Erkennung von Überschneidungen werden nur die ersten %s davon beachtet!
 study_conditions#:#Studiengangs-Bedingungen
@@ -356,3 +359,8 @@ studycond_not_fulfilled#:#Studiengangs-Bedingung nicht erfüllt!
 mail_notify_removed_conflicts#:#Bei Ihrer Zuteilung wurden die folgenden Konflikte mit anderen Anmeldungen erkannt und die entsprechenden Auswahlen entfernt. Bitte überprüfen Sie diese und wählen Sie Alternativen.
 explanation_info#:#Wenn Sie hier einen Text eingeben, ersetzt er die Standard-Erklärung zum Verfahren auf der Anmeldeseite
 conflict_explanation#:#Wenn Sie eine Option mit Termin zugeteilt bekommen, werden Termin-Überschneidungen in anderen kombinierten Anmeldungen erkannt und Ihre Auswahlen dort entfernt. Sie werden darüber nach der Zuteilung per E-Mail informiert.
+auto_process#:#Automatische Zuteilung
+auto_process_info#:#Nach Ende des Anmeldezeitraums werden die Zuteilungen automatisch vorgenommen und die Nutzer informiert. Bei verknüpften Kursen, Gruppen oder Sitzungen werden die Zuteilungen automatisch in die Mitgliedschaften oder Wartelisten aufgenommen. Sie können außerdem einstellen, wie die Anmeldung dort im Anschluss weiterlaufen soll.
+number_of_tries#:#Berechnungsversuche
+number_of_tries_info#:#Bei der automatischen Zuteilung werden so viele Berechnungen durchgeführt und davon die mit den meisten erfüllten Nutzerwünschen ausgewählt.
+last_process#:#Automatisch zugeteilt

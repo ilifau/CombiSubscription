@@ -62,6 +62,41 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
+	 * Check if cron job is active
+	 * @return bool
+	 */
+	public function withCronJob()
+	{
+		/** @var ilPluginAdmin $ilPluginAdmin */
+		global $ilPluginAdmin;
+
+		return $ilPluginAdmin->isActive('Services', 'Cron', 'crnhk', 'CombiSubscriptionCron');
+	}
+
+	/**
+	 * Handle a call by the cron job plugin
+	 * @return	int		Number of processed objects
+	 * @throws	Exception
+	 */
+	public function handleCronJob()
+	{
+		$this->includeClass('class.ilObjCombiSubscription.php');
+
+		$processed = 0;
+
+		foreach (ilObjCombiSubscription::_getRefIdsForAutoProcess() as $ref_id)
+		{
+			$subObj = new ilObjCombiSubscription($ref_id);
+			if ($subObj->handleAutoProcess())
+			{
+				$processed++;
+			}
+		}
+
+		return $processed;
+	}
+
+	/**
 	 * Get a global setting for a class (maintained in administration)
 	 * @param   string  $a_class
 	 * @param   string  $a_key
@@ -130,7 +165,16 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function getOutOfConflictTime()
 	{
-		return (int) self::_getSetting('out_of_conflict_time');
+		return (int) self::_getSetting('out_of_conflict_time', 900);
+	}
+
+	/**
+	 * Get the number of calculation tries for the auto assignment
+	 * @return int
+	 */
+	public function getNumberOfTries()
+	{
+		return (int) self::_getSetting('number_of_tries', 5);
 	}
 }
 ?>

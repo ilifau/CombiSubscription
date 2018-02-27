@@ -493,3 +493,20 @@
     $ilDB->manipulate("UPDATE rep_robj_xcos_prop SET property='priority_choices', value='free' WHERE property = 'one_per_priority' AND value = '0'");
     $ilDB->manipulate("UPDATE rep_robj_xcos_prop SET property='priority_choices', value='unique' WHERE property = 'one_per_priority' AND value = '1'");
 ?>
+<#24>
+<?php
+    $ilDB->addTableColumn('rep_robj_xcos_data', 'auto_process', array(
+        'type' => 'integer',
+        'length' => 4,
+        'notnull' => true,
+        'default' => 0
+    ));
+?>
+<#25>
+<?php
+$ilDB->addTableColumn('rep_robj_xcos_data', 'last_process', array(
+	'type' => 'timestamp',
+	'notnull' => false,
+	'default' => null
+));
+?>

@@ -120,19 +120,57 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->addItem($min_choices);
 
 		// method
-		$method = new ilRadioGroupInputGUI($this->plugin->txt('assignment_method'), 'method');
-		$method->setRequired(true);
+		$methods = array();
 		foreach ($this->object->getAvailableMethods() as $method_obj)
 		{
-			if (!$method_obj->isActive())
+			if ($method_obj->isActive() || $method_obj->getId() == $this->object->getMethod())
 			{
-				continue;
+				$methods[] = $method_obj;
 			}
-			$option = new ilRadioOption($method_obj->getTitle(), $method_obj->getId(), $method_obj->getDescription());
-			$option->setDisabled(!$method_obj->isActive());
-			$method->addOption($option);
+		}
+		if (count($methods) > 1)
+		{
+			$method = new ilRadioGroupInputGUI($this->plugin->txt('assignment_method'), 'method');
+			$method->setRequired(true);
+			foreach ($methods as $method_obj)
+			{
+				$option = new ilRadioOption($method_obj->getTitle(), $method_obj->getId(), $method_obj->getDescription());
+				$option->setDisabled(!$method_obj->isActive());
+				$method->addOption($option);
+			}
+		}
+		else
+		{
+			$method = new ilHiddenInputGUI('method');
 		}
 		$this->form->addItem($method);
+
+		if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+		{
+			// auto process
+			$auto = new ilCheckboxInputGUI($this->plugin->txt('auto_process'), 'auto_process');
+			$auto->setInfo($this->plugin->txt('auto_process_info'));
+
+			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+			$config = new ilCoSubTargetsConfig($this->object);
+			$config->readFromObject();
+			foreach ($targets->getFormProperties('auto', $config) as $property)
+			{
+				$auto->addSubItem($property);
+			}
+			$this->form->addItem($auto);
+
+			// last process
+			if (is_object($this->object->getLastProcess()))
+			{
+				require_once('Services/Calendar/classes/class.ilDatePresentation.php');
+				$last = new ilNonEditableValueGUI($this->plugin->txt('last_process'), 'last_process');
+				$last->setValue(ilDatePresentation::formatDate($this->object->getLastProcess()));
+				$this->form->addItem($last);
+			}
+		}
+
 
 		$this->form->addCommandButton('updateProperties', $this->plugin->txt('save'));
 
@@ -155,6 +193,10 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->getItemByPostVar('pre_select')->setChecked($this->object->getPreSelect());
 		$this->form->getItemByPostVar('min_choices')->setValue($this->object->getMinChoices());
 		$this->form->getItemByPostVar('method')->setValue($this->object->getMethod());
+		if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+		{
+			$this->form->getItemByPostVar('auto_process')->setChecked($this->object->getAutoProcess());
+		}
 	}
 
 	/**
@@ -175,6 +217,15 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->object->setPreSelect($this->form->getInput('pre_select'));
 		$this->object->setMinChoices($this->form->getInput('min_choices'));
 		$this->object->setMethod($this->form->getInput('method'));
+		$this->form->getItemByPostVar('auto_process')->setChecked($this->object->getAutoProcess());
+		{
+			$this->object->setAutoProcess($this->form->getInput('auto_process'));
+		}
 		$this->object->update();
+
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$config = $targets->getFormInputs($this->form, 'auto');
+		$config->saveInObject();
 	}
 }

@@ -42,6 +42,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$cmd = $this->ctrl->getCmd('editAssignments');
 		switch ($cmd)
 		{
+//			case 'autoProcess': // testing only
 			case 'editAssignments':
 			case 'calculateAssignments':
 			case 'calculateAssignmentsConfirmation':
@@ -123,6 +124,12 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$button->setCommand('notifyAssignmentsConfirmation');
 		$button->setCaption($this->plugin->txt('notify_assignments'), false);
 		$ilToolbar->addButtonInstance($button);
+
+		// for testing purposes
+//		$button = ilSubmitButton::getInstance();
+//		$button->setCommand('autoProcess');
+//		$button->setCaption($this->plugin->txt('auto_process'), false);
+//		$ilToolbar->addButtonInstance($button);
 	}
 
 	/**
@@ -393,6 +400,15 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$notification->sendAssignments($removedConflicts);
 
 		$this->object->setClassProperty(get_class($this), 'notify_time', time());
+		$this->ctrl->redirect($this,'editAssignments');
+	}
+
+	/**
+	 * Manual start of auto processing (for testing)
+	 */
+	public function autoProcess()
+	{
+		$this->object->handleAutoProcess();
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 

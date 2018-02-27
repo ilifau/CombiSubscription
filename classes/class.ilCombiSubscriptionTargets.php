@@ -6,16 +6,6 @@
  */
 class ilCombiSubscriptionTargets
 {
-	const SUB_TYPE_COMBI = 'combi';
-	const SUB_TYPE_DIRECT = 'direct';
-	const SUB_TYPE_CONFIRM = 'confirm';
-	const SUB_TYPE_NONE = 'none';
-
-	const SUB_WAIT_MANU = 'manu';
-	const SUB_WAIT_AUTO = 'auto';
-	const SUB_WAIT_NONE = 'none';
-
-
 	/** @var  ilObjCombiSubscription */
 	protected $object;
 
@@ -36,6 +26,8 @@ class ilCombiSubscriptionTargets
 		$this->plugin = $a_plugin;
 
 		$this->items = $this->object->getItems();
+
+		$this->plugin->includeClass('models/class.ilCoSubTargetsConfig.php');
 	}
 
 
@@ -46,7 +38,7 @@ class ilCombiSubscriptionTargets
 	 */
 	public function hasSubscriptionPeriod($a_type)
 	{
-		return in_array($a_type, array('crs', 'grp'));
+		return in_array($a_type, array('crs', 'grp', 'auto'));
 	}
 
 	/**
@@ -60,6 +52,16 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
+	 * Check if a target type supports minimum subscriptions
+	 * @param string $a_type
+	 * @return bool
+	 */
+	public function hasMaxSubscriptions($a_type)
+	{
+		return in_array($a_type, array('crs', 'grp', 'sess'));
+	}
+
+	/**
 	 * Check if a target type supports membership limitation groupings
 	 * @param string $a_type
 	 * @return bool
@@ -69,6 +71,136 @@ class ilCombiSubscriptionTargets
 		return in_array($a_type, array('crs', 'grp'));
 	}
 
+
+	/**
+	 * Get the form properties for setting the targets config
+	 * @param string $a_type	target object type or 'auto' for auto assignment configuration
+	 * @param ilCoSubTargetsConfig $a_config
+	 * @return array
+	 */
+	public function getFormProperties($a_type, $a_config)
+	{
+		$properties = array();
+
+		$set_type = new ilCheckboxInputGUI($this->plugin->txt('set_sub_type'), 'set_sub_type');
+		$set_type->setInfo($this->plugin->txt($a_type == 'auto' ? 'set_sub_type_info_auto' : 'set_sub_type_info'));
+		$set_type->setChecked($a_config->set_sub_type);
+		$properties[] = $set_type;
+
+		$sub_type = new ilRadioGroupInputGUI($this->plugin->txt('sub_type'), 'sub_type');
+		$opt = new ilRadioOption($this->plugin->txt('sub_type_combi'), ilCoSubTargetsConfig::SUB_TYPE_COMBI);
+		$sub_type->addOption($opt);
+		$opt = new ilRadioOption($this->plugin->txt('sub_type_direct'), ilCoSubTargetsConfig::SUB_TYPE_DIRECT);
+		$sub_type->addOption($opt);
+		$opt = new ilRadioOption($this->plugin->txt('sub_type_confirm'), ilCoSubTargetsConfig::SUB_TYPE_CONFIRM);
+		$sub_type->addOption($opt);
+		$opt = new ilRadioOption($this->plugin->txt('sub_type_none'), ilCoSubTargetsConfig::SUB_TYPE_NONE);
+		$sub_type->addOption($opt);
+		$sub_type->setValue($a_config->sub_type);
+		$set_type->addSubItem($sub_type);
+
+		if ($this->hasSubscriptionPeriod($a_type))
+		{
+			$set_sub_period = new ilCheckboxInputGUI($this->plugin->txt('set_sub_period'), 'set_sub_period');
+			$set_sub_period->setInfo($this->plugin->txt($a_type == 'auto' ? 'set_sub_period_info_auto' : 'set_sub_period_info'));
+			$set_sub_period->setChecked($a_config->set_sub_period);
+			$properties[] = $set_sub_period;
+
+			include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
+			$sub_period = new ilDateDurationInputGUI($this->plugin->txt('sub_period'), "sub_period");
+			$sub_period->setShowTime(true);
+			$sub_period->setStart(new ilDateTime($a_config->sub_period_start, IL_CAL_UNIX));
+			$sub_period->setStartText($this->plugin->txt('sub_period_start'));
+			$sub_period->setEnd(new ilDateTime($a_config->sub_period_end,IL_CAL_UNIX));
+			$sub_period->setEndText($this->plugin->txt('sub_period_end'));
+			$set_sub_period->addSubItem($sub_period);
+		}
+
+		if ($this->object->getMethodObject()->hasMinSubscription() && $this->hasMinSubscriptions($a_type))
+		{
+			$set_min = new ilCheckboxInputGUI($this->plugin->txt('set_sub_min'), 'set_sub_min');
+			$set_min->setInfo($this->plugin->txt('set_sub_min_info'));
+			$set_min->setChecked($a_config->set_sub_min);
+			$properties[] = $set_min;
+		}
+
+		if ($this->object->getMethodObject()->hasMaxSubscription() && $this->hasMaxSubscriptions($a_type)) {
+			$set_max = new ilCheckboxInputGUI($this->plugin->txt('set_sub_max'), 'set_sub_max');
+			$set_max->setInfo($this->plugin->txt('set_sub_max_info'));
+			$set_max->setChecked($a_config->set_sub_max);
+			$properties[] = $set_max;
+		}
+
+		$set_wait = new ilCheckboxInputGUI($this->plugin->txt('set_sub_wait'), 'set_sub_wait');
+		$set_wait->setInfo($this->plugin->txt($a_type == 'auto' ? 'set_sub_wait_info_auto' : 'set_sub_wait_info'));
+		$set_wait->setChecked($a_config->set_sub_wait);
+		$properties[] = $set_wait;
+
+		$sub_wait = new ilRadioGroupInputGUI($this->plugin->txt('sub_wait'), 'sub_wait');
+		$sub_wait->setValue($a_config->sub_wait);
+		$opt = new ilRadioOption($this->plugin->txt('sub_wait_auto'), ilCoSubTargetsConfig::SUB_WAIT_AUTO);
+		$sub_wait->addOption($opt);
+		$opt = new ilRadioOption($this->plugin->txt('sub_wait_manu'), ilCoSubTargetsConfig::SUB_WAIT_MANU);
+		$sub_wait->addOption($opt);
+		$opt = new ilRadioOption($this->plugin->txt('sub_wait_none'), ilCoSubTargetsConfig::SUB_WAIT_NONE);
+		$sub_wait->addOption($opt);
+		$set_wait->addSubItem($sub_wait);
+
+		return $properties;
+	}
+
+	/**
+	 * Get the inputs from the properties form
+	 * @param ilPropertyFormGUI 	$form
+	 * @param string 				$a_type target type
+	 * @return ilCoSubTargetsConfig
+	 */
+	public function getFormInputs($form, $a_type)
+	{
+		$config = new ilCoSubTargetsConfig($this->object);
+
+		$config->set_sub_type = (bool) $form->getInput('set_sub_type');
+		$config->sub_type = (string) $form->getInput('sub_type');
+
+
+		if ($this->hasSubscriptionPeriod($a_type))
+		{
+			$config->set_sub_period = (bool) $form->getInput('set_sub_period');
+
+			/** @var ilDateDurationInputGUI $sub_period */
+			$sub_period = $form->getItemByPostVar('sub_period');
+			$config->sub_period_start = (int) $sub_period->getStart()->get(IL_CAL_UNIX);
+			$config->sub_period_end = (int) $sub_period->getEnd()->get(IL_CAL_UNIX);
+		}
+		else
+		{
+			$config->set_sub_period = false;
+			$config->sub_period_start = null;
+			$config->sub_period_end = null;
+		}
+
+		if ($this->object->getMethodObject()->hasMinSubscription() && $this->hasMinSubscriptions($a_type))
+		{
+			$config->set_sub_min = (bool) $form->getInput('set_sub_min');
+		}
+		else
+		{
+			$config->set_sub_min = false;
+		}
+		if ($this->object->getMethodObject()->hasMaxSubscription() && $this->hasMaxSubscriptions($a_type))
+		{
+			$config->set_sub_max = (bool) $form->getInput('set_sub_max');
+		}
+		else
+		{
+			$config->set_sub_max = false;
+		}
+
+		$config->set_sub_wait = (bool) $form->getInput('set_sub_wait');
+		$config->sub_wait = (string) $form->getInput('sub_wait');
+
+		return $config;
+	}
 
 	/**
 	 * Get an item for a target reference
@@ -532,16 +664,11 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
-	 * Set the target configurations
-	 * @param string $sub_type
-	 * @param int $sub_start
-	 * @param int $sub_end
-	 * @param bool $set_min
-	 * @param bool $set_max
-	 * @param string $sub_wait
+	 * apply the target configurations
+	 * @param ilCoSubTargetsConfig $config
 	 * @throws Exception
 	 */
-	public function setTargetsConfig($sub_type = null, $sub_start = null, $sub_end = null, $set_min = null, $set_max = null, $sub_wait = null)
+	public function applyTargetsConfig($config)
 	{
 		/** @var ilAccessHandler  $ilAccess*/
 		global $ilAccess;
@@ -581,63 +708,65 @@ class ilCombiSubscriptionTargets
 			{
 				case 'crs':
 					/** @var ilObjCourse $target */
-					switch ($sub_type)
-					{
-						case self::SUB_TYPE_COMBI:
-							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_OBJECT);
-							$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
-							$target->setSubscriptionRefId($this->object->getRefId());
-							$target->setSubscriptionStart($this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
-							$target->setSubscriptionEnd($this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
 
-							break;
-						case self::SUB_TYPE_CONFIRM:
-							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_CONFIRMATION);
-							break;
-						case self::SUB_TYPE_DIRECT:
-							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DIRECT);
-							break;
-						case self::SUB_TYPE_NONE:
-							$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DEACTIVATED);
-							break;
+					if ($config->set_sub_type)
+					{
+						switch ($config->sub_type)
+						{
+							case ilCoSubTargetsConfig::SUB_TYPE_COMBI:
+								$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_OBJECT);
+								$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
+								$target->setSubscriptionRefId($this->object->getRefId());
+								$target->setSubscriptionStart($this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
+								$target->setSubscriptionEnd($this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
+
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_CONFIRM:
+								$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_CONFIRMATION);
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_DIRECT:
+								$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DIRECT);
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_NONE:
+								$target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DEACTIVATED);
+								break;
+						}
 					}
 
-					if (isset($sub_start))
-					{
-						$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
-						$target->setSubscriptionStart($sub_start);
-					}
-
-					if (isset($sub_end))
+					if ($config->set_sub_period)
 					{
 						$target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
-						$target->setSubscriptionEnd($sub_end);
+						$target->setSubscriptionStart($config->sub_period_start);
+						$target->setSubscriptionEnd($config->sub_period_end);
 					}
 
-					if ($set_min)
+					if ($config->set_sub_min)
 					{
 						$target->enableSubscriptionMembershipLimitation(true);
 						$target->setSubscriptionMinMembers($item->sub_min);
 					}
-					if ($set_max)
+					if ($config->set_sub_max)
 					{
 						$target->enableSubscriptionMembershipLimitation(true);
 						$target->setSubscriptionMaxMembers($item->sub_max);
 					}
 
-					switch($sub_wait)
+					if ($config->set_sub_wait)
 					{
-						case self::SUB_WAIT_AUTO:
-							$target->enableWaitingList(true);
-							$target->setWaitingListAutoFill(true);
-							break;
-						case self::SUB_WAIT_MANU:
-							$target->enableWaitingList(true);
-							$target->setWaitingListAutoFill(false);
-							break;
-						case self::SUB_WAIT_NONE:
-							$target->enableWaitingList(false);
-							break;
+						switch($config->sub_wait)
+						{
+							case ilCoSubTargetsConfig::SUB_WAIT_AUTO:
+								$target->enableWaitingList(true);
+								$target->setWaitingListAutoFill(true);
+								break;
+							case ilCoSubTargetsConfig::SUB_WAIT_MANU:
+								$target->enableWaitingList(true);
+								$target->setWaitingListAutoFill(false);
+								break;
+							case ilCoSubTargetsConfig::SUB_WAIT_NONE:
+								$target->enableWaitingList(false);
+								break;
+						}
 					}
 
 					$target->update();
@@ -645,62 +774,64 @@ class ilCombiSubscriptionTargets
 
 				case 'grp':
 					/** @var ilObjGroup $target */
-					switch ($sub_type)
-					{
-						case self::SUB_TYPE_COMBI:
-							$target->setRegistrationType(GRP_REGISTRATION_OBJECT);
-							$target->setRegistrationRefId($this->object->getRefId());
-							$target->setRegistrationStart($this->object->getSubscriptionStart());
-							$target->setRegistrationEnd($this->object->getSubscriptionEnd());
 
-							break;
-						case self::SUB_TYPE_CONFIRM:
-							$target->setRegistrationType(GRP_REGISTRATION_REQUEST);
-							break;
-						case self::SUB_TYPE_DIRECT:
-							$target->setRegistrationType(GRP_REGISTRATION_DIRECT);
-							break;
-						case self::SUB_TYPE_NONE:
-							$target->setRegistrationType(GRP_REGISTRATION_DEACTIVATED);
-							break;
+					if ($config->set_sub_type)
+					{
+						switch ($config->sub_type)
+						{
+							case ilCoSubTargetsConfig::SUB_TYPE_COMBI:
+								$target->setRegistrationType(GRP_REGISTRATION_OBJECT);
+								$target->setRegistrationRefId($this->object->getRefId());
+								$target->setRegistrationStart($this->object->getSubscriptionStart());
+								$target->setRegistrationEnd($this->object->getSubscriptionEnd());
+
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_CONFIRM:
+								$target->setRegistrationType(GRP_REGISTRATION_REQUEST);
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_DIRECT:
+								$target->setRegistrationType(GRP_REGISTRATION_DIRECT);
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_NONE:
+								$target->setRegistrationType(GRP_REGISTRATION_DEACTIVATED);
+								break;
+						}
 					}
 
-					if (isset($sub_start))
-					{
-						$target->enableUnlimitedRegistration(false);
-						$target->setRegistrationStart(new ilDateTime($sub_start, IL_CAL_UNIX));
-					}
-
-					if (isset($sub_end))
+					if ($config->set_sub_period)
 					{
 						$target->enableUnlimitedRegistration(false);
-						$target->setRegistrationEnd(new ilDateTime($sub_end, IL_CAL_UNIX));
+						$target->setRegistrationStart(new ilDateTime($config->sub_period_start, IL_CAL_UNIX));
+						$target->setRegistrationEnd(new ilDateTime($config->sub_period_end, IL_CAL_UNIX));
 					}
 
-					if ($set_min)
+					if ($config->set_sub_min)
 					{
 						$target->enableMembershipLimitation(true);
 						$target->setMinMembers($item->sub_min);
 					}
-					if ($set_max)
+					if ($config->set_sub_max)
 					{
 						$target->enableMembershipLimitation(true);
 						$target->setMaxMembers($item->sub_max);
 					}
 
-					switch($sub_wait)
+					if ($config->set_sub_wait)
 					{
-						case self::SUB_WAIT_AUTO:
-							$target->enableWaitingList(true);
-							$target->setWaitingListAutoFill(true);
-							break;
-						case self::SUB_WAIT_MANU:
-							$target->enableWaitingList(true);
-							$target->setWaitingListAutoFill(false);
-							break;
-						case self::SUB_WAIT_NONE:
-							$target->enableWaitingList(false);
-							break;
+						switch($config->sub_wait)
+						{
+							case ilCoSubTargetsConfig::SUB_WAIT_AUTO:
+								$target->enableWaitingList(true);
+								$target->setWaitingListAutoFill(true);
+								break;
+							case ilCoSubTargetsConfig::SUB_WAIT_MANU:
+								$target->enableWaitingList(true);
+								$target->setWaitingListAutoFill(false);
+								break;
+							case ilCoSubTargetsConfig::SUB_WAIT_NONE:
+								$target->enableWaitingList(false);
+								break;
+						}
 					}
 
 					$target->update();
@@ -708,43 +839,50 @@ class ilCombiSubscriptionTargets
 
 				case "sess";
 					/** @var ilObjSession $target */
-					switch ($sub_type)
+
+					if ($config->set_sub_type)
 					{
-						case self::SUB_TYPE_COMBI:
-							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_OBJECT);
-							$target->setRegistrationRefId($this->object->getRefId());
-							break;
-						case self::SUB_TYPE_CONFIRM:
-							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_REQUEST);
-							break;
-						case self::SUB_TYPE_DIRECT:
-							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_DIRECT);
-							break;
-						case self::SUB_TYPE_NONE:
-							$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_NONE);
-							break;
+						switch ($config->sub_type)
+						{
+							case ilCoSubTargetsConfig::SUB_TYPE_COMBI:
+								$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_OBJECT);
+								$target->setRegistrationRefId($this->object->getRefId());
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_CONFIRM:
+								$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_REQUEST);
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_DIRECT:
+								$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_DIRECT);
+								break;
+							case ilCoSubTargetsConfig::SUB_TYPE_NONE:
+								$target->setRegistrationType(ilMembershipRegistrationSettings::TYPE_NONE);
+								break;
+						}
 					}
 
-					if ($set_max)
+					if ($config->set_sub_max)
 					{
 						$target->enableRegistrationUserLimit(true);
 						$target->setRegistrationMaxUsers($item->sub_max);
 					}
 
-					switch($sub_wait)
+					if ($config->set_sub_wait)
 					{
-						case self::SUB_WAIT_AUTO:
-							$target->enableRegistrationWaitingList(true);
-							$target->setWaitingListAutoFill(true);
-							break;
-						case self::SUB_WAIT_MANU:
-							$target->enableRegistrationWaitingList(true);
-							$target->setWaitingListAutoFill(false);
-							break;
-						case self::SUB_WAIT_NONE:
-							$target->enableRegistrationWaitingList(false);
-							$target->setWaitingListAutoFill(false);
-							break;
+						switch($config->sub_wait)
+						{
+							case ilCoSubTargetsConfig::SUB_WAIT_AUTO:
+								$target->enableRegistrationWaitingList(true);
+								$target->setWaitingListAutoFill(true);
+								break;
+							case ilCoSubTargetsConfig::SUB_WAIT_MANU:
+								$target->enableRegistrationWaitingList(true);
+								$target->setWaitingListAutoFill(false);
+								break;
+							case ilCoSubTargetsConfig::SUB_WAIT_NONE:
+								$target->enableRegistrationWaitingList(false);
+								$target->setWaitingListAutoFill(false);
+								break;
+						}
 					}
 
 					$target->update();

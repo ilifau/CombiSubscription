@@ -195,6 +195,14 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		return true;
 	}
 
+	/**
+	 * This method provides the result of calculateAssignments instantly
+	 */
+	public function hasInstantResult()
+	{
+		return true;
+	}
+
 
 	/**
 	 * This method is active

@@ -28,6 +28,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	protected $pre_select = false;
 	protected $min_choices = 0;
 	protected $method = 'ilCoSubMethodRandom';
+	protected $auto_process = false;
+	protected $last_process = null;
 	protected $class_properties = array();
 
 	/** @var  ilCombiSubscriptionPlugin */
@@ -93,7 +95,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$dummyDate = new ilDateTime(time(), IL_CAL_UNIX);
 
 		$ilDB->manipulate("INSERT INTO rep_robj_xcos_data ".
-			"(obj_id, is_online, explanation, sub_start, sub_end, show_bars, pre_select, min_choices, method) VALUES (".
+			"(obj_id, is_online, explanation, sub_start, sub_end, show_bars, pre_select, min_choices, method, auto_process, last_process) VALUES (".
 			$ilDB->quote($this->getId(), 'integer').','.
 			$ilDB->quote(0, 'integer').','.
 			$ilDB->quote($this->plugin->txt('default_explanation'), 'text').','.
@@ -102,7 +104,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$ilDB->quote($this->getShowBars(), 'integer').','.
 			$ilDB->quote($this->getPreSelect(), 'integer').','.
 			$ilDB->quote($this->getMinChoices(), 'integer').','.
-			$ilDB->quote('ilCoSubMethodRandom', 'text').
+			$ilDB->quote('ilCoSubMethodRandom', 'text').','.
+			$ilDB->quote($this->getAutoProcess(), 'integer').','.
+			$ilDB->quote(null, 'text').
 			")");
 	}
 	
@@ -126,6 +130,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$this->setPreSelect((bool) $rec['pre_select']);
 			$this->setMinChoices($rec['min_choices']);
 			$this->setMethod($rec['method']);
+			$this->setAutoProcess($rec['auto_process']);
+			$this->setLastProcess(empty($rec['last_process']) ? null : new ilDateTime($rec['last_process'], IL_CAL_DATETIME));
 		}
 		else
 		{
@@ -136,6 +142,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			$this->setPreSelect(false);
 			$this->setMinChoices(0);
 			$this->setMethod('ilCoSubMethodRandom');
+			$this->setAutoProcess(false);
+			$this->setLastProcess(null);
 		}
 	}
 	
@@ -154,7 +162,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			" show_bars = ".$ilDB->quote($this->getShowBars(), 'integer').','.
 			" min_choices = ".$ilDB->quote($this->getMinChoices(), 'integer').','.
 			" pre_select = ".$ilDB->quote($this->getPreSelect(), 'integer').','.
-			" method = ".$ilDB->quote($this->getMethod(),'text').
+			" method = ".$ilDB->quote($this->getMethod(),'text').','.
+			" auto_process = ". $ilDB->quote($this->getAutoProcess(), 'integer'). ','.
+			" last_process = ". $ilDB->quote(is_object($this->getLastProcess()) ? $this->getLastProcess()->get(IL_CAL_DATETIME) : null, 'timestamp').
 			" WHERE obj_id = ".$ilDB->quote($this->getId(), 'integer')
 			);
 	}
@@ -276,7 +286,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Set Subscription End
 	 * @param $a_sub_end
-	 * @internal param ilDateTime $a_sub_start
 	 */
 	public function setSubscriptionEnd($a_sub_end)
 	{
@@ -352,6 +361,43 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function setPreSelect($a_pre_select)
 	{
 		$this->pre_select = $a_pre_select;
+	}
+
+	/**
+	 * Get auto processing after subscription end
+	 * @return bool
+	 */
+	public function getAutoProcess()
+	{
+		return $this->auto_process;
+	}
+
+	/**
+	 * Set auto processing after subscription end
+	 * @param bool $a_val
+	 */
+	public function setAutoProcess($a_val)
+	{
+		$this->auto_process = $a_val;
+	}
+
+
+	/**
+	 * Get the last processing time
+	 * @return ilDateTime|null
+	 */
+	public function getLastProcess()
+	{
+		return $this->last_process;
+	}
+
+	/**
+	 * Set the last processing tile
+	 * @param ilDateTime|null $a_val
+	 */
+	public function setLastProcess($a_val = null)
+	{
+		$this->last_process = $a_val;
 	}
 
 
@@ -1335,5 +1381,84 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 
 		return $removedConflicts;
+	}
+
+	/**
+	 * Get a list of reference ids that are due for an auto procesing
+	 */
+	public static function _getRefIdsForAutoProcess()
+	{
+		global $ilDB;
+
+		$query = "SELECT obj_id FROM rep_robj_xcos_data WHERE auto_process = 1 AND sub_end < NOW()";
+		$result = $ilDB->query($query);
+
+		$ref_ids = array();
+		while ($row = $ilDB->fetchAssoc($result))
+		{
+			foreach (ilObject::_getAllReferences($row['obj_id']) as $ref_id)
+			{
+				if (!ilObject::_isInTrash($ref_id))
+				{
+					$ref_ids[] = $ref_id;
+					break;
+				}
+			}
+		}
+
+		return $ref_ids;
+	}
+
+	/**
+	 * Handle the auto processing of an object
+	 */
+	public function handleAutoProcess()
+	{
+		$this->setAutoProcess(false);
+		$this->setLastProcess(new ilDateTime(time(), IL_CAL_UNIX));
+		$this->update();
+
+		$run = $this->getMethodObject()->getBestCalculationRun($this->plugin->getNumberOfTries());
+		if (!isset($run))
+		{
+			return false;
+		}
+
+		// copy the calculated assignments of the run to the current assignments
+		$this->copyAssignments($run->run_id, 0);
+		$this->getAssignments(true);
+		$this->fixAssignedUsers();
+
+		$this->plugin->includeClass('models/class.ilCoSubTargetsConfig.php');
+		$config = new ilCoSubTargetsConfig($this);
+		$config->readFromObject();
+
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
+		$targets_obj->applyTargetsConfig($config); // may change waiting list settings
+		$targets_obj->addAssignedUsersAsMembers();
+		$targets_obj->addNonAssignedUsersAsSubscribers(); // should be called with new waiting list settings
+
+		$removedConflicts = $this->removeConflicts();
+
+		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+		$notification = new ilCombiSubscriptionMailNotification();
+		$notification->setPlugin($this->plugin);
+		$notification->setObject($this);
+		$notification->sendAssignments($removedConflicts);
+
+		// new subscription period for second round in combined subscription
+		if ($config->set_sub_type && $config->sub_type == ilCoSubTargetsConfig::SUB_TYPE_COMBI
+			&& $config->set_sub_period && $config->sub_period_end > time())
+		{
+			$this->setSubscriptionEnd(new ilDateTime($config->sub_period_end, IL_CAL_UNIX));
+			$this->setAutoProcess(true);
+			$this->update();
+		}
+
+		// show the transfer time in the assignments gui
+		$this->setClassProperty('ilCoSubAssignmentsGUI', 'transfer_time', time());
+
+		return true;
 	}
 }
