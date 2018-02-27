@@ -463,12 +463,13 @@ class ilCoSubImport
 			}
 
 			$item->save();
-			$item->deleteSchedules();
 
 			if (empty($rowdata['period_start']) || empty ($rowdata['period_end']))
 			{
 				continue;
 			}
+
+			$item->deleteSchedules();
 
 			$this->plugin->includeClass('models/class.ilCoSubSchedule.php');
 			$schedule = new ilCoSubSchedule();
@@ -487,7 +488,7 @@ class ilCoSubImport
 
 			if (is_float($rowdata['period_end']))
 			{
-				$item->period_end = $this->excelTimeToUnix($rowdata['period_end']);
+				$schedule->period_end = $this->excelTimeToUnix($rowdata['period_end']);
 			}
 			else
 			{
