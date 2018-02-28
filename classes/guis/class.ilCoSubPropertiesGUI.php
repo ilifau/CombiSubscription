@@ -217,15 +217,14 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->object->setPreSelect($this->form->getInput('pre_select'));
 		$this->object->setMinChoices($this->form->getInput('min_choices'));
 		$this->object->setMethod($this->form->getInput('method'));
-		$this->form->getItemByPostVar('auto_process')->setChecked($this->object->getAutoProcess());
+		if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
 		{
 			$this->object->setAutoProcess($this->form->getInput('auto_process'));
+			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+			$config = $targets->getFormInputs($this->form, 'auto');
+			$config->saveInObject();
 		}
 		$this->object->update();
-
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
-		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-		$config = $targets->getFormInputs($this->form, 'auto');
-		$config->saveInObject();
 	}
 }

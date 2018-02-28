@@ -160,11 +160,16 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 
+		$items = array();
 		foreach ($_POST['ref_id'] as $ref_id)
 		{
 			$item = $targets->getItemForTarget($ref_id);
 			$item->save();
+			$items[$item->item_id] = $item;
 		}
+
+		$targets->applyDefaultTargetsConfig($items);
+
 		ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
 		$this->ctrl->redirect($this, 'listItems');
 	}

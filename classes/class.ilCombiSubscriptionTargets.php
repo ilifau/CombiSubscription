@@ -12,7 +12,7 @@ class ilCombiSubscriptionTargets
 	/** @var ilCombiSubscriptionPlugin  */
 	protected $plugin;
 
-	/** @var  ilCoSubItem[] */
+	/** @var  ilCoSubItem[] (indexed by item_id) */
 	protected $items = array();
 
 	/**
@@ -664,11 +664,43 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
-	 * apply the target configurations
+	 * Apply the default configuration settings to the target objects
+	 * This is done when new target objects are connected
+	 * - the subscription type is set to the combined subscription
+	 * - the subscription period is set to the period of the combined subscription
+	 * @param $items
+	 * @return bool
+	 */
+	public function applyDefaultTargetsConfig($items)
+	{
+		$config = new ilCoSubTargetsConfig($this->object);
+		$config->set_sub_type = true;
+		$config->sub_type = ilCoSubTargetsConfig::SUB_TYPE_COMBI;
+
+		$config->set_sub_period = true;
+		$config->sub_period_start = $this->object->getSubscriptionStart()->get(IL_CAL_UNIX);
+		$config->sub_period_end = $this->object->getSubscriptionEnd()->get(IL_CAL_UNIX);
+
+		try
+		{
+			$this->applyTargetsConfig($config, $items);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Apply configuration settings to the target objects
 	 * @param ilCoSubTargetsConfig $config
+	 * @param ilCoSubItem[]	$items (indexed by item_id)
 	 * @throws Exception
 	 */
-	public function applyTargetsConfig($config)
+	public function applyTargetsConfig($config, $items = array())
 	{
 		/** @var ilAccessHandler  $ilAccess*/
 		global $ilAccess;
@@ -676,9 +708,12 @@ class ilCombiSubscriptionTargets
 		require_once('Services/Object/classes/class.ilObjectFactory.php');
 		require_once('Services/Membership/classes/class.ilMembershipRegistrationSettings.php');
 
-		$items = array();
+		if (empty($items))
+		{
+			$items = $this->items;
+		}
 		$targets = array();
-		foreach($this->items as $item)
+		foreach($items as $item)
 		{
 			if (!empty($item->target_ref_id))
 			{
@@ -696,7 +731,6 @@ class ilCombiSubscriptionTargets
 					throw new Exception(sprintf($this->plugin->txt('target_object_not_writable'), $item->title));
 				}
 
-				$items[$item->item_id] = $item;
 				$targets[$item->item_id] = $target;
 			}
 		}
