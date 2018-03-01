@@ -312,8 +312,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 
 		$this->ctrl->saveParameter($this, 'item_id');
-
-
 		// get the existing properties
 		if (!empty($_GET['item_id']))
 		{
@@ -324,19 +322,22 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$item = new ilCoSubItem;
 		}
 
+		// init the item form without schedules to read the target ref_id
+		$this->initItemForm($item);
+
 		/** @var ilRepositorySelectorInputGUI $target_ref_id */
 		$target_input = $this->form->getItemByPostVar('target_ref_id');
 		$target_input->readFromSession();
-
 		$target_ref_id = $target_input->getValue();
 
-		// unsaved item with values generated from the target object
+		// apply values generated from the target object
 		$item = $targets->getItemForTarget($target_ref_id, $item);
 
 		// unsaved schedules with values generated from the target object
 		// todo: form handling only support one unsaved schedule without schedule_id
 		$schedules = $targets->getSchedulesForTarget($target_ref_id);
 
+		// re-init the item form to apply the schedules
 		$this->initItemForm($item, $schedules);
 
 		$this->tpl->setContent($this->form->getHTML());
@@ -577,6 +578,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveItemProperties($a_item)
 	{
+		$old_target_ref_id = $a_item->target_ref_id;
+
 		$a_item->obj_id = $this->object->getId();
 		$a_item->identifier = $this->form->getInput('identifier');
 		$a_item->title = $this->form->getInput('title');
@@ -595,6 +598,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$a_item->sub_max = empty($sub_max) ? null : $sub_max;
 		}
 		$a_item->selectable = $this->form->getInput('selectable');
+
+		if (!empty($a_item->target_ref_id) && $a_item->target_ref_id != $old_target_ref_id)
+		{
+			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+			$targets->applyDefaultTargetsConfig(array($a_item));
+		}
 
 		return $a_item->save();
 	}

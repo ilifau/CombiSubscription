@@ -212,7 +212,7 @@ class ilCombiSubscriptionTargets
 	{
 		$this->plugin->includeClass('models/class.ilCoSubItem.php');
 
-		if (!isset($a_item))
+		if (!isset($item))
 		{
 			$item = new ilCoSubItem;
 			$item->obj_id = $this->object->getId();
