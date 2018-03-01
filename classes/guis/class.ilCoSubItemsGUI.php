@@ -166,8 +166,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$item = $targets->getItemForTarget($ref_id);
 			$item->save();
 			$items[$item->item_id] = $item;
-		}
 
+			foreach($targets->getSchedulesForTarget($ref_id) as $schedule)
+			{
+				$schedule->obj_id = $this->object->getId();
+				$schedule->item_id = $item->item_id;
+				$schedule->save();
+			}
+		}
 		$targets->applyDefaultTargetsConfig($items);
 
 		ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);

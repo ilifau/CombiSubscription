@@ -55,6 +55,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Check if study conditions are available
+	 * @return bool
 	 */
 	public function withStudyCond()
 	{
@@ -72,6 +73,16 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 		return $ilPluginAdmin->isActive('Services', 'Cron', 'crnhk', 'CombiSubscriptionCron');
 	}
+
+	/**
+	 * Check if univis import exists
+	 * @return bool
+	 */
+	public function withUnivisImport()
+	{
+		return file_exists('Services/UnivIS/classes/class.ilUnivisImport.php');
+	}
+
 
 	/**
 	 * Handle a call by the cron job plugin

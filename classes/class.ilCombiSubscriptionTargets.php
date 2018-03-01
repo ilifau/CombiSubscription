@@ -273,6 +273,30 @@ class ilCombiSubscriptionTargets
 		$schedules = array();
 		switch (ilObject::_lookupType($a_ref_id, true))
 		{
+			case 'crs':
+				if ($this->plugin->withUnivisImport())
+				{
+					require_once ('Services/UnivIS/classes/class.ilUnivisImport.php');
+					require_once ('Services/UnivIS/classes/class.ilUnivisLecture.php');
+					$import = new ilUnivisImport();
+					$obj_id = ilObject::_lookupObjId($a_ref_id);
+					$import_id = ilObject::_lookupImportId($obj_id);
+					if (ilUnivisLecture::_isIliasImportId($import_id))
+					{
+						$import->cleanupLectures();
+						if ($import->importLecture($import_id))
+						{
+							foreach (ilUnivisLecture::_getLecturesData() as $lecture_id => $data)
+							{
+								$terms = ilUnivisTerm::_getTermsOfLecture($data['key'], $data['semester']);
+								$schedules = ilCoSubSchedule::_getFromUnivisTerms($terms);
+								break;
+							}
+						}
+					}
+				}
+				break;
+
 			case 'sess':
 				require_once('Modules/Session/classes/class.ilObjSession.php');
 				$session = new ilObjSession($a_ref_id, true);
@@ -285,6 +309,7 @@ class ilCombiSubscriptionTargets
 					$schedule->period_end = $app->getEnd()->get(IL_CAL_UNIX);
 					$schedules[] = $schedule;
 				}
+				break;
 		}
 
 		return $schedules;
