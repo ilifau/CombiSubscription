@@ -22,6 +22,9 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 	/** @var  ilCoSubCategory[]	indexed by cat_id */
 	protected $categories;
 
+	/** @var ilCombiSubscriptionTargets */
+	protected $targets;
+
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilCoSubItemsGUI 			$a_parent_gui
@@ -36,6 +39,9 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->plugin = $a_parent_gui->plugin;
 		$this->categories = $this->parent->object->getCategories();
 		$this->ctrl = $ilCtrl;
+
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$this->targets = new ilCombiSubscriptionTargets($this->parent->object, $this->plugin);
 
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
 		$this->setRowTemplate("tpl.il_xcos_items_row.html", $this->plugin->getDirectory());
@@ -63,6 +69,8 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->setSelectAllCheckbox('item_ids');
 		$this->addMultiCommand('configureTargets', $this->plugin->txt('configure_targets'));
 		$this->addMultiCommand('confirmDeleteItems', $this->plugin->txt('delete_items'));
+		$this->addMultiCommand('addGrouping', $this->plugin->txt('add_grouping'));
+		$this->addMultiCommand('removeGrouping', $this->plugin->txt('remove_grouping'));
 		$this->addCommandButton('saveSorting',  $this->lng->txt('sorting_save'));
 	}
 
@@ -83,6 +91,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 			}
 			$row['period'] = $item->getPeriodInfo();
 			$row['selectable'] = $this->lng->txt($row['selectable'] ? 'yes' : 'no');
+			$row['groupings'] = $this->targets->getGroupingsOfItem($item);
 			$data[] = $row;
 			$sort += 10;
 		}
@@ -94,6 +103,8 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 	 */
 	protected function fillRow($a_set)
 	{
+		global $lng;
+
 		$this->tpl->setCurrentBlock('checkbox');
 		$this->tpl->setVariable('ITEM_ID',$a_set['item_id']);
 		$this->tpl->parseCurrentBlock();
@@ -154,6 +165,20 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 				}
 				$this->tpl->setVariable('INFO', ($prop['property'] ? $prop['property']. ': ' : '') . $prop['value']);
 				$this->tpl->parseCurrentBlock();
+			}
+
+			if (!empty($a_set['groupings']))
+			{
+				$groupingTitles = array();
+				/** @var ilObjCourseGrouping $grouping */
+				foreach ($a_set['groupings'] as $grouping)
+				{
+					$groupingTitles[] = $grouping->getTitle();
+				}
+				$this->tpl->setCurrentBlock('info');
+				$this->tpl->setVariable('INFO', '<em>'. $lng->txt('groupings') . ': ' . implode(', ', $groupingTitles) .'</em>');
+				$this->tpl->parseCurrentBlock();
+
 			}
 
 			$locator = new ilLocatorGUI();

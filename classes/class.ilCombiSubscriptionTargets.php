@@ -16,6 +16,11 @@ class ilCombiSubscriptionTargets
 	protected $items = array();
 
 	/**
+	 * @var array [['grouping' => ilObjCourseGrouping, 'conditions' => array], ...]
+	 */
+	protected $groupings = null;
+
+	/**
 	 * Constructor
 	 * @param ilObjCombiSubscription        $a_object
 	 * @param ilCombiSubscriptionPlugin     $a_plugin
@@ -66,7 +71,7 @@ class ilCombiSubscriptionTargets
 	 * @param string $a_type
 	 * @return bool
 	 */
-	public function hasMemLimitGrouping($a_type)
+	public static function hasMemLimitGrouping($a_type)
 	{
 		return in_array($a_type, array('crs', 'grp'));
 	}
@@ -520,17 +525,122 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
+	 * Read the list of groupings for the item targets
+	 */
+	public function getGroupingData()
+	{
+		require_once('Modules/Course/classes/class.ilObjCourseGrouping.php');
+		if (!isset($this->groupings))
+		{
+			$this->groupings = array();
+			foreach ($this->object->getItems() as $item)
+			{
+				if (isset($item->target_ref_id))
+				{
+					$obj_id = ilObject::_lookupObjId($item->target_ref_id);
+					foreach(ilObjCourseGrouping::_getGroupings($obj_id) as $grouping_id)
+					{
+						$grouping = new ilObjCourseGrouping($grouping_id);
+						$conditions = $grouping->getAssignedItems();
+						$this->groupings[] = array('grouping' => $grouping, 'conditions' => $conditions);
+					}
+				}
+			}
+		}
+		return $this->groupings;
+	}
+
+	/**
+	 * Get the groupings of an item
+	 * @param ilCoSubItem $a_item
+	 * @return ilObjCourseGrouping[]
+	 */
+	public function getGroupingsOfItem($a_item)
+	{
+		if (!isset($a_item->target_ref_id))
+		{
+			return array();
+		}
+		$groupings = array();
+		foreach ($this->getGroupingData() as $groupingData)
+		{
+			foreach ($groupingData['conditions'] as $condition)
+			{
+				if ($condition['target_ref_id'] == $a_item->target_ref_id)
+				{
+					$groupings[] = $groupingData['grouping'];
+				}
+			}
+		}
+		return $groupings;
+	}
+
+	/**
+	 * Add a grouping for the items
+	 */
+	public function addGrouping()
+	{
+		require_once('Modules/Course/classes/class.ilObjCourseGrouping.php');
+		$grouping = new ilObjCourseGrouping();
+		$ref_ids = $this->getTargetRefIds();
+		if (empty($ref_ids))
+		{
+			return;
+		}
+
+		$ref_id = $ref_ids[0];
+		$obj_id = ilObject::_lookupObjId($ref_id);
+
+		$grouping->setContainerRefId($ref_id);
+		$grouping->setContainerObjId($obj_id);
+		$grouping->setContainerType($this->getCommonType());
+		$grouping->setTitle($this->object->getTitle());
+		$grouping->setUniqueField('login');
+		$grouping->create($ref_id, $obj_id);
+
+		foreach($ref_ids as $ref_id)
+		{
+			$obj_id = ilObject::_lookupObjId($ref_id);
+			$grouping->assign($ref_id, $obj_id);
+		}
+	}
+
+	/**
+	 * Remove a course grouping from the items
+	 */
+	public function removeGrouping()
+	{
+		foreach ($this->items as $item)
+		{
+			foreach ($this->getGroupingsOfItem($item) as $grouping)
+			{
+				$grouping->deassign($item->target_ref_id, ilObject::_lookupObjId($item->target_ref_id));
+			}
+		}
+
+		foreach($this->getGroupingData() as $data)
+		{
+			/** @var ilObjCourseGrouping $grouping */
+			$grouping = $data['grouping'];
+			if ($grouping->getCountAssignedItems() < 2)
+			{
+				$grouping->delete();
+			}
+		}
+	}
+
+	/**
 	 * Get grouping conditions of a container object
 	 *
 	 * @param 	int     $a_obj_id
 	 * @param	string	$a_type
 	 * @return 	array   assoc: grouping conditions
 	 */
-	function _getGroupingConditions($a_obj_id, $a_type)
+	static function _getGroupingConditions($a_obj_id, $a_type)
 	{
 		global $tree;
 
-		if (!$this->hasMemLimitGrouping($a_type))
+		if (!self::hasMemLimitGrouping($a_type))
 		{
 			return array();
 		}
@@ -580,7 +690,7 @@ class ilCombiSubscriptionTargets
 	 * @param  	array 		$conditions
 	 * @return   string     obj_id
 	 */
-	function _findGroupingMembership($user_id, $type, $conditions)
+	static function _findGroupingMembership($user_id, $type, $conditions)
 	{
 		foreach ($conditions as $condition)
 		{

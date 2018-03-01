@@ -78,6 +78,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			case 'saveSorting':
 			case 'configureTargets':
 			case 'saveTargetsConfig':
+			case 'addGrouping':
+			case 'removeGrouping':
 				$this->$cmd();
 				return;
 
@@ -760,5 +762,70 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		ilUtil::sendSuccess($this->plugin->txt('target_config_saved'), true);
 		$this->ctrl->redirect($this, 'listItems');
+	}
+
+	/**
+	 * add a grouping to the targets
+	 */
+	protected function addGrouping()
+	{
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+
+		if (empty($_POST['item_ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$this->ctrl->redirect($this,'listItems');
+		}
+
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$targets->setItemsByIds($_POST['item_ids']);
+		if (!$targets->targetsExist())
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_not_defined'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
+		if (!$targets->targetsWritable())
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
+
+		$type = $targets->getCommonType();
+		if (empty($type))
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_different_type'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
+
+		$targets->addGrouping();
+		$this->ctrl->redirect($this, 'listItems');
+	}
+
+	protected function removeGrouping()
+	{
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+
+		if (empty($_POST['item_ids']))
+		{
+			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$this->ctrl->redirect($this,'listItems');
+		}
+
+		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$targets->setItemsByIds($_POST['item_ids']);
+		if (!$targets->targetsExist())
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_not_defined'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
+		if (!$targets->targetsWritable())
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
+
+		$targets->removeGrouping();
+		$this->ctrl->redirect($this, 'listItems');
+
 	}
 }

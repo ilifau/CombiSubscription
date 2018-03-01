@@ -364,3 +364,5 @@ auto_process_info#:#Nach Ende des Anmeldezeitraums werden die Zuteilungen automa
 number_of_tries#:#Berechnungsversuche
 number_of_tries_info#:#Bei der automatischen Zuteilung werden so viele Berechnungen durchgeführt und davon die mit den meisten erfüllten Nutzerwünschen ausgewählt.
 last_process#:#Automatisch zugeteilt
+add_grouping#:#Mitgliedschaftsbeschränkung einrichten
+remove_grouping#:#Mitgliedschaftsbeschränkung auflösen
