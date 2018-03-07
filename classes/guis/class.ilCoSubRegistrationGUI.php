@@ -49,6 +49,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	 */
 	public function editRegistration($priorities = null)
 	{
+		/** @var ilObjUser $ilUser */
 		global $ilUser;
 
 		// get the user for checking if it is fixed
@@ -135,7 +136,8 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	}
 
 	/**
-	 * @param ilObjUser $userObj
+	 * @param ilCoSubUser $userObj
+	 * @return array
 	 */
 	public function getRegistrationInfos($userObj)
 	{
@@ -214,7 +216,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			{
 				$info[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
 
-				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $userObj->getId()))
+				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $userObj->user_id))
 				{
 					ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
 				}
