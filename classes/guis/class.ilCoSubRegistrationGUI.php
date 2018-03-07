@@ -214,7 +214,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 
 			if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
 			{
-				$info[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
+				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
 
 				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $userObj->user_id))
 				{
