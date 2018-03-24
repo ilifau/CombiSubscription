@@ -180,6 +180,15 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
+	 * Get the tolerated percentage of schedule time being in conflict with other item
+	 * @eturn int;
+	 */
+	public function getToleratedConflictPercentage()
+	{
+		return (int) self::_getSetting('tolerated_conflict_percentage', 20);
+	}
+
+	/**
 	 * Get the number of calculation tries for the auto assignment
 	 * @return int
 	 */

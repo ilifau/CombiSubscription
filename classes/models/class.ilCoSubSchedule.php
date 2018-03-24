@@ -257,6 +257,19 @@ class ilCoSubSchedule
 		return count($this->times);
 	}
 
+	/**
+	 * Get the sum of times of this schedule
+	 * @return int	sum in seconds
+	 */
+	public function getSumOfTimes()
+	{
+		$sum = 0;
+		foreach ($this->times as $time)
+		{
+			$sum += $time[1] - $time[0];
+		}
+		return $sum;
+	}
 
 	/**
 	 * Get the slots for ilScheduleInputGUI
@@ -383,31 +396,36 @@ class ilCoSubSchedule
 	}
 
 	/**
-	 * Check if two schedules have a period conflict
+	 * Get the sum of conflicting time between two schedules
 	 * @param self $schedule1
 	 * @param self $schedule2
-	 * @param int $buffer	needed free time between appointments in seconds
-	 * @return bool
+	 * @param int $buffer		needed free time between appointments in seconds
+	 * @return int				conflicting time in seconds
 	 */
-	public static function _haveConflict($schedule1, $schedule2, $buffer)
+	public static function _getConflictTime($schedule1, $schedule2, $buffer = 0)
 	{
+		$conflict = 0;
+
 		foreach ($schedule1->times as $time1)
 		{
 			foreach ($schedule2->times as $time2)
 			{
-				// check if start of one timespan is in the period of the other
-				if (
-					// start of time1 is in period of times plus buffer
-					($time1[0] >= $time2[0] && $time1[0] < $time2[1] + $buffer) ||
-					// start of times2 is in period of times1 plus buffer
-					($time2[0] >= $time1[0] && $time2[0] < $time1[1] + $buffer))
+				// start of time2 is in period of time1 plus buffer
+				if ($time2[0] >= $time1[0] && $time2[0] < $time1[1] + $buffer)
 				{
-					return true;
+					// add overlapping time, assuming end of time1 is later by buffer
+					$conflict += $time1[1] + $buffer - $time2[0];
+				}
+				// start of time1 is in period of time2 plus buffer
+				elseif ($time1[0] >= $time2[0] && $time1[0] < $time2[1] + $buffer)
+				{
+					// add overlapping time, assuming end of time2 is later by buffer
+					$conflict += $time2[1] + $buffer - $time1[0];
 				}
 			}
 		}
 
-		return false;
+		return $conflict;
 	}
 
 	/**

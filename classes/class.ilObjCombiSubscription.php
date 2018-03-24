@@ -738,6 +738,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function getItemsConflicts()
 	{
 		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
+		$tolerance = min($this->getMethodObject()->getToleratedConflictPercentage(), $this->plugin->getToleratedConflictPercentage());
 
 		if (!isset($this->conflicts))
 		{
@@ -747,7 +748,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				$this->conflicts[$item1_id] = array();
 				foreach ($this->getItems() as $item2_id => $item2)
 				{
-					if ($item1_id != $item2_id && ilCoSubItem::_haveConflict($item1, $item2, $buffer))
+					if ($item1_id != $item2_id && ilCoSubItem::_haveConflict($item1, $item2, $buffer, $tolerance))
 					{
 						$this->conflicts[$item1_id][] = $item2_id;
 					}
@@ -1293,6 +1294,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function removeConflicts()
 	{
 		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
+		$tolerance = min($this->getMethodObject()->getToleratedConflictPercentage(), $this->plugin->getToleratedConflictPercentage());
 
 		$items[$this->getId()] = $this->getItems();
 
@@ -1355,7 +1357,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 					{
 						if (!isset($conflicts[$other_item_id][$local_item_id]))
 						{
-							$conflicts[$other_item_id][$local_item_id] = ilCoSubItem::_haveConflict($otherItem, $localItem, $buffer);
+							$conflicts[$other_item_id][$local_item_id] = ilCoSubItem::_haveConflict($otherItem, $localItem, $buffer, $tolerance);
 						}
 
 						if ($conflicts[$other_item_id][$local_item_id])

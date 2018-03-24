@@ -116,23 +116,40 @@ class ilCoSubItem
 	 * Check if two items have a period conflict
 	 * @param self $item1
 	 * @param self $item2
-	 * @param int $buffer	needed free time between appointments in seconds
+	 * @param int $buffer		needed free time between appointments in seconds
+	 * @param int $tolerance	tolerated percentage of schedule time being in conflict with other item
 	 * @return bool
 	 */
-	public static function _haveConflict($item1, $item2, $buffer)
+	public static function _haveConflict($item1, $item2, $buffer = 0, $tolerance = 0)
 	{
+		$conflict_time = 0;
+		$item1_time = $item1->getSumOfTimes();
+		$item2_time = $item2->getSumOfTimes();
+
+		// avoid division by zero when calculating relation
+		if ($item1_time == 0 || $item2_time == 0)
+		{
+			// no times, no conflict
+			return false;
+		}
+
 		foreach ($item1->getSchedules() as $schedule1)
 		{
 			foreach ($item2->getSchedules() as $schedule2)
 			{
-				if (ilCoSubSchedule::_haveConflict($schedule1, $schedule2, $buffer))
-				{
-					return true;
-				}
+				$conflict_time += ilCoSubSchedule::_getConflictTime($schedule1, $schedule2, $buffer);
 			}
 		}
 
-		return false;
+		// check if conflict share is in tolerance for both items
+		if ((100 * $conflict_time / $item1_time) > $tolerance || (100 * $conflict_time / $item2_time) > $tolerance)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -261,5 +278,19 @@ class ilCoSubItem
 			$info[] = $schedule->getPeriodInfo();
 		}
 		return implode('; ', $info);
+	}
+
+	/**
+	 * Get the sum of times of this item
+	 * @return int	sum in seconds
+	 */
+	public function getSumOfTimes()
+	{
+		$sum = 0;
+		foreach ($this->getSchedules() as $schedule)
+		{
+			$sum += $schedule->getSumOfTimes();
+		}
+		return $sum;
 	}
 }

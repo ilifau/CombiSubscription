@@ -13,6 +13,8 @@ abstract class ilCoSubMethodBase
 	/** @var int minimum seconds between appointments without conflict */
 	public $out_of_conflict_time = 3600;
 
+	/** @var int tolerated percentage of schedule time being in conflict with other item */
+	public $tolerated_conflict_percentage = 20;
 
 	/** @var  ilObjCombiSubscription */
 	protected $object;
@@ -168,6 +170,15 @@ abstract class ilCoSubMethodBase
 	public function getOutOfConflictTime()
 	{
 		return $this->out_of_conflict_time;
+	}
+
+	/**
+	 * Get the tolerated percentage of schedule time being in conflict with other item
+	 * @eturn int;
+	 */
+	public function getToleratedConflictPercentage()
+	{
+		return $this->tolerated_conflict_percentage;
 	}
 
 	/**
