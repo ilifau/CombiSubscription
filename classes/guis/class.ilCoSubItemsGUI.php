@@ -80,6 +80,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			case 'saveTargetsConfig':
 			case 'addGrouping':
 			case 'removeGrouping':
+			case 'showConflicts':
 				$this->$cmd();
 				return;
 
@@ -108,6 +109,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$button->setCaption($this->plugin->txt('import_items'), false);
 		$button->setUrl($this->ctrl->getLinkTargetByClass('ilCoSubItemsImportGUI', 'showImportForm'));
 		$ilToolbar->addButtonInstance($button);
+
+		$ilToolbar->addFormButton($this->plugin->txt('show_conflicts'),'showConflicts');
 
 		$this->plugin->includeClass('guis/class.ilCoSubItemsTableGUI.php');
 		$table_gui = new ilCoSubItemsTableGUI($this, 'listItems');
@@ -801,6 +804,9 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$this->ctrl->redirect($this, 'listItems');
 	}
 
+	/**
+	 * remove grouping of targets
+	 */
 	protected function removeGrouping()
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
@@ -828,4 +834,48 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$this->ctrl->redirect($this, 'listItems');
 
 	}
+
+	/**
+	 * Show a list of item conflicts
+	 */
+	protected function showConflicts()
+	{
+		$conflicts = $this->object->getItemsConflicts();
+		$items = $this->object->getItems();
+
+		$buffer = max($this->object->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
+		$tolerance = $this->object->getMethodObject()->getToleratedConflictPercentage();
+
+		$html = '';
+		foreach ($conflicts as $item_id => $conflict_items)
+		{
+			$item = $items[$item_id];
+			$conflict_html = '';
+			foreach ($conflict_items as $conflict_id)
+			{
+				if ($conflict_id != $item_id)
+				{
+					$conflict_item = $items[$conflict_id];
+					if (ilCoSubItem::_haveConflict($item, $conflict_item, $buffer, $tolerance))
+					{
+						$conflict_html .= $conflict_item->getPeriodInfo().': '.$conflict_item->title.'<br />';
+					}
+				}
+			}
+
+			if (!empty($conflict_html))
+			{
+				$html .= '<p><strong>'.$item->getPeriodInfo().': '.$item->title.'</strong><br />' . $conflict_html . '</p>';
+			}
+		}
+
+		if (empty($html))
+		{
+			$html = $this->plugin->txt('no_conflicts_found');
+		}
+
+		ilUtil::sendInfo($html, false);
+		$this->listItems();
+	}
+
 }
