@@ -80,7 +80,7 @@ assignments_description#:#In dieser Matrix können Sie festlegen, welche Auswahl
 assignments_description_runs#:#Wenn Sie Zuteilungen berechnen lassen, werden sie hier eingetragen und zusätzlich mit einem Datum gespeichert. Sie sehen die Verteilung gespeicherter Zuteilungen mit Buchstaben eingeblendet und können diese auch wieder als aktuelle übernehmen.
 save_assignments#:#Speichern
 msg_assignments_saved#:#Die aktuellen Zuteilungen wurden gespeichert.
-satisfaction#:#Erfüllung
+satisfaction#:#Erfüllung der Auswahlen
 satisfied_not#:#Nicht erfüllt
 satisfied_medium#:#Ausreichend erfüllt
 satisfied_full#:#Voll erfüllt
@@ -366,3 +366,7 @@ number_of_tries_info#:#Bei der automatischen Zuteilung werden so viele Berechnun
 last_process#:#Automatisch zugeteilt
 add_grouping#:#Mitgliedschaftsbeschränkung einrichten
 remove_grouping#:#Mitgliedschaftsbeschränkung auflösen
+show_conflicts#:#Konflikte anzeigen
+tolerated_conflict_percentage#:#Tolerierte Überschneidung (%)
+tolerated_conflict_percentage_info#:#Mit Einberechnung des minimalen Terminabstands darf die Überlappung zweier Termine oder Terminreihen maximal diesen Anteil an der Gesamtzeit eines Termins oder einer Terminreihe haben.
+no_conflicts_found#:#Keine Konflikte gefunden.

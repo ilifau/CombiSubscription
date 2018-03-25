@@ -793,7 +793,24 @@ class ilCombiSubscriptionTargets
 		{
 			if (in_array($item->item_id, $a_item_ids))
 			{
-				$this->items[] = $item;
+				$this->items[$item->item_id] = $item;
+			}
+		}
+	}
+
+	/**
+	 * Restrict the list of items to those with writable targets
+	 */
+	public function filterWritableTargets()
+	{
+		/** @var ilAccessHandler $ilAccess */
+		global $ilAccess;
+
+		foreach($this->items as $item_id => $item)
+		{
+			if (!$ilAccess->checkAccess('write','', $item->target_ref_id))
+			{
+				unset($this->items[$item_id]);
 			}
 		}
 	}

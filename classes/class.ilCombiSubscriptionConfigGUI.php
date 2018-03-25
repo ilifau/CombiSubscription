@@ -180,6 +180,16 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 		$ni->setInfo($this->plugin->txt('out_of_conflict_time_info'));
 		$ni->setRequired(true);
 		$ni->setSize(10);
+		$ni->allowDecimals(false);
+		$this->form->addItem($ni);
+
+		$ni = new ilNumberInputGUI($this->plugin->txt('tolerated_conflict_percentage'),'tolerated_conflict_percentage');
+		$ni->setInfo($this->plugin->txt('tolerated_conflict_percentage_info'));
+		$ni->setRequired(true);
+		$ni->setSize(10);
+		$ni->setMinValue(0);
+		$ni->setMaxValue(100);
+		$ni->allowDecimals(false);
 		$this->form->addItem($ni);
 
 		$nt = new ilNumberInputGUI($this->plugin->txt('number_of_tries'),'number_of_tries');
@@ -200,6 +210,9 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 		$this->form->getItemByPostVar('out_of_conflict_time')->setValue(
 			ilCombiSubscriptionPlugin::_getSetting('out_of_conflict_time', 900));
 
+		$this->form->getItemByPostVar('tolerated_conflict_percentage')->setValue(
+			ilCombiSubscriptionPlugin::_getSetting('tolerated_conflict_percentage', 20));
+
 		$this->form->getItemByPostVar('number_of_tries')->setValue(
 			ilCombiSubscriptionPlugin::_getSetting('number_of_tries', 5));
 	}
@@ -210,6 +223,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	protected function savePropertiesValues()
 	{
 		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('out_of_conflict_time'));
+		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('tolerated_conflict_percentage'));
 		ilCombiSubscriptionPlugin::_setSetting('number_of_tries', $this->form->getInput('number_of_tries'));
 	}
 

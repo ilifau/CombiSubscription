@@ -77,7 +77,7 @@ assignments_description#:#This matrix allows you to assign items to users. The p
 assignments_description_runs#:#Calculated assignments are set here and additinally saved with a date. You see these assignments with letters and eingeblendet and you can take them as the actual ones.
 save_assignments#:#Save Assignments
 msg_assignments_saved#:#The assignments were saved.
-satisfaction#:#Satisfaction
+satisfaction#:#Satisfaction of Choices
 satisfied_not#:#Not satisfiend
 satisfied_medium#:#Sufficiently satisfied
 satisfied_full#:#Fully satisfied
@@ -349,3 +349,14 @@ studycond_not_fulfilled#:#Study conditions not satisfied!
 mail_notify_removed_conflicts#:#The folowing conflicts were recognized in other subscriptions and the choices were removed. Please check them and choose alternatives.
 explanation_info#:#A text entered here will replace the automatically generated explanation on the registration page.
 conflict_explanation#:#If the system assigns you an item with a schedule, then it will remove conflicting choices in other combined subscription. You will get an e-mail notification about this after the assignment.
+auto_process#:#Auto Assignments
+auto_process_info#:#The Assignments will be automatically calculated after the subscription period and the users will be informed. Users will automatically get members of the linked courses or groups or will be set on their waiting lists. You can also define the registration settings that will be set after the automatic assignment.
+number_of_tries#:#Number of Tries
+number_of_tries_info#:#The automatic assignments will to this number of calculations and take the one with the most satisfied user preferences.
+last_process#:#Automatically assigned
+add_grouping#:#Add Membership Limitation
+remove_grouping#:#Remove Membership Limitation
+show_conflicts#:#Show Conflicts
+tolerated_conflict_percentage#:#Tolerated Overlapping (%)
+tolerated_conflict_percentage_info#:#Respecting the time buffer, the overlapping time of two schedules should have maximum this part of the total time of a schedule.
+no_conflicts_found#:#No conflicts found.

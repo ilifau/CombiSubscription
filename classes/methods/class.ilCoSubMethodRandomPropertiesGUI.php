@@ -137,6 +137,16 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$di->setShowSeconds(false);
 		$this->form->addItem($di);
 
+		$ni = new ilNumberInputGUI($this->plugin->txt('tolerated_conflict_percentage'),'tolerated_conflict_percentage');
+		$ni->setInfo($this->plugin->txt('tolerated_conflict_percentage_info'));
+		$ni->setRequired(true);
+		$ni->setSize(10);
+		$ni->setMinValue(0);
+		$ni->setMaxValue(100);
+		$ni->allowDecimals(false);
+		$this->form->addItem($ni);
+
+
 		$this->form->addCommandButton('updateProperties', $this->lng->txt('save'));
 	}
 
@@ -157,6 +167,8 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 
 		$this->form->getItemByPostVar('out_of_conflict_time')->setHours($hours);
 		$this->form->getItemByPostVar('out_of_conflict_time')->setMinutes($minutes);
+
+		$this->form->getItemByPostVar('tolerated_conflict_percentage')->setValue($this->method->getToleratedConflictPercentage());
 	}
 
 	/**
@@ -172,6 +184,8 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$di = $this->form->getItemByPostVar('out_of_conflict_time');
 		$seconds = $di->getHours() * 3600 + $di->getMinutes() * 60;
 		$this->method->out_of_conflict_time = max($seconds, $this->plugin->getOutOfConflictTime());
+
+		$this->method->tolerated_conflict_percentage = (int) $this->form->getInput('tolerated_conflict_percentage');
 
 		$this->method->saveProperties();
 	}

@@ -738,7 +738,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function getItemsConflicts()
 	{
 		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
-		$tolerance = min($this->getMethodObject()->getToleratedConflictPercentage(), $this->plugin->getToleratedConflictPercentage());
+		$tolerance = $this->getMethodObject()->getToleratedConflictPercentage();
 
 		if (!isset($this->conflicts))
 		{
@@ -1293,8 +1293,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function removeConflicts()
 	{
+		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
+		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
+
 		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
-		$tolerance = min($this->getMethodObject()->getToleratedConflictPercentage(), $this->plugin->getToleratedConflictPercentage());
+		$tolerance = $this->getMethodObject()->getToleratedConflictPercentage();
 
 		$items[$this->getId()] = $this->getItems();
 
@@ -1437,6 +1440,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
+		$targets_obj->filterWritableTargets();
 		$targets_obj->applyTargetsConfig($config); // may change waiting list settings
 		$targets_obj->addAssignedUsersAsMembers();
 		$targets_obj->addNonAssignedUsersAsSubscribers(); // should be called with new waiting list settings
