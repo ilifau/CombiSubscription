@@ -166,25 +166,57 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 
 		$items = array();
-		foreach ($_POST['ref_id'] as $ref_id)
+
+		if ($this->checkTargetsWritable($_POST['ref_id'], true))
 		{
-			$item = $targets->getItemForTarget($ref_id);
-			$item->save();
-			$items[$item->item_id] = $item;
-
-			foreach($targets->getSchedulesForTarget($ref_id) as $schedule)
+			foreach ($_POST['ref_id'] as $ref_id)
 			{
-				$schedule->obj_id = $this->object->getId();
-				$schedule->item_id = $item->item_id;
-				$schedule->save();
-			}
-		}
-		$targets->applyDefaultTargetsConfig($items);
+				$item = $targets->getItemForTarget($ref_id);
+				$item->save();
+				$items[$item->item_id] = $item;
 
-		ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
+				foreach($targets->getSchedulesForTarget($ref_id) as $schedule)
+				{
+					$schedule->obj_id = $this->object->getId();
+					$schedule->item_id = $item->item_id;
+					$schedule->save();
+				}
+			}
+			$targets->setItems($items);
+			$targets->applyDefaultTargetsConfig();
+
+			ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
+		}
+
 		$this->ctrl->redirect($this, 'listItems');
 	}
 
+
+	/**
+	 * Check if target objects are writable
+	 * @param array $a_ref_ids
+	 * @param bool $a_redirect		keep message for redirect
+	 * @return bool
+	 */
+	protected function checkTargetsWritable($a_ref_ids = array(), $a_redirect = false)
+	{
+		/** @var ilAccessHandler $ilAccess */
+		global $ilAccess;
+
+		foreach ($a_ref_ids as $ref_id)
+		{
+			if (!$ilAccess->checkAccess('write','', (int) $ref_id))
+			{
+				$obj_id = ilObject::_lookupObjId($ref_id);
+				$title = ilObject::_lookupTitle($obj_id);
+
+				ilUtil::sendFailure(sprintf($this->plugin->txt('target_object_not_writable'), $title), $a_redirect);
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 * Show form to create a new item
@@ -201,7 +233,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	protected function saveItem()
 	{
 		$this->initItemForm();
-		if ($this->form->checkInput())
+		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))))
 		{
 			$item = new ilCoSubItem();
 			$this->saveItemProperties($item);
@@ -238,7 +270,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$item = ilCoSubItem::_getById($_GET['item_id']);
 		$schedules = ilCoSubSchedule::_getForObject($this->object->getId(), $_GET['item_id']);
 		$this->initItemForm($item, $schedules);
-		if ($this->form->checkInput())
+		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))))
 		{
 			$item = ilCoSubItem::_getById($_GET['item_id']);
 			$this->saveItemProperties($item);
@@ -254,7 +286,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	}
 
 	/**
-	 * Confirm the ddeletion of items
+	 * Confirm the deletion of items
 	 */
 	protected function confirmDeleteItems()
 	{
@@ -563,8 +595,10 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Initialize the form to configure the targets commonly
+	 * @var string $a_type	target object type or 'auto' for auto assignment configuration
+	 * @var int[]	$a_item_ids		posted item_ids that should be kept for next post
 	 */
-	protected function initTargetsForm($a_type)
+	protected function initTargetsForm($a_type, $a_item_ids = array())
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 
@@ -579,6 +613,12 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		{
 			$this->form->addItem($property);
 		}
+		foreach ($a_item_ids as $item_id)
+		{
+			$hi = new ilHiddenInputGUI('item_ids[]');
+			$hi->setValue((int) $item_id);
+			$this->form->addItem($hi);
+		}
 
 		$this->form->addCommandButton('saveTargetsConfig', $this->plugin->txt('save_target_config'));
 		$this->form->addCommandButton('listItems', $this->lng->txt('cancel'));
@@ -591,7 +631,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Save the properties from the form to an item
 	 * @param   ilCoSubItem   $a_item
-	 * @return  boolean       success
 	 */
 	protected function saveItemProperties($a_item)
 	{
@@ -615,15 +654,16 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$a_item->sub_max = empty($sub_max) ? null : $sub_max;
 		}
 		$a_item->selectable = $this->form->getInput('selectable');
+		$a_item->save();
+
 
 		if (!empty($a_item->target_ref_id) && $a_item->target_ref_id != $old_target_ref_id)
 		{
 			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-			$targets->applyDefaultTargetsConfig(array($a_item));
+			$targets->setItems(array($a_item));
+			$targets->applyDefaultTargetsConfig();
 		}
-
-		return $a_item->save();
 	}
 
 	/**
@@ -734,7 +774,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
-		$this->initTargetsForm($type);
+		$this->initTargetsForm($type, $_POST['item_ids']);
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
@@ -745,11 +785,17 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-		$type = $_GET['type'];
+		$targets->setItemsByIds($_POST['item_ids']);
+		if (!$targets->targetsWritable())
+		{
+			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$this->ctrl->redirect($this, 'listItems');
+		}
 
+		// get the posted configuration
+		$type = $_GET['type'];
 		$this->initTargetsForm($type);
 		$this->form->checkInput();
-
 		$config = $targets->getFormInputs($this->form, $type);
 		$config->saveInSession();
 

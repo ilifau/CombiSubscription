@@ -284,7 +284,7 @@ target_config_saved#:#Die ausgewählten Einstellungen wurden auf die Ziel-Objekt
 target_config_failed#:#Die Einstellungen konnten nicht übertragen werden!
 target_object_not_found#:#Das Ziel-Objekt der Einheit "%s" wurde nicht gefunden!
 target_object_wrong_type#:#Das Ziel-Objekt der Einheit "%s" ist kein Kurs, keine Gruppe oder Sitzung!
-target_object_not_writable#:#Das Ziel-Objekt der Einheit "%s" kann nicht bearbeitet werden!
+target_object_not_writable#:#Das Ziel-Objekt "%s" kann nicht bearbeitet werden!
 registration_categories#:#Auswahl-Kategorien
 categories_description#:#Kategorien gliedern auf der Anmeldeseite die Auswahl-Einheiten in Form aufklappbarer Bereiche. Sie können zudem festlegen, dass in jeder Kategorie eine bestimmte Anzahl an Auswahlen getroffen werden muss. Sie können Kategorien verwenden, müssen es aber nicht.
 create_category#:#Kategorie erstellen

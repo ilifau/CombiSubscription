@@ -274,7 +274,7 @@ target_config_saved#:#The selected settings are applied to the target objects.
 target_config_failed#:#The selected settings can't be applied!
 target_object_not_found#:#The target object of item '%s' is not found.
 target_object_wrong_type#:#The target object of item '%s' is not a course, group or session.
-target_object_not_writable#:#You don't have write access to the target object of item  '%s'.
+target_object_not_writable#:#You don't have write access to the target object '%s'.
 registration_categories#:#Registration Categories
 categories_description#:#Registration Categories are used to show the registration items in an accordeon. You can define how much items have to be chosen per category. You may use categories, but don't need to.
 create_category#:#Create Category

@@ -799,6 +799,19 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
+	 * Set the items to be treated
+	 * @var ilCoSubItem[]
+	 */
+	public function setItems($a_items)
+	{
+		$this->items = array();
+		foreach ($a_items as $item)
+		{
+			$this->items[$item->item_id] = $item;
+		}
+	}
+
+	/**
 	 * Restrict the list of items to those with writable targets
 	 */
 	public function filterWritableTargets()
@@ -837,7 +850,7 @@ class ilCombiSubscriptionTargets
 	 * @param $items
 	 * @return bool
 	 */
-	public function applyDefaultTargetsConfig($items)
+	public function applyDefaultTargetsConfig()
 	{
 		$config = new ilCoSubTargetsConfig($this->object);
 		$config->set_sub_type = true;
@@ -849,7 +862,7 @@ class ilCombiSubscriptionTargets
 
 		try
 		{
-			$this->applyTargetsConfig($config, $items);
+			$this->applyTargetsConfig($config);
 		}
 		catch (Exception $e)
 		{
@@ -863,23 +876,15 @@ class ilCombiSubscriptionTargets
 	/**
 	 * Apply configuration settings to the target objects
 	 * @param ilCoSubTargetsConfig $config
-	 * @param ilCoSubItem[]	$items (indexed by item_id)
 	 * @throws Exception
 	 */
-	public function applyTargetsConfig($config, $items = array())
+	public function applyTargetsConfig($config)
 	{
-		/** @var ilAccessHandler  $ilAccess*/
-		global $ilAccess;
-
 		require_once('Services/Object/classes/class.ilObjectFactory.php');
 		require_once('Services/Membership/classes/class.ilMembershipRegistrationSettings.php');
 
-		if (empty($items))
-		{
-			$items = $this->items;
-		}
 		$targets = array();
-		foreach($items as $item)
+		foreach($this->items as $item)
 		{
 			if (!empty($item->target_ref_id))
 			{
@@ -892,10 +897,6 @@ class ilCombiSubscriptionTargets
 				{
 					throw new Exception(sprintf($this->plugin->txt('target_object_wrong_type'), $item->title));
 				}
-				if (!$ilAccess->checkAccess('write', '', $item->target_ref_id))
-				{
-					throw new Exception(sprintf($this->plugin->txt('target_object_not_writable'), $item->title));
-				}
 
 				$targets[$item->item_id] = $target;
 			}
@@ -903,7 +904,7 @@ class ilCombiSubscriptionTargets
 
 		foreach ($targets as $item_id => $target)
 		{
-			$item = $items[$item_id];
+			$item = $this->items[$item_id];
 			switch ($target->getType())
 			{
 				case 'crs':

@@ -1434,9 +1434,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->getAssignments(true);
 		$this->fixAssignedUsers();
 
-		// add users as members or subscribers
-		$this->handleAutoProcessTargets();
-
 		// remove conflicting choices from other combined subscriptions
 		$removedConflicts = $this->removeConflicts();
 
@@ -1445,6 +1442,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this);
 		$notification->sendAssignments($removedConflicts);
+
+		// add users as members or subscribers
+		$this->handleAutoProcessTargets();
 
 		// show the transfer time in the assignments gui
 		$this->setClassProperty('ilCoSubAssignmentsGUI', 'transfer_time', time());
@@ -1465,10 +1465,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
 		$targets_obj->filterUntrashedTargets();
-
-		$targets_obj->applyTargetsConfig($config); // may change waiting list settings
+		$targets_obj->applyTargetsConfig($config); 			// may change waiting list settings
 		$targets_obj->addAssignedUsersAsMembers();
-		$targets_obj->addNonAssignedUsersAsSubscribers(); // should be called with new waiting list settings
+		$targets_obj->addNonAssignedUsersAsSubscribers(); 	// should be called with new waiting list settings
 
 		// new subscription period for second round in combined subscription
 		if ($config->set_sub_type && $config->sub_type == ilCoSubTargetsConfig::SUB_TYPE_COMBI
