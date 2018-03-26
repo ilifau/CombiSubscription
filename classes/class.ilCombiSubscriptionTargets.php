@@ -816,6 +816,20 @@ class ilCombiSubscriptionTargets
 	}
 
 	/**
+	 * Restrict the list of items to existing, untrashed targets
+	 */
+	public function filterUntrashedTargets()
+	{
+		foreach($this->items as $item_id => $item)
+		{
+			if (!ilObject::_exists($item->target_ref_id, true) || ilObject::_isInTrash($item->target_ref_id))
+			{
+				unset($this->items[$item_id]);
+			}
+		}
+	}
+
+	/**
 	 * Apply the default configuration settings to the target objects
 	 * This is done when new target objects are connected
 	 * - the subscription type is set to the combined subscription

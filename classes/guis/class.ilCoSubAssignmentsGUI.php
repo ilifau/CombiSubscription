@@ -350,6 +350,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+		$targets_obj->filterUntrashedTargets();
 		$targets_obj->addAssignedUsersAsMembers();
 		$targets_obj->addNonAssignedUsersAsSubscribers();
 
