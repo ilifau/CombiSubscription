@@ -205,7 +205,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		foreach ($a_ref_ids as $ref_id)
 		{
-			if (!$ilAccess->checkAccess('write','', (int) $ref_id))
+			if (!empty($ref_id) && !$ilAccess->checkAccess('write','', (int) $ref_id))
 			{
 				$obj_id = ilObject::_lookupObjId($ref_id);
 				$title = ilObject::_lookupTitle($obj_id);
@@ -378,6 +378,10 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		// unsaved schedules with values generated from the target object
 		$schedules = $targets->getSchedulesForTarget($target_ref_id);
+		if (empty($schedules))
+		{
+			$schedules = $item->getSchedules();
+		}
 
 		// re-init the item form to apply the schedules
 		$this->initItemForm($item, $schedules);
