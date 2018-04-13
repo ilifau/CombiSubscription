@@ -16,6 +16,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	const SATISFIED_FULL = 2;
 	const SATISFIED_OVER = 3;
 	const SATISFIED_CONFLICT = -1;
+	const SATISFIED_EMPTY = -2;
 	# endregion
 
 	# region class variables
@@ -1439,6 +1440,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 		// copy the calculated assignments of the run to the current assignments
 		$this->copyAssignments($run->run_id, 0);
+		$this->setClassProperty('ilCoSubAssignmentsGUI', 'source_run', $run->run_id);
 		$this->getAssignments(true);
 		$this->fixAssignedUsers();
 

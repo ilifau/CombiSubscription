@@ -354,6 +354,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				return ilUtil::getImagePath('icon_alert.svg');
 			case ilObjCombiSubscription::SATISFIED_CONFLICT:
 				return ilUtil::getImagePath('icon_alert.svg');
+			case ilObjCombiSubscription::SATISFIED_EMPTY:
+				return ilUtil::getImagePath('scorm/not_attempted.svg');
 			default:
 				return ilUtil::getImagePath('scorm/not_attempted.svg');
 		}
@@ -378,6 +380,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				return $this->plugin->txt('satisfied_over');
 			case ilObjCombiSubscription::SATISFIED_CONFLICT:
 				return $this->plugin->txt('satisfied_conflict');
+			case ilObjCombiSubscription::SATISFIED_EMPTY:
+				return $this->plugin->txt('not_assigned');
 
 			default:
 				return $this->plugin->txt('satisfied_unknown');

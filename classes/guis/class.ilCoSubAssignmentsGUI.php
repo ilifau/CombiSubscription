@@ -95,16 +95,16 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		if ($runs = $this->object->getRunsFinished())
 		{
 			$options = array();
-			$last_run_id = 0;
+			$source_run = $this->object->getClassProperty(get_class($this), 'source_run', 0);
+			$options[0] = $this->lng->txt('please_select');
 			foreach ($runs as $index => $run)
 			{
 				$options[$run->run_id] = $this->object->getRunLabel($index).': '.ilDatePresentation::formatDate($run->run_start);
-				$last_run_id = $run->run_id;
 			}
 			include_once './Services/Form/classes/class.ilSelectInputGUI.php';
 			$si = new ilSelectInputGUI($this->plugin->txt('saved_label'), "run_id");
 			$si->setOptions($options);
-			$si->setValue($last_run_id);
+			$si->setValue($source_run);
 
 			$ilToolbar->addInputItem($si, true);
 
@@ -195,6 +195,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 
 					// copy the calculated assignments of the run to the current assignments
 					$this->object->copyAssignments($run->run_id, 0);
+					$this->object->setClassProperty(get_class($this), 'source_run', $run->run_id);
 					ilUtil::sendSuccess(sprintf($this->plugin->txt('msg_calculation_finished'), $letter, $date), true);
 				}
 				else
@@ -244,6 +245,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		$run->save();
 
 		$this->object->copyAssignments(0, $run->run_id);
+		$this->object->setClassProperty(get_class($this), 'source_run', $run->run_id);
 
 		$letter = $this->object->getRunLabel(count($this->object->getRuns()) -1);
 		$date = ilDatePresentation::formatDate($run->run_start);
@@ -299,6 +301,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubBaseGUI
 		if (!empty($_POST['run_id']))
 		{
 			$this->object->copyAssignments($_POST['run_id'], 0);
+			$this->object->setClassProperty(get_class($this), 'source_run', $_POST['run_id']);
 			ilUtil::sendSuccess($this->plugin->txt('msg_assignments_set'), true);
 		}
 		$this->ctrl->redirect($this,'editAssignments');

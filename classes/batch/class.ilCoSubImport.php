@@ -174,13 +174,14 @@ class ilCoSubImport
 		if (isset($this->run) && isset($this->run->run_id))
 		{
 			$this->object->copyAssignments($this->run->run_id, 0);
+			$this->object->setClassProperty('ilCoSubAssignmentsGUI', 'source_run', $this->run->run_id);
 		}
 
 		return true;
 	}
 
 	/**
-	 * Read the data of the imprted sheet
+	 * Read the data of the imported sheet
 	 * Prepare the column list
 	 * Prepare the row data list of arrays (indexed by column names)
 	 *

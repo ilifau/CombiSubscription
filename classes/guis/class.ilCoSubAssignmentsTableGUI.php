@@ -111,7 +111,12 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$tpl->setVariable('SUM_LABEL', $this->plugin->txt('item_assignment_sum_label'));
 			$tpl->setVariable('SUM', $sum);
 
-			if (isset($item->sub_min) && $sum < $item->sub_min)
+			if ($sum == 0)
+			{
+				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_EMPTY));
+				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('not_assigned'));
+			}
+			elseif (isset($item->sub_min) && $sum < $item->sub_min)
 			{
 				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_NOT));
 				$tpl->setVariable('SUM_STATUS', $this->plugin->txt('sub_min_not_reached'));
