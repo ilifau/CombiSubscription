@@ -9,7 +9,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	const PRIO_CHOICES_LIMITED = 'limited';
 	const PRIO_CHOICES_UNIQUE = 'unique';
 
-	# region class variables
 
 	/** @var int number of selectable priorities */
 	public $number_priorities = 2;
@@ -25,7 +24,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var  ilCoSubRun */
 	protected $run;
 
-	/** @var array ilCoSubItem[] (indexed by item_id) */
+	/**	@var ilCoSubUser[] (indexed by user_id) */
+	protected $users;
+
+	/** @var ilCoSubItem[] (indexed by item_id) */
 	protected $items = array();
 
 	/** @var  array 	item_id => item_id[] */
@@ -37,11 +39,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var  array     user_id => item_id => priority */
 	protected $priorities = array();
 
+	/** @var array	user_id => item_id => true */
+	protected $assignments = array();
+
 	/** @var array 		item_id => priority => count */
 	protected $priority_counts_item = array();
-
-	/**	@var array ilCoSubUser[] (indexed by user_id) */
-	protected $users;
 
 	/** @var array  	item_id => count */
 	protected $assign_counts_item = array();
@@ -215,11 +217,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		return true;
 	}
 
-
 	/**
-	 * Initialize the data for calculating assignments
+	 * Initialize the basic data needed for the calculation
 	 */
-	protected function initCalculationData()
+	protected function initCalculationBasics()
 	{
 		$this->items = $this->object->getItems();
 		$this->conflicts = $this->object->getItemsConflicts();
@@ -233,14 +234,21 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$this->users = $this->object->getUsers();
 		}
 
-		$this->priorities = $this->object->getPriorities();
-		$this->priority_counts_item = $this->object->getPriorityCounts();
-
 //		log_var($this->items, 'items');
 //		log_var($this->conflicts, 'conflicts');
 //		log_var($this->category_limits, 'category_limits');
 //		log_var($this->priorities, 'priorities');
+	}
 
+	/**
+	 * Initialize the calculated data
+	 */
+	protected function initCalculationData()
+	{
+		$this->priorities = $this->object->getPriorities();
+		$this->priority_counts_item = $this->object->getPriorityCounts();
+
+		$this->assignments = array();
 		$this->assign_counts_item = array();
 		foreach ($this->items as $item)
 		{
@@ -258,6 +266,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		{
 			if ($user_obj->is_fixed)
 			{
+				// get the actual assignments (run_id = 0)
 				foreach ($this->object->getAssignmentsOfUser($user_id) as $item_id => $assign_id)
 				{
 					// assign also in the new run
@@ -266,6 +275,62 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			}
 		}
 	}
+
+	/**
+	 * Assign a user to an item and remove it from the priority lists
+	 * @param integer	$a_user_id
+	 * @param integer	$a_item_id
+	 */
+	protected function assignUser($a_user_id, $a_item_id)
+	{
+		// note the assignments
+		$this->assignments[$a_user_id][$a_item_id] = true;
+
+		// increase the assignment counters
+		$this->assign_counts_user[$a_user_id]++;
+		$this->assign_counts_item[$a_item_id]++;
+
+		// decrease the priority count for the chosen item
+		// remove the item choice from the user
+		$priority = $this->priorities[$a_user_id][$a_item_id];
+		$this->priority_counts_item[$a_item_id][$priority]--;
+		unset($this->priorities[$a_user_id][$a_item_id]);
+
+		// this user has reached the number of assignments per user
+		if ($this->assign_counts_user[$a_user_id] >= $this->number_assignments && !empty($this->priorities[$a_user_id]))
+		{
+			// decrease the priority counts for remaining items chosen by the user
+			foreach ($this->priorities[$a_user_id] as $item_id => $priority)
+			{
+				$this->priority_counts_item[$item_id][$priority]--;
+			}
+
+			// then remove user from the list of priorities
+			unset($this->priorities[$a_user_id]);
+		}
+	}
+
+	/**
+	 * Save the calculated assignments
+	 */
+	protected function saveAssignments()
+	{
+		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
+
+		foreach ($this->assignments as $user_id => $items)
+		{
+			foreach ($items as $item_id => $assigned)
+			{
+				$assign = new ilCoSubAssign;
+				$assign->obj_id = $this->object->getId();
+				$assign->run_id = $this->run->run_id;
+				$assign->user_id = $user_id;
+				$assign->item_id = $item_id;
+				$assign->save();
+			}
+		}
+	}
+
 
 	/**
 	 * Calculate the assignments
@@ -283,8 +348,23 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->run->run_start = new ilDateTime(time(), IL_CAL_UNIX);
 		$this->run->save();
 
-		$this->initCalculationData();
-		$this->calculateByUsers();
+		$this->initCalculationBasics();
+
+		// calculate multiple times and remove low filled items
+		for ($try = 1; $try <= $this->plugin->getNumberOfTries(); $try++)
+		{
+			$this->initCalculationData();
+			$this->calculateByUsers();
+
+			$low_ids = $this->getLowFilledItemIds();
+			if (empty($low_ids))
+			{
+				break;
+			}
+			$this->removeItemsById($low_ids);
+		}
+
+		$this->saveAssignments();
 
 		$this->run->details = '';
 		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
@@ -296,162 +376,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	}
 
 	/**
-	 * Calculate the assignments primary by items
-	 * - support multiple assignments
-	 * - don't support category limits
-	 * - don't support period conflicts
-	 * - may leave partially assigned users
-	 */
-	protected function calculateByItems()
-	{
-		for ($priority = 0; $priority < $this->number_priorities; $priority++)
-		{
-			foreach ($this->getSortedItemsForPriority($priority) as $item)
-			{
-				foreach ($this->getSortedUsersForItemAndPriority($item, $priority) as $user_id)
-				{
-					// respect maximum assignments per item
-					if (isset($item->sub_max) && $this->assign_counts_item[$item->item_id] >= $item->sub_max)
-					{
-						break;
-					}
-
-					$this->assignUser($user_id, $item->item_id);
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Get sorted items for a priority
-	 * Sorting criteria:
-	 * -	first group: items where all choices of the priority can be fulfilled
-	 * -	second group: items, where choices can't be fulfilled
-	 * items in each group by decreasing number of choices in this priority
-	 *
-	 * @param 	int	$a_priority
-	 * @return	ilCoSubItem[]
-	 */
-	protected function getSortedItemsForPriority($a_priority)
-	{
-		$indexed = array();
-		$position = count($this->items);
-		foreach($this->items as $item_id => $item)
-		{
-			$p_count = (int) $this->priority_counts_item[$item_id][$a_priority];
-
-			// will go into reverse sorting
-			$key1 = ((isset($item->sub_max) && $p_count > $item->sub_max) ? '0' : '1');		// satisfiable
-			$key2 = sprintf('%06d', $p_count);										// number of choices in this priority
-			$key3 = sprintf('%06d', $position);										// reverse position
-
-			$indexed[$key1.$key2.$key3] = $item;
-			$position--;
-		}
-
-		krsort($indexed);
-		return array_values($indexed);
-	}
-
-	/**
-	 * Get sorted users for an item and a priority
-	 * Sorting criteria:
-	 * - 	first group: users without any other alternative choice in this priority (only lower priorities)
-	 * -	second group: all other users
-	 * -	users in each group are sorted randomly
-	 *
-	 * @param 	ilCoSubItem $a_item
-	 * @param	int			$a_priority
-	 * @return 	array		user_ids
-	 */
-	protected function getSortedUsersForItemAndPriority($a_item, $a_priority)
-	{
-		$first = array();
-		$second = array();
-		$users = array();
-
-		foreach ($this->priorities as $user_id => $item_priorities)
-		{
-			$choices = 0;		// all choices of the user for the given priority
-			$chosen = false;	// the given item is chosen
-			foreach ($item_priorities as $item_id => $priority)
-			{
-				if ($priority == $a_priority)
-				{
-					$choices++;
-					if ($item_id == $a_item->item_id)
-					{
-						$chosen = true;
-					}
-				}
-			}
-
-			if ($chosen)
-			{
-				$users[] = $user_id;
-
-				// users with only one choice in this priority
-				if ($a_priority > 0 && $choices == 1)
-				{
-					$first[] = $user_id;
-				}
-				// all other users
-				// all users in (highest) priority 0
-				else
-				{
-					$second[] = $user_id;
-				}
-			}
-		}
-
-		shuffle($first);
-		shuffle($second);
-
-		$users = array_merge($first, $second);
-		return $users;
-	}
-
-	/**
-	 * Assign a user to an item and remove it from the priority lists
-	 * @param integer	$a_user_id
-	 * @param integer	$a_item_id
-	 */
-	protected function assignUser($a_user_id, $a_item_id)
-	{
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-		$assign = new ilCoSubAssign;
-		$assign->obj_id = $this->object->getId();
-		$assign->run_id = $this->run->run_id;
-		$assign->user_id = $a_user_id;
-		$assign->item_id = $a_item_id;
-		$assign->save();
-
-		// increase the assignment counters
-		$this->assign_counts_user[$a_user_id]++;
-		$this->assign_counts_item[$a_item_id]++;
-
-		// decrease the priority count for the chosen item
-		// remove the item choice from the user
-		 $priority = $this->priorities[$a_user_id][$a_item_id];
-		 $this->priority_counts_item[$a_item_id][$priority]--;
-		 unset($this->priorities[$a_user_id][$a_item_id]);
-
-		// this user has reached the number of assignments per user
-		if ($this->assign_counts_user[$a_user_id] >= $this->number_assignments && !empty($this->priorities[$a_user_id]))
-		{
-			// decrease the priority counts for remaining items chosen by the user
-			foreach ($this->priorities[$a_user_id] as $item_id => $priority)
-			{
-				$this->priority_counts_item[$item_id][$priority]--;
-			}
-
-			// then remove user from the list of priorities
-			unset($this->priorities[$a_user_id]);
-		}
-	}
-
-	/**
 	 * Calculate the assignments primary by users
 	 * - support multiple assignments
 	 * - support category limits
@@ -460,24 +384,21 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	protected function calculateByUsers()
 	{
-		for ($priority = 0; $priority < $this->number_priorities; $priority++)
+		foreach ($this->getShuffledUserIds() as $user_id)
 		{
-			foreach ($this->getSortedUsers() as $user_id)
+			$selected = array();
+			$available = $this->getSortedItemsForUser($user_id);
+			$catlimits = $this->category_limits;
+
+			//log_line("<h2>calculate user $user_id</h2>");
+
+			$selected = $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits);
+
+			if (count($selected) >= $this->number_assignments)
 			{
-				$selected = array();
-				$available = $this->getSortedItemsForUser($user_id);
-				$catlimits = $this->category_limits;
-
-				//log_line("<h2>calculate user $user_id</h2>");
-
-				$selected = $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits);
-
-				if (count($selected) >= $this->number_assignments)
+				foreach ($selected as $item_id => $item)
 				{
-					foreach ($selected as $item_id => $item)
-					{
-						$this->assignUser($user_id, $item_id);
-					}
+					$this->assignUser($user_id, $item_id);
 				}
 			}
 		}
@@ -486,15 +407,22 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Get a randomly sorted list of users
 	 */
-	protected function getSortedUsers()
+	protected function getShuffledUserIds()
 	{
-		$users  = array_keys($this->users);
-		shuffle($users);
-		return $users;
+		$user_ids = array();
+		foreach ($this->users as $user_id => $user)
+		{
+			if (!$user->is_fixed)
+			{
+				$user_ids[] = $user_id;
+			}
+		}
+		shuffle($user_ids);
+		return $user_ids;
 	}
 
 	/**
-	 *	Get a list of items sorted by sorted by some criteria
+	 *	Get a list of items sorted by some criteria
 	 *  1) the priority set by the user
 	 *  2) already existing assignments (try to fill groups)
 	 *
@@ -543,6 +471,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	}
 
 	/**
+	 * Get the item selection for a user recursively
+	 *
 	 * @param $a_selected	ilCoSubItem[]	item_id => item		list of already selected items
 	 * @param $a_available	ilCoSubItem[]	item_id => item		list of still available items
 	 * @param $a_catlimits	int[]		 	item_id => limit	still available selections per category
@@ -632,5 +562,38 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 		//log_line('no item fits (after)');
 		return array();
+	}
+
+	/**
+	 * Get the items with less than minimum assignments
+	 * @return int[]
+	 */
+	protected function getLowFilledItemIds()
+	{
+		$ids = array();
+		foreach ($this->items as $item)
+		{
+			if (!empty($item->sub_min) && $this->assign_counts_item[$item->item_id] < $item->sub_min)
+			{
+				$ids[] = $item->item_id;
+			}
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Remove items from the calculation
+	 * @param int[]
+	 */
+	protected function removeItemsById($a_ids)
+	{
+		foreach ($this->items as $item_id => $item)
+		{
+			if (in_array($item_id, $a_ids))
+			{
+				unset($this->items[$item_id]);
+			}
+		}
 	}
 }
