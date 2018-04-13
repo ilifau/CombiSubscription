@@ -821,6 +821,14 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		{
 			$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 			$this->priorities = ilCoSubChoice::_getPriorities($this->getId());
+
+			foreach($this->getUsers() as $userObj)
+			{
+				if (!isset($this->priorities[$userObj->user_id]))
+				{
+					$this->priorities[$userObj->user_id] = array();
+				}
+			}
 			$this->all_priorities_loaded = true;
 		}
 		return $this->priorities;

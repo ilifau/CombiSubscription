@@ -173,7 +173,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 				'result' => $this->object->getUserSatisfaction($user_id, 0),
 				'assignments' => 0,
 				'is_fixed' => $userObj->is_fixed,
-				'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
+				// performance killer
+				//'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
 				'no_studycond' => !isset($users_for_studycond[$user_id])
 			);
 
@@ -269,10 +270,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('ID', $a_set['user_id']);
 
 		$this->tpl->setVariable($a_set['is_fixed'] ? 'USER_FIXED' : 'USER', $a_set['user']);
-		if (!$a_set['has_access'])
-		{
-			$this->tpl->setVariable('NO_ACCESS', $this->lng->txt('permission_denied'));
-		}
+//		if (!$a_set['has_access'])
+//		{
+//			$this->tpl->setVariable('NO_ACCESS', $this->lng->txt('permission_denied'));
+//		}
 		if ($a_set['no_studycond'])
 		{
 			$this->tpl->setVariable('NO_STUDYCOND', $this->plugin->txt('studycond_not_fulfilled'));
