@@ -132,9 +132,9 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		}
 
 		// target info
-		if (!empty($a_set['target_ref_id']))
+		$ref_id = $a_set['target_ref_id'];
+		if (!empty($ref_id)  && ilObject::_exists($ref_id, true) && !ilObject::_isInTrash($ref_id))
 		{
-			$ref_id = $a_set['target_ref_id'];
 			$type = ilObject::_lookupType($ref_id, true);
 			$props = array();
 			if ($type == 'crs')
