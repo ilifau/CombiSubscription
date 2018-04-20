@@ -19,6 +19,17 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var int number of items to assign in the calculation */
 	public $number_assignments = 1;
 
+	/** @var bool tweak: allow less than sub_min assignments per item */
+	protected $allow_low_filled_items = false;
+
+	/** @var bool tewak: allow less than number_assignments per user */
+	protected $allow_low_filled_users = false;
+
+	/** @var bool tweak: calculate as if all items were selected by the users */
+	protected $assume_all_items_selected = false;
+
+	/** @var bool tweak: calculate as if the maximum per item is limited by the minimum */
+	protected $assume_sub_min_as_limit = false;
 
 
 	/** @var  ilCoSubRun */
@@ -50,8 +61,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	
 	/** @var array 		user_id => count */
 	protected $assign_counts_user = array();
-
-	# endregion
 
 	/**
 	 * Constructor
@@ -356,6 +365,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$this->initCalculationData();
 			$this->calculateByUsers();
 
+			if ($this->allow_low_filled_items)
+			{
+				break;
+			}
+
 			$low_ids = $this->getLowFilledItemIds();
 			if (empty($low_ids))
 			{
@@ -394,7 +408,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 			$selected = $this->getRecursiveItemSelectionForUser($selected, $available, $catlimits);
 
-			if (count($selected) >= $this->number_assignments)
+			if ($this->allow_low_filled_users || count($selected) >= $this->number_assignments)
 			{
 				foreach ($selected as $item_id => $item)
 				{
@@ -439,7 +453,15 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$indexed = array();
 
 		// get a random order of items as default
-		$item_ids = array_keys($this->priorities[$a_user_id]);
+		if ($this->assume_all_items_selected)
+		{
+			$item_ids = array_keys($this->items);
+		}
+		else
+		{
+			$item_ids = array_keys($this->priorities[$a_user_id]);
+		}
+
 		shuffle($item_ids);
 
 		foreach ($item_ids as $index => $item_id)
@@ -450,8 +472,18 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			{
 				$item = $this->items[$item_id];
 
+				// check the item subscription limit
+				if ($this->assume_sub_min_as_limit && !empty($item->sub_min))
+				{
+					$limit = $item->sub_min;
+				}
+				else
+				{
+					$limit = $item->sub_max;
+				}
+
 				// take only items that are not yet full
-				if (empty($item->sub_max) || $item->sub_max > $this->assign_counts_item[$item_id])
+				if (empty($limit) || $limit > $this->assign_counts_item[$item_id])
 				{
 					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
 					$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//then sort by existing assignments (highest first)
@@ -490,7 +522,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		}
 
 		// negative break condition - assignment not possible
-		if (count($a_selected) + count($a_available) < $this->number_assignments)
+		if (!$this->allow_low_filled_users && count($a_selected) + count($a_available) < $this->number_assignments)
 		{
 			//log_line('number assignments not reachable (start)');
 			return array();
