@@ -770,6 +770,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 		foreach ($a_item_ids as $item_id)
 		{
+			if (empty($conflicts[$item_id]))
+			{
+				return false;
+			}
 			$found = array_intersect($conflicts[$item_id], $a_item_ids);
 			if (!empty($found))
 			{
