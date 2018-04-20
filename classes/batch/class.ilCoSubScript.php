@@ -66,6 +66,18 @@ class ilCoSubScript
 	/** @var  ilObjectLP */
 	protected $obj_lp;
 
+	/** @var array item_id => (int) sum of assignments */
+	protected $assignment_sums = array();
+
+	/** @var bool tweak: don't create objects for items without assignments*/
+	protected $ignore_unassigned_items = false;
+
+	/** @var  string tweak: owner of created objects */
+	protected $owner_login = 'root';
+
+	/** @var  int tweak: owner of created objects */
+	protected $owner_id = 6;
+
 	/**
 	 * Constructor.
 	 * @param ilCombiSubscriptionPlugin		$plugin
@@ -80,6 +92,11 @@ class ilCoSubScript
 		$this->plugin  = $plugin;
 		$this->mode = $mode;
 		$this->lng = $lng;
+
+		if (!empty($this->owner_login))
+		{
+			$this->owner_id = ilObjUser::_lookupId($this->owner_login);
+		}
 
 		$this->modes = array(
 			ilCoSubScript::MODE_FTP_STRUCTURE => array(
@@ -336,6 +353,15 @@ class ilCoSubScript
 
 		foreach ($this->rows as $r => $rowdata)
 		{
+			if ($this->ignore_unassigned_items)
+			{
+				$item_id = $this->items_by_identifier[$rowdata['identifier']];
+				if (empty($this->assignment_sums[$item_id]))
+				{
+					continue;
+				}
+			}
+
 			$period_start = $this->excelTimeToUnix($rowdata['period_start']);
 			$period_end = $this->excelTimeToUnix($rowdata['period_end']);
 			$deadline = $this->excelTimeToUnix($rowdata['ex_deadline']);
@@ -368,6 +394,8 @@ class ilCoSubScript
 			$newTest->setEndingTimeEnabled(true);
 			$newTest->setEndingTime(ilFormat::dateDB2timestamp($test_end_obj->get(IL_CAL_DATETIME)));
 			$newTest->saveToDb();
+			$newTest->setOwner($this->owner_id);
+			$newTest->updateOwner();
 
 			/**
 			 * Copy Exercise
@@ -377,6 +405,8 @@ class ilCoSubScript
 			$newExercise = $origExercise->cloneObject($rowdata['group_id']);
 			$newExercise->setDescription("Abgabe bis: " .ilDatePresentation::formatDate($deadline_obj));
 			$newExercise->update();
+			$newExercise->setOwner($this->owner_id);
+			$newExercise->updateOwner();
 
 			/** @var ilExAssignment $assignment */
 			foreach (ilExAssignment::getInstancesByExercise($newExercise->getId()) as $assignment)
@@ -423,6 +453,8 @@ class ilCoSubScript
 			//$newSession->enableRegistrationWaitingList(true);
 			//$newSession->setWaitingListAutoFill(false);
 			$newSession->update();
+			$newSession->setOwner($this->owner_id);
+			$newSession->updateOwner();
 
 			ilSessionAppointment::_deleteBySession($newSession->getId());
 			$appointment = new ilSessionAppointment();
@@ -812,6 +844,8 @@ class ilCoSubScript
 	protected function loadItemData()
 	{
 		$this->items = $this->object->getItems();
+		$this->assignment_sums = $this->object->getAssignmentsSums();
+
 		foreach ($this->object->getItems() as $item_id => $item)
 		{
 			if (!empty($item->identifier))
