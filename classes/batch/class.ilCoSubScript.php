@@ -73,7 +73,7 @@ class ilCoSubScript
 	protected $ignore_unassigned_items = false;
 
 	/** @var  string tweak: owner of created objects */
-	protected $owner_login = 'root';
+	protected $owner_login = 'manfred.vogel';
 
 	/** @var  int tweak: owner of created objects */
 	protected $owner_id = 6;
