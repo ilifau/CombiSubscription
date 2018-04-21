@@ -70,10 +70,10 @@ class ilCoSubScript
 	protected $assignment_sums = array();
 
 	/** @var bool tweak: don't create objects for items without assignments*/
-	protected $ignore_unassigned_items = false;
+	protected $ignore_unassigned_items = true;
 
 	/** @var  string tweak: owner of created objects */
-	protected $owner_login = 'manfred.vogel';
+	protected $owner_login = 'root';
 
 	/** @var  int tweak: owner of created objects */
 	protected $owner_id = 6;
@@ -362,6 +362,14 @@ class ilCoSubScript
 				}
 			}
 
+			// avoid race condition
+			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
+			$ref_id = $item->target_ref_id;
+			if (!empty($ref_id)  && ilObject::_exists($ref_id, true) && !ilObject::_isInTrash($ref_id))
+			{
+				continue;
+			}
+
 			$period_start = $this->excelTimeToUnix($rowdata['period_start']);
 			$period_end = $this->excelTimeToUnix($rowdata['period_end']);
 			$deadline = $this->excelTimeToUnix($rowdata['ex_deadline']);
@@ -387,6 +395,7 @@ class ilCoSubScript
 			/** @var ilObjTest $newTest */
 			$newTest = new ilObjTest($newTest->getRefId(), true);
 			$newTest->setOnline(true);
+			$newTest->setTitle($rowdata['title']. ' - ' . $newTest->getTitle());
 			$newTest->setDescription($test_duration);
 			$newTest->update();
 			$newTest->setStartingTimeEnabled(true);
@@ -403,6 +412,7 @@ class ilCoSubScript
 			/** @var ilObjExercise $newExercise */
 			$origExercise = new ilObjExercise($rowdata['ex_orig_id'], true);
 			$newExercise = $origExercise->cloneObject($rowdata['group_id']);
+			$newExercise->setTitle($rowdata['title']. ' - ' . $newExercise->getTitle());
 			$newExercise->setDescription("Abgabe bis: " .ilDatePresentation::formatDate($deadline_obj));
 			$newExercise->update();
 			$newExercise->setOwner($this->owner_id);
@@ -445,7 +455,7 @@ class ilCoSubScript
 			/** @var ilObjSession $newSession */
 			$origSession = new ilObjSession($rowdata['sess_orig_id'], true);
 			$newSession = $origSession->cloneObject($rowdata['group_id']);
-			//$newSession->setTitle("Teilnahme ". $rowdata['title']);
+			$newSession->setTitle($rowdata['title']);
 			$newSession->setRegistrationType(ilMembershipRegistrationSettings::TYPE_OBJECT);
 			$newSession->setRegistrationRefId($this->object->getRefId());
 			//$newSession->setRegistrationMaxUsers($rowdata['sub_max']);
@@ -557,6 +567,7 @@ class ilCoSubScript
 
 	protected function createFtpExerciseTeams()
 	{
+
 		require_once('Modules/Session/classes/class.ilEventItems.php');
 		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
 		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
@@ -572,9 +583,16 @@ class ilCoSubScript
 			$item = $this->items[$this->items_by_identifier[$rowdata['identifier']]];
 			$user_ids = array_keys($this->object->getAssignmentsOfItem($item->item_id));
 
+			if (empty($user_ids))
+			{
+				continue;
+			}
+
 			$sess_ref_id = $item->target_ref_id;
 			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
 			$sessItems = new ilEventItems($sess_obj_id);
+
+
 
 			foreach ($sessItems->getItems() as $ref_id)
 			{
@@ -799,7 +817,7 @@ class ilCoSubScript
 		{
 			if (empty($rowdata['identifier']) || empty($this->items_by_identifier[$rowdata['identifier']]))
 			{
-				throw new Exception("Kein Identifier oder Einheit nicht gefunden in Zeile $r");
+				throw new Exception("Kein Identifier oder Einheit '".$rowdata['identifier']."'' nicht gefunden in Zeile $r");
 			}
 
 			$group_id = $rowdata['group_id'];
