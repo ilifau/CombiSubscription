@@ -675,7 +675,7 @@ class ilCoSubScript
 
 		if(empty($group_id) || empty($ex_title))
 		{
-			throw new Exception("Gruppe oder Ünbungstitel nich angegeben!");
+			throw new Exception("Gruppe oder Übungstitel nicht angegeben!");
 		}
 
 		// collect the status by user id
@@ -701,7 +701,7 @@ class ilCoSubScript
 		// write the learning progress of the exercise members
 		foreach ($et_data as $ex_data)
 		{
-			if ($ex_data['title'] == $ex_title)
+			if (strpos($ex_data['title'], $ex_title) !== false)
 			{
 				$exObj = new ilObjExercise($ex_data['child'], true);
 
@@ -746,18 +746,34 @@ class ilCoSubScript
 			$sess_ref_id = $item->target_ref_id;
 			$sess_obj_id = ilObject::_lookupObjId($sess_ref_id);
 
+			// sessions may have been be deleted due to missing registrations
+			if (empty($sess_obj_id) || ilObject::_isInTrash($sess_ref_id))
+			{
+				continue;
+			}
+
 			$sessItems = new ilEventItems($sess_obj_id);
 			$cleaned = array();
+			$ex_ref_id = null;
+			$ex_obj_id = null;
 			foreach ($sessItems->getItems() as $ref_id)
 			{
+				$type = ilObject::_lookupType($ref_id, true);
+
 				// Delete test 'Antestat'
-				if (ilObject::_lookupType($ref_id, true) == "tst")
+				if ($type == "tst")
 				{
 					$tstObj = new ilObjTest($ref_id, true);
 					$tstObj->delete();
 				}
 				else
 				{
+					if ($type == 'exc')
+					{
+						$ex_ref_id = $ref_id;
+						$ex_obj_id = ilObject::_lookupObjectId($ex_ref_id);
+					}
+
 					$cleaned[] = $ref_id;
 				}
 			}
@@ -766,7 +782,7 @@ class ilCoSubScript
 
 			// Create Exercie 'Antestat'
 			$newExercise = new ilObjExercise();
-			$newExercise->setTitle('Antestat');
+			$newExercise->setTitle($rowdata['identifier'] . ' - Antestat');
 			$newExercise->setDescription('Hier werden die Ergebnisse des Antestats eingetragen.');
 			$newExercise->setInstruction('Sie müssen diese Übung nicht direkt bearbeiten. In ihr werden die Ergebnisse des Tests eingetragen.');
 			$newExercise->create();
@@ -788,7 +804,8 @@ class ilCoSubScript
 			$this->obj_settings->setMode(ilLPObjSettings::LP_MODE_EXERCISE_RETURNED);
 			$this->obj_settings->update(true);
 
-			 //Set Exerrcise as precondition for session
+			 //Set Exercise as precondition for session
+			$this->cleanupCoditionsOfTarget($sess_ref_id);
 			$cond = new ilConditionHandler();
 			$cond->setTriggerRefId($newExercise->getRefId());
 			$cond->setTriggerObjId($newExercise->getId());
@@ -802,6 +819,22 @@ class ilCoSubScript
 			$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
 			$cond->storeCondition();
 
+			// Set Exercise es precondition for the other exercise
+			$this->cleanupCoditionsOfTarget($ex_ref_id);
+			$cond = new ilConditionHandler();
+			$cond->setTriggerRefId($newExercise->getRefId());
+			$cond->setTriggerObjId($newExercise->getId());
+			$cond->setTriggerType('exc');
+			$cond->setOperator(ilConditionHandler::OPERATOR_LP);
+			$cond->setTargetRefId($ex_ref_id);
+			$cond->setTargetObjId($ex_obj_id);
+			$cond->setTargetType('exc');
+			$cond->setObligatory(true);
+			$cond->setHiddenStatus(false);
+			$cond->setReferenceHandlingType(ilConditionHandler::UNIQUE_CONDITIONS);
+			$cond->storeCondition();
+
+
 			// Assign the exercise as session material
 			$event_items = new ilEventItems($sess_obj_id);
 			$event_items->addItem($newExercise->getRefId());
@@ -809,6 +842,25 @@ class ilCoSubScript
 		}
 	}
 
+	/**
+	 * Remove the conditions of a target triggered by deleted objects
+	 * @param $ref_id
+	 */
+	protected function cleanupCoditionsOfTarget($ref_id)
+	{
+		$obj_id = ilObject::_lookupObjectId($ref_id);
+		$type = ilObject::_lookupType($obj_id);
+
+		$conditions = ilConditionHandler::_getConditionsOfTarget($ref_id,$obj_id, $type);
+
+		foreach ($conditions as $condition)
+		{
+			if (!ilObject::_exists($condition['trigger_ref_id']) || ilObject::_isInTrash($condition['trigger_ref_id']))
+			{
+				ilConditionHandler::deleteCondition($condition['id']);
+			}
+		}
+	}
 
 
 	protected function checkFtpStructure()
