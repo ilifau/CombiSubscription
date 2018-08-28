@@ -71,6 +71,8 @@ registration_header_bars_info#:#The bars show the number of choices
 save_registration#:#Save Choices
 method_not_defined#:#This object has not assignment method defined!
 msg_registration_saved#:#The choices where saved.
+msg_registration_saved_own#:#Your choices where saved.
+msg_send_email_confirmation#:#Send confirmation by e-mail
 assignment#:#Assigment
 assignments#:#Assignments
 assignments_description#:#This matrix allows you to assign items to users. The priorities chosen by the users are shown as background colors.
@@ -175,9 +177,11 @@ mail_signature#:#This message relates to the following combined subscription:
 mail_notify_subject#:#Assignment for '%s'
 mail_notify_no_assignment#:#Sorry, you didn't get an assignment.
 mail_notify_assignments#:#You got the following assignments:
-mail_registration_subject#:#Registration for "%s"
-mail_registration_no_choice#:#You made no selection.
-mail_registration_choices#:#You selected the following items (with priorities):
+mail_registration_subject#:#Your Subscription for "%s"
+mail_registration_own#:#You created or edited the subscription.
+mail_registration_by_admin#:#Your subscription was created or edited by "%".
+mail_registration_no_choice#:#No items are selection.
+mail_registration_choices#:#The following items are selected (with priorities):
 mail_removal_subject#:#Your Subscription for "%s"
 mail_removal_message#:#Your subscription is deleted.
 transfer_assignments#:#Transfer Assignments
@@ -318,6 +322,7 @@ import_items_finished#:#The registration items were imported.
 import_items_failed#:#The registration items can't be imported.
 run_scripts#:#Run Scripts
 run#:#Run
+fixed#:#Assignment Fixed
 fix_users#:#Fix Assignments
 fix_users_confirmation#:#Do you like to fix the assignments of the following users. They will be kept when assignnemts are calculated, set or imported. The users won't be able to change their registration.
 fix_users_done#:#The assignments are fixed.
@@ -360,3 +365,10 @@ show_conflicts#:#Show Conflicts
 tolerated_conflict_percentage#:#Tolerated Overlapping (%)
 tolerated_conflict_percentage_info#:#Respecting the time buffer, the overlapping time of two schedules should have maximum this part of the total time of a schedule.
 no_conflicts_found#:#No conflicts found.
+own_registration#:#Own Registration
+list_registrations#:#Registered Users
+selected_items#:#Selected Items
+search_users#:#Search Users
+add_users#:#Add Users
+users_added#:#The users(s) were added.
+edit_registration#:#Edit Registration

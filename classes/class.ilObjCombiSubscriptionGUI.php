@@ -121,23 +121,17 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				case 'ilcosubregistrationgui':
 					$this->checkPermission('read');
 					$this->checkMethodAvailable();
-					$this->setSubTabs('registration','registration');
+					$this->setSubTabs('registration','own_registration');
+					$this->plugin->includeClass('abstract/class.ilCoSubUserManagementBaseGUI.php');
 					$this->plugin->includeClass('guis/class.ilCoSubRegistrationGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubRegistrationGUI($this));
 					return;
-
-//				case 'ilcosubpeersgui':
-//					$this->checkPermission('read');
-//					$this->checkMethodAvailable();
-//					$this->setSubTabs('registration','peers');
-//					$this->plugin->includeClass('guis/class.ilCoSubPeersGUI.php');
-//					$this->ctrl->forwardCommand(new ilCoSubPeersGUI($this));
-//					return;
 
 				case 'ilcosubassignmentsgui':
 					$this->checkPermission('write');
 					$this->checkMethodAvailable();
 					$this->setSubTabs('assignments','assignments');
+					$this->plugin->includeClass('abstract/class.ilCoSubUserManagementBaseGUI.php');
 					$this->plugin->includeClass('guis/class.ilCoSubAssignmentsGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubAssignmentsGUI($this));
 					return;
@@ -188,12 +182,14 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 			$cmd = $cmd ? $cmd : $this->ctrl->getCmd();
 			switch ($cmd)
 			{
+				// defined in ilObjCombiSubscriptionListGUI
 				case 'editProperties':
-					$this->performCommand($cmd, 'ilcosubpropertiesgui');
+					$this->ctrl->redirectByClass('ilCoSubPropertiesGUI','editProperties');
 					return;
 
+				// defined in ilObjCombiSubscriptionListGUI
 				case 'editRegistration':
-					$this->performCommand($cmd, 'ilcosubregistrationgui');
+					$this->ctrl->redirectByClass('ilCoSubRegistrationGUI','editRegistration');
 					return;
 
 				case 'returnToContainer':
@@ -294,8 +290,12 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 		switch ($a_tab)
 		{
 			case 'registration':
-				$this->tabs_gui->addSubTab('registration', $this->txt('registration'), $this->ctrl->getLinkTarget($this,'editRegistration'));
-				//$this->tabs_gui->addSubTab('peers', $this->txt('peers'), $this->ctrl->getLinkTargetByClass('ilCoSubPeersGUI'));
+				$this->tabs_gui->addSubTab('own_registration', $this->txt('own_registration'), $this->ctrl->getLinkTargetByClass('ilCoSubRegistrationGUI', 'editRegistration'));
+
+				if ($this->checkPermissionBool('write', '', $this->getType(), $this->object->getRefId()))
+				{
+					$this->tabs_gui->addSubTab('list_registrations', $this->txt('list_registrations'), $this->ctrl->getLinkTargetByClass('ilCoSubRegistrationGUI', 'listRegistrations'));
+				}
 				break;
 
 			case 'settings':

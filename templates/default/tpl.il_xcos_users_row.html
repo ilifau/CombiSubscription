@@ -1,0 +1,41 @@
+<tr class="{CSS_ROW}">
+    <td class="std">
+        <input type="checkbox" name="ids[]" value="{ID}" />
+        <input type="hidden" name="page_ids[]" value="{ID}" />
+    </td>
+    <td class="std">
+        <!-- BEGIN user_fixed -->
+            <strong>{USER_FIXED}</strong>
+        <!-- END user_fixed -->
+        <!-- BEGIN user -->
+            {USER}
+        <!-- END user -->
+        <!-- BEGIN access -->
+        <div class="small warning">{NO_ACCESS}</div>
+        <!-- END access -->
+        <!-- BEGIN studycond -->
+        <div class="small warning">{NO_STUDYCOND}</div>
+        <!-- END studycond -->
+    </td>
+    <td class="std">
+        <!-- BEGIN login_fixed -->
+        <strong>{LOGIN_FIXED}</strong>
+        <!-- END login_fixed -->
+        <!-- BEGIN login -->
+        {LOGIN}
+        <!-- END login -->
+    </td>
+    <td class="std">
+        {REGISTRATIONS}
+    </td>
+    <td class="std">
+        {FIXED}
+    </td>
+    <td class="std">
+        <div class="il_ContainerItemCommands2">
+            <!-- BEGIN link -->
+            <a class="il_ContainerItemCommand2" href="{LINK_URL}">{LINK_TXT}</a><br />
+            <!-- END link -->
+        </div>
+    </td>
+</tr>

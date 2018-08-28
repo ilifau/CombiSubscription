@@ -74,6 +74,8 @@ delete_registration_question#:#Sind Sie sicher, dass Sie Ihre Auswahlen komplett
 registration_deleted#:#Ihre Anmeldung wurde gelöscht.
 method_not_defined#:#Für die Anmeldung ist keine Zuteilungs-Methode definiert!
 msg_registration_saved#:#Die Auswahl wurde gespeichert.
+msg_registration_saved_own#:#Ihre Auswahl wurde gespeichert.
+msg_send_email_confirmation#:#Bestätigung per E-Mail versenden
 assignment#:#Zuteilung
 assignments#:#Zuteilungen
 assignments_description#:#In dieser Matrix können Sie festlegen, welche Auswahl-Einheit welchem Nutzer zugeteilt ist. Sie sehen die Prioritäten aus der Anmeldung farbig hinterlegt.
@@ -182,9 +184,11 @@ mail_signature#:#Diese Nachricht betrifft die folgende kombinierte Anmeldung:
 mail_notify_subject#:#Zuteilung für "%s"
 mail_notify_no_assignment#:#Sie haben leider keine Zuteilung erhalten.
 mail_notify_assignments#:#Sie haben die folgenden Zuteilungen erhalten:
-mail_registration_subject#:#Anmeldung bei "%s"
-mail_registration_no_choice#:#Sie haben keine Auswahl getroffen.
-mail_registration_choices#:#Sie haben folgende Auswahlen (mit Priorität) getroffen:
+mail_registration_subject#:#Ihre Anmeldung bei "%s"
+mail_registration_own#:#Sie haben Ihre Anmeldung erstellt oder bearbeitet.
+mail_registration_by_admin#:#Ihre Anmeldung wurde von "%s" erstellt bzw bearbeitet.
+mail_registration_no_choice#:#Es sind keine Auswahlen getroffen.
+mail_registration_choices#:#Die folgenden Auswahlen sind (mit Priorität) getroffen:
 mail_removal_subject#:#Ihre Anmeldung bei "%s"
 mail_removal_message#:#Ihre Anmeldung wurde gelöscht.
 transfer_assignments#:#Auf Kurse/Gruppen/Sitzungen übertragen
@@ -328,6 +332,7 @@ import_items_finished#:#Die Auswahl-Einheiten wurden importiert.
 import_items_failed#:#Die Auswahl-Einheiten konnten nicht importiert werden.
 run_scripts#:#Skripte ausführen
 run#:#Ausführen
+fixed#:#Zuteilung fixiert
 fix_users#:#Zuteilungen fixieren
 fix_users_confirmation#:#Möchten Sie die Zuteilungen der folgenden Nutzer fixieren? Sie bleiben bei Berechnungen, Übernahme oder Import erhalten. Die Nutzer können ihre Anmeldung nicht mehr ändern.
 fix_users_done#:#Die Zuteilungen der Nutzer wurden fixiert.
@@ -370,3 +375,10 @@ show_conflicts#:#Konflikte anzeigen
 tolerated_conflict_percentage#:#Tolerierte Überschneidung (%)
 tolerated_conflict_percentage_info#:#Mit Einberechnung des minimalen Terminabstands darf die Überlappung zweier Termine oder Terminreihen maximal diesen Anteil an der Gesamtzeit eines Termins oder einer Terminreihe haben.
 no_conflicts_found#:#Keine Konflikte gefunden.
+own_registration#:#Eigene Anmeldung
+list_registrations#:#Angemeldete Benutzer
+selected_items#:#Ausgewählte Einheiten
+search_users#:#Nutzer suchen
+add_users#:#Nutzer hinzufügen
+users_added#:#Der/die Nutzer wurde(n) hinzugefügt.
+edit_registration#:#Anmeldung bearbeiten

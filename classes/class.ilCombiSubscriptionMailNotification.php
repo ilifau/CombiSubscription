@@ -38,10 +38,13 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 
 	/**
 	 * Send a registration confirmation to the user
-	 * @param	array	$user_id
+	 * @param	int	$user_id
+	 * @param	bool $by_admin
 	 */
-	public function sendRegistration($user_id)
+	public function sendRegistration($user_id, $by_admin = false)
 	{
+		global $ilUser;
+
 		$priorities = $this->object->getPrioritiesOfUser($user_id);
 		$names = $this->object->getMethodObject()->getPriorities();
 
@@ -58,6 +61,16 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 		);
 		$this->setBody(ilMail::getSalutation($user_id, $this->getLanguage()));
 		$this->appendBody("\n\n");
+
+
+		if ($by_admin)
+		{
+			$this->appendBody(sprintf($this->txt('mail_registration_by_admin'), $ilUser->getFullname())."\n\n");
+		}
+		else
+		{
+			$this->appendBody($this->txt('mail_registration_own')."\n\n");
+		}
 
 		if (empty($priorities))
 		{

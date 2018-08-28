@@ -4,35 +4,62 @@
  * Registration screen of a combined subscription
  *
  * @author Fred Neumann <fred.neumann@fau.de>
- * @version $Id$
  *
  * @ilCtrl_isCalledBy ilCoSubRegistrationGUI: ilObjCombiSubscriptionGUI
+ * @ilCtrl_Calls ilCoSubRegistrationGUI: ilRepositorySearchGUI
  */
-class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
+class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 {
+	/** @var string command to show the list of users */
+	protected $cmdUserList = 'listRegistrations';
+
 	/** @var ilCoSubCategory[] */
-	var $categories = array();
+	protected $categories = array();
 
 	/** @var bool registration is disabled */
-	var $disabled = false;
+	protected $disabled = false;
+
+	/** @var ilObjUser ilias_user */
+	protected $ilias_user = null;
 
 	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
+	 * @throws ilCtrlException
 	 */
 	public function executeCommand()
 	{
+		$next_class = $this->ctrl->getNextClass();
+		switch ($next_class)
+		{
+			case 'ilrepositorysearchgui':
+				$this->tabs->setSubTabActive('list_registrations');
+				$this->performUserSearch();
+				return;
+		}
+
+		// get the user that should be treated
+		$this->loadIliasUser();
+		$this->ctrl->saveParameter($this, 'user_id');
+
+		$this->tabs->setSubTabActive($this->isOwnRegistration() ? 'own_registration' : 'list_registrations');
 		$this->categories = $this->object->getCategories();
 
 		$cmd = $this->ctrl->getCmd('editRegistration');
 		switch ($cmd)
 		{
+			case 'listRegistrations':
 			case 'editRegistration':
 			case 'saveRegistration':
+			case 'sendSubscriptionEmail':
 			case 'confirmDeleteRegistration':
 			case 'deleteRegistration':
 			case 'cancelRegistration':
-				$this->$cmd();
+			case 'mailToUsers':
+			case 'removeUsers':
+			case 'removeUsersConfirmation':
+
+			$this->$cmd();
 				return;
 
 			default:
@@ -44,36 +71,62 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 
 
 	/**
+	 * Show a list of registered users
+	 */
+	public function listRegistrations()
+	{
+		/**
+		 * @var ilAccessHandler $ilAccess
+		 * @var ilErrorHandling $ilErr
+		 */
+		global $ilAccess, $ilErr;
+
+		if (!$ilAccess->checkAccess('write', '', $this->object->getRefId()))
+		{
+			$ilErr->raiseError($this->lng->txt('permission_denied'));
+		}
+
+		$this->tabs->activateSubTab('list_registrations');
+
+		$this->plugin->includeClass('guis/class.ilCoSubUsersTableGUI.php');
+		$table_gui = new ilCoSubUsersTableGUI($this, 'listRegistrations');
+		$table_gui->prepareData();
+
+		$this->showInfo();
+		$this->provideUserSearch();
+		$this->tpl->setContent($table_gui->getHTML());
+	}
+
+	/**
 	 * Edit the registration of the current user
 	 * @param array|null	posted priorities to be set (item_id => priority)
 	 */
 	public function editRegistration($priorities = null)
 	{
-		/** @var ilObjUser $ilUser */
-		global $ilUser;
-
 		// get the user for checking if it is fixed
-		$userObj = $this->object->getUser($ilUser->getId());
+		$userObj = $this->object->getUser($this->ilias_user->getId());
 
-		// check subscription period
-		if ($this->object->isBeforeSubscription())
+		if ($this->isOwnRegistration())
 		{
-			ilUtil::sendInfo($this->plugin->txt('subscription_period_not_started'));
-			$this->disabled = true;
-		}
-		elseif ($this->object->isAfterSubscription())
-		{
-			ilUtil::sendInfo($this->plugin->txt('subscription_period_finished'));
-			$this->disabled = true;
-		}
-		elseif ($userObj->is_fixed)
-		{
-			ilUtil::sendInfo($this->plugin->txt('subscription_message_user_fixed'));
-			$this->disabled = true;
+			// check subscription period
+			if ($this->object->isBeforeSubscription())
+			{
+				ilUtil::sendInfo($this->plugin->txt('subscription_period_not_started'));
+				$this->disabled = true;
+			}
+			elseif ($this->object->isAfterSubscription())
+			{
+				ilUtil::sendInfo($this->plugin->txt('subscription_period_finished'));
+				$this->disabled = true;
+			}
+			elseif ($userObj->is_fixed)
+			{
+				ilUtil::sendInfo($this->plugin->txt('subscription_message_user_fixed'));
+				$this->disabled = true;
+			}
 		}
 
-
-		$saved_priorities = $this->object->getPrioritiesOfUser($ilUser->getId());
+		$saved_priorities = $this->object->getPrioritiesOfUser($this->ilias_user->getId());
 
 		// take the current priorities of the user if none are posted
 		if (!isset($priorities))
@@ -104,14 +157,13 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		if (!$this->disabled)
 		{
 			$form->addCommandButton('saveRegistration', $this->plugin->txt('save_registration'));
+			$form->addCommandButton('cancelRegistration', $this->lng->txt('cancel'));
+			if ($this->isOwnRegistration() && !empty($saved_priorities))
+			{
+				$form->addSeparator();
+				$form->addCommandButton('confirmDeleteRegistration', $this->plugin->txt('delete_registration'));
+			}
 		}
-		$form->addCommandButton('cancelRegistration', $this->lng->txt('cancel'));
-		if (!$this->disabled && !empty($saved_priorities))
-		{
-			$form->addSeparator();
-			$form->addCommandButton('confirmDeleteRegistration', $this->plugin->txt('delete_registration'));
-		}
-
 
 		if (empty($this->categories))
 		{
@@ -123,7 +175,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		}
 
 		$infos = $this->getRegistrationInfos($userObj);
-		$this->tpl->setContent(implode('', $infos) . $form->getHTML());
+		$this->tpl->setContent($this->getUserInfoHTML() .implode('', $infos) . $form->getHTML());
 
 		// color coding of priorities
 		$this->tpl->addJavaScript($this->plugin->getDirectory().'/js/ilCombiSubscription.js');
@@ -309,10 +361,10 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	 */
 	public function saveRegistration()
 	{
-		global $ilUser;
+		$userObj = $this->object->getUser($this->ilias_user->getId());
 
-		// check subscription period
-		if ($this->object->isBeforeSubscription() or $this->object->isAfterSubscription())
+		// check fixation and subscription period
+		if ($this->isOwnRegistration() && ($userObj->is_fixed || $this->object->isBeforeSubscription() || $this->object->isAfterSubscription()))
 		{
 			$this->ctrl->redirect($this,'editRegistration');
 		}
@@ -350,7 +402,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 
 				$choice = new ilCoSubChoice();
 				$choice->obj_id  = $this->object->getId();
-				$choice->user_id = $ilUser->getId();
+				$choice->user_id = $this->ilias_user->getId();
 				$choice->item_id = $item->item_id;
 				$choice->priority = $priority;
 				$choices[] = $choice;
@@ -360,7 +412,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			}
 		}
 
-		// check for unused priorities if each priority has to chosen
+		// check for unused priorities if each priority has to be chosen
 		if (count($used_prio) <= $max_prio && !$has_ec)
 		{
 			ilUtil::sendFailure($this->plugin->txt('empty_choice_alert'));
@@ -382,24 +434,49 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			return $this->editRegistration($posted);
 		}
 
-		ilCoSubChoice::_deleteForObject($this->object->getId(), $ilUser->getId());
+		// finally save the choices
+		$userObj->save();
+		ilCoSubChoice::_deleteForObject($this->object->getId(), $userObj->user_id);
 		foreach ($choices as $choice)
 		{
 			$choice->save();
 		}
-		$user = $this->object->getUser($ilUser->getId());
-		$user->save();
 
+		if ($this->isOwnRegistration())
+		{
+			ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved_own')
+				.sprintf('<br /><a class="small" href="%s">%s</a>',
+					$this->ctrl->getLinkTarget($this, 'sendSubscriptionEmail'),
+					$this->plugin->txt('msg_send_email_confirmation')));
+		}
+		else
+		{
+			$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+			$notification = new ilCombiSubscriptionMailNotification();
+			$notification->setPlugin($this->plugin);
+			$notification->setObject($this->object);
+			$notification->sendRegistration($userObj->user_id, true);
+
+			ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'));
+		}
+		// don't redirect because this may show the pre-select
+		$this->editRegistration($posted);
+	}
+
+
+	/**
+	 * Send an email with the subscriotion info
+	 */
+	public function sendSubscriptionEmail()
+	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this->object);
-		$notification->sendRegistration($ilUser->getId());
-
-		// don't redirect because this may show the pre-select
-		ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'));
-		$this->editRegistration($posted);
+		$notification->sendRegistration($this->ilias_user->getId());
+		$this->parent->returnToContainer();
 	}
+
 
 	/**
 	 * Show the confirmation message for deleting the registration
@@ -412,7 +489,7 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 		$gui->setHeaderText($this->plugin->txt('delete_registration_question'));
 		$gui->setConfirm($this->plugin->txt('delete_registration'),'deleteRegistration');
 		$gui->setCancel($this->lng->txt('cancel'),'editRegistration');
-		$this->tpl->setContent($gui->getHTML());
+		$this->tpl->setContent($this->getUserInfoHTML() . $gui->getHTML());
 	}
 
 	/**
@@ -420,21 +497,34 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 	 */
 	public function deleteRegistration()
 	{
-		global $ilUser;
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 		$this->plugin->includeClass('models/class.ilCoSubUser.php');
-		ilCoSubChoice::_deleteForObject($this->object->getId(), $ilUser->getId());
-		ilCoSubUser::_deleteForObject($this->object->getId(), $ilUser->getId());
+		ilCoSubChoice::_deleteForObject($this->object->getId(), $this->ilias_user->getId());
+		ilCoSubUser::_deleteForObject($this->object->getId(), $this->ilias_user->getId());
 		ilUtil::sendSuccess($this->plugin->txt('registration_deleted'), true);
-		$this->parent->returnToContainer();
+		if ($this->isOwnRegistration())
+		{
+			$this->parent->returnToContainer();
+		}
+		else
+		{
+			$this->ctrl->redirect($this, 'listRegistrations');
+		}
 	}
 
 	/**
 	 * Cancel the registration
 	 */
-	public function cancelRegistration()
+	public function  cancelRegistration()
 	{
-		$this->parent->returnToContainer();
+		if ($this->isOwnRegistration())
+		{
+			$this->parent->returnToContainer();
+		}
+		else
+		{
+			$this->ctrl->redirect($this, 'listRegistrations');
+		}
 	}
 
 
@@ -454,5 +544,55 @@ class ilCoSubRegistrationGUI extends ilCoSubBaseGUI
 			}
 		}
 		return $priorities;
+	}
+
+	/**
+	 * Get the currently treated user object
+	 */
+	protected function loadIliasUser()
+	{
+		/**
+		 * @var ilObjUser $ilUser
+		 * @var ilAccessHandler $ilAccess
+		 * @var ilErrorHandling $ilErr
+		 */
+		global $ilUser, $ilErr, $ilAccess;
+
+		if (!empty($_GET['user_id']))
+		{
+			if (!$ilAccess->checkAccess('write', '', $this->object->getRefId()))
+			{
+				$ilErr->raiseError($this->lng->txt('permission_denied'));
+			}
+			$this->ilias_user = new ilObjUser($_GET['user_id']);
+		}
+		else
+		{
+			$this->ilias_user = $ilUser;
+		}
+	}
+
+	/**
+	 * Check if the the registration is down for oneseof
+	 */
+	protected function isOwnRegistration()
+	{
+		return empty($_GET['user_id']);
+	}
+
+	/**
+	 * Get the information about the currently treated user
+	 * @return string
+	 */
+	protected function getUserInfoHTML()
+	{
+		if ($this->isOwnRegistration())
+		{
+			return '';
+		}
+		else
+		{
+			return '<h3>'.$this->ilias_user->getFullname() . ' ('. $this->ilias_user->getLogin(). ')'.'</h3>';
+		}
 	}
 }

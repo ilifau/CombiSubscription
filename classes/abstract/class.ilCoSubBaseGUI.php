@@ -28,19 +28,23 @@ abstract class ilCoSubBaseGUI
 	/** @var ilPropertyFormGUI */
 	protected $form;
 
+	/** @var ilToolbarGUI */
+	protected $toolbar;
+
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI     $a_parent_gui
 	 */
 	public function __construct($a_parent_gui)
 	{
-		global $ilCtrl, $ilTabs, $tpl, $lng;
+		global $ilCtrl, $ilTabs, $ilToolbar, $tpl, $lng;
 
 		$this->parent = $a_parent_gui;
 		$this->object = $this->parent->object;
 		$this->plugin = $this->parent->plugin;
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
+		$this->toolbar = $ilToolbar;
 		$this->tpl = $tpl;
 		$this->lng = $lng;
 	}
@@ -87,4 +91,8 @@ abstract class ilCoSubBaseGUI
 	{
 		return '<p class="small">'.$text.'</p>';
 	}
+
+
+
+
 }
