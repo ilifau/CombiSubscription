@@ -44,6 +44,16 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
+	 * decides if this repository plugin can be copied
+	 *
+	 * @return bool
+	 */
+	public function allowCopy()
+	{
+		return true;
+	}
+
+	/**
 	 * Check if the user has administrative access
 	 * @return bool
 	 */

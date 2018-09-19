@@ -1,7 +1,5 @@
 <?php
 
-include_once('./Services/Repository/classes/class.ilObjectPluginAccess.php');
-
 /**
 * Access/Condition checking for combined subscription object
 *
@@ -35,18 +33,18 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	*/
 	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '')
 	{
-		global $ilUser, $ilAccess;
+		global $DIC;
 
 		if ($a_user_id == '')
 		{
-			$a_user_id = $ilUser->getId();
+			$a_user_id = $DIC->user()->getId();
 		}
 
 		switch ($a_permission)
 		{
 			case 'read':
 				if (!self::checkOnline($a_obj_id) &&
-					!$ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id))
+					!$DIC->access()->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id))
 				{
 					return false;
 				}
@@ -90,7 +88,8 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	 */
 	private static function getStatusData($a_obj_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		if (!isset(self::$status_data[$a_obj_id]))
 		{
