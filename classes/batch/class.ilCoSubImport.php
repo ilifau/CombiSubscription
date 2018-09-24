@@ -620,7 +620,6 @@ class ilCoSubImport
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter($user_ids);
-		$user_query->setLimit(0);
 
 		$user_query_result = $user_query->query();
 		foreach ($user_query_result['set'] as $user)

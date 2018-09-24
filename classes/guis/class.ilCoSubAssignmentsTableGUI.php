@@ -161,7 +161,6 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter(array_keys($this->users));
-		$user_query->setLimit(0);
 		$user_query_result = $user_query->query();
 
 

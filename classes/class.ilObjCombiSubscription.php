@@ -1197,7 +1197,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter($a_user_ids);
-		$user_query->setLimit(0);
 		$user_query_result = $user_query->query();
 
 		$details = array();

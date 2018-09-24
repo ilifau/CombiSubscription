@@ -349,7 +349,6 @@ class ilCoSubExport
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter($user_ids);
 		$user_query->setAdditionalFields(array('gender','matriculation'));
-		$user_query->setLimit(0);
 		$user_query->setOrderField('lastname');
 
 		return $user_query->query();
