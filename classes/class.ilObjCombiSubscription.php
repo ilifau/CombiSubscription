@@ -279,7 +279,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get Subscription Start
 	 * @return ilDateTime
 	 */
-	public function getSubscriptionStart()
+	public function 	getSubscriptionStart()
 	{
 		return $this->sub_start;
 	}

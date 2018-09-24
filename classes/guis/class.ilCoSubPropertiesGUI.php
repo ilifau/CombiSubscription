@@ -204,15 +204,18 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	 */
 	protected function savePropertiesValues()
 	{
-		$start = $this->form->getInput('sub_start');
-		$end = $this->form->getInput('sub_end');
+		/** @var ilDateTimeInputGUI $start */
+		$start = $this->form->getItemByPostVar('sub_start');
+
+		/** @var ilDateTimeInputGUI $end */
+		$end = $this->form->getItemByPostVar('sub_end');
 
 		$this->object->setTitle($this->form->getInput('title'));
 		$this->object->setDescription($this->form->getInput('description'));
 		$this->object->setOnline($this->form->getInput('online'));
 		$this->object->setExplanation($this->form->getInput('explanation'));
-		$this->object->setSubscriptionStart(new ilDateTime($start['date'].' '.$start['time'], IL_CAL_DATETIME));
-		$this->object->setSubscriptionEnd(new ilDateTime($end['date'].' '.$end['time'], IL_CAL_DATETIME));
+		$this->object->setSubscriptionStart($start->getDate());
+		$this->object->setSubscriptionEnd($end->getDate());
 		$this->object->setShowBars($this->form->getInput('show_bars'));
 		$this->object->setPreSelect($this->form->getInput('pre_select'));
 		$this->object->setMinChoices($this->form->getInput('min_choices'));

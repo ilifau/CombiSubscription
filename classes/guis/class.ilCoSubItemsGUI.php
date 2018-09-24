@@ -715,12 +715,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 					break;
 
 				case 'multi':
-					$first = $this->form->getInput('period_first_'.$i);
-					$last = $this->form->getInput('period_last_'.$i);
+					/** @var ilDateTime $first */
+					$first = $this->form->getItemByPostVar('period_first_'.$i)->getDate();
+					/** @var ilDateTimeInputGUI $last */
+					$last = $this->form->getItemByPostVar('period_last_'.$i)->getDate();
 
 					// set times to 00:00 of entered day in server time zone
-					$start = new ilDateTime($first['date']. ' 00:00:00', IL_CAL_DATETIME);
-					$end = new ilDateTime($last['date']. ' 00:00:00', IL_CAL_DATETIME);
+					$start = new ilDateTime($first->get(IL_CAL_DATE) . ' 00:00:00', IL_CAL_DATETIME);
+					$end = new ilDateTime($last->get(IL_CAL_DATE) . ' 00:00:00', IL_CAL_DATETIME);
 
 					$schedule->period_start = $start->get(IL_CAL_UNIX);
 					$schedule->period_end = $end->get(IL_CAL_UNIX);
