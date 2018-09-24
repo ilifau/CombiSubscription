@@ -347,6 +347,7 @@ class ilCoSubExport
 		// query for users
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
+		$user_query->setLimit($this->plugin->getUserQueryLimit());
 		$user_query->setUserFilter($user_ids);
 		$user_query->setAdditionalFields(array('gender','matriculation'));
 		$user_query->setOrderField('lastname');

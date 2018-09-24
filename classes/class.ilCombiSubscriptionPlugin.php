@@ -42,7 +42,6 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 		$ilDB->dropTable('rep_robj_xcos_ass');
 		$ilDB->dropTable('rep_robj_xcos_prop');
 	}
-
 	/**
 	 * decides if this repository plugin can be copied
 	 *
@@ -52,6 +51,15 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	{
 		return true;
 	}
+
+	/**
+	 * Limit for user queries
+	 */
+	public function getUserQueryLimit()
+	{
+		return 100000;
+	}
+
 
 	/**
 	 * Check if the user has administrative access

@@ -84,6 +84,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		// query for users
 		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
+		$user_query->setLimit($this->plugin->getUserQueryLimit());
 		$user_query->setUserFilter(array_keys($this->users));
 		$user_query_result = $user_query->query();
 
