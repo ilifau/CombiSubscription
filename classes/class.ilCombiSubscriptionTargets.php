@@ -322,8 +322,10 @@ class ilCombiSubscriptionTargets
 
 	/**
 	 * Add the assigned users as members to the target objects
+     * @param array     $a_item_ids list if item ids to tread
+     * @return array    list of added user_ids
 	 */
-	public function addAssignedUsersAsMembers()
+	public function addAssignedUsersAsMembers($a_item_ids = array())
 	{
 		global $tree;
 
@@ -337,10 +339,18 @@ class ilCombiSubscriptionTargets
 		include_once('./Modules/Session/classes/class.ilSessionParticipants.php');
 		include_once('./Modules/Session/classes/class.ilSessionMembershipMailNotification.php');
 
+		$added_users = array();
+
 		// collect the assigning actions to be done
 		$actions = array();
 		foreach ($this->items as $item)
 		{
+		    // treat only selected items, if list is given
+		    if (!empty($a_item_ids) && !in_array($item->item_id, $a_item_ids))
+            {
+                continue;
+            }
+
 			if (!empty($item->target_ref_id))
 			{
 				// get the users to be assigned
@@ -435,6 +445,7 @@ class ilCombiSubscriptionTargets
 					$part_obj->add($user_id);
 				}
 				$added_members[] = $user_id;
+				$added_users[] = $user_id;
 			}
 
 			if (!empty($added_members))
@@ -443,9 +454,15 @@ class ilCombiSubscriptionTargets
 				$mail_obj->send();
 			}
 		}
+
+		return array_unique($added_users);
 	}
 
-	public function addNonAssignedUsersAsSubscribers()
+    /**
+     * Put the non assigned userson the waiting list of target objects
+     * @param array     $a_item_ids  list if item ids to tread
+     */
+	public function addNonAssignedUsersAsSubscribers($a_item_ids = array())
 	{
 		include_once('./Modules/Course/classes/class.ilObjCourse.php');
 		include_once('./Modules/Course/classes/class.ilCourseWaitingList.php');
@@ -457,11 +474,18 @@ class ilCombiSubscriptionTargets
 		include_once('./Modules/Session/classes/class.ilObjSession.php');
 		include_once('./Modules/Session/classes/class.ilSessionWaitingList.php');
 
+        $added_users = array();
 
 		// collect the actions to be done
 		$actions = array();
 		foreach ($this->items as $item)
 		{
+            // treat only selected items, if list is given
+            if (!empty($a_item_ids) && !in_array($item->item_id, $a_item_ids))
+            {
+                continue;
+            }
+
 			if (!empty($item->target_ref_id))
 			{
 				// find users who selected the item
@@ -519,9 +543,12 @@ class ilCombiSubscriptionTargets
 				if (isset($list_obj))
 				{
 					$list_obj->addToList($user_id);
+                    $added_users[] = $user_id;
 				}
 			}
 		}
+
+        return array_unique($added_users);
 	}
 
 	/**

@@ -1285,6 +1285,22 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 	}
 
+    /**
+     * Set specific users to 'fixed'
+     * @param array $a_user_ids
+     */
+	public function fixUsers($a_user_ids = array())
+    {
+        foreach ($this->getUsers() as $subUser)
+        {
+            if (in_array($subUser->user_id, $a_user_ids))
+            {
+                $subUser->is_fixed = true;
+                $subUser->save();
+            }
+        }
+    }
+
 	/**
 	 * Remove all user related data choices, runs and assignments
 	 */
@@ -1302,9 +1318,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Remove conflicting choices and assignments from other combi subscriptions
+     * @param   array   $a_user_ids list of specific user_ids to treat
 	 * @return array 	removed conflicts  user_id => obj_id => item
 	 */
-	public function removeConflicts()
+	public function removeConflicts($a_user_ids = array())
 	{
 		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
@@ -1323,7 +1340,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		// loop over users in this object
 		foreach (array_keys($this->getUsers()) as $user_id)
 		{
-			$localItems = array();
+            // treat only selected users, if list is given
+            if (!empty($a_user_ids) && !in_array($user_id, $a_user_ids))
+            {
+                continue;
+            }
+
+            $localItems = array();
 			foreach (array_keys($this->getAssignmentsOfUser($user_id)) as $item_id)
 			{
 				/** @var ilCoSubItem $item */

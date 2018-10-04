@@ -102,15 +102,19 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 	 * Send the notifications about Assignments
 	 * Object and plugin must be set before
 	 * @param array 	$removedConflicts  user_id => obj_id => item
+     * @param array     $users  list of specific users to treat: user_id[]
 	 */
-	public function sendAssignments($removedConflicts = array())
+	public function sendAssignments($removedConflicts = array(), $users = array())
 	{
 		require_once('Services/Link/classes/class.ilLink.php');
 
 		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
 
-		$users = array_keys($this->object->getPriorities());
+		if (empty($users))
+        {
+            $users = array_keys($this->object->getPriorities());
+        }
 		$assignments = $this->object->getAssignments();
 
 		/** @var ilCoSubItem[] $items */

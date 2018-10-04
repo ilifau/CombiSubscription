@@ -81,6 +81,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			case 'addGrouping':
 			case 'removeGrouping':
 			case 'showConflicts':
+            case 'confirmTransferAssignments':
+            case 'transferAssignments':
 				$this->$cmd();
 				return;
 
@@ -311,6 +313,74 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 		$this->tpl->setContent($conf_gui->getHTML());
 	}
+
+    /**
+     * Confirm the transfer of assignments
+     */
+    protected function confirmTransferAssignments()
+    {
+        if (empty($_POST['item_ids']))
+        {
+            ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+            $this->ctrl->redirect($this,'listItems');
+        }
+
+        require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+        $conf_gui = new ilConfirmationGUI();
+        $conf_gui->setFormAction($this->ctrl->getFormAction($this));
+        $conf_gui->setHeaderText($this->plugin->txt('transfer_assignments_confirmation'));
+        $conf_gui->setConfirm($this->plugin->txt('transfer_assignments'),'transferAssignments');
+        $conf_gui->setCancel($this->lng->txt('cancel'), 'listItems');
+
+        $count = 0;
+        foreach($_POST['item_ids'] as $item_id)
+        {
+            $item = ilCoSubItem::_getById($item_id);
+            $locator = new ilLocatorGUI();
+            if (!empty($item->target_ref_id))
+            {
+                $locator->addContextItems($item->target_ref_id);
+                $conf_gui->addItem('item_ids[]', $item_id, $locator->getHTML());
+                $count++;
+            }
+        }
+        if ($count == 0)
+        {
+            ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+            $this->ctrl->redirect($this,'listItems');
+        }
+
+        $this->tpl->setContent($conf_gui->getHTML());
+    }
+
+
+    /**
+     * Transfer the assignments to the selected items
+     */
+    protected function transferAssignments()
+    {
+
+        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+        $targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+        $targets_obj->filterUntrashedTargets();
+        $added_members = $targets_obj->addAssignedUsersAsMembers((array) $_POST['item_ids']);
+        $added_subscribers = $targets_obj->addNonAssignedUsersAsSubscribers((array) $_POST['item_ids']);
+
+        if (!empty($added_members))
+        {
+            $this->object->fixUsers($added_members);
+            $removedConflicts = $this->object->removeConflicts($added_members);
+
+            $this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+            $notification = new ilCombiSubscriptionMailNotification();
+            $notification->setPlugin($this->plugin);
+            $notification->setObject($this->object);
+            $notification->sendAssignments($removedConflicts, $added_members);
+        }
+
+        $this->ctrl->redirect($this,'listItems');
+    }
+
 
 	/**
 	 * Delete confirmed items

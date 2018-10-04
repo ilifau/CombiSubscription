@@ -72,6 +72,11 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 		$this->addMultiCommand('addGrouping', $this->plugin->txt('add_grouping'));
 		$this->addMultiCommand('removeGrouping', $this->plugin->txt('remove_grouping'));
 		$this->addCommandButton('saveSorting',  $this->lng->txt('sorting_save'));
+
+		if ($this->plugin->hasAdminAccess())
+        {
+            $this->addMultiCommand('confirmTransferAssignments', $this->plugin->txt('transfer_assignments'));
+        }
 	}
 
 	/**
