@@ -58,6 +58,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			case 'mailToUsers':
 			case 'removeUsers':
 			case 'removeUsersConfirmation':
+            case 'fillEmptyRegistrations':
 
 			$this->$cmd();
 				return;
@@ -94,6 +95,16 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 		$this->showInfo();
 		$this->provideUserSearch();
+
+        if ($this->plugin->hasAdminAccess())
+        {
+            $button = ilLinkButton::getInstance();
+            $button->setUrl($this->ctrl->getLinkTarget($this,'fillEmptyRegistrations'));
+            $button->setCaption('fill_empty_registrations');
+            $this->toolbar->addButtonInstance($button);
+        }
+
+
 		$this->tpl->setContent($table_gui->getHTML());
 	}
 
@@ -526,6 +537,33 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			$this->ctrl->redirect($this, 'listRegistrations');
 		}
 	}
+
+
+	public function fillEmptyRegistrations()
+    {
+        $users = $this->object->getUsers();
+        $items = $this->object->getItems();
+        $priorities = $this->object->getPriorities();
+
+        foreach ($users as $user_id => $subUser)
+        {
+            if (empty($priorities[$user_id]))
+            {
+
+                foreach ($items as $item_id => $item)
+                {
+                    $choiceObj = new ilCoSubChoice();
+                    $choiceObj->obj_id = $this->object->getId();
+                    $choiceObj->user_id = $user_id;
+                    $choiceObj->item_id = $item_id;
+                    $choiceObj->priority = 0;
+                    $choiceObj->save();
+                }
+            }
+        }
+
+        $this->ctrl->redirect($this, 'listRegistrations');
+    }
 
 
 	/**
