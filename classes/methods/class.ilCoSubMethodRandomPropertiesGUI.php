@@ -146,6 +146,10 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$ni->allowDecimals(false);
 		$this->form->addItem($ni);
 
+		// assume sub min as limit
+        $asm = new ilCheckboxInputGUI($this->method->txt('assume_sub_min_as_limit'),'assume_sub_min_as_limit');
+        $asm->setInfo($this->method->txt('assume_sub_min_as_limit_info'));
+        $this->form->addItem($asm);
 
 		$this->form->addCommandButton('updateProperties', $this->lng->txt('save'));
 	}
@@ -159,6 +163,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->getItemByPostVar('number_priorities')->setValue($this->method->number_priorities);
 		$this->form->getItemByPostVar('priority_choices')->setValue($this->method->priority_choices);
 		$this->form->getItemByPostVar('number_assignments')->setValue($this->method->number_assignments);
+        $this->form->getItemByPostVar('assume_sub_min_as_limit')->setChecked($this->method->assume_sub_min_as_limit);
 
 		$seconds = (int) max($this->method->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
 		$hours = (int) ($seconds / 3600);
@@ -179,6 +184,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->method->number_priorities = (int) $this->form->getInput('number_priorities');
 		$this->method->priority_choices = (string) $this->form->getInput('priority_choices');
 		$this->method->number_assignments = (int) $this->form->getInput('number_assignments');
+        $this->method->assume_sub_min_as_limit = (bool) $this->form->getInput('assume_sub_min_as_limit');
 
 		/** @var ilDurationInputGUI $di */
 		$di = $this->form->getItemByPostVar('out_of_conflict_time');

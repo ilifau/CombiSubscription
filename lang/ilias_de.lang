@@ -177,6 +177,8 @@ ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen,
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimale Zeitspanne zwischen Terminen, die nicht als Konflikt erkannt werden sollen. Sie muss größer oder gleich %s Minuten sein.
+ilcosubmethodrandom_assume_sub_min_as_limit#:#Minimum als Maximum
+ilcosubmethodrandom_assume_sub_min_as_limit_info#:#Begrenzt die Zuteilungen pro Einheit auf den als "Minimale Zuteilungen" angegebenen Wert. Das kann in einem ersten Berechnungs-Schritt verwendet werden, um eine möglichst gleichmäßige Verteilung zu erwirken. Die zugeteilten Nutzer sollten anschließend fixiert und die Berechnung in einem zweiten Schritt ohne diesen Schalter mit der echten Maximalzahl pro Einheit erneut durchgeführt werden.
 show_bars#:#Balken zeigen
 show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben

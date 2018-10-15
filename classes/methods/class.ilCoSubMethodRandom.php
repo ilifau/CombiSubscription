@@ -20,16 +20,16 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	public $number_assignments = 1;
 
 	/** @var bool tweak: allow less than sub_min assignments per item */
-	protected $allow_low_filled_items = false;
+	public $allow_low_filled_items = false;
 
 	/** @var bool tewak: allow less than number_assignments per user */
-	protected $allow_low_filled_users = false;
+    public $allow_low_filled_users = false;
 
 	/** @var bool tweak: calculate as if all items were selected by the users */
-	protected $assume_all_items_selected = false;
+    public $assume_all_items_selected = false;
 
 	/** @var bool tweak: calculate as if the maximum per item is limited by the minimum */
-	protected $assume_sub_min_as_limit = false;
+    public $assume_sub_min_as_limit = false;
 
 
 	/** @var  ilCoSubRun */
@@ -77,6 +77,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->out_of_conflict_time = (int) $this->getProperty('out_of_conflict_time', '3600');
 		$this->tolerated_conflict_percentage = (int) $this->getProperty('tolerated_conflict_percentage',
 			$this->plugin->getToleratedConflictPercentage());
+        $this->assume_sub_min_as_limit = (bool) $this->getProperty('assume_sub_min_as_limit','0');
 	}
 
 
@@ -90,6 +91,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->setProperty('number_assignments', sprintf('%d', (int) $this->number_assignments));
 		$this->setProperty('out_of_conflict_time', sprintf('%d', (int) $this->out_of_conflict_time));
 		$this->setProperty('tolerated_conflict_percentage', sprintf('%d', (int) $this->tolerated_conflict_percentage));
+        $this->setProperty('assume_sub_min_as_limit', sprintf('%d', (int) $this->assume_sub_min_as_limit));
 
 		if ($this->priority_choices == self::PRIO_CHOICES_UNIQUE)
 		{
