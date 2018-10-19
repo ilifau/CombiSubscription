@@ -29,6 +29,9 @@ class ilCoSubTargetsConfig
 	public $sub_period_end;
 	public $sub_wait;
 
+    /** @var bool send the standard emails for user assignments in groups etc */
+	public $send_target_emails = false;
+
 
 	/**
 	 * ilCoSubTargetsConfig constructor.
@@ -82,10 +85,13 @@ class ilCoSubTargetsConfig
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'set_sub_min', $this->set_sub_min);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'set_sub_max', $this->set_sub_max);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'set_sub_wait', $this->set_sub_wait);
+
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_type', $this->sub_type);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_period_start', $this->sub_period_start);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_period_end', $this->sub_period_end);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_wait', $this->sub_wait);
+
+        $this->object->setClassProperty('ilCoSubTargetsConfig', 'send_target_emails', $this->send_target_emails);
 	}
 
 	/**
@@ -103,5 +109,7 @@ class ilCoSubTargetsConfig
 		$this->sub_period_start = (int) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_period_start', $this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
 		$this->sub_period_end = (int) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_period_end', $this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
 		$this->sub_wait = (string) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_wait', self::SUB_WAIT_AUTO);
+
+        $this->send_target_emails = (bool) $this->object->getClassProperty('ilCoSubTargetsConfig', 'send_target_emails', true);
 	}
 }

@@ -158,11 +158,15 @@ class ilCombiSubscriptionTargets
 	 * Get the inputs from the properties form
 	 * @param ilPropertyFormGUI 	$form
 	 * @param string 				$a_type target type
+     * @param ilCoSubTargetsConfig  $config
 	 * @return ilCoSubTargetsConfig
 	 */
-	public function getFormInputs($form, $a_type)
+	public function getFormInputs($form, $a_type, $config = null)
 	{
-		$config = new ilCoSubTargetsConfig($this->object);
+	    if (!isset($config))
+        {
+            $config = new ilCoSubTargetsConfig($this->object);
+        }
 
 		$config->set_sub_type = (bool) $form->getInput('set_sub_type');
 		$config->sub_type = (string) $form->getInput('sub_type');
@@ -329,15 +333,8 @@ class ilCombiSubscriptionTargets
 	{
 		global $tree;
 
-		include_once('./Modules/Course/classes/class.ilCourseParticipants.php');
-		include_once('./Modules/Course/classes/class.ilCourseMembershipMailNotification.php');
-		include_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
-
-		include_once('./Modules/Group/classes/class.ilGroupParticipants.php');
-		include_once('./Modules/Group/classes/class.ilGroupMembershipMailNotification.php');
-
-		include_once('./Modules/Session/classes/class.ilSessionParticipants.php');
-		include_once('./Modules/Session/classes/class.ilSessionMembershipMailNotification.php');
+        $config = new ilCoSubTargetsConfig($this->object);
+        $config->readFromObject();
 
 		$added_users = array();
 
@@ -410,7 +407,7 @@ class ilCombiSubscriptionTargets
 
 				case 'sess':
 					$part_obj = ilSessionParticipants::_getInstanceByObjId($action['obj_id']);
-					$role = null;
+					$role = IL_SESS_MEMBER;
 					$mail_obj = new ilSessionMembershipMailNotification();
 					$mail_obj->setRefId($ref_id);
 					$mail_obj->setType(ilSessionMembershipMailNotification::TYPE_ADMISSION_MEMBER);
@@ -425,7 +422,7 @@ class ilCombiSubscriptionTargets
 			foreach ($action['users'] as $user_id)
 			{
 				// check if user is already a member (relevant for parent course)
-				if ($part_obj->isMember($user_id))
+				if ($part_obj->isAssigned($user_id))
 				{
 					continue;
 				}
@@ -436,7 +433,11 @@ class ilCombiSubscriptionTargets
 				}
 
 				// adding the user also deletes the user from the subscribers and from the waiting list
-				if (isset($role))
+				if ($part_obj instanceof ilSessionParticipants)
+                {
+                    $part_obj->register($user_id);
+                }
+                elseif (isset($role))
 				{
 					$part_obj->add($user_id,$role);
 				}
@@ -448,7 +449,7 @@ class ilCombiSubscriptionTargets
 				$added_users[] = $user_id;
 			}
 
-			if (!empty($added_members))
+			if (!empty($added_members) && $config->send_target_emails)
 			{
 				$mail_obj->setRecipients($added_members);
 				$mail_obj->send();
@@ -464,16 +465,6 @@ class ilCombiSubscriptionTargets
      */
 	public function addNonAssignedUsersAsSubscribers($a_item_ids = array())
 	{
-		include_once('./Modules/Course/classes/class.ilObjCourse.php');
-		include_once('./Modules/Course/classes/class.ilCourseWaitingList.php');
-		require_once('./Modules/Course/classes/class.ilObjCourseGrouping.php');
-
-		include_once('./Modules/Group/classes/class.ilObjGroup.php');
-		include_once('./Modules/Group/classes/class.ilGroupWaitingList.php');
-
-		include_once('./Modules/Session/classes/class.ilObjSession.php');
-		include_once('./Modules/Session/classes/class.ilSessionWaitingList.php');
-
         $added_users = array();
 
 		// collect the actions to be done

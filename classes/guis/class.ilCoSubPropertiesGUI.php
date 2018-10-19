@@ -145,16 +145,17 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		}
 		$this->form->addItem($method);
 
-		if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+        $targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+        $config = new ilCoSubTargetsConfig($this->object);
+        $config->readFromObject();
+
+        if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
 		{
 			// auto process
 			$auto = new ilCheckboxInputGUI($this->plugin->txt('auto_process'), 'auto_process');
 			$auto->setInfo($this->plugin->txt('auto_process_info'));
 
-			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
-			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-			$config = new ilCoSubTargetsConfig($this->object);
-			$config->readFromObject();
 			foreach ($targets->getFormProperties('auto', $config) as $property)
 			{
 				$auto->addSubItem($property);
@@ -171,6 +172,10 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 			}
 		}
 
+		$emails = $auto = new ilCheckboxInputGUI($this->plugin->txt('send_target_emails'), 'send_target_emails');
+        $emails->setInfo($this->plugin->txt('send_target_emails_info'));
+        $emails->setChecked($config->send_target_emails);
+        $this->form->addItem($emails);
 
 		$this->form->addCommandButton('updateProperties', $this->plugin->txt('save'));
 
@@ -220,14 +225,20 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->object->setPreSelect($this->form->getInput('pre_select'));
 		$this->object->setMinChoices($this->form->getInput('min_choices'));
 		$this->object->setMethod($this->form->getInput('method'));
-		if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+
+        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+        $targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
+        $config = new ilCoSubTargetsConfig($this->object);
+        $config->readFromObject();
+
+        if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
 		{
 			$this->object->setAutoProcess($this->form->getInput('auto_process'));
-			$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
-			$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-			$config = $targets->getFormInputs($this->form, 'auto');
-			$config->saveInObject();
+            $config = $targets->getFormInputs($this->form, 'auto', $config);
 		}
+
+		$config->send_target_emails = $this->form->getInput('send_target_emails');
+        $config->saveInObject();
 		$this->object->update();
 	}
 }

@@ -384,3 +384,5 @@ search_users#:#Nutzer suchen
 add_users#:#Nutzer hinzufügen
 users_added#:#Der/die Nutzer wurde(n) hinzugefügt.
 edit_registration#:#Anmeldung bearbeiten
+send_target_emails#:#Standard-E-Mails
+send_target_emails_info#:#Sende den zugeteilten Nutzern neben ihrer Benachrichtigung über die Zuteilung auch die Standard-E-Mails zur Aufnahme in Kurse, Gruppen oder Sitzungen.
