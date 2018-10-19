@@ -72,8 +72,10 @@ class ilCoSubScript
 	/** @var bool tweak: don't create objects for items without assignments*/
 	protected $ignore_unassigned_items = true;
 
-	/** @var  string tweak: owner of created objects */
+	/** @var  string tweak: owner of created objects (higher precedence as owner_id) */
 	protected $owner_login = 'root';
+    //protected $owner_login = 'manfred.vogel';
+    //protected $owner_login = 'andreas.rohrmoser';
 
 	/** @var  int tweak: owner of created objects */
 	protected $owner_id = 6;
@@ -108,29 +110,29 @@ class ilCoSubScript
 				'default' => true
 			),
 			ilCoSubScript::MODE_FTP_EX_MEM => array(
-				'title' => 'Test-Teilnehmer und Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
-				'info' => 'Trägt die Testteilnehmer und Übungsmitglieder ein und legt die Übungsteams an',
+				'title' => 'Übungs-Teams für Fertigungstechnisches Praktikum anlegen',
+				'info' => 'Trägt die Übungsmitglieder ein und legt die Übungsteams an',
 				'success' => 'Die Teams wurden angelegt.',
 				'failure' => 'Die Teams konnten nicht anglegt werden!',
 				'filename' => 'structure.xlsx',
 				'default' => true
 			),
-			ilCoSubScript::MODE_FTP_ADJUST => array(
-				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
-				'info' => 'Ersetzt das Antestat durch ein Übungsobjekt mit manuellem Lernfortschritt',
-				'success' => 'Die Struktur wurde angepasst.',
-				'failure' => 'Die Struktur konnte nicht angepasst werden!',
-				'filename' => 'structure.xlsx',
-				'default' => true
-			),
-			ilCoSubScript::MODE_FTP_EX_STATUS => array(
-				'title' => 'Ergebnisse der Antestate für Fertigungstechnisches Praktikum eintragen',
-				'info' => 'Trägt die externen Testergebnisse als Status in den Übungsobjekten der Antestate ein',
-				'success' => 'Die Ergebnisse wurden eingetragen.',
-				'failure' => 'Die Ergebnisse konnten nicht eingetragen werden!',
-				'filename' => 'structure.xlsx',
-				'default' => true
-			),
+//			ilCoSubScript::MODE_FTP_ADJUST => array(
+//				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
+//				'info' => 'Ersetzt das Antestat durch ein Übungsobjekt mit manuellem Lernfortschritt',
+//				'success' => 'Die Struktur wurde angepasst.',
+//				'failure' => 'Die Struktur konnte nicht angepasst werden!',
+//				'filename' => 'structure.xlsx',
+//				'default' => true
+//			),
+//			ilCoSubScript::MODE_FTP_EX_STATUS => array(
+//				'title' => 'Ergebnisse der Antestate für Fertigungstechnisches Praktikum eintragen',
+//				'info' => 'Trägt die externen Testergebnisse als Status in den Übungsobjekten der Antestate ein',
+//				'success' => 'Die Ergebnisse wurden eingetragen.',
+//				'failure' => 'Die Ergebnisse konnten nicht eingetragen werden!',
+//				'filename' => 'structure.xlsx',
+//				'default' => true
+//			),
 
 		);
 
@@ -328,20 +330,6 @@ class ilCoSubScript
 
 	protected function createFtpStructure()
 	{
-		require_once('Modules/Group/classes/class.ilObjGroup.php');
-		require_once('Modules/Test/classes/class.ilObjTest.php');
-		require_once('Modules/Session/classes/class.ilObjSession.php');
-		require_once('Modules/Session/classes/class.ilEventItems.php');
-		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
-		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
-		require_once('Services/AccessControl/classes/class.ilConditionHandler.php');
-
-		require_once('Services/Tracking/classes/class.ilLPObjSettings.php');
-		require_once('Services/Object/classes/class.ilObjectLP.php');
-		require_once('Services/Tracking/classes/class.ilLPStatusWrapper.php');
-
-		require_once('Services/Utilities/classes/class.ilFormat.php');
-
 		$this->loadItemData();
 		$this->checkFtpStructure();
 
@@ -379,32 +367,38 @@ class ilCoSubScript
 			$period_end_obj = new ilDateTime($period_end, IL_CAL_UNIX);
 			$period_duration = ilDatePresentation::formatPeriod($period_start_obj, $period_end_obj);
 
-			$test_start_obj = new ilDateTime($period_start-(3*24*3600), IL_CAL_UNIX); 	// 3 days before
-			$test_end_obj = new ilDateTime($period_start - 3600, IL_CAL_UNIX);			// 1 hour before
-			$test_duration = ilDatePresentation::formatPeriod($test_start_obj, $test_end_obj);
+//			$test_start_obj = new ilDateTime($period_start-(3*24*3600), IL_CAL_UNIX); 	// 3 days before
+//			$test_end_obj = new ilDateTime($period_start - 3600, IL_CAL_UNIX);			// 1 hour before
+//			$test_duration = ilDatePresentation::formatPeriod($test_start_obj, $test_end_obj);
 
 			/**
 			 * Copy Test
 			 */
-			$origTest = new ilObjTest($rowdata['test_orig_id'], true);
-			$origTest->setOnline(false);
-			$origTest->saveToDb();
+//			$origTest = new ilObjTest($rowdata['test_orig_id'], true);
+//			$origTest->setOnline(false);
+//			$origTest->saveToDb();
 
-			$newTest = $origTest->cloneObject($rowdata['group_id']);
+//			$newTest = $origTest->cloneObject($rowdata['group_id']);
 
 			/** @var ilObjTest $newTest */
-			$newTest = new ilObjTest($newTest->getRefId(), true);
-			$newTest->setOnline(true);
-			$newTest->setTitle($rowdata['title']. ' - ' . $newTest->getTitle());
-			$newTest->setDescription($test_duration);
-			$newTest->update();
-			$newTest->setStartingTimeEnabled(true);
-			$newTest->setStartingTime(ilFormat::dateDB2timestamp($test_start_obj->get(IL_CAL_DATETIME)));
-			$newTest->setEndingTimeEnabled(true);
-			$newTest->setEndingTime(ilFormat::dateDB2timestamp($test_end_obj->get(IL_CAL_DATETIME)));
-			$newTest->saveToDb();
-			$newTest->setOwner($this->owner_id);
-			$newTest->updateOwner();
+//			$newTest = new ilObjTest($newTest->getRefId(), true);
+//			$newTest->setOnline(true);
+//			$newTest->setTitle($rowdata['title']. ' - ' . $newTest->getTitle());
+//			$newTest->setDescription($test_duration);
+//			$newTest->update();
+//			$newTest->setStartingTimeEnabled(true);
+//			$newTest->setStartingTime(ilFormat::dateDB2timestamp($test_start_obj->get(IL_CAL_DATETIME)));
+//			$newTest->setEndingTimeEnabled(true);
+//			$newTest->setEndingTime(ilFormat::dateDB2timestamp($test_end_obj->get(IL_CAL_DATETIME)));
+//			$newTest->saveToDb();
+//			$newTest->setOwner($this->owner_id);
+//			$newTest->updateOwner();
+
+
+            /**
+             * Take existing test
+             */
+            $newTest = new ilObjTest($rowdata['test_orig_id'], true);
 
 			/**
 			 * Copy Exercise
@@ -494,7 +488,7 @@ class ilCoSubScript
 			 * Assign test and exercise as materials to the session
 			 */
 			$event_items = new ilEventItems($newSession->getId());
-			$event_items->addItem($newTest->getRefId());
+//			$event_items->addItem($newTest->getRefId());
 			$event_items->addItem($newExercise->getRefId());
 			$event_items->update();
 
@@ -565,16 +559,12 @@ class ilCoSubScript
 		}
 	}
 
+    /**
+     * Add the participants to their exercises and build teams
+     * @throws Exception
+     */
 	protected function createFtpExerciseTeams()
 	{
-
-		require_once('Modules/Session/classes/class.ilEventItems.php');
-		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
-		require_once('Modules/Exercise/classes/class.ilExAssignment.php');
-		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
-		require_once('Modules/Exercise/classes/class.ilExAssignmentTeam.php');
-		require_once('Modules/Test/classes/class.ilObjTest.php');
-
 		$this->loadItemData();
 		$this->checkFtpStructure();
 
@@ -621,18 +611,18 @@ class ilCoSubScript
 				}
 
 				// test
-				if (ilObject::_lookupType($ref_id, true) == "tst")
-				{
-					$tstObj = new ilObjTest($ref_id, true);
-
-					$tstObj->setFixedParticipants(1);
-					$tstObj->saveToDb();
-
-					foreach ($user_ids as $user_id)
-					{
-						$tstObj->inviteUser($user_id);
-					}
-				}
+//				if (ilObject::_lookupType($ref_id, true) == "tst")
+//				{
+//					$tstObj = new ilObjTest($ref_id, true);
+//
+//					$tstObj->setFixedParticipants(1);
+//					$tstObj->saveToDb();
+//
+//					foreach ($user_ids as $user_id)
+//					{
+//						$tstObj->inviteUser($user_id);
+//					}
+//				}
 			}
 		}
 	}
