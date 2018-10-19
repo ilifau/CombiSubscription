@@ -275,18 +275,27 @@ class ilCoSubScript
 		for ($row = 1; $row < count($data); $row++)
 		{
 			$rowdata = $data[$row];
+
 			if (count($rowdata) > count($this->columns))
 			{
 				throw new Exception($this->plugin->txt('import_error_empty_colname'));
 			}
-			for ($col = 0; $col < count($rowdata); $col++)
+
+            $rowdata_by_name = array();
+            $has_data = false;
+            for ($col = 0; $col < count($rowdata); $col++)
 			{
 				if (isset($rowdata[$col]))
 				{
-					// use column names as
-					$this->rows[$row -1][$this->columns[$col]] = $rowdata[$col];
+                    $has_data = true;
+                    $rowdata_by_name[$this->columns[$col]] = $rowdata[$col];
 				}
 			}
+
+			if ($has_data)
+            {
+                $this->rows[] = $rowdata_by_name;
+            }
 		}
 	}
 
