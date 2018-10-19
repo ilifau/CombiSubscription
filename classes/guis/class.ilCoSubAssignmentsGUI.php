@@ -359,6 +359,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		$notification->sendAssignments($removedConflicts);
 
 		$this->object->setClassProperty(get_class($this), 'transfer_time', time());
+        $this->object->setClassProperty(get_class($this), 'notify_time', time());
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
