@@ -1220,10 +1220,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$priorities = $this->getPrioritiesOfUser($a_user_id);
 		$assignments = $this->getAssignmentsOfUser($a_user_id, $a_run_id);
 
-		if (count($assignments) < $this->getMethodObject()->getNumberAssignments())
-		{
-			return self::SATISFIED_NOT;			// not enough assignments
-		}
 		if (count($assignments) > $this->getMethodObject()->getNumberAssignments())
 		{
 			return self::SATISFIED_OVER;
@@ -1232,10 +1228,14 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		{
 			return self::SATISFIED_OVER;
 		}
-		if ($this->itemsHaveConflicts(array_keys($assignments)))
-		{
-			return self::SATISFIED_CONFLICT;
-		}
+        if ($this->itemsHaveConflicts(array_keys($assignments)))
+        {
+            return self::SATISFIED_CONFLICT;
+        }
+        if (count($assignments) < $this->getMethodObject()->getNumberAssignments())
+        {
+            return self::SATISFIED_NOT;			// not enough assignments
+        }
 
 		foreach ($assignments as $item_id => $assign_id)
 		{
