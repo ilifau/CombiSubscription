@@ -18,6 +18,8 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	/** @var bool	setting choices is disabled  */
 	protected $disabled = false;
 
+	/** @var array local_item_id => other_item_id => item */
+	protected $conflicts = [];
 
 	/**
 	 * ilCoSubItemsTableGUI constructor.
@@ -66,9 +68,10 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	 * Prepare the data to be displayed
 	 * @param   ilCoSubItem[]   $a_items
 	 * @param   array           $a_priorities   item_id => priority
-	 * @return  array           $a_counts       item_id => priority => count
+	 * @param   array           $a_counts       item_id => priority => count
+	 * @param   array           $a_conflicts    local_item_id => other_item_id => item
 	 */
-	public function prepareData($a_items, $a_priorities, $a_counts)
+	public function prepareData($a_items, $a_priorities, $a_counts, $a_conflicts = [])
 	{
 		// get the available options
 		$method = $this->object->getMethodObject();
@@ -107,6 +110,8 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 				$this->max_choices = max($this->max_choices, $count);
 			}
 		}
+
+		$this->conflicts = $a_conflicts;
 	}
 
 	/**
@@ -142,6 +147,17 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		elseif (isset($a_set['sub_max']))
 		{
 			$this->tpl->setVariable('LIMITS', sprintf($this->plugin->txt('sub_limit_to'), $a_set['sub_max']));
+		}
+
+		if (isset($this->conflicts[$a_set['item_id']]))
+		{
+			$titles = [];
+			/** @var  ilCoSubItem $item */
+			foreach	($this->conflicts[$a_set['item_id']] as $item_id => $item)
+			{
+				$titles[] = $item->title;
+			}
+			$this->tpl->setVariable('CONFLICTS', $this->plugin->txt('conflict_with_assigned_unit') . ' '. implode(', ', $titles));
 		}
 
 		foreach ($this->options as $value => $text)

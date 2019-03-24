@@ -74,7 +74,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->number_priorities = (int) $this->getProperty('number_priorities','2');
 		$this->priority_choices = (string) $this->getProperty('priority_choices','free');
 		$this->number_assignments = (int) $this->getProperty('number_assignments','1');
-		$this->out_of_conflict_time = (int) $this->getProperty('out_of_conflict_time', '3600');
+		$this->out_of_conflict_time = (int) $this->getProperty('out_of_conflict_time',
+			$this->plugin->getOutOfConflictTime());
 		$this->tolerated_conflict_percentage = (int) $this->getProperty('tolerated_conflict_percentage',
 			$this->plugin->getToleratedConflictPercentage());
         $this->assume_sub_min_as_limit = (bool) $this->getProperty('assume_sub_min_as_limit','0');

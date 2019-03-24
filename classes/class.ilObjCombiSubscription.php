@@ -1116,6 +1116,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 	/**
 	 * Get a list of user objects (indexed by user_id)
+     * ilCoSubUser objects will be created but not saved for new users
+     *
 	 * @param	array	$a_user_ids (optional)
 	 * @return	ilCoSubUser[]
 	 */

@@ -84,15 +84,28 @@ class ilCoSubAssign
 	 * Get all assignment ids for an object and user as an indexed array
 	 * @param integer       $a_obj_id
 	 * @param integer		$a_user_id
+     * @param integer		$a_run_id
 	 * @return array       item_id => run_id => assign_id (run_id = 0 for the chosen assignments)
 	 */
-	public static function _getIdsByItemAndRun($a_obj_id, $a_user_id)
+	public static function _getIdsByItemAndRun($a_obj_id, $a_user_id, $a_run_id = null)
 	{
 		global $ilDB;
 
 		$query = 'SELECT * FROM rep_robj_xcos_ass'
 			.' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
 			.' AND user_id = ' . $ilDB->quote($a_user_id,'integer');
+
+		if (isset($a_run_id))
+		{
+		    if ($a_run_id == 0)
+            {
+                $query .= ' AND run_id IS NULL';
+            }
+            else
+            {
+                $query .= ' AND run_id = ' . $ilDB->quote($a_run_id,'integer');
+            }
+        }
 
 		$assignments = array();
 		$res = $ilDB->query($query);

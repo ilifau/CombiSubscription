@@ -14,13 +14,16 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	protected $cmdUserList = 'listRegistrations';
 
 	/** @var ilCoSubCategory[] */
-	protected $categories = array();
+	protected $categories = [];
 
 	/** @var bool registration is disabled */
 	protected $disabled = false;
 
 	/** @var ilObjUser ilias_user */
 	protected $ilias_user = null;
+
+	/** @var array local_item_id => other_item_id => item */
+	protected $conflicts = [];
 
 	/**
 	 * Execute a command
@@ -116,6 +119,15 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	{
 		// get the user for checking if it is fixed
 		$userObj = $this->object->getUser($this->ilias_user->getId());
+
+		// get conflicts
+		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+		$conflicts = $conflictsObj->getExternalConflicts([$userObj->user_id], false);
+		if (isset($conflicts[$userObj->user_id]))
+		{
+			$this->conflicts = $conflicts[$userObj->user_id];
+		}
 
 		if ($this->isOwnRegistration())
 		{
@@ -302,7 +314,8 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$table_gui->prepareData(
 			$this->object->getItems('selectable'),
 			$priorities,
-			$this->object->getPriorityCounts());
+			$this->object->getPriorityCounts(),
+			$this->conflicts);
 
 		return $table_gui->getHTML();
 	}
@@ -339,7 +352,8 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				$table_gui->prepareData(
 					$items[$cat_id],
 					$priorities,
-					$counts);
+					$counts,
+					$this->conflicts);
 
 				$infos = array();
 				if ($category->description) {
