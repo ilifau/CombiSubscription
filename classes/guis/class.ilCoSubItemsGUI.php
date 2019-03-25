@@ -369,7 +369,10 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
         if (!empty($added_members))
         {
             $this->object->fixUsers($added_members);
-            $removedConflicts = $this->object->removeConflicts($added_members);
+
+			$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+			$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+			$removedConflicts = $conflictsObj->removeConflicts($added_members);
 
             $this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
             $notification = new ilCombiSubscriptionMailNotification();

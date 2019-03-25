@@ -70,7 +70,7 @@ class ilCoSubUser
 	/**
 	 * Get all users for an user as an indexed array
 	 * @param integer       	$a_user_id
-	 * @return array        obj_id => ilCoSubUser
+	 * @return ilCoSubUser[]    (indexed by obj_id)
 	 */
 	public static function _getForUser($a_user_id)
 	{

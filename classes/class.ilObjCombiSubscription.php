@@ -1303,6 +1303,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
         }
     }
 
+
 	/**
 	 * Remove all user related data choices, runs and assignments
 	 */
@@ -1317,114 +1318,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		ilCoSubRun::_deleteForObject($this->getId());
 	}
 
-
-	/**
-	 * Remove conflicting choices and assignments from other combi subscriptions
-     * @param   array   $a_user_ids list of specific user_ids to treat
-	 * @return array 	removed conflicts  user_id => obj_id => item
-	 */
-	public function removeConflicts($a_user_ids = array())
-	{
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
-
-		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
-		$tolerance = $this->getMethodObject()->getToleratedConflictPercentage();
-
-		$items[$this->getId()] = $this->getItems();
-
-		/** @var array other_item_id => local_item_id  => conflict (true|false|null) */
-		$conflicts = array();
-
-		/** @var array user_id => obj_id => item  */
-		$removedConflicts = array();
-
-		// loop over users in this object
-		foreach (array_keys($this->getUsers()) as $user_id)
-		{
-            // treat only selected users, if list is given
-            if (!empty($a_user_ids) && !in_array($user_id, $a_user_ids))
-            {
-                continue;
-            }
-
-            $localItems = array();
-			foreach (array_keys($this->getAssignmentsOfUser($user_id)) as $item_id)
-			{
-				/** @var ilCoSubItem $item */
-				$item = $items[$this->getId()][$item_id];
-				if (isset($item) && !empty($item->getSchedules()))
-				{
-					$localItems[$item_id] = $item;
-				}
-			}
-
- 			// nothing to compare for the user
- 			if (empty($localItems))
-			{
-				continue;
-			}
-
-			// loop over  other combi subscriptions for the user
-			/** @var ilCoSubUser $subUser */
-			foreach (ilCoSubUser::_getForUser($user_id) as $subUser)
-			{
-				// object can be ignored
-				if ($subUser->obj_id == $this->getId() || $subUser->is_fixed)
-				{
-					continue;
-				}
-
-				// load the items of the object (may already be loaded for another user)
-				if (!isset($items[$subUser->obj_id]))
-				{
-					$items[$subUser->obj_id] = ilCoSubItem::_getForObject($subUser->obj_id);
-				}
-
-				$choice_ids = ilCoSubChoice::_getIdsByItem($subUser->obj_id, $subUser->user_id);
-				$assign_ids = ilCoSubAssign::_getIdsByItemAndRun($subUser->obj_id, $subUser->user_id);
-
-				/** @var  ilCoSubItem $otherItem */
-				foreach ($items[$subUser->obj_id] as $other_item_id => $otherItem)
-				{
-					// item can be ignored
-					if ((!isset($choice_ids[$other_item_id]) && !isset($assign_ids[$other_item_id])) || empty($otherItem->getSchedules()))
-					{
-						continue;
-					}
-
-					/** @var  ilCoSubItem $localItem */
-					foreach ($localItems as $local_item_id => $localItem)
-					{
-						if (!isset($conflicts[$other_item_id][$local_item_id]))
-						{
-							$conflicts[$other_item_id][$local_item_id] = ilCoSubItem::_haveConflict($otherItem, $localItem, $buffer, $tolerance);
-						}
-
-						if ($conflicts[$other_item_id][$local_item_id])
-						{
-							if (!empty($choice_ids[$other_item_id]))
-							{
-								ilCoSubChoice::_deleteById($choice_ids[$other_item_id]);
-							}
-
-							if (!empty($assign_ids[$other_item_id]))
-							{
-								foreach ($assign_ids[$other_item_id] as $run => $assign_id)
-								{
-									ilCoSubAssign::_deleteById($assign_ids[$other_item_id]);
-								}
-							}
-
-							$removedConflicts[$subUser->user_id][$subUser->obj_id][$other_item_id] = $otherItem;
-						}
-					}
-				}
-			}
-		}
-
-		return $removedConflicts;
-	}
 
 	/**
 	 * Get a list of reference ids that are due for an auto procesing
@@ -1452,6 +1345,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $ref_ids;
 	}
 
+
 	/**
 	 * Handle the auto processing of an object
 	 */
@@ -1474,7 +1368,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->fixAssignedUsers();
 
 		// remove conflicting choices from other combined subscriptions
-		$removedConflicts = $this->removeConflicts();
+		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+		$conflictsObj = new ilCombiSubscriptionConflicts($this, $this->plugin);
+		$removedConflicts = $conflictsObj->removeConflicts();
 
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();

@@ -350,7 +350,9 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		$targets_obj->addNonAssignedUsersAsSubscribers();
 
 		$this->object->fixAssignedUsers();
-		$removedConflicts = $this->object->removeConflicts();
+		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+		$removedConflicts = $conflictsObj->removeConflicts();
 
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
@@ -388,7 +390,9 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	public function notifyAssignments()
 	{
 		$this->object->fixAssignedUsers();
-		$removedConflicts = $this->object->removeConflicts();
+		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+		$removedConflicts = $conflictsObj->removeConflicts();
 
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
