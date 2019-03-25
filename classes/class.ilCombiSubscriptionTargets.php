@@ -269,6 +269,17 @@ class ilCombiSubscriptionTargets
 		return $item;
 	}
 
+
+	/**
+	 * Synchronize the items from the targets before the assignments are calculated
+	 * Course members will be added as users with fixed assignments
+	 * Maximum assignments is set to the lower value of the subscription and the target
+	 */
+	public function syncFromTargetsBeforeCalculation()
+	{
+
+	}
+
 	/**
 	 * Get a list of unsaved schedules for a target object
 	 *
@@ -462,6 +473,7 @@ class ilCombiSubscriptionTargets
     /**
      * Put the non assigned userson the waiting list of target objects
      * @param array     $a_item_ids  list if item ids to tread
+	 * @return array	list of added user_ids
      */
 	public function addNonAssignedUsersAsSubscribers($a_item_ids = array())
 	{
