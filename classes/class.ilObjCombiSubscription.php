@@ -1119,11 +1119,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
      * ilCoSubUser objects will be created but not saved for new users
      *
 	 * @param	array	$a_user_ids (optional)
+	 * @param bool		$a_force 	force the reading of users
 	 * @return	ilCoSubUser[]
 	 */
-	public function getUsers($a_user_ids = array())
+	public function getUsers($a_user_ids = array(), $a_force = false)
 	{
-		if (!isset($this->users))
+		if (!isset($this->users) || $a_force)
 		{
 			$this->plugin->includeClass('models/class.ilCoSubUser.php');
 			$this->users = ilCoSubUser::_getForObject($this->getId());
@@ -1355,6 +1356,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->setLastProcess(new ilDateTime(time(), IL_CAL_UNIX));
 		$this->update();
 
+		// adjust subscribe users and maximum subscriptions
+		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
+		$targets_obj->syncFromTargetsBeforeCalculation();
+
+
+		// calculate the assignments
 		$run = $this->getMethodObject()->getBestCalculationRun($this->plugin->getNumberOfTries());
 		if (!isset($run))
 		{
@@ -1372,6 +1380,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$conflictsObj = new ilCombiSubscriptionConflicts($this, $this->plugin);
 		$removedConflicts = $conflictsObj->removeConflicts();
 
+		// notify users about calculation result
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);

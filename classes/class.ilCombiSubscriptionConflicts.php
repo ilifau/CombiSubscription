@@ -14,14 +14,12 @@ class ilCombiSubscriptionConflicts
     /** @var array obj_id => item_id => item) */
     protected $itemCache = [];
 
+	/** @var array obj_id => property_name => (mixed) property */
+	protected $propertyCache = [];
+
     /** @var array local_item_id => other_item_id  => conflict (true|false|null) */
     protected $conflictCache = [];
 
-    /** @var array obj_id => (int) buffer */
-    protected $bufferCache = [];
-
-    /** @var array obj_id => (int) tolerance */
-	protected $toleranceCache = [];
 
     /**
      * Constructor
@@ -236,30 +234,7 @@ class ilCombiSubscriptionConflicts
 	 */
 	protected function getBuffer($obj_id)
 	{
-		global $DIC;
-
-		if (!isset($this->bufferCache[$obj_id]))
-		{
-			$sql = "
-				SELECT p.value 
-				FROM rep_robj_xcos_prop p INNER JOIN rep_robj_xcos_data d ON p.obj_id = d.obj_id AND p.class = d.method 
-				WHERE p.property = 'out_of_conflict_time'
-				AND d.obj_id = ". $DIC->database()->quote($obj_id, 'integer');
-
-			$result = $DIC->database()->query($sql);
-			$row = $DIC->database()->fetchAssoc($result);
-
-			if (isset($row['value']))
-			{
-				$this->bufferCache[$obj_id] = $row['value'];
-			}
-			else
-			{
-				$this->bufferCache[$obj_id] = $this->plugin->getOutOfConflictTime();
-			}
-		}
-
-		return $this->bufferCache[$obj_id];
+		return $this->getMethodProperty($obj_id, 'out_of_conflict_time', $this->plugin->getToleratedConflictPercentage());
 	}
 
 	/**
@@ -269,14 +244,26 @@ class ilCombiSubscriptionConflicts
 	 */
 	protected function getTolerance($obj_id)
 	{
+		return $this->getMethodProperty($obj_id, 'tolerated_conflict_percentage', $this->plugin->getToleratedConflictPercentage());
+	}
+
+	/**
+	 * Get a method property of an object (cached)
+	 * @param int $obj_id
+	 * @param string $prop_name
+	 * @param mixed $default_value
+	 * @return integer
+	 */
+	protected function getMethodProperty($obj_id, $prop_name, $default_value)
+	{
 		global $DIC;
 
-		if (!isset($this->bufferCache[$obj_id]))
+		if (!isset($this->propertyCache[$obj_id][$prop_name]))
 		{
 			$sql = "
 				SELECT p.value 
 				FROM rep_robj_xcos_prop p INNER JOIN rep_robj_xcos_data d ON p.obj_id = d.obj_id AND p.class = d.method 
-				WHERE p.property = 'tolerated_conflict_percentage'
+				WHERE p.property = " . $DIC->database()->quote($prop_name, 'text') . "
 				AND d.obj_id = ". $DIC->database()->quote($obj_id, 'integer');
 
 			$result = $DIC->database()->query($sql);
@@ -284,14 +271,14 @@ class ilCombiSubscriptionConflicts
 
 			if (isset($row['value']))
 			{
-				$this->toleranceCache[$obj_id] = $row['value'];
+				$this->propertyCache[$obj_id][$prop_name] = $row['value'];
 			}
 			else
 			{
-				$this->toleranceCache[$obj_id] = $this->plugin->getToleratedConflictPercentage();
+				$this->propertyCache[$obj_id][$prop_name] = $default_value;
 			}
 		}
 
-		return $this->toleranceCache[$obj_id];
+		return $this->propertyCache[$obj_id][$prop_name];
 	}
 }

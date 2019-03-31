@@ -272,12 +272,81 @@ class ilCombiSubscriptionTargets
 
 	/**
 	 * Synchronize the items from the targets before the assignments are calculated
-	 * Course members will be added as users with fixed assignments
-	 * Maximum assignments is set to the lower value of the subscription and the target
+	 * - Course members will be added as users with fixed assignments
+	 * - Maximum assignments is set to the lower value of the subscription and the target
 	 */
 	public function syncFromTargetsBeforeCalculation()
 	{
+		$users = $this->object->getUsers();
+		$assignments = $this->object->getAssignments();
 
+		$this->filterUntrashedTargets();
+		foreach($this->items as $item_id => $item)
+		{
+			if (!empty($item->target_ref_id))
+			{
+				$obj_id = ilObject::_lookupObjectId($item->target_ref_id);
+				$max = 0;
+
+				switch (ilObject::_lookupType($obj_id, false))
+				{
+					case 'crs':
+						$info = ilObjCourseAccess::lookupRegistrationInfo($obj_id, $item->target_ref_id);
+						$partObj = ilCourseParticipants::_getInstanceByObjId($obj_id);
+						$max = (int) $info['reg_info_max_members'];
+						break;
+
+					case 'grp':
+						$info = ilObjGroupAccess::lookupRegistrationInfo($obj_id, $item->target_ref_id);
+						$partObj = ilGroupParticipants::_getInstanceByObjId($obj_id);
+						$max = (int) $info['reg_info_max_members'];
+						break;
+
+					case 'sess':
+						$sessObj = new ilObjSession($item->target_ref_id, true);
+						$partObj = ilSessionParticipants::_getInstanceByObjId($obj_id);
+						$max = (int) $sessObj->getRegistrationMaxUsers();
+						break;
+				}
+
+				// adjust the maximum assignments
+				if ($max > 0 && (empty($item->sub_max) || $item->sub_max > $max))
+				{
+					$item->sub_max = $max;
+					$item->save();
+				}
+
+				// add members as fixed assignments
+				foreach ($partObj->getMembers() as $user_id)
+				{
+					if (!isset($users[$user_id]))
+					{
+						$subUser = new ilCoSubUser();
+						$subUser->obj_id = $this->object->getId();
+						$subUser->user_id = $user_id;
+						$users[$user_id] = $subUser;
+					}
+					$subUser = $users[$user_id];
+					$subUser->is_fixed = true;
+					$subUser->save();
+
+					if (!isset($assignments[0][$user_id][$item_id]))
+					{
+						$assObj = new ilCoSubAssign();
+						$assObj->obj_id = $this->object->getId();
+						$assObj->user_id = $user_id;
+						$assObj->item_id = $item_id;
+						$assObj->run_id = 0;
+						$assObj->save();
+						$assignments[0][$user_id][$item_id] = $assObj->assign_id;
+					}
+				}
+			}
+		}
+
+		// re-read users and assignments for a proper calculation
+		$this->object->getUsers([], true);
+		$this->object->getAssignments(true);
 	}
 
 	/**
@@ -910,9 +979,6 @@ class ilCombiSubscriptionTargets
 	 */
 	public function applyTargetsConfig($config)
 	{
-		require_once('Services/Object/classes/class.ilObjectFactory.php');
-		require_once('Services/Membership/classes/class.ilMembershipRegistrationSettings.php');
-
 		$targets = array();
 		foreach($this->items as $item)
 		{
