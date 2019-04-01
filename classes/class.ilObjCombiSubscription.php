@@ -1154,7 +1154,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	}
 
 	/**
-	 * Get a list of user objects (indexed by user_id) that satisfy the studidata condition
+	 * Get a list of user objects (indexed by user_id) that are fixed or satisfy the studidata condition
 	 * @return	array
 	 */
 	public function getUsersForStudyCond()
@@ -1174,6 +1174,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$users = array();
 		foreach ($this->getUsers() as $user_id => $userObj)
 		{
+			// always take the fixed users
+			$users[$user_id] = $userObj;
+			if ($userObj->is_fixed)
+			{
+				$users[$user_id] = $userObj;
+			}
+
 			$studydata = ilStudyAccess::_getStudyData($user_id);
 			if (!count($studydata))
 			{
