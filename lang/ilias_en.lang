@@ -170,6 +170,8 @@ ilcosubmethodrandom_sub_min_info#:#Items with fewer assignments will be indicate
 ilcosubmethodrandom_sub_max_info#:#The calculation will not assign more than these subscriptions.
 ilcosubmethodrandom_out_of_conflict_time#:#Minimum Appointment Distance
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimum time between Appointments that should not produce a conflict. It must be longer thant %s minutes.
+ilcosubmethodrandom_assume_sub_min_as_limit#:#Minimum as Maximum
+ilcosubmethodrandom_assume_sub_min_as_limit_info#:#Limits the assignments per item to the value of "minimum assignments". This can be used in a first calculation run to reach a homogeneous filling uf items. The assigned users should be fixed afterwards and the calculation be called again without this setting to assign the remaining usrs.
 show_bars#:#Show Bars
 show_bars_info#:#The registration screen shows bars with the mumber of existing registrations for each priority. The users will see how popular an item is.
 mail_to_users#:#Send E-Mail
@@ -373,3 +375,5 @@ add_users#:#Add Users
 users_added#:#The users(s) were added.
 edit_registration#:#Edit Registration
 conflict_with#:#Conflict with existing assignment:
+calculation_workarounds#:#Workarounds
+calculation_workarounds_info#:#Please use these settings only in spacial cases, if the standard calculation does not produce a satisfying result.

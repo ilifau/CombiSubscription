@@ -14,13 +14,22 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	protected $method;
 
 	/**
+	 * ilCoSubMethodRandomPropertiesGUI constructor.
+	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
+	 */
+	public function __construct($a_parent_gui)
+	{
+		parent::__construct($a_parent_gui);
+
+		$this->method = $this->object->getMethodObject();
+	}
+
+	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
 	public function executeCommand()
 	{
-		$this->method = $this->object->getMethodObject();
-
 		$cmd = $this->ctrl->getCmd('editProperties');
 		switch ($cmd)
 		{
@@ -146,12 +155,51 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$ni->allowDecimals(false);
 		$this->form->addItem($ni);
 
-		// assume sub min as limit
-        $asm = new ilCheckboxInputGUI($this->method->txt('assume_sub_min_as_limit'),'assume_sub_min_as_limit');
-        $asm->setInfo($this->method->txt('assume_sub_min_as_limit_info'));
-        $this->form->addItem($asm);
-
 		$this->form->addCommandButton('updateProperties', $this->lng->txt('save'));
+	}
+
+	/**
+	 * Add spcific calculation settings to a properties form
+	 * @param ilPropertyFormGUI $form
+	 */
+	public function addCalculationSettings(ilPropertyFormGUI $form)
+	{
+		// workarounds switch
+		$work = new ilCheckboxInputGUI($this->plugin->txt('calculation_workarounds'),'');
+		$work->setInfo($this->plugin->txt('calculation_workarounds_info'));
+		$form->addItem($work);
+
+		// allow low filled items
+		$lowi = new ilCheckboxInputGUI($this->method->txt('allow_low_filled_items'),'allow_low_filled_items');
+		$lowi->setInfo($this->method->txt('allow_low_filled_items_info'));
+		$work->addSubItem($lowi);
+
+		// allow low filled users
+		$lowu = new ilCheckboxInputGUI($this->method->txt('allow_low_filled_users'),'allow_low_filled_users');
+		$lowu->setInfo($this->method->txt('allow_low_filled_users_info'));
+		$work->addSubItem($lowu);
+
+		// assume all items selected
+		$asa = new ilCheckboxInputGUI($this->method->txt('assume_all_items_selected'),'assume_all_items_selected');
+		$asa->setInfo($this->method->txt('assume_all_items_selected_info'));
+		$work->addSubItem($asa);
+
+		// assume sub min as limit
+		$asm = new ilCheckboxInputGUI($this->method->txt('assume_sub_min_as_limit'),'assume_sub_min_as_limit');
+		$asm->setInfo($this->method->txt('assume_sub_min_as_limit_info'));
+		$work->addSubItem($asm);
+	}
+
+	/**
+	 * Apply the specific settings fom a posted properties form
+	 * @param ilPropertyFormGUI $form
+	 */
+	public function applyCalculationSettings(ilPropertyFormGUI $form)
+	{
+		$this->method->allow_low_filled_items = (bool) $form->getInput('allow_low_filled_items');
+		$this->method->allow_low_filled_users = (bool) $form->getInput('allow_low_filled_users');
+		$this->method->assume_all_items_selected = (bool) $form->getInput('assume_all_items_selected');
+		$this->method->assume_sub_min_as_limit = (bool) $form->getInput('assume_sub_min_as_limit');
 	}
 
 
@@ -163,7 +211,6 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->getItemByPostVar('number_priorities')->setValue($this->method->number_priorities);
 		$this->form->getItemByPostVar('priority_choices')->setValue($this->method->priority_choices);
 		$this->form->getItemByPostVar('number_assignments')->setValue($this->method->number_assignments);
-        $this->form->getItemByPostVar('assume_sub_min_as_limit')->setChecked($this->method->assume_sub_min_as_limit);
 
 		$seconds = (int) max($this->method->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
 		$hours = (int) ($seconds / 3600);
@@ -172,7 +219,6 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 
 		$this->form->getItemByPostVar('out_of_conflict_time')->setHours($hours);
 		$this->form->getItemByPostVar('out_of_conflict_time')->setMinutes($minutes);
-
 		$this->form->getItemByPostVar('tolerated_conflict_percentage')->setValue($this->method->getToleratedConflictPercentage());
 	}
 
@@ -184,7 +230,6 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->method->number_priorities = (int) $this->form->getInput('number_priorities');
 		$this->method->priority_choices = (string) $this->form->getInput('priority_choices');
 		$this->method->number_assignments = (int) $this->form->getInput('number_assignments');
-        $this->method->assume_sub_min_as_limit = (bool) $this->form->getInput('assume_sub_min_as_limit');
 
 		/** @var ilDurationInputGUI $di */
 		$di = $this->form->getItemByPostVar('out_of_conflict_time');

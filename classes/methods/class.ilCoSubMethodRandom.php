@@ -53,9 +53,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var array	user_id => item_id => true */
 	protected $assignments = array();
 
-	/** @var array 		item_id => priority => count */
-	protected $priority_counts_item = array();
-
 	/** @var array  	item_id => count */
 	protected $assign_counts_item = array();
 	
@@ -78,7 +75,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$this->plugin->getOutOfConflictTime());
 		$this->tolerated_conflict_percentage = (int) $this->getProperty('tolerated_conflict_percentage',
 			$this->plugin->getToleratedConflictPercentage());
-        $this->assume_sub_min_as_limit = (bool) $this->getProperty('assume_sub_min_as_limit','0');
 	}
 
 
@@ -92,7 +88,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->setProperty('number_assignments', sprintf('%d', (int) $this->number_assignments));
 		$this->setProperty('out_of_conflict_time', sprintf('%d', (int) $this->out_of_conflict_time));
 		$this->setProperty('tolerated_conflict_percentage', sprintf('%d', (int) $this->tolerated_conflict_percentage));
-        $this->setProperty('assume_sub_min_as_limit', sprintf('%d', (int) $this->assume_sub_min_as_limit));
 
 		if ($this->priority_choices == self::PRIO_CHOICES_UNIQUE)
 		{
@@ -258,7 +253,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	protected function initCalculationData()
 	{
 		$this->priorities = $this->object->getPriorities();
-		$this->priority_counts_item = $this->object->getPriorityCounts();
 
 		$this->assignments = array();
 		$this->assign_counts_item = array();
@@ -302,21 +296,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->assign_counts_user[$a_user_id]++;
 		$this->assign_counts_item[$a_item_id]++;
 
-		// decrease the priority count for the chosen item
 		// remove the item choice from the user
-		$priority = $this->priorities[$a_user_id][$a_item_id];
-		$this->priority_counts_item[$a_item_id][$priority]--;
 		unset($this->priorities[$a_user_id][$a_item_id]);
 
 		// this user has reached the number of assignments per user
 		if ($this->assign_counts_user[$a_user_id] >= $this->number_assignments && !empty($this->priorities[$a_user_id]))
 		{
-			// decrease the priority counts for remaining items chosen by the user
-			foreach ($this->priorities[$a_user_id] as $item_id => $priority)
-			{
-				$this->priority_counts_item[$item_id][$priority]--;
-			}
-
 			// then remove user from the list of priorities
 			unset($this->priorities[$a_user_id]);
 		}
@@ -383,7 +368,25 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 		$this->saveAssignments();
 
-		$this->run->details = '';
+		$details = [];
+		if ($this->allow_low_filled_items)
+		{
+			$details[] = $this->txt('allow_low_filled_items');
+		}
+		if ($this->allow_low_filled_users)
+		{
+			$details[] = $this->txt('allow_low_filled_users');
+		}
+		if ($this->assume_all_items_selected)
+		{
+			$details[] = $this->txt('assume_all_items_selected');
+		}
+		if ($this->assume_sub_min_as_limit)
+		{
+			$details[] = $this->txt('assume_sub_min_as_limit');
+		}
+
+		$this->run->details = implode(', ', $details);
 		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
 		$this->run->save();
 
@@ -469,7 +472,17 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 		foreach ($item_ids as $index => $item_id)
 		{
-			$priority = $this->priorities[$a_user_id][$item_id];
+
+			if (isset($this->priorities[$a_user_id][$item_id]))
+			{
+				// take the chosen priority
+				$priority = $this->priorities[$a_user_id][$item_id];
+			}
+			elseif ($this->assume_all_items_selected)
+			{
+				// take one after the weakest priority for the workaround
+				$priority = $this->number_priorities;
+			}
 
 			if (!empty($this->items[$item_id]))
 			{

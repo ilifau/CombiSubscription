@@ -147,16 +147,25 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function calculateAssignmentsConfirmation()
 	{
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
-
-		$conf_gui = new ilConfirmationGUI();
-		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'calculateAssignments'));
-		$conf_gui->setHeaderText($this->plugin->txt('calculate_assignments_confirmation')
+		ilUtil::sendQuestion($this->plugin->txt('calculate_assignments_confirmation')
 			. $this->messageDetails($this->plugin->txt('calculate_assignments_confirmation_details')));
-		$conf_gui->setConfirm($this->plugin->txt('calculate_assignments'),'calculateAssignments');
-		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
 
-		$this->tpl->setContent($conf_gui->getHTML());
+		$form = new ilPropertyFormGUI();
+		$form->setFormAction($this->ctrl->getFormAction($this,'calculateAssignments'));
+
+		/** @var ilCoSubMethodBase $method */
+		if (($method = $this->object->getMethodObject()) && ($classname = $this->object->getMethodObject()->getPropertiesGuiName()))
+		{
+			/** @var ilCoSubMethodRandomPropertiesGUI $gui */
+			require_once($method->getPropertiesGuiPath());
+			$gui = new $classname($this->parent);
+			$gui->addCalculationSettings($form);
+		}
+
+		$form->addCommandButton('calculateAssignments', $this->plugin->txt('calculate_assignments'));
+		$form->addCommandButton('editAssignments', $this->lng->txt('cancel'));
+
+		$this->tpl->setContent($form->getHTML());
 		$this->showInfo();
 	}
 
@@ -172,6 +181,19 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		}
 		else
 		{
+			/** @var ilCoSubMethodBase $method */
+			if (($method = $this->object->getMethodObject()) && ($classname = $this->object->getMethodObject()->getPropertiesGuiName()))
+			{
+				$form = new ilPropertyFormGUI();
+				$form->checkInput();
+
+				/** @var ilCoSubMethodRandomPropertiesGUI $gui */
+				require_once($method->getPropertiesGuiPath());
+				$gui = new $classname($this->parent);
+				$gui->applyCalculationSettings($form);
+			}
+
+
 			$this->plugin->includeClass('models/class.ilCoSubRun.php');
 			$run = new ilCoSubRun;
 			$run->obj_id = $this->object->getId();
