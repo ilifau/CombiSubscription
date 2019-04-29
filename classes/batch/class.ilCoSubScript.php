@@ -72,13 +72,14 @@ class ilCoSubScript
 	/** @var bool tweak: don't create objects for items without assignments*/
 	protected $ignore_unassigned_items = true;
 
-	/** @var  string tweak: owner of created objects (higher precedence as owner_id) */
-	protected $owner_login = 'root';
-    //protected $owner_login = 'manfred.vogel';
-    //protected $owner_login = 'andreas.rohrmoser';
-
 	/** @var  int tweak: owner of created objects */
 	protected $owner_id = 6;
+
+	/** @var  string tweak: owner of created objects (higher precedence as owner_id) */
+	//protected $owner_login = 'root';
+    //protected $owner_login = 'martin.killmann';
+    //protected $owner_login = 'andreas.rohrmoser';
+
 
 	/**
 	 * Constructor.
