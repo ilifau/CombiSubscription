@@ -14,6 +14,7 @@ class ilCoSubScript
 
 	const MODE_FTP_STRUCTURE = 'ftp_structure';	/** Fertigungstechnisches Praktikum */
 	const MODE_FTP_ADJUST = 'ftp_adjust';
+	const MODE_FTP_ADJUST_TESTS = 'ftp_adjust_tests';
 	const MODE_FTP_EX_MEM = 'ftp_ex_mem';
 	const MODE_FTP_EX_STATUS = 'ftp_ex_status';
 
@@ -118,6 +119,15 @@ class ilCoSubScript
 				'filename' => 'structure.xlsx',
 				'default' => true
 			),
+			ilCoSubScript::MODE_FTP_ADJUST_TESTS => array(
+				'title' => 'Antestate für Fertigungstechnisches Praktikum anpassen',
+				'info' => 'Setzt Passwort, Durchäufe, Bearbeitungszeit und -Dauer für Testobjekte',
+				'success' => 'Die Antestate wurde angepasst.',
+				'failure' => 'Die Antestate konnte nicht angepasst werden!',
+				'filename' => 'structure.xlsx',
+				'default' => true
+			),
+
 //			ilCoSubScript::MODE_FTP_ADJUST => array(
 //				'title' => 'Struktur für Fertigungstechnisches Praktikum anpassen',
 //				'info' => 'Ersetzt das Antestat durch ein Übungsobjekt mit manuellem Lernfortschritt',
@@ -206,6 +216,10 @@ class ilCoSubScript
 
 				case self::MODE_FTP_ADJUST:
 					$this->adjustFtpObjects();
+					$write = true;
+					break;
+				case self::MODE_FTP_ADJUST_TESTS:
+					$this->adjustFtpTestObjects();
 					$write = true;
 					break;
 
@@ -841,6 +855,50 @@ class ilCoSubScript
 			$event_items->update();
 		}
 	}
+
+
+	/**
+	 * Replace the 'Antestat' test by an exercise with manual LP setting
+	 */
+	protected function adjustFtpTestObjects()
+	{
+		foreach ($this->rows as $r => $rowdata)
+		{
+			$test_id = $rowdata['test_id'];
+
+			if (empty($test_id) || !ilObject::_exists($test_id,true, 'tst') || ilObject::_isInTrash($test_id))
+			{
+				throw new Exception("Test $test_id nicht gefunden in Zeile $r!");
+			}
+		}
+
+		foreach ($this->rows as $r => $rowdata)
+		{
+			$test_id = $rowdata['test_id'];
+			$test_password = (string) $rowdata['test_password'];
+			$tries = (int) $rowdata['test_tries'];
+			$minutes = (int) $rowdata['test_minutes'];
+
+			$test_start = $this->excelTimeToUnix($rowdata['test_start']);
+			$test_end = $this->excelTimeToUnix($rowdata['test_end']);
+
+			$test_start_obj = new ilDateTime($test_start, IL_CAL_UNIX);
+			$test_end_obj = new ilDateTime($test_end, IL_CAL_UNIX);
+
+			/** @var ilObjTest $newTest */
+			$testObj = new ilObjTest($test_id, true);
+			$testObj->setOnline(true);
+			$testObj->setPassword($test_password);
+			$testObj->setNrOfTries($tries);
+			$testObj->setProcessingTimeByMinutes($minutes);
+			$testObj->setStartingTimeEnabled(true);
+			$testObj->setStartingTime($test_start);
+			$testObj->setEndingTimeEnabled(true);
+			$testObj->setEndingTime($test_end);
+			$testObj->saveToDb();
+		}
+	}
+
 
 	/**
 	 * Remove the conditions of a target triggered by deleted objects
