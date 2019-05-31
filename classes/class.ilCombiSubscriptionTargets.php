@@ -756,7 +756,7 @@ class ilCombiSubscriptionTargets
 		$trigger_ids = array();
 		$conditions = array();
 
-		foreach(ilConditionHandler::_getConditionsOfTarget($ref_id, $a_obj_id, $a_type) as $condition)
+		foreach(ilConditionHandler::_getPersistedConditionsOfTarget($ref_id, $a_obj_id, $a_type) as $condition)
 		{
 			if($condition['operator'] == 'not_member')
 			{
@@ -765,7 +765,7 @@ class ilCombiSubscriptionTargets
 		}
 		foreach ($trigger_ids as $trigger_id)
 		{
-			foreach(ilConditionHandler::_getConditionsOfTrigger('crsg', $trigger_id) as $condition)
+			foreach(ilConditionHandler::_getPersistedConditionsOfTrigger('crsg', $trigger_id) as $condition)
 			{
 				// Handle deleted items
 				if(!$tree->isDeleted($condition['target_ref_id'])

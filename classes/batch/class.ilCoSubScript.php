@@ -909,7 +909,7 @@ class ilCoSubScript
 		$obj_id = ilObject::_lookupObjectId($ref_id);
 		$type = ilObject::_lookupType($obj_id);
 
-		$conditions = ilConditionHandler::_getConditionsOfTarget($ref_id,$obj_id, $type);
+		$conditions = ilConditionHandler::_getPersistedConditionsOfTarget($ref_id,$obj_id, $type);
 
 		foreach ($conditions as $condition)
 		{
