@@ -178,8 +178,10 @@ class ilCombiSubscriptionTargets
 
 			/** @var ilDateDurationInputGUI $sub_period */
 			$sub_period = $form->getItemByPostVar('sub_period');
-			$config->sub_period_start = (int) $sub_period->getStart()->get(IL_CAL_UNIX);
-			$config->sub_period_end = (int) $sub_period->getEnd()->get(IL_CAL_UNIX);
+			$start = $sub_period->getStart();
+			$end = $sub_period->getEnd();
+			$config->sub_period_start = (int) (isset($start) ? $sub_period->getStart()->get(IL_CAL_UNIX) : null);
+			$config->sub_period_end = (int) (isset($end) ? $sub_period->getEnd()->get(IL_CAL_UNIX) : null);
 		}
 		else
 		{
