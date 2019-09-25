@@ -149,7 +149,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->priorities = $this->object->getPriorities();
 		$this->assignments = $this->object->getAssignments();
 
-		$users_for_studycond = $this->object->getUsersForStudyCond();
+		$users_for_studycond = $this->object->getUsersForStudyCond(false);
 
 		if (empty($this->users))
 		{
