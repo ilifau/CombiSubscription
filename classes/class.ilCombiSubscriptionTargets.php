@@ -111,7 +111,6 @@ class ilCombiSubscriptionTargets
 			$set_sub_period->setChecked($a_config->set_sub_period);
 			$properties[] = $set_sub_period;
 
-			include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
 			$sub_period = new ilDateDurationInputGUI($this->plugin->txt('sub_period'), "sub_period");
 			$sub_period->setShowTime(true);
 			$sub_period->setStart(new ilDateTime($a_config->sub_period_start, IL_CAL_UNIX));
@@ -233,7 +232,6 @@ class ilCombiSubscriptionTargets
 		switch (ilObject::_lookupType($a_ref_id, true))
 		{
 			case 'crs':
-				require_once('Modules/Course/classes/class.ilObjCourse.php');
 				$course = new ilObjCourse($a_ref_id, true);
 				$item->title = $course->getTitle();
 				$item->description = $course->getDescription();
@@ -245,7 +243,6 @@ class ilCombiSubscriptionTargets
 				break;
 
 			case 'grp':
-				require_once('Modules/Group/classes/class.ilObjGroup.php');
 				$group = new ilObjGroup($a_ref_id, true);
 				$item->title = $group->getTitle();
 				$item->description = $group->getDescription();
@@ -257,7 +254,6 @@ class ilCombiSubscriptionTargets
 				break;
 
 			case 'sess':
-				require_once('Modules/Session/classes/class.ilObjSession.php');
 				$session = new ilObjSession($a_ref_id, true);
 				$item->title = $session->getTitle();
 				$item->description = $session->getDescription();
@@ -389,7 +385,6 @@ class ilCombiSubscriptionTargets
 				break;
 
 			case 'sess':
-				require_once('Modules/Session/classes/class.ilObjSession.php');
 				$session = new ilObjSession($a_ref_id, true);
 				if ($session->getAppointments())
 				{
@@ -630,7 +625,6 @@ class ilCombiSubscriptionTargets
 	 */
 	public function getGroupingData()
 	{
-		require_once('Modules/Course/classes/class.ilObjCourseGrouping.php');
 		if (!isset($this->groupings))
 		{
 			$this->groupings = array();
@@ -681,7 +675,6 @@ class ilCombiSubscriptionTargets
 	 */
 	public function addGrouping()
 	{
-		require_once('Modules/Course/classes/class.ilObjCourseGrouping.php');
 		$grouping = new ilObjCourseGrouping();
 		$ref_ids = $this->getTargetRefIds();
 		if (empty($ref_ids))
@@ -752,8 +745,6 @@ class ilCombiSubscriptionTargets
 			return $cached_conditions[$a_obj_id];
 		}
 
-		include_once './Services/AccessControl/classes/class.ilConditionHandler.php';
-
 		$ref_id = current(ilObject::_getAllReferences($a_obj_id));
 		$trigger_ids = array();
 		$conditions = array();
@@ -797,7 +788,6 @@ class ilCombiSubscriptionTargets
 		{
 			if ($type == 'crs')
 			{
-				include_once('Modules/Course/classes/class.ilCourseParticipants.php');
 				$members = ilCourseParticipants::_getInstanceByObjId($condition['target_obj_id']);
 				if($members->isGroupingMember($user_id, $condition['value']))
 				{
@@ -806,7 +796,6 @@ class ilCombiSubscriptionTargets
 			}
 			elseif ($type == 'grp')
 			{
-				include_once('Modules/Group/classes/class.ilGroupParticipants.php');
 				$members = ilGroupParticipants::_getInstanceByObjId($condition['target_obj_id']);
 				if($members->isGroupingMember($user_id, $condition['value']))
 				{
