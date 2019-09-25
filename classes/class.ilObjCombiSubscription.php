@@ -1175,7 +1175,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		foreach ($this->getUsers() as $user_id => $userObj)
 		{
 			// always take the fixed users
-			$users[$user_id] = $userObj;
 			if ($userObj->is_fixed)
 			{
 				$users[$user_id] = $userObj;
