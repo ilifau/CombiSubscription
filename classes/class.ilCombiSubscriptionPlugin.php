@@ -62,14 +62,43 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 
 	/**
+	 * Checks if a user has extended access to other user data
+	 * @return   boolean
+	 */
+	public function hasUserDataAccess()
+	{
+		global $DIC;
+
+		static $allowed = null;
+
+		if (!isset($allowed))
+		{
+			$privacy = ilPrivacySettings::_getInstance();
+			$allowed = $DIC->rbac()->system()->checkAccess('export_member_data', $privacy->getPrivacySettingsRefId());
+		}
+
+		return $allowed;
+	}
+
+	/**
 	 * Check if the user has administrative access
 	 * @return bool
 	 */
 	public function hasAdminAccess()
 	{
-		global $rbacsystem;
-		return $rbacsystem->checkAccess("visible", SYSTEM_FOLDER_ID);
+		global $DIC;
+
+		return $DIC->rbac()->system()->checkAccess("visible", SYSTEM_FOLDER_ID);
 	}
+
+	/**
+	 * Check if the platform has studydata available (StudOn only)
+	 */
+	public function hasStudyData()
+	{
+		return file_exists('Services/StudyData/classes/class.ilStudyData.php');
+	}
+
 
 	/**
 	 * Check if study conditions are available

@@ -9,7 +9,15 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 	/** @var  ilCtrl */
 	protected $ctrl;
 
-	/**
+    /**
+     * @var ilObjCombiSubscription
+     */
+    protected $object;
+
+    /** @var ilCombiSubscriptionPlugin  */
+    protected $plugin;
+
+    /**
 	 * List of users (indexed by user_id)
 	 * @var ilCoSubUser[];
 	 */
@@ -50,6 +58,14 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		$this->addColumn('','', 1, true);
 		$this->addColumn($this->lng->txt('user'), 'user');
 		$this->addColumn($this->lng->txt('login'), 'login');
+
+		if ($this->plugin->hasUserDataAccess()) {
+            $this->addColumn($this->lng->txt('matriculation'), 'matriculation');
+
+            if ($this->plugin->hasStudyData()) {
+                $this->addColumn($this->lng->txt('studydata'), 'studydata');
+            }
+        }
 		$this->addColumn($this->plugin->txt('selected_items'), 'registrations');
 		$this->addColumn($this->plugin->txt('fixed'), 'is_fixed');
 		$this->addColumn('');
@@ -86,7 +102,18 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		$user_query = new ilUserQuery();
 		$user_query->setLimit($this->plugin->getUserQueryLimit());
 		$user_query->setUserFilter(array_keys($this->users));
-		$user_query_result = $user_query->query();
+
+        $additional = [];
+        if ($this->plugin->hasUserDataAccess()) {
+            $additional[] = 'matriculation';
+
+            if ($this->plugin->hasStudyData()) {
+                $additional[] = 'studydata';
+            }
+        }
+        $user_query->setAdditionalFields($additional);
+
+        $user_query_result = $user_query->query();
 
 
 		// prepare only the data that is used for sorting
@@ -100,6 +127,8 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 				'user_id' => $user_id,
 				'login' => $user['login'],
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
+				'matriculation' => $user['matriculation'],
+                'studydata' => $user['studydata'],
 				'is_fixed' => $userObj->is_fixed,
 				// performance killer
 				//'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
@@ -128,6 +157,13 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('FIXED', $a_set['is_fixed'] ? $this->lng->txt('yes') : $this->lng->txt('no'));
 		$this->tpl->setVariable($a_set['is_fixed'] ? 'LOGIN_FIXED' : 'LOGIN', $a_set['login']);
 		$this->tpl->setVariable($a_set['is_fixed'] ? 'USER_FIXED' : 'USER', $a_set['user']);
+        if ($this->plugin->hasUserDataAccess()) {
+            $this->tpl->setVariable('MATRICULATION', $a_set['matriculation'] . '&nbsp;');
+
+            if ($this->plugin->hasStudyData()) {
+                $this->tpl->setVariable('STUDYDATA', $a_set['studydata'] . '&nbsp;');
+            }
+        }
 //		if (!$a_set['has_access'])
 //		{
 //			$this->tpl->setVariable('NO_ACCESS', $this->lng->txt('permission_denied'));

@@ -94,17 +94,16 @@ class ilCoSubExport
 		$this->lng = $lng;
 
 		// check capabilities
-		if ($this->object->hasExtendedUserData())
+		if ($this->plugin->hasUserDataAccess())
 		{
 			$this->extended = true;
 
-			if ($this->object->hasStudyData())
+			if ($this->plugin->hasStudyData())
 			{
 				require_once('Services/StudyData/classes/class.ilStudyData.php');
 				$this->with_studydata = true;
 			}
 		}
-
 	}
 
 

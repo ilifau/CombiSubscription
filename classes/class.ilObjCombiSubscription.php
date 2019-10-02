@@ -424,27 +424,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 
 	/**
-	 * Check if the current user has access to extended user data
-	 * @return bool
-	 */
-	public function hasExtendedUserData()
-	{
-		global $rbacsystem;
-		include_once('Services/PrivacySecurity/classes/class.ilPrivacySettings.php');
-		$privacy = ilPrivacySettings::_getInstance();
-		return $rbacsystem->checkAccess('export_member_data',$privacy->getPrivacySettingsRefId());
-	}
-
-
-	/**
-	 * Check if the platform has studydata available (StudOn only)
-	 */
-	public function hasStudyData()
-	{
-		return file_exists('Services/StudyData/classes/class.ilStudyData.php');
-	}
-
-	/**
 	 * Get a property for this class
 	 * @param   string  $a_key
 	 * @param   string  $a_default_value
