@@ -377,3 +377,4 @@ edit_registration#:#Edit Registration
 conflict_with#:#Conflict with existing assignment:
 calculation_workarounds#:#Workarounds
 calculation_workarounds_info#:#Please use these settings only in spacial cases, if the standard calculation does not produce a satisfying result.
+fill_empty_registrations#:#Fill Empty Registrations

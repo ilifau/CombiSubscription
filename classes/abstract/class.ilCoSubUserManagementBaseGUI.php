@@ -76,6 +76,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 		}
 
 		$users = $this->object->getUsers();
+        $items = $this->object->getItems();
+
+        $this->plugin->includeClass('models/class.ilCoSubChoice.php');
+        $preselect = ($this->object->getPreSelect() && $this->object->getMethodObject()->hasMultipleChoice());
+
 		$added = 0;
 		foreach ($user_ids as $user_id)
 		{
@@ -86,6 +91,17 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 				$userObj->user_id = $user_id;
 				$userObj->save();
 				$added++;
+
+				if ($preselect) {
+                    foreach ($items as $item_id => $item) {
+                        $choiceObj = new ilCoSubChoice();
+                        $choiceObj->obj_id = $this->object->getId();
+                        $choiceObj->user_id = $user_id;
+                        $choiceObj->item_id = $item_id;
+                        $choiceObj->priority = 0;
+                        $choiceObj->save();
+                    }
+                }
 			}
 		}
 

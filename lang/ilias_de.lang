@@ -395,3 +395,4 @@ send_target_emails_info#:#Sende den zugeteilten Nutzern neben ihrer Benachrichti
 conflict_with_assigned_unit#:#Konflikt mit bereits erfolgter Zuteilung:
 calculation_workarounds#:#Workarounds
 calculation_workarounds_info#:#Diese Einstellungen sollten Sie nur in Spezialfällen verwenden, wenn die Standard-Berechnung zu keinem befriedigenden Ergebnis führt.
+fill_empty_registrations#:#Leere Anmeldungen befüllen

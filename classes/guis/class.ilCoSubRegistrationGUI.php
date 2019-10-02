@@ -103,7 +103,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
         {
             $button = ilLinkButton::getInstance();
             $button->setUrl($this->ctrl->getLinkTarget($this,'fillEmptyRegistrations'));
-            $button->setCaption('fill_empty_registrations');
+            $button->setCaption($this->plugin->txt('fill_empty_registrations'), false);
             $this->toolbar->addButtonInstance($button);
         }
 
@@ -552,7 +552,9 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		}
 	}
 
-
+    /**
+     * Select all items as choice for users who don't have a choice
+     */
 	public function fillEmptyRegistrations()
     {
         $users = $this->object->getUsers();
