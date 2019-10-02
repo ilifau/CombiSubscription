@@ -195,6 +195,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$new_obj->setExplanation($this->getExplanation());
 		$new_obj->setSubscriptionStart($this->getSubscriptionStart());
 		$new_obj->setSubscriptionEnd($this->getSubscriptionEnd());
+		$new_obj->setPreSelect($this->getPreSelect());
 		$new_obj->setShowBars($this->getShowBars());
 		$new_obj->setMinChoices($this->getMinChoices());
 		$new_obj->setMethod($this->getMethod());
