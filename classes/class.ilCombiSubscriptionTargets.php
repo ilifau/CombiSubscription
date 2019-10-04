@@ -403,15 +403,19 @@ class ilCombiSubscriptionTargets
 
 	/**
 	 * Add the assigned users as members to the target objects
-     * @param array     $a_item_ids list if item ids to tread
+     * @param array     $a_item_ids     list if item ids to tread
+     * @param bool      $send_target_emails     send notification e-mails for the target objects
      * @return array    list of added user_ids
 	 */
-	public function addAssignedUsersAsMembers($a_item_ids = array())
+	public function addAssignedUsersAsMembers($a_item_ids = array(), $send_target_emails = null)
 	{
 		global $tree;
 
-        $config = new ilCoSubTargetsConfig($this->object);
-        $config->readFromObject();
+		if (!isset($send_target_emails)) {
+            $config = new ilCoSubTargetsConfig($this->object);
+            $config->readFromObject();
+            $send_target_emails = $config->send_target_emails;
+        }
 
 		$added_users = array();
 
@@ -526,7 +530,7 @@ class ilCombiSubscriptionTargets
 				$added_users[] = $user_id;
 			}
 
-			if (!empty($added_members) && $config->send_target_emails)
+			if (!empty($added_members) && $send_target_emails)
 			{
 				$mail_obj->setRecipients($added_members);
 				$mail_obj->send();
@@ -537,14 +541,12 @@ class ilCombiSubscriptionTargets
 	}
 
     /**
-     * Put the non assigned userson the waiting list of target objects
+     * Put the non assigned users on the waiting list of target objects
      * @param array     $a_item_ids  list if item ids to tread
 	 * @return array	list of added user_ids
      */
 	public function addNonAssignedUsersAsSubscribers($a_item_ids = array())
 	{
-        $added_users = array();
-
 		// collect the actions to be done
 		$actions = array();
 		foreach ($this->items as $item)
@@ -577,50 +579,101 @@ class ilCombiSubscriptionTargets
 			}
 		}
 
-		// do the actions
-		foreach ($actions as $action)
-		{
-			// get membership limitation conditions
-			$conditions = self::_getGroupingConditions($action['obj_id'], $action['type']);
-
-			switch($action['type'])
-			{
-				case 'grp':
-					$object = new ilObjGroup($action['ref_id'], true);
-					$list_obj = $object->isWaitingListEnabled() ? new ilGroupWaitingList($action['obj_id']) : null;
-					break;
-
-				case 'crs':
-					$object = new ilObjCourse($action['ref_id'], true);
-					$list_obj = $object->enabledWaitingList() ? new ilCourseWaitingList($action['obj_id']) : null;
-					break;
-
-				case 'sess':
-					$object = new ilObjSession($action['ref_id'], true);
-					$list_obj = $object->isRegistrationWaitingListEnabled() ? new ilSessionWaitingList($action['obj_id']) : null;
-					break;
-			}
-
-			foreach ($action['users'] as $user_id)
-			{
-				// check if user is already member in one of the other groups/course
-				if (self::_findGroupingMembership($user_id, $action['type'], $conditions))
-				{
-					continue;
-				}
-
-				if (isset($list_obj))
-				{
-					$list_obj->addToList($user_id);
-                    $added_users[] = $user_id;
-				}
-			}
-		}
-
-        return array_unique($added_users);
+        return $this->addSubscribersByActions($actions);
 	}
 
-	/**
+    /**
+     * Put the assigned users on the waiting list of target objects (workaround)
+     * @param array     $a_item_ids  list if item ids to tread
+     * @return array	list of added user_ids
+     */
+    public function addAssignedUsersAsSubscribers($a_item_ids = array())
+    {
+        // collect the actions to be done
+        $actions = array();
+        foreach ($this->items as $item)
+        {
+            // treat only selected items, if list is given
+            if (!empty($a_item_ids) && !in_array($item->item_id, $a_item_ids))
+            {
+                continue;
+            }
+
+            if (!empty($item->target_ref_id))
+            {
+                // find users who selected the item
+                $users = array();
+                foreach ($this->object->getAssignmentsOfItem($item->item_id) as $user_id => $assign_id)
+                {
+                    $users[] = $user_id;
+                }
+
+                $actions[] = array(
+                    'ref_id' => $item->target_ref_id,
+                    'obj_id' => ilObject::_lookupObjId($item->target_ref_id),
+                    'type' => ilObject::_lookupType($item->target_ref_id, true),
+                    'users' => $users
+                );
+            }
+        }
+
+        return $this->addSubscribersByActions($actions);
+    }
+
+
+    /**
+     * Put users on the waiting list of target objects
+     * @param array     [[ref_id => int, obj_id => int, type => string, users => int[] ], ...]
+     * @return array	list of added user_ids
+     */
+    protected function addSubscribersByActions($actions)
+    {
+        $added_users = array();
+
+        // do the actions
+        foreach ($actions as $action)
+        {
+            // get membership limitation conditions
+            $conditions = self::_getGroupingConditions($action['obj_id'], $action['type']);
+
+            switch($action['type'])
+            {
+                case 'grp':
+                    $object = new ilObjGroup($action['ref_id'], true);
+                    $list_obj = $object->isWaitingListEnabled() ? new ilGroupWaitingList($action['obj_id']) : null;
+                    break;
+
+                case 'crs':
+                    $object = new ilObjCourse($action['ref_id'], true);
+                    $list_obj = $object->enabledWaitingList() ? new ilCourseWaitingList($action['obj_id']) : null;
+                    break;
+
+                case 'sess':
+                    $object = new ilObjSession($action['ref_id'], true);
+                    $list_obj = $object->isRegistrationWaitingListEnabled() ? new ilSessionWaitingList($action['obj_id']) : null;
+                    break;
+            }
+
+            foreach ($action['users'] as $user_id)
+            {
+                // check if user is already member in one of the other groups/course
+                if (self::_findGroupingMembership($user_id, $action['type'], $conditions))
+                {
+                    continue;
+                }
+
+                if (isset($list_obj))
+                {
+                    $list_obj->addToList($user_id);
+                    $added_users[] = $user_id;
+                }
+            }
+        }
+
+        return array_unique($added_users);
+    }
+
+    /**
 	 * Read the list of groupings for the item targets
 	 */
 	public function getGroupingData()

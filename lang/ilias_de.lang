@@ -396,3 +396,9 @@ conflict_with_assigned_unit#:#Konflikt mit bereits erfolgter Zuteilung:
 calculation_workarounds#:#Workarounds
 calculation_workarounds_info#:#Diese Einstellungen sollten Sie nur in Spezialfällen verwenden, wenn die Standard-Berechnung zu keinem befriedigenden Ergebnis führt.
 fill_empty_registrations#:#Leere Anmeldungen befüllen
+transfer_workarounds#:#Workarounds
+transfer_workarounds_info#:#Diese Einstellungen sollten Sie nur in Spezialfällen verwenden.
+suppress_target_emails#:#Benachrichtigungen unterdrücken
+suppress_target_emails_info#:#Unterdrücke die Benachrichtigungen über die Zuteilung und zur Aufnahme in die Kurse, Gruppen oder Sitzungen. In diesem Fall werden auch keine Konflikte mit anderen Anmeldungen bereinigt.
+transfer_to_waiting#:#Auf Wartelisten setzen
+transfer_to_waiting_info#:#Setzt die Teilnehmer auf die Wartelisten ihrer zugeteilten Kurse/Gruppen statt sie als Mitglieder aufzunehmen. Sie können dann über die Mitgliederverwaltung aufgenommen oder abgelehnt werden. Sie werden aber nicht auf die Wartelisten der alternativ ausgewählten Kurse/Gruppen gesetzt, d.h. die Administratoren müssen im Fall der Ablehnung selbst für eine Alternative sorgen.

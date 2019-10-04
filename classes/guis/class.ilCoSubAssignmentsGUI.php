@@ -326,35 +326,49 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function transferAssignmentsConfirmation()
 	{
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
-		require_once('Services/Locator/classes/class.ilLocatorGUI.php');
+        $targets = [];
+        foreach ($this->object->getItems() as $item)
+        {
+            $locator = new ilLocatorGUI();
+            if (!empty($item->target_ref_id))
+            {
+                $locator->addContextItems($item->target_ref_id);
+                $targets[] =  $locator->getHTML();
+            }
+        }
 
-		$conf_gui = new ilConfirmationGUI();
-		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'transferAssignments'));
-		$conf_gui->setHeaderText($this->plugin->txt('transfer_assignments_confirmation'));
-		$conf_gui->setConfirm($this->plugin->txt('transfer_assignments'),'transferAssignments');
-		$conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+        if (empty($targets))
+        {
+            ilUtil::sendFailure($this->plugin->txt('no_target_objects'),true);
+            $this->ctrl->redirect($this,'editAssignments');
+        }
 
-		$count = 0;
-		foreach ($this->object->getItems() as $item)
-		{
-			$locator = new ilLocatorGUI();
-			if (!empty($item->target_ref_id))
-			{
-				$locator->addContextItems($item->target_ref_id);
-				$count++;
-			}
-			$conf_gui->addItem('ref_id', $item->target_ref_id, $locator->getHTML());
-		}
+        ilUtil::sendQuestion($this->plugin->txt('transfer_assignments_confirmation')
+            . $this->messageDetails(implode('', $targets)));
 
-		if ($count == 0)
-		{
-			ilUtil::sendFailure($this->plugin->txt('no_target_objects'),true);
-			$this->ctrl->redirect($this,'editAssignments');
-		}
+        $form = new ilPropertyFormGUI();
+        $form->setFormAction($this->ctrl->getFormAction($this,'calculateAssignments'));
 
-		$this->tpl->setContent($conf_gui->getHTML());
-		$this->showInfo();
+        // workarounds switch
+        $work = new ilCheckboxInputGUI($this->plugin->txt('transfer_workarounds'),'');
+        $work->setInfo($this->plugin->txt('transfer_workarounds_info'));
+        $form->addItem($work);
+
+        // Suppress target e-mails
+        $supp = new ilCheckboxInputGUI($this->plugin->txt('suppress_target_emails'),'suppress_target_emails');
+        $supp->setInfo($this->plugin->txt('suppress_target_emails_info'));
+        $work->addSubItem($supp);
+
+        // Transfer to waiting list
+        $supp = new ilCheckboxInputGUI($this->plugin->txt('transfer_to_waiting'),'transfer_to_waiting');
+        $supp->setInfo($this->plugin->txt('transfer_to_waiting_info'));
+        $work->addSubItem($supp);
+
+        $form->addCommandButton('transferAssignments', $this->plugin->txt('transfer_assignments'));
+        $form->addCommandButton('editAssignments', $this->lng->txt('cancel'));
+
+        $this->tpl->setContent($form->getHTML());
+        $this->showInfo();
 	}
 
 
@@ -365,25 +379,39 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function transferAssignments()
 	{
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
+        $form = new ilPropertyFormGUI();
+        $form->checkInput();
+        $suppress_target_emails = $form->getInput('suppress_target_emails');
+        $transfer_to_waiting = $form->getInput('transfer_to_waiting');
+
+        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 		$targets_obj->filterUntrashedTargets();
-		$targets_obj->addAssignedUsersAsMembers();
-		$targets_obj->addNonAssignedUsersAsSubscribers();
+		if ($transfer_to_waiting) {
+            $targets_obj->addAssignedUsersAsSubscribers();
+        }
+		else {
+            $targets_obj->addAssignedUsersAsMembers(null, $suppress_target_emails ? false : null);
+            $targets_obj->addNonAssignedUsersAsSubscribers();
+        }
 
 		$this->object->fixAssignedUsers();
-		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
-		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
-		$removedConflicts = $conflictsObj->removeConflicts();
 
-		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
-		$notification = new ilCombiSubscriptionMailNotification();
-		$notification->setPlugin($this->plugin);
-		$notification->setObject($this->object);
-		$notification->sendAssignments($removedConflicts);
+		if (!$suppress_target_emails) {
+            $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+            $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+            $removedConflicts = $conflictsObj->removeConflicts();
 
-		$this->object->setClassProperty(get_class($this), 'transfer_time', time());
-        $this->object->setClassProperty(get_class($this), 'notify_time', time());
+            $this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
+            $notification = new ilCombiSubscriptionMailNotification();
+            $notification->setPlugin($this->plugin);
+            $notification->setObject($this->object);
+            $notification->sendAssignments($removedConflicts);
+
+            $this->object->setClassProperty(get_class($this), 'notify_time', time());
+        }
+
+        $this->object->setClassProperty(get_class($this), 'transfer_time', time());
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
