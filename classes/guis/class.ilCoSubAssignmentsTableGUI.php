@@ -105,8 +105,12 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$sum = $sums[$item->item_id];
 
 			$tpl = $this->plugin->getTemplate('/default/tpl.il_xcos_assignments_header.html');
-			$tpl->setVariable('TITLE', isset($item->identifier) ? $item->identifier : $item->title);
-
+			if (!empty($item->identifier)) {
+                $tpl->setVariable('IDENTIFIER', $item->identifier);
+            }
+            if (!empty($item->title)) {
+                $tpl->setVariable('TITLE', $item->title);
+            }
 			$tpl->setVariable('LIMIT', $limit);
 			$tpl->setVariable('SUM_LABEL', $this->plugin->txt('item_assignment_sum_label'));
 			$tpl->setVariable('SUM', $sum);
