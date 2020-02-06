@@ -96,7 +96,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function hasStudyData()
 	{
-		return file_exists('Services/StudyData/classes/class.ilStudyData.php');
+		return file_exists('Services/StudyData/classes/class.ilStudyAccess.php');
 	}
 
 
@@ -106,7 +106,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function withStudyCond()
 	{
-		return file_exists('Services/Membership/classes/class.ilSubscribersStudyCond.php');
+		return file_exists('Services/StudyData/classes/class.ilStudyAccess.php');
 	}
 
 	/**

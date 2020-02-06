@@ -1145,10 +1145,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			return $this->getUsers();
 		}
 
-		require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
-		$conditionsdata = ilSubscribersStudyCond::_getConditionsData($this->getId());
-		if (!count($conditionsdata))
-		{
+		if (!ilStudyAccess::_hasConditions($this->getId())) {
 			return $this->getUsers();
 		}
 
@@ -1162,13 +1159,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				continue;
 			}
 
-			$studydata = ilStudyAccess::_getStudyData($user_id);
-			if (!count($studydata))
-			{
+			if (!ilStudyAccess::_hasData($user_id)) {
 				continue;
 			}
 
-			if (ilStudyAccess::_checkConditions($conditionsdata, $studydata))
+			if (ilStudyAccess::_checkSubscription($this->getId(), $user_id))
 			{
 				$users[$user_id] = $userObj;
 			}

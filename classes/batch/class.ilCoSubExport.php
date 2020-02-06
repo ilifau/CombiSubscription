@@ -100,7 +100,6 @@ class ilCoSubExport
 
 			if ($this->plugin->hasStudyData())
 			{
-				require_once('Services/StudyData/classes/class.ilStudyData.php');
 				$this->with_studydata = true;
 			}
 		}
@@ -378,7 +377,7 @@ class ilCoSubExport
 
 			if ($this->with_studydata)
 			{
-				$studydata = ilStudyData::_getStudyDataText($user['usr_id']);
+				$studydata = ilStudyAccess::_getDataText($user['usr_id']);
 
 				if ($this->type == self::TYPE_CSV)
 				{
