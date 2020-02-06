@@ -285,13 +285,11 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		// studydata conditions are avaiable
 		if ($this->plugin->withStudyCond())
 		{
-			require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
-
-			if (ilSubscribersStudyCond::_hasConditions($this->object->getId()))
+			if (ilStudyAccess::_hasConditions($this->object->getId()))
 			{
-				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilSubscribersStudyCond::_getConditionsText($this->object->getId())));
+				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilStudyAccess::_getConditionsText($this->object->getId())));
 
-				if (!ilSubscribersStudyCond::_checkConditions($this->object->getId(), $userObj->user_id))
+				if (!ilStudyAccess::_checkSubscription($this->object->getId(), $userObj->user_id))
 				{
 					ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
 				}

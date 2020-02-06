@@ -180,7 +180,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$ilDB->manipulate("DELETE FROM rep_robj_xcos_data WHERE ".
 			" obj_id = ".$ilDB->quote($this->getId(), 'integer')
 			);
-		
+
+		if ($this->plugin->withStudyCond()) {
+		    ilStudyAccess::_deleteConditions($this->getId());
+        }
 	}
 	
 	/**
@@ -221,8 +224,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 		if ($this->plugin->withStudyCond())
 		{
-			require_once('Services/Membership/classes/class.ilSubscribersStudyCond.php');
-			ilSubscribersStudyCond::_clone($this->getId(), $new_obj->getId());
+		    ilStudyAccess::_cloneConditions($this->getId(), $new_obj->getId());
 		}
 	}
 
