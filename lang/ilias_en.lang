@@ -349,7 +349,7 @@ out_of_conflict_time_info#:#Minimum time (seconds) between appointments that sho
 message_too_many_schedule_times#:#The schedule "%s" creates %s appointments. ZConflicts will only be recognized for the first %s of them!
 study_conditions#:#Study Conditions
 studycond_headline#:#Edit Study Conditions
-studycond_info#:#Students must satisfy one of the following conditions to be included in the calculation of assignments. Otherwise they may only give their priorities and will be set on the witing lists. Within a condition all criteria (subject, degree, semester) must be satisfied to fulfil the condition.
+studycond_info#:#Students must satisfy one of the following conditions to be included in the calculation of assignments. Otherwise they may only give their priorities and will be set on the witing lists. Within a condition all criteria must be satisfied to fulfil the condition.
 studycond_msg_not_fulfilled#:#You don't fulfil the required study conditions. You may give yourpriorities but won'T be included in the calculation of assignments. Afterwards you will be set on the waiting lists of the courses or groups.
 studycond_intro#:#This subsription has the following study conditions:<p class="small">%s</p>
 studycond_not_fulfilled#:#Study conditions not satisfied!

@@ -365,7 +365,7 @@ out_of_conflict_time_info#:#Minimale Zeitspanne (Sekunden) zwischen Terminen, di
 message_too_many_schedule_times#:#Die Terminreihe "%s" erzeugt %s Termine. Zur Erkennung von Überschneidungen werden nur die ersten %s davon beachtet!
 study_conditions#:#Studiengangs-Bedingungen
 studycond_headline#:#Studiengangs-Bedingungen bearbeiten
-studycond_info#:#Studenten müssen eine der folgenden Bedingungen erfüllen, um bei der Zuteilung berücksichtigt zu werden. Andernfalls können sie nur ihren Anmeldewunsch abgeben und werden nach der Zuteilung auf die Wartelisten gesetzt. Innerhalb einer Bedingung müssen alle Kriterien (Fach, Abschluss, Semester) erfüllt sein, damit die Bedingung erfüllt ist.
+studycond_info#:#Studenten müssen eine der folgenden Bedingungen erfüllen, um bei der Zuteilung berücksichtigt zu werden. Andernfalls können sie nur ihren Anmeldewunsch abgeben und werden nach der Zuteilung auf die Wartelisten gesetzt. Innerhalb einer Bedingung müssen alle Kriterien erfüllt sein, damit die Bedingung erfüllt ist.
 studycond_msg_not_fulfilled#:#Sie erfüllen leider nicht die notwendigen Studiengangbedingungen. Sie können sich zwar anmelden, werden aber bei der automatischen Zuteilung nicht berücksichtigt, sondern im Anschluss auf die Wartelisten der gewählten Kurse/Gruppen gesetzt.
 studycond_intro#:#Für diese Anmeldung gelten Studiengang-Bedingungen:<p class="small">%s</p>
 studycond_not_fulfilled#:#Studiengangs-Bedingung nicht erfüllt!
