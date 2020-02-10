@@ -10,8 +10,8 @@ include_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
  *
  * @ilCtrl_isCalledBy ilObjCombiSubscriptionGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
  * @ilCtrl_Calls ilObjCombiSubscriptionGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilCommonActionDispatcherGUI
- * fim: [memcond] added ilSubscribersStudyCondGUI to call structure
- * @ilCtrl_Calls ilObjCombiSubscriptionGUI: ilSubscribersStudyCondGUI
+ * fim: [memcond] added ilStudyCondGUI to call structure
+ * @ilCtrl_Calls ilObjCombiSubscriptionGUI: ilStudyCondGUI
  * fim.
  */
 class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
@@ -91,11 +91,11 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->ctrl->forwardCommand(new ilCoSubPropertiesGUI($this));
 					return;
 
-				case 'ilsubscribersstudycondgui':
+				case 'ilstudycondgui':
 					$this->checkPermission("write");
 					$this->setSubTabs('settings', 'study_conditions');
-					require_once('Services/Membership/classes/class.ilSubscribersStudyCondGUI.php');
-					$gui = new ilSubscribersStudyCondGUI($this);
+					require_once('Services/StudyData/classes/class.ilStudyCondGUI.php');
+					$gui = new ilStudyCondGUI($this);
 					$gui->setHeadline($this->plugin->txt('studycond_headline'));
 					$gui->setInfo($this->plugin->txt('studycond_info'));
 					$gui->setWithBacklink(false);
@@ -311,7 +311,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 				if ($this->plugin->withStudyCond())
 				{
-					$this->tabs_gui->addSubTab('study_conditions', $this->plugin->txt('study_conditions'), $this->ctrl->getLinkTargetByClass('ilSubscribersStudyCondGUI'));
+					$this->tabs_gui->addSubTab('study_conditions', $this->plugin->txt('study_conditions'), $this->ctrl->getLinkTargetByClass('ilStudyCondGUI'));
 				}
 
 				if ($this->plugin->hasAdminAccess())
