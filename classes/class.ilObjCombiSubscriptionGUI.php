@@ -10,7 +10,7 @@ include_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
  *
  * @ilCtrl_isCalledBy ilObjCombiSubscriptionGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
  * @ilCtrl_Calls ilObjCombiSubscriptionGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilCommonActionDispatcherGUI
- * fau: studyData - added ilStudyCondGUI to call structure
+ * fau: studyCond - added ilStudyCondGUI to call structure
  * @ilCtrl_Calls ilObjCombiSubscriptionGUI: ilStudyCondGUI
  * fau.
  */
