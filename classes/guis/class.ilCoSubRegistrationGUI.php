@@ -62,6 +62,9 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			case 'removeUsers':
 			case 'removeUsersConfirmation':
             case 'fillEmptyRegistrations':
+            case 'listConflicts':
+            case 'confirmRemoveConflicts':
+            case 'removeConflicts':
 
 			$this->$cmd();
 				return;
@@ -99,17 +102,115 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$this->showInfo();
 		$this->provideUserSearch();
 
+        $this->toolbar->addSeparator();
+
+        $button = ilLinkButton::getInstance();
+        $button->setUrl($this->ctrl->getLinkTarget($this,'listConflicts'));
+        $button->setCaption($this->plugin->txt('list_conflicts'), false);
+        $this->toolbar->addButtonInstance($button);
+
+
         if ($this->plugin->hasAdminAccess())
         {
+            $button = ilLinkButton::getInstance();
+            $button->setUrl($this->ctrl->getLinkTarget($this,'confirmRemoveConflicts'));
+            $button->setCaption($this->plugin->txt('remove_conflicts'), false);
+            $this->toolbar->addButtonInstance($button);
+
             $button = ilLinkButton::getInstance();
             $button->setUrl($this->ctrl->getLinkTarget($this,'fillEmptyRegistrations'));
             $button->setCaption($this->plugin->txt('fill_empty_registrations'), false);
             $this->toolbar->addButtonInstance($button);
         }
 
-
 		$this->tpl->setContent($table_gui->getHTML());
 	}
+
+    /**
+     * list conflicts with external assignments
+     */
+    public function listConflicts()
+    {
+        /**
+         * @var ilErrorHandling $ilErr
+         */
+        global $ilErr;
+
+        $this->tabs->activateSubTab('list_registrations');
+
+        if (!$this->plugin->hasAdminAccess()) {
+            $ilErr->raiseError($this->lng->txt('permission_denied'));
+        }
+
+        $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+        $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+        $conflicts = $conflictsObj->getExternalConflicts(array_keys($this->object->getUsers()), false);
+
+        $lines = [];
+        foreach ($conflicts as $user_id => $user_conflicts) {
+            $this->ctrl->setParameter($this,'user_id', $user_id);
+
+            $lines[] = '<h3>' . ilObjUser::_lookupFullname($user_id) . ' '
+                . '<a class="small" href="' . $this->ctrl->getLinkTarget($this,'editRegistration').'">' . $this->plugin->txt('edit_registration') . '</a></h3>';
+
+            foreach ($user_conflicts as $internal_item_id => $external_items) {
+                /** @var  ilCoSubItem $item */
+
+                foreach ($external_items as $item) {
+                    $line = '<a href="' . $item->getObjectLink() . '">' .   $item->getObjectTitle() . '</a>: '. $item->title
+                        . '<br /><span class="small">' . $item->getPeriodInfo() . '</span><br />';
+                    $lines[] = $line;
+                }
+            }
+        }
+
+        $this->tpl->setContent(implode("\n", $lines));
+
+       // $this->tpl->setContent('<pre>'. print_r($conflicts, true). '</pre>');
+    }
+
+    /**
+     * Show the confirmation message for removing conflicts
+     */
+    public function confirmRemoveConflicts()
+    {
+        $this->tabs->activateSubTab('list_registrations');
+
+        require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
+        $gui = new ilConfirmationGUI();
+        $gui->setFormAction($this->ctrl->getFormAction($this));
+        $gui->setHeaderText($this->plugin->txt('remove_conflicts_question'));
+        $gui->setConfirm($this->plugin->txt('remove_conflicts'),'removeConflicts');
+        $gui->setCancel($this->lng->txt('cancel'),'listRegistrations');
+        $this->tpl->setContent($this->getUserInfoHTML() . $gui->getHTML());
+    }
+
+    /**
+     * Remove choices that have conflicts with external assignments
+     */
+    public function removeConflicts()
+    {
+        /**
+         * @var ilErrorHandling $ilErr
+         */
+        global $ilErr;
+
+        if (!$this->plugin->hasAdminAccess()) {
+            $ilErr->raiseError($this->lng->txt('permission_denied'));
+        }
+
+        $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
+        $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
+        $conflicts = $conflictsObj->getExternalConflicts(array_keys($this->object->getUsers()), false);
+
+        foreach ($conflicts as $user_id => $user_conflicts) {
+            foreach ($user_conflicts as $internal_item_id => $external_items) {
+                ilCoSubItem::_deleteById($internal_item_id);
+            }
+        }
+
+        $this->ctrl->redirect($this, 'listRegistrations');
+    }
 
 	/**
 	 * Edit the registration of the current user

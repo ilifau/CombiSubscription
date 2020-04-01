@@ -151,13 +151,17 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 
 		if (isset($this->conflicts[$a_set['item_id']]))
 		{
-			$titles = [];
+			$infos = [];
 			/** @var  ilCoSubItem $item */
 			foreach	($this->conflicts[$a_set['item_id']] as $item_id => $item)
 			{
-				$titles[] = $item->title;
+                $infos[] = '<p class="small"><a href="' . $item->getObjectLink() . '">' .   $item->getObjectTitle() . '</a>: '
+                    . $item->title . ' ' . $item->getPeriodInfo() .'</p>';
 			}
-			$this->tpl->setVariable('CONFLICTS', $this->plugin->txt('conflict_with_assigned_unit') . ' '. implode(', ', $titles));
+			if (!empty($infos)) {
+                $this->tpl->setVariable('CONFLICTS_WARNING', $this->plugin->txt('conflict_with_assigned_unit'));
+                $this->tpl->setVariable('CONFLICTS', implode('', $infos));
+            }
 		}
 
 		foreach ($this->options as $value => $text)

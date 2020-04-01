@@ -43,6 +43,16 @@ class ilCoSubItem
 	/** @var  ilCoSubSchedule[] */
 	public $schedules = null;
 
+	/** @var string cached info about the period */
+	protected $periodInfoCache;
+
+	/** @var string cached link to the object with this item */
+	protected $objectLinkCache;
+
+	/** @var string cached title of the object with this item */
+	protected $objectTitleCache;
+
+
 	/**
 	 * Get item by id
 	 * @param integer  $a_id
@@ -272,13 +282,44 @@ class ilCoSubItem
 	 */
 	public function getPeriodInfo()
 	{
-		$info = array();
-		foreach($this->getSchedules() as $schedule)
-		{
-			$info[] = $schedule->getPeriodInfo();
-		}
-		return implode('; ', $info);
+	    if (!isset($this->periodInfoCache)) {
+            $info = array();
+            foreach($this->getSchedules() as $schedule)
+            {
+                $info[] = $schedule->getPeriodInfo();
+            }
+
+            $this->periodInfoCache =  implode(' | ', $info);
+        }
+	    return $this->periodInfoCache;
 	}
+
+	/**
+     * Get the title of the object to which this item belongs
+     */
+	public function getObjectTitle()
+    {
+        if (!isset($this->objectTitleCache)) {
+            $this->objectTitleCache = ilObject::_lookupTitle($this->obj_id);
+        }
+        return $this->objectTitleCache;
+    }
+
+    /**
+     * Get the Link to the object to which this item belongs
+     */
+    public function getObjectLink()
+    {
+        if (!isset($this->objectLinkCache)) {
+            foreach (ilObject::_getAllReferences($this->obj_id) as $ref_id) {
+                if (!ilObject::_isInTrash($ref_id)) {
+                   $this->objectLinkCache = ilLink::_getStaticLink($ref_id, 'xcos');
+                    break;
+                }
+            }
+        }
+        return $this->objectLinkCache;
+    }
 
 	/**
 	 * Get the sum of times of this item
