@@ -481,6 +481,10 @@ class ilCoSubSchedule
 		$collected = array();
 		foreach ($terms as $term)
 		{
+		    if (!$term->isComplete()) {
+		        continue;
+            }
+
 			try
 			{
 				$weekdays = $term->getWeekdays();
