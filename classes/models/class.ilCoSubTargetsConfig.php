@@ -14,6 +14,9 @@ class ilCoSubTargetsConfig
 	const SUB_WAIT_AUTO = 'auto';
 	const SUB_WAIT_NONE = 'none';
 
+	const SET_BY_ITEM = 'item';
+	const SET_BY_INPUT = 'input';
+
 
 	/** @var ilObjCombiSubscription */
 	protected $object;
@@ -28,6 +31,12 @@ class ilCoSubTargetsConfig
 	public $sub_period_start;
 	public $sub_period_end;
 	public $sub_wait;
+
+	public $sub_min_by = self::SET_BY_ITEM;
+    public $sub_max_by = self::SET_BY_ITEM;
+    public $sub_min;
+    public $sub_max;
+
 
     /** @var bool send the standard emails for user assignments in groups etc */
 	public $send_target_emails = false;
@@ -56,7 +65,11 @@ class ilCoSubTargetsConfig
 		$this->object->setPreference('ilCoSubTargetsConfig', 'sub_period_start', $this->sub_period_start);
 		$this->object->setPreference('ilCoSubTargetsConfig', 'sub_period_end', $this->sub_period_end);
 		$this->object->setPreference('ilCoSubTargetsConfig', 'sub_wait', $this->sub_wait);
-	}
+        $this->object->setPreference('ilCoSubTargetsConfig', 'sub_min_by', $this->sub_min_by);
+		$this->object->setPreference('ilCoSubTargetsConfig', 'sub_max_by', $this->sub_max_by);
+        $this->object->setPreference('ilCoSubTargetsConfig', 'sub_min', $this->sub_min);
+        $this->object->setPreference('ilCoSubTargetsConfig', 'sub_max', $this->sub_max);
+    }
 
 	/**
 	 * Read config from user session (for manual configuration of target objects)
@@ -73,6 +86,11 @@ class ilCoSubTargetsConfig
 		$this->sub_period_start = (int) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_period_start', $this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
 		$this->sub_period_end = (int) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_period_end', $this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
 		$this->sub_wait = (string) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_wait', self::SUB_WAIT_AUTO);
+
+        $this->sub_min_by = (string) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_min_by', self::SET_BY_ITEM);
+        $this->sub_max_by = (string) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_max_by', self::SET_BY_ITEM);
+        $this->sub_min = (int) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_min', 0);
+        $this->sub_max = (int) $this->object->getPreference('ilCoSubTargetsConfig', 'sub_max', 100);
 	}
 
 	/**
@@ -90,6 +108,11 @@ class ilCoSubTargetsConfig
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_period_start', $this->sub_period_start);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_period_end', $this->sub_period_end);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_wait', $this->sub_wait);
+
+        $this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_min_by', $this->sub_min_by);
+        $this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_max_by', $this->sub_max_by);
+        $this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_min', $this->sub_min);
+        $this->object->setClassProperty('ilCoSubTargetsConfig', 'sub_max', $this->sub_max);
 
         $this->object->setClassProperty('ilCoSubTargetsConfig', 'send_target_emails', $this->send_target_emails);
 	}
@@ -109,6 +132,11 @@ class ilCoSubTargetsConfig
 		$this->sub_period_start = (int) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_period_start', $this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
 		$this->sub_period_end = (int) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_period_end', $this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
 		$this->sub_wait = (string) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_wait', self::SUB_WAIT_AUTO);
+
+        $this->sub_min_by = (string) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_min_by', self::SET_BY_ITEM);
+        $this->sub_max_by = (string) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_max_by', self::SET_BY_ITEM);
+        $this->sub_min = (int) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_min', 0);
+        $this->sub_max = (int) $this->object->getClassProperty('ilCoSubTargetsConfig', 'sub_max', 100);
 
         $this->send_target_emails = (bool) $this->object->getClassProperty('ilCoSubTargetsConfig', 'send_target_emails', true);
 	}

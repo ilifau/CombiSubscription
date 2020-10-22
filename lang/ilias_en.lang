@@ -266,9 +266,14 @@ sub_period#:#Period
 sub_period_start#:#Star
 sub_period_end#:#End
 set_sub_min#:#Set Minimum Number of Members
-set_sub_min_info#:#The minimum number of members configured in the item will be set in the target object.
+set_sub_min_info#:#Define the mimimum number of members
 set_sub_max#:#Set Maximum Number of Members
-set_sub_max_info#:#The maximum number of members configured in the item will be set in the target object.
+set_sub_max_info#:#Define the maximum number of members
+set_sub_max_info#:#Legen Sie eine maximale Mitgliederzahl fest.
+set_by_item#:#From Item
+set_by_item_info#:#The numbers defined in the items will be copied to their target objects.
+set_by_input#:#New Input
+set_by_input_info#:#The entered number will be set in the items and in the target objects.
 set_sub_wait#:#Set Waiting List
 set_sub_wait_info#:#The waiting list settings will be commonly set for all target objects
 sub_wait#:#Procedure

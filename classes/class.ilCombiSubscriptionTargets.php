@@ -126,6 +126,21 @@ class ilCombiSubscriptionTargets
 			$set_min->setInfo($this->plugin->txt('set_sub_min_info'));
 			$set_min->setChecked($a_config->set_sub_min);
 			$properties[] = $set_min;
+
+			$sub_min_by = new ilRadioGroupInputGUI($this->plugin->txt('set_sub_min'),'sub_min_by');
+			$sub_min_by_item = new ilRadioOption($this->plugin->txt('set_by_item'), ilCoSubTargetsConfig::SET_BY_ITEM);
+            $sub_min_by_input = new ilRadioOption($this->plugin->txt('set_by_input'), ilCoSubTargetsConfig::SET_BY_INPUT);
+			$sub_min_by_item->setInfo($this->plugin->txt('set_by_item_info'));
+            $sub_min_by_input->setInfo($this->plugin->txt('set_by_input_info'));
+			$sub_min_by->addOption($sub_min_by_item);
+			$sub_min_by->addOption(($sub_min_by_input));
+
+			$sub_min = new ilNumberInputGUI($this->plugin->txt('sub_min_short'), 'sub_min');
+			$sub_min->allowDecimals(false);
+			$sub_min->setMinValue(0);
+			$sub_min->setSize(4);
+			$sub_min_by_input->addSubItem($sub_min);
+            $set_min->addSubItem($sub_min_by);
 		}
 
 		if ($this->object->getMethodObject()->hasMaxSubscription() && $this->hasMaxSubscriptions($a_type)) {
@@ -133,7 +148,22 @@ class ilCombiSubscriptionTargets
 			$set_max->setInfo($this->plugin->txt('set_sub_max_info'));
 			$set_max->setChecked($a_config->set_sub_max);
 			$properties[] = $set_max;
-		}
+
+            $sub_max_by = new ilRadioGroupInputGUI($this->plugin->txt('set_sub_max'),'sub_max_by');
+            $sub_max_by_item = new ilRadioOption($this->plugin->txt('set_by_item'), ilCoSubTargetsConfig::SET_BY_ITEM);
+            $sub_max_by_input = new ilRadioOption($this->plugin->txt('set_by_input'), ilCoSubTargetsConfig::SET_BY_INPUT);
+            $sub_max_by_item->setInfo($this->plugin->txt('set_by_item_info'));
+            $sub_max_by_input->setInfo($this->plugin->txt('set_by_input_info'));
+            $sub_max_by->addOption($sub_max_by_item);
+            $sub_max_by->addOption(($sub_max_by_input));
+
+            $sub_max = new ilNumberInputGUI($this->plugin->txt('sub_max_short'), 'sub_max');
+            $sub_max->allowDecimals(false);
+            $sub_max->setmaxValue(0);
+            $sub_max->setSize(4);
+            $sub_max_by_input->addSubItem($sub_max);
+            $set_max->addSubItem($sub_max_by);
+        }
 
 		$set_wait = new ilCheckboxInputGUI($this->plugin->txt('set_sub_wait'), 'set_sub_wait');
 		$set_wait->setInfo($this->plugin->txt($a_type == 'auto' ? 'set_sub_wait_info_auto' : 'set_sub_wait_info'));
@@ -192,7 +222,9 @@ class ilCombiSubscriptionTargets
 		if ($this->object->getMethodObject()->hasMinSubscription() && $this->hasMinSubscriptions($a_type))
 		{
 			$config->set_sub_min = (bool) $form->getInput('set_sub_min');
-		}
+            $config->sub_min_by = (string) $form->getInput('sub_min_by');
+            $config->sub_min = (int) $form->getInput('sub_min');
+        }
 		else
 		{
 			$config->set_sub_min = false;
@@ -200,6 +232,8 @@ class ilCombiSubscriptionTargets
 		if ($this->object->getMethodObject()->hasMaxSubscription() && $this->hasMaxSubscriptions($a_type))
 		{
 			$config->set_sub_max = (bool) $form->getInput('set_sub_max');
+            $config->sub_max_by = (string) $form->getInput('sub_max_by');
+            $config->sub_max = (int) $form->getInput('sub_max');
 		}
 		else
 		{
@@ -1084,13 +1118,27 @@ class ilCombiSubscriptionTargets
 					if ($config->set_sub_min)
 					{
 						$target->enableSubscriptionMembershipLimitation(true);
-						$target->setSubscriptionMinMembers($item->sub_min);
+						if ($config->sub_min_by == ilCoSubTargetsConfig::SET_BY_ITEM) {
+                            $target->setSubscriptionMinMembers($item->sub_min);
+                        }
+						elseif ($config->sub_min_by == ilCoSubTargetsConfig::SET_BY_INPUT) {
+                            $target->setSubscriptionMinMembers($config->sub_min);
+                            $item->sub_min = $config->sub_min;
+                            $item->save();
+                        }
 					}
 					if ($config->set_sub_max)
 					{
-						$target->enableSubscriptionMembershipLimitation(true);
-						$target->setSubscriptionMaxMembers($item->sub_max);
-					}
+                        $target->enableSubscriptionMembershipLimitation(true);
+                        if ($config->sub_max_by == ilCoSubTargetsConfig::SET_BY_ITEM) {
+                            $target->setSubscriptionMaxMembers($item->sub_max);
+                        }
+                        elseif ($config->sub_max_by == ilCoSubTargetsConfig::SET_BY_INPUT) {
+                            $target->setSubscriptionMaxMembers($config->sub_max);
+                            $item->sub_max = $config->sub_max;
+                            $item->save();
+                        }
+                    }
 
 					if ($config->set_sub_wait)
 					{
@@ -1149,12 +1197,26 @@ class ilCombiSubscriptionTargets
 					if ($config->set_sub_min)
 					{
 						$target->enableMembershipLimitation(true);
-						$target->setMinMembers($item->sub_min);
+                        if ($config->sub_min_by == ilCoSubTargetsConfig::SET_BY_ITEM) {
+                            $target->setMinMembers($item->sub_min);
+                        }
+                        elseif ($config->sub_min_by == ilCoSubTargetsConfig::SET_BY_INPUT) {
+                            $target->setMinMembers($config->sub_min);
+                            $item->sub_min = $config->sub_min;
+                            $item->save();
+                        }
 					}
 					if ($config->set_sub_max)
 					{
 						$target->enableMembershipLimitation(true);
-						$target->setMaxMembers($item->sub_max);
+                        if ($config->sub_max_by == ilCoSubTargetsConfig::SET_BY_ITEM) {
+                            $target->setMaxMembers($item->sub_max);
+                        }
+                        elseif ($config->sub_max_by == ilCoSubTargetsConfig::SET_BY_INPUT) {
+                            $target->setMaxMembers($config->sub_max);
+                            $item->sub_max = $config->sub_max;
+                            $item->save();
+                        }
 					}
 
 					if ($config->set_sub_wait)
@@ -1204,7 +1266,14 @@ class ilCombiSubscriptionTargets
 					if ($config->set_sub_max)
 					{
 						$target->enableRegistrationUserLimit(true);
-						$target->setRegistrationMaxUsers($item->sub_max);
+                        if ($config->sub_max_by == ilCoSubTargetsConfig::SET_BY_ITEM) {
+                            $target->setRegistrationMaxUsers($item->sub_max);
+                        }
+                        elseif ($config->sub_max_by == ilCoSubTargetsConfig::SET_BY_INPUT) {
+                            $target->setRegistrationMaxUsers($config->sub_max);
+                            $item->sub_max = $config->sub_max;
+                            $item->save();
+                        }
 					}
 
 					if ($config->set_sub_wait)

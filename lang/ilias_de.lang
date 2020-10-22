@@ -281,9 +281,13 @@ sub_period#:#Anmeldezeitraum
 sub_period_start#:#Start
 sub_period_end#:#Ende
 set_sub_min#:#Minimale Mitgliederzahl einstellen
-set_sub_min_info#:#Die in der Auswahl-Einheit festgelegte Mindestzahl wird auch im Ziel-Objekt eingestellt.
+set_sub_min_info#:#Legen Sie eine minimale Mitgliederzahl fest.
 set_sub_max#:#Maximale Mitgliederzahl einstellen
-set_sub_max_info#:#Die in der Auswahl-Einheit festgelegte Maximalzahl wird auch im Ziel-Objekt eingestellt.
+set_sub_max_info#:#Legen Sie eine maximale Mitgliederzahl fest.
+set_by_item#:#Aus Einheit
+set_by_item_info#:#Die in einer Auswahl-Einheit festgelegte Zahl wird auch in ihrem Ziel-Objekt eingestellt.
+set_by_input#:#Neue Eingabe
+set_by_input_info#:#Die eingegebene Zahl wird in den Auswahl-Einheiten und ihren Ziel-Objekten eingestellt.
 set_sub_wait#:#Warteliste einstellen
 set_sub_wait_info#:#Die Einstellungen zur Warteliste werden einheitlich vorgenommen.
 set_sub_wait_info_auto#:#Stellen Sie hier ein, wie nach der Zuteilung die nicht zugeteilten Anmeldungen behandelt werden sollen.
