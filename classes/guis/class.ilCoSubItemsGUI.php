@@ -187,7 +187,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$targets->setItems($items);
 			$targets->applyDefaultTargetsConfig();
 
-			ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
+			ilUtil::sendSuccess($this->plugin->txt(count($_POST['ref_id']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
 		}
 
 		$this->ctrl->redirect($this, 'listItems');
