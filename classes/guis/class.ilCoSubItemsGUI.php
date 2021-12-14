@@ -7,7 +7,7 @@
  * @version $Id$
  *
  * @ilCtrl_isCalledBy ilCoSubItemsGUI: ilObjCombiSubscriptionGUI
- * @ilCtrl_Calls: ilCoSubItemsGUI: ilPropertyFormGUI
+ * @ilCtrl_Calls ilCoSubItemsGUI: ilPropertyFormGUI
  */
 class ilCoSubItemsGUI extends ilCoSubBaseGUI
 {
