@@ -337,7 +337,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				}
 				elseif ($min > 0)
 				{
-					$sentences[] = sprintf($this->plugin->txt('min_choicess_explanation'),$min);
+					$sentences[] = sprintf($this->plugin->txt('min_choices_explanation'),$min);
 				}
 			}
 
