@@ -145,19 +145,19 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 			if ($type == 'crs')
 			{
 				$list = new ilObjCourseListGUI();
-				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
+				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id), NULL);
 				$props = $list->getProperties();
 			}
 			elseif ($type == 'grp')
 			{
 				$list = new ilObjGroupListGUI();
-				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
+				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id), NULL);
 				$props = $list->getProperties();
 			}
 			elseif ($type == 'sess')
 			{
 				$list = new ilObjSessionListGUI();
-				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id));
+				$list->initItem($ref_id, ilObject::_lookupObjId($ref_id), NULL);
 				$props = $list->getProperties();
 			}
 
