@@ -409,3 +409,4 @@ transfer_to_waiting_info#:#Setzt die Teilnehmer auf die Wartelisten ihrer zugete
 list_conflicts#:#Konflikte auflisten
 remove_conflicts#:#Konflikte bereinigen
 remove_conflicts_question#:#Möchten Sie alle Auswahlen, die in Konflikt mit bereits erhaltenen Zuteilungen stehen löschen?
+no_best_run_found#:#Es konnte in %s Berechnungen keine Zuteilung gefunden werden!
