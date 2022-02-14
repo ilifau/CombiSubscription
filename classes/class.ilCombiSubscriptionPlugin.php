@@ -34,13 +34,15 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	{
 		global $ilDB;
 
-		$ilDB->dropTable('rep_robj_xcos_data');
-		$ilDB->dropTable('rep_robj_xcos_items');
-		$ilDB->dropTable('rep_robj_xcos_scheds');
-		$ilDB->dropTable('rep_robj_xcos_choices');
-		$ilDB->dropTable('rep_robj_xcos_runs');
-		$ilDB->dropTable('rep_robj_xcos_ass');
-		$ilDB->dropTable('rep_robj_xcos_prop');
+//		$ilDB->dropTable('rep_robj_xcos_ass');
+//		$ilDB->dropTable('rep_robj_xcos_cats');
+//		$ilDB->dropTable('rep_robj_xcos_choices');
+//		$ilDB->dropTable('rep_robj_xcos_data');
+//		$ilDB->dropTable('rep_robj_xcos_items');
+//		$ilDB->dropTable('rep_robj_xcos_prop');
+//		$ilDB->dropTable('rep_robj_xcos_runs');
+//		$ilDB->dropTable('rep_robj_xcos_scheds');
+//		$ilDB->dropTable('rep_robj_xcos_users');
 	}
 	/**
 	 * decides if this repository plugin can be copied
