@@ -1,6 +1,13 @@
 <?php
 // Copyright (c) 2017 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg, GPLv3, see LICENSE
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+
 /**
  * Combined Subscription Export
  *
@@ -112,10 +119,8 @@ class ilCoSubExport
 	 */
 	public function buildExportFile($path)
 	{
-		//Creating Files with Charts using PHPExcel
-		require_once $this->plugin->getDirectory(). '/lib/PHPExcel-1.8/Classes/PHPExcel.php';
-		$excelObj = new PHPExcel();
-		$excelObj->setActiveSheetIndex(0);
+        $excelObj = new Spreadsheet();
+		//$excelObj->setActiveSheetIndex(0);
 
 		switch($this->mode)
 		{
@@ -136,16 +141,16 @@ class ilCoSubExport
 		switch ($this->type)
 		{
 			case self::TYPE_EXCEL:
-				/** @var PHPExcel_Writer_Excel2007 $writerObj */
-				$writerObj = PHPExcel_IOFactory::createWriter($excelObj, 'Excel2007');
-				$writerObj->save($path);
+                $writer = IOFactory::createWriter($excelObj, 'Xlsx');
+                $writer->save($path);
 				break;
 			case self::TYPE_CSV:
-				/** @var PHPExcel_Writer_CSV $writerObj */
-				$writerObj = PHPExcel_IOFactory::createWriter($excelObj, 'CSV');
-				$writerObj->setDelimiter(';');
-				$writerObj->setEnclosure('"');
-				$writerObj->save($path);
+                /** @var Csv $writer */
+                $writer = IOFactory::createWriter($excelObj, 'Csv');
+                $writer->setDelimiter(';');
+                $writer->setEnclosure('"');
+                $writer->save($path);
+                break;
 		}
 	}
 
@@ -153,7 +158,7 @@ class ilCoSubExport
 	/**
 	 * Fill the sheet with user registrations
 	 * Items are columns, the priorities are values
-	 * @param PHPExcel_Worksheet $worksheet
+	 * @param Worksheet $worksheet
 	 */
 	protected function fillRegistrationsByItem($worksheet)
 	{
@@ -195,14 +200,14 @@ class ilCoSubExport
 
 		$worksheet->setTitle($this->plugin->txt('registrations'));
 		$worksheet->freezePane('D2');
-		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+		$this->adjustSizes($worksheet, range('A',  Coordinate::stringFromColumnIndex($basecols)));
 	}
 
 
 	/**
 	 * Fill the sheet with assignments
 	 * Items are columns, assigned items will have a 1 in the cell
-	 * @param PHPExcel_Worksheet $worksheet
+	 * @param Worksheet $worksheet
 	 */
 	protected function fillAssignmentsByItem($worksheet)
 	{
@@ -244,14 +249,14 @@ class ilCoSubExport
 
 		$worksheet->setTitle($this->plugin->txt('assignments'));
 		$worksheet->freezePane('D2');
-		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+		$this->adjustSizes($worksheet, range('A',  Coordinate::stringFromColumnIndex($basecols -1)));
 	}
 
 
 	/**
 	 * Fill the sheet with user registrations
 	 * Priorities are columns, the items are listed as values
-	 * @param PHPExcel_Worksheet $worksheet
+	 * @param Worksheet $worksheet
 	 */
 	protected function fillRegistrationsByPrio($worksheet)
 	{
@@ -293,7 +298,7 @@ class ilCoSubExport
 
 		$worksheet->setTitle($this->plugin->txt('registrations'));
 		$worksheet->freezePane('D2');
-		$this->adjustSizes($worksheet, range('A',  PHPExcel_Cell::stringFromColumnIndex($basecols -1)));
+		$this->adjustSizes($worksheet, range('A',  Coordinate::stringFromColumnIndex($basecols -1)));
 	}
 
 
@@ -399,21 +404,21 @@ class ilCoSubExport
 
 	/**
 	 * Fill the header Row of a sheet
-	 * @param PHPExcel_Worksheet	$worksheet
+	 * @param Worksheet	$worksheet
 	 * @param array	$columns
 	 * @return array	column key => column letter
 	 */
 	protected function fillHeaderRow($worksheet, $columns)
 	{
-		$col = 0;
+		$col = 1;
 		$mapping = array();
 		foreach ($columns as $key => $value)
 		{
-			$letter = PHPExcel_Cell::stringFromColumnIndex($col++);
+			$letter = Coordinate::stringFromColumnIndex($col++);
 			$mapping[$key] = $letter;
 			$coordinate = $letter.'1';
 			$cell = $worksheet->getCell($coordinate);
-			$cell->setValueExplicit($value, PHPExcel_Cell_DataType::TYPE_STRING);
+			$cell->setValueExplicit($value, DataType::TYPE_STRING);
 			$cell->getStyle()->applyFromArray($this->headerStyle);
 			$cell->getStyle()->getAlignment()->setWrapText(true);
 		}
@@ -422,7 +427,7 @@ class ilCoSubExport
 
 	/**
 	 * Fill a row of a sheet with data
-	 * @param PHPExcel_Worksheet	$worksheet
+	 * @param Worksheet	$worksheet
 	 * @param array 				$data		key => value
 	 * @param array					$mapping 	key => letter
 	 * @param int					$row 		row number
@@ -439,7 +444,7 @@ class ilCoSubExport
 	}
 
 	/**
-	 * @param PHPExcel_Worksheet	$worksheet
+	 * @param Worksheet	$worksheet
 	 */
 	protected function adjustSizes($worksheet, $range = null)
 	{

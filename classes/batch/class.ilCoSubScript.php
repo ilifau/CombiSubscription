@@ -1,6 +1,11 @@
 <?php
 // Copyright (c) 2017 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg, GPLv3, see LICENSE
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 /**
  * Handler for Combined Subscription Scripts
  *
@@ -183,24 +188,20 @@ class ilCoSubScript
 
 
 			//  Create a new Reader of the type that has been identified
-			require_once $this->plugin->getDirectory(). '/lib/PHPExcel-1.8/Classes/PHPExcel.php';
-			$type = PHPExcel_IOFactory::identify($inputFile);
+			$type = IOFactory::identify($inputFile);
 			switch ($type)
 			{
-				case 'Excel5':
-				case 'Excel2007':
-				case 'Excel2003XML':
-					/** @var PHPExcel_Reader_Excel2007 $reader */
-					$reader = PHPExcel_IOFactory::createReader($type);
-					$reader->setReadDataOnly(true);
-					$this->type = self::TYPE_EXCEL;
+				case 'Xls':
+				case 'Xlsx':
+                    $reader = IOFactory::createReader($type);
+                    $reader->setReadDataOnly(true);
+                    $this->type = self::TYPE_EXCEL;
 					break;
 
 				default:
 					throw new Exception($this->plugin->txt('import_error_format'));
 			}
 
-			/** @var PHPExcel $xls */
 			$xls = $reader->load($inputFile);
 			$sheet = $xls->getSheet(0);
 			$this->readData($sheet);
@@ -241,13 +242,11 @@ class ilCoSubScript
 			if ($write)
 			{
 				ilUtil::makeDirParents(dirname($resultFile));
-				$excelObj = new PHPExcel();
-				$excelObj->setActiveSheetIndex(0);
+				$excelObj = new Spreadsheet();
 				$this->writeData($excelObj->getActiveSheet());
 
-				/** @var PHPExcel_Writer_Excel2007 $writerObj */
-				$writerObj = PHPExcel_IOFactory::createWriter($excelObj, 'Excel2007');
-				$writerObj->save($resultFile);
+                $writer = IOFactory::createWriter($excelObj, 'Xlsx');
+                $writer->save($resultFile);
 			}
 		}
 		catch (Exception $e)
@@ -264,7 +263,7 @@ class ilCoSubScript
 	 * Prepare the column list
 	 * Prepare the row data list of arrays (indexed by column names)
 	 *
-	 * @param PHPExcel_Worksheet $sheet
+	 * @param Worksheet $sheet
 	 * @throws Exception	if columns are not named or unique, or if id column is missing
 	 */
 	protected function readData($sheet)
@@ -318,7 +317,7 @@ class ilCoSubScript
 	/**
 	 * Write the data to a sheet
 	 *
-	 * @param PHPExcel_Worksheet $sheet
+	 * @param Worksheet $sheet
 	 * @throws Exception	if columns are not named or unique, or if id column is missing
 	 */
 	protected function writeData($sheet)
@@ -535,8 +534,6 @@ class ilCoSubScript
 			$this->rows[$r]['ex_id'] = $newExercise->getRefId();
 			$this->rows[$r]['ex_ass_id'] = $newExercise->getRefId();
 		}
-
-		include_once 'include/inc.debug.php';
 
 		// learning progress settings
 		foreach (array_keys($group_ids) as $group_ref_id)
@@ -986,28 +983,24 @@ class ilCoSubScript
 
 
 
-	/**
-	 * Convert an excel time to unix
-	 * todo: check the ugly workaround, especially the -3600
-	 *
-	 * @param $time
-	 * @return int
-	 */
-	protected function excelTimeToUnix($time)
-	{
-		if (is_numeric($time))
-		{
-			$date = (int) $time;
-			$time = round(($time - $date) * 86400) - 3600;
+    /**
+     * Convert an excel time to unix
+     * todo: check if the date conversion is ok
+     *
+     * @param $time
+     * @return int
+     */
+    protected function excelTimeToUnix($time)
+    {
+        return Date::excelToTimestamp($time);
 
-			$date = PHPExcel_Shared_Date::ExcelToPHP($date);
-			$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
-		}
-		else
-		{
-			$dateTime = new ilDateTime($time, IL_CAL_DATETIME);
-		}
-
-		return $dateTime->get(IL_CAL_UNIX);
-	}
+// old implementation
+//		$date = (int) $time;
+//		$time = round(($time - $date) * 86400) - 3600;
+//
+//		$date = PHPExcel_Shared_Date::ExcelToPHP($date);
+//		$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
+//
+//		return $dateTime->get(IL_CAL_UNIX);
+    }
 }

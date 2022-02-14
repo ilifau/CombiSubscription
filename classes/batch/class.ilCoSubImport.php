@@ -1,6 +1,10 @@
 <?php
 // Copyright (c) 2017 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg, GPLv3, see LICENSE
 
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 /**
  * Combined Subscription Import
  *
@@ -100,22 +104,18 @@ class ilCoSubImport
 
 
 			//  Create a new Reader of the type that has been identified
-			require_once $this->plugin->getDirectory(). '/lib/PHPExcel-1.8/Classes/PHPExcel.php';
-			$type = PHPExcel_IOFactory::identify($file);
+			$type = IOFactory::identify($file);
 			switch ($type)
 			{
-				case 'Excel5':
-				case 'Excel2007':
-				case 'Excel2003XML':
-					/** @var PHPExcel_Reader_Excel2007 $reader */
-					$reader = PHPExcel_IOFactory::createReader($type);
+				case 'Xls':
+				case 'Xlsx':
+					$reader = IOFactory::createReader($type);
 					$reader->setReadDataOnly(true);
 					$this->type = self::TYPE_EXCEL;
 					break;
 
-				case 'CSV':
-					/** @var PHPExcel_Reader_CSV $reader */
-					$reader = PHPExcel_IOFactory::createReader($type);
+				case 'Csv':
+					$reader = IOFactory::createReader($type);
 					$reader->setDelimiter(';');
 					$reader->setEnclosure('"');
 					$this->type = self::TYPE_CSV;
@@ -125,7 +125,6 @@ class ilCoSubImport
 					throw new Exception($this->plugin->txt('import_error_format'));
 			}
 
-			/** @var PHPExcel $xls */
 			$xls = $reader->load($file);
 			$sheet = $xls->getSheet(0);
 
@@ -185,13 +184,18 @@ class ilCoSubImport
 	 * Prepare the column list
 	 * Prepare the row data list of arrays (indexed by column names)
 	 *
-	 * @param PHPExcel_Worksheet $sheet
+	 * @param Worksheet $sheet
 	 * @throws Exception	if columns are not named or unique, or if id column is missing
 	 */
 	protected function readData($sheet)
 	{
 
 		$data = $sheet->toArray(null, true, false, false);
+
+//        echo "<pre>";
+//        print_r($data);
+//        exit;
+
 		$this->columns = $data[0];
 
 		if (count($data) < 2)
@@ -630,21 +634,22 @@ class ilCoSubImport
 
 	/**
 	 * Convert an excel time to unix
-	 * todo: check the ugly workaround
+	 * todo: check if the date conversion is ok
 	 *
 	 * @param $time
 	 * @return int
 	 */
 	protected function excelTimeToUnix($time)
 	{
-		global $ilUser;
+        return Date::excelToTimestamp($time);
 
-		$date = (int) $time;
-		$time = round(($time - $date) * 86400) - 3600;
-
-		$date = PHPExcel_Shared_Date::ExcelToPHP($date);
-		$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
-
-		return $dateTime->get(IL_CAL_UNIX);
+// old implementation
+//		$date = (int) $time;
+//		$time = round(($time - $date) * 86400) - 3600;
+//
+//		$date = PHPExcel_Shared_Date::ExcelToPHP($date);
+//		$dateTime = new ilDateTime(date('Y-m-d', $date) .' '. date('H:i:s', $time), IL_CAL_DATETIME);
+//
+//		return $dateTime->get(IL_CAL_UNIX);
 	}
 }
