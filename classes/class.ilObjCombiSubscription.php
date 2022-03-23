@@ -1377,7 +1377,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 
 		// calculate the assignments
-		$run = $this->getMethodObject()->getBestCalculationRun($this->plugin->getNumberOfTries());
+		$run = $this->getMethodObject()->getBestCalculationRun($this->plugin->getNumberOfTries(), true);
 		if (!isset($run))
 		{
 			return false;
