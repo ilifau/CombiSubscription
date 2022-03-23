@@ -144,4 +144,20 @@ class ilCoSubUser
 		);
 		return $rows > 0;
 	}
+
+
+    /**
+     * Clone the user for a new object
+     * @param int	$a_obj_id
+     * @return self
+     */
+    public function saveClone($a_obj_id)
+    {
+        $clone = clone $this;
+        $clone->obj_id = $a_obj_id;
+        $clone->is_fixed = false;
+        $clone->save();
+
+        return $clone;
+    }
 }

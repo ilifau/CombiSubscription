@@ -217,15 +217,33 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 
 		// clone the items
+        $item_map = array();
 		foreach ($this->getItems() as $item)
 		{
-			$item->saveClone($new_obj->getId(), $cat_map);
+            $item_id = $item->item_id;
+			$clone = $item->saveClone($new_obj->getId(), $cat_map);
+            $item_map[$item_id] = $clone->item_id;
 		}
 
 		if ($this->plugin->withStudyCond())
 		{
 		    ilStudyAccess::_cloneConditions($this->getId(), $new_obj->getId());
 		}
+
+        // comment this return to clone users and their choices
+        return;
+
+        // clone the users
+        foreach ($this->getUsers() as $user)
+        {
+            $user->saveClone($new_obj->getId());
+        }
+
+        // clone the choices
+        foreach ($this->getChoices() as $choice)
+        {
+            $choice->saveClone($new_obj->getId(), $item_map);
+        }
 	}
 
 	/**
@@ -796,6 +814,17 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		}
 		return false;
 	}
+
+
+    /**
+     * Get the choices of an object
+     * @return ilCoSubChoice[] indexed by choice_id
+     */
+    public function getChoices()
+    {
+        $this->plugin->includeClass('models/class.ilCoSubChoice.php');
+        return ilCoSubChoice::_getForObject($this->getId());
+    }
 
 
 	/**

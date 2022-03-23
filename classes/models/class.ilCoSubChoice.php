@@ -126,7 +126,31 @@ class ilCoSubChoice
 	}
 
 
-	/**
+    /**
+     * Get all choices for an object as an indexed array
+     * @param integer       	$a_obj_id
+     * @return array        choice_id => ilCoSubChoice
+     */
+    public static function _getForObject($a_obj_id)
+    {
+        global $ilDB;
+
+        $query = 'SELECT * FROM rep_robj_xcos_choices'
+            .' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer');
+        $result = $ilDB->query($query);
+
+        $choices = array();
+        while ($row = $ilDB->fetchAssoc($result))
+        {
+            $obj = new ilCoSubChoice;
+            $obj->fillData($row);
+            $choices[$obj->choice_id] = $obj;
+        }
+        return $choices;
+    }
+
+
+    /**
 	 * Fill the properties with data from an array
 	 * @param array assoc data
 	 */
@@ -164,4 +188,24 @@ class ilCoSubChoice
 		);
 		return $rows > 0;
 	}
+
+    /**
+     * Clone the choice for a new object
+     * @param int	$a_obj_id
+     * @param array	$a_item_map (old_item_id => new_item_id)
+     * @return self
+     */
+    public function saveClone($a_obj_id, $a_item_map)
+    {
+        $clone = clone $this;
+        $clone->obj_id = $a_obj_id;
+        $clone->choice_id = null;
+        if (!empty($this->item_id)) {
+            $clone->item_id = $a_item_map[$this->item_id];
+        }
+        $clone->save();
+
+        return $clone;
+    }
+
 }
