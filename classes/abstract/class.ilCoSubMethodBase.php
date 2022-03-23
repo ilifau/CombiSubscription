@@ -263,9 +263,10 @@ abstract class ilCoSubMethodBase
 	/**
 	 * Calculate multiple assignment runs and get the best one
 	 * @param	integer		number of tries
+     * @param	bool		delete other runs except the best
 	 * @return 	ilCoSubRun|null
 	 */
-	public function getBestCalculationRun($a_tries)
+	public function getBestCalculationRun($a_tries, $a_cleanup = false)
 	{
 		if (!$this->hasInstantResult())
 		{
@@ -321,10 +322,26 @@ abstract class ilCoSubMethodBase
 			}
 		}
 
+        // cleanup all runs which are not the best
+        if ($a_cleanup)
+        {
+            foreach ($runs as $run_id => $run)
+            {
+                if ($run_id != (int) $best_run_id) {
+                    ilCoSubAssign::_deleteForObject($this->object->getId(), $run_id);
+                    ilCoSubRun::_deleteById($run_id);
+                }
+            }
+        }
+
 		if (isset($best_run_id))
 		{
 			return $runs[$best_run_id];
 		}
+        else
+        {
+            $this->error = sprintf($this->plugin->txt('no_best_run_of'), $a_tries);
+        }
 
 		return null;
 	}

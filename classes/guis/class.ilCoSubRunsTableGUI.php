@@ -26,8 +26,9 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
 		$this->setRowTemplate("tpl.il_xcos_runs_row.html", $this->plugin->getDirectory());
+        $this->setSelectAllCheckbox('run_ids');
 
-		$this->addColumn('', '', '1%', true);
+		$this->addColumn('', 'run_id', '1%', true);
 		$this->addColumn($this->plugin->txt('index'),'start');
 		$this->addColumn($this->lng->txt('details'), '','30%');
 		$this->addColumn($this->plugin->txt('users_assigned'), 'users_assigned');

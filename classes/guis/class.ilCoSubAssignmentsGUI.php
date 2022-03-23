@@ -193,14 +193,23 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 				$gui->applyCalculationSettings($form);
 			}
 
+            if ($this->object->getMethodObject()->hasInstantResult())
+            {
+                $run = $this->object->getMethodObject()->getBestCalculationRun($this->plugin->getNumberOfTries(), true);
+                $success = isset($run);
+            }
+            else
+            {
+                $this->plugin->includeClass('models/class.ilCoSubRun.php');
+                $run = new ilCoSubRun;
+                $run->obj_id = $this->object->getId();
+                $run->method = $this->object->getMethodObject()->getId();
+                $run->save();
 
-			$this->plugin->includeClass('models/class.ilCoSubRun.php');
-			$run = new ilCoSubRun;
-			$run->obj_id = $this->object->getId();
-			$run->method = $this->object->getMethodObject()->getId();
-			$run->save();
+                $success = $this->object->getMethodObject()->calculateAssignments($run);
+            }
 
-			if ($this->object->getMethodObject()->calculateAssignments($run))
+			if ($success)
 			{
 				if ($run->run_end)
 				{
