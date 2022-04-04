@@ -161,7 +161,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 				$props = $list->getProperties();
 			}
 
-			foreach ($props as $prop)
+			foreach ((array)$props as $prop)
 			{
 				$this->tpl->setCurrentBlock('info');
 				if ($prop['alert'])
