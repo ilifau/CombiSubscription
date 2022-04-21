@@ -1,289 +1,72 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 17.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-
-<svg
-   xmlns:i="&amp;#38;ns_ai;"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   version="1.1"
-   id="Layer_1"
-   x="0px"
-   y="0px"
-   width="32px"
-   height="32px"
-   viewBox="0 0 32 32"
-   enable-background="new 0 0 32 32"
-   xml:space="preserve"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="icon_xcos.svg"><metadata
-   id="metadata86"><rdf:RDF><cc:Work
-       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
-   id="defs84">
-	<foreignObject
-   id="foreignObject5"
-   height="1"
-   width="1"
-   y="0"
-   x="0"
-   requiredExtensions="http://ns.adobe.com/AdobeIllustrator/10.0/">
-		<i:pgfRef
-   xlink:href="#adobe_illustrator_pgf">
+<svg xmlns:i="&amp;#38;ns_ai;" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" id="Layer_1" x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" inkscape:version="0.48.4 r9939" sodipodi:docname="icon_xcos.svg"><metadata id="metadata86"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/></cc:Work></rdf:RDF></metadata><defs id="defs84">
+	<foreignObject id="foreignObject5" height="1" width="1" y="0" x="0" requiredExtensions="http://ns.adobe.com/AdobeIllustrator/10.0/">
+		<i:pgfRef xlink:href="#adobe_illustrator_pgf">
 		</i:pgfRef>
 	</foreignObject>
 	
-<linearGradient
-   inkscape:collect="always"
-   xlink:href="#SVGID_3_"
-   id="linearGradient3106"
-   gradientUnits="userSpaceOnUse"
-   gradientTransform="matrix(0,21.9999,-21.9999,0,-6603.5264,9155.8203)"
-   x1="-415.8573"
-   y1="-300.88889"
-   x2="-414.8573"
-   y2="-300.88889" /><linearGradient
-   inkscape:collect="always"
-   xlink:href="#SVGID_6_"
-   id="linearGradient3108"
-   gradientUnits="userSpaceOnUse"
-   gradientTransform="matrix(4,0,0,4,1216.9449,1420.86)"
-   x1="-302.23621"
-   y1="-353.465"
-   x2="-301.23621"
-   y2="-353.465" /><linearGradient
-   inkscape:collect="always"
-   xlink:href="#SVGID_9_"
-   id="linearGradient3110"
-   gradientUnits="userSpaceOnUse"
-   gradientTransform="matrix(4,0,0,4,1228.9449,1420.86)"
-   x1="-302.23621"
-   y1="-353.465"
-   x2="-301.23621"
-   y2="-353.465" />
+<linearGradient inkscape:collect="always" xlink:href="#SVGID_3_" id="linearGradient3106" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0,21.9999,-21.9999,0,-6603.5264,9155.8203)" x1="-415.8573" y1="-300.88889" x2="-414.8573" y2="-300.88889"/><linearGradient inkscape:collect="always" xlink:href="#SVGID_6_" id="linearGradient3108" gradientUnits="userSpaceOnUse" gradientTransform="matrix(4,0,0,4,1216.9449,1420.86)" x1="-302.23621" y1="-353.465" x2="-301.23621" y2="-353.465"/><linearGradient inkscape:collect="always" xlink:href="#SVGID_9_" id="linearGradient3110" gradientUnits="userSpaceOnUse" gradientTransform="matrix(4,0,0,4,1228.9449,1420.86)" x1="-302.23621" y1="-353.465" x2="-301.23621" y2="-353.465"/>
 		
-	</defs><sodipodi:namedview
-   pagecolor="#ffffff"
-   bordercolor="#666666"
-   borderopacity="1"
-   objecttolerance="10"
-   gridtolerance="10"
-   guidetolerance="10"
-   inkscape:pageopacity="0"
-   inkscape:pageshadow="2"
-   inkscape:window-width="640"
-   inkscape:window-height="480"
-   id="namedview82"
-   showgrid="false"
-   inkscape:zoom="7.375"
-   inkscape:cx="16"
-   inkscape:cy="16"
-   inkscape:window-x="0"
-   inkscape:window-y="0"
-   inkscape:window-maximized="0"
-   inkscape:current-layer="g9" />
-<g
-   id="g9">
-			<rect
-   x="0"
-   width="32"
-   height="32"
-   id="rect11"
-   y="0"
-   style="fill:none" />
-			<g
-   id="g13">
-				<g
-   id="g15">
-					<defs
-   id="defs17">
-						<path
-   id="SVGID_1_"
-   d="M 25,7 V 9.501 C 25,10.439 24.237,11 23.5,11 h -3 C 19.561,11 19,10.238 19,9.501 V 7 H 13 V 9.501 C 13,10.439 12.237,11 11.5,11 h -3 C 7.562,11 7,10.238 7,9.501 V 7 H 4 C 4,7 3.5,7 3.5,7.5 v 21 c 0,0 0,0.5 0.5,0.5 h 24 c 0,0 0.5,0 0.5,-0.5 v -21 c 0,0 0,-0.5 -0.5,-0.5 h -3 z"
-   inkscape:connector-curvature="0" />
+	</defs><sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="640" inkscape:window-height="480" id="namedview82" showgrid="false" inkscape:zoom="7.375" inkscape:cx="16" inkscape:cy="16" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="0" inkscape:current-layer="g9"/>
+<g id="g9">
+			<rect x="0" width="32" height="32" id="rect11" y="0" style="fill:none"/>
+			<g id="g13">
+				<g id="g15">
+					<defs id="defs17">
+						<path id="SVGID_1_" d="M 25,7 V 9.501 C 25,10.439 24.237,11 23.5,11 h -3 C 19.561,11 19,10.238 19,9.501 V 7 H 13 V 9.501 C 13,10.439 12.237,11 11.5,11 h -3 C 7.562,11 7,10.238 7,9.501 V 7 H 4 C 4,7 3.5,7 3.5,7.5 v 21 c 0,0 0,0.5 0.5,0.5 h 24 c 0,0 0.5,0 0.5,-0.5 v -21 c 0,0 0,-0.5 -0.5,-0.5 h -3 z" inkscape:connector-curvature="0"/>
 					</defs>
-					<clipPath
-   id="SVGID_2_">
-						<use
-   xlink:href="#SVGID_1_"
-   overflow="visible"
-   id="use21"
-   style="overflow:visible"
-   x="0"
-   y="0"
-   width="32"
-   height="32" />
+					<clipPath id="SVGID_2_">
+						<use xlink:href="#SVGID_1_" overflow="visible" id="use21" style="overflow:visible" x="0" y="0" width="32" height="32"/>
 					</clipPath>
 					
-						<linearGradient
-   id="SVGID_3_"
-   gradientUnits="userSpaceOnUse"
-   x1="-415.8573"
-   y1="-300.88889"
-   x2="-414.8573"
-   y2="-300.88889"
-   gradientTransform="matrix(0,21.9999,-21.9999,0,-6603.5264,9155.8203)">
-						<stop
-   offset="0"
-   style="stop-color:#4C6486"
-   id="stop24" />
-						<stop
-   offset="0.0198"
-   style="stop-color:#4C6486"
-   id="stop26" />
-						<stop
-   offset="1"
-   style="stop-color:#5A77A0"
-   id="stop28" />
+						<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-415.8573" y1="-300.88889" x2="-414.8573" y2="-300.88889" gradientTransform="matrix(0,21.9999,-21.9999,0,-6603.5264,9155.8203)">
+						<stop offset="0" style="stop-color:#4C6486" id="stop24"/>
+						<stop offset="0.0198" style="stop-color:#4C6486" id="stop26"/>
+						<stop offset="1" style="stop-color:#5A77A0" id="stop28"/>
 					</linearGradient>
-					<rect
-   x="3.5"
-   y="7"
-   clip-path="url(#SVGID_2_)"
-   width="25"
-   height="22"
-   id="rect30"
-   style="fill:url(#linearGradient3106)" />
+					<rect x="3.5" y="7" clip-path="url(#SVGID_2_)" width="25" height="22" id="rect30" style="fill:url(#linearGradient3106)"/>
 				</g>
 			</g>
-			<rect
-   x="6.75"
-   y="13.644067"
-   width="19.144068"
-   height="3.3220339"
-   id="rect32"
-   style="fill:#ffffff" />
+			<rect x="6.75" y="13.644067" width="19.144068" height="3.3220339" id="rect32" style="fill:#ffffff"/>
 			
 			
 			
 			
 			
-			<g
-   id="g44">
-				<g
-   id="g46">
-					<defs
-   id="defs48">
-						<path
-   id="SVGID_4_"
-   d="M 8.5,4 C 8.5,4 8,4 8,4.5 v 5 c 0,0 0,0.5 0.5,0.5 h 3 c 0,0 0.5,0 0.5,-0.5 v -5 C 12,4.5 12,4 11.5,4 h -3 z"
-   inkscape:connector-curvature="0" />
+			<g id="g44">
+				<g id="g46">
+					<defs id="defs48">
+						<path id="SVGID_4_" d="M 8.5,4 C 8.5,4 8,4 8,4.5 v 5 c 0,0 0,0.5 0.5,0.5 h 3 c 0,0 0.5,0 0.5,-0.5 v -5 C 12,4.5 12,4 11.5,4 h -3 z" inkscape:connector-curvature="0"/>
 					</defs>
-					<clipPath
-   id="SVGID_5_">
-						<use
-   xlink:href="#SVGID_4_"
-   overflow="visible"
-   id="use52"
-   style="overflow:visible"
-   x="0"
-   y="0"
-   width="32"
-   height="32" />
+					<clipPath id="SVGID_5_">
+						<use xlink:href="#SVGID_4_" overflow="visible" id="use52" style="overflow:visible" x="0" y="0" width="32" height="32"/>
 					</clipPath>
 					
-						<linearGradient
-   id="SVGID_6_"
-   gradientUnits="userSpaceOnUse"
-   x1="-302.23621"
-   y1="-353.465"
-   x2="-301.23621"
-   y2="-353.465"
-   gradientTransform="matrix(4,0,0,4,1216.9449,1420.86)">
-						<stop
-   offset="0"
-   style="stop-color:#012356"
-   id="stop55" />
-						<stop
-   offset="0.0198"
-   style="stop-color:#012356"
-   id="stop57" />
-						<stop
-   offset="1"
-   style="stop-color:#0D3479"
-   id="stop59" />
+						<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="-302.23621" y1="-353.465" x2="-301.23621" y2="-353.465" gradientTransform="matrix(4,0,0,4,1216.9449,1420.86)">
+						<stop offset="0" style="stop-color:#012356" id="stop55"/>
+						<stop offset="0.0198" style="stop-color:#012356" id="stop57"/>
+						<stop offset="1" style="stop-color:#0D3479" id="stop59"/>
 					</linearGradient>
-					<rect
-   x="8"
-   y="4"
-   clip-path="url(#SVGID_5_)"
-   width="4"
-   height="6"
-   id="rect61"
-   style="fill:url(#linearGradient3108)" />
+					<rect x="8" y="4" clip-path="url(#SVGID_5_)" width="4" height="6" id="rect61" style="fill:url(#linearGradient3108)"/>
 				</g>
 			</g>
-			<g
-   id="g63">
-				<g
-   id="g65">
-					<defs
-   id="defs67">
-						<path
-   id="SVGID_7_"
-   d="M 20.5,4 C 20.5,4 20,4 20,4.5 v 5 c 0,0 0,0.5 0.5,0.5 h 3 c 0,0 0.5,0 0.5,-0.5 v -5 C 24,4.5 24,4 23.5,4 h -3 z"
-   inkscape:connector-curvature="0" />
+			<g id="g63">
+				<g id="g65">
+					<defs id="defs67">
+						<path id="SVGID_7_" d="M 20.5,4 C 20.5,4 20,4 20,4.5 v 5 c 0,0 0,0.5 0.5,0.5 h 3 c 0,0 0.5,0 0.5,-0.5 v -5 C 24,4.5 24,4 23.5,4 h -3 z" inkscape:connector-curvature="0"/>
 					</defs>
-					<clipPath
-   id="SVGID_8_">
-						<use
-   xlink:href="#SVGID_7_"
-   overflow="visible"
-   id="use71"
-   style="overflow:visible"
-   x="0"
-   y="0"
-   width="32"
-   height="32" />
+					<clipPath id="SVGID_8_">
+						<use xlink:href="#SVGID_7_" overflow="visible" id="use71" style="overflow:visible" x="0" y="0" width="32" height="32"/>
 					</clipPath>
 					
-						<linearGradient
-   id="SVGID_9_"
-   gradientUnits="userSpaceOnUse"
-   x1="-302.23621"
-   y1="-353.465"
-   x2="-301.23621"
-   y2="-353.465"
-   gradientTransform="matrix(4,0,0,4,1228.9449,1420.86)">
-						<stop
-   offset="0"
-   style="stop-color:#012356"
-   id="stop74" />
-						<stop
-   offset="0.0198"
-   style="stop-color:#012356"
-   id="stop76" />
-						<stop
-   offset="1"
-   style="stop-color:#0D3479"
-   id="stop78" />
+						<linearGradient id="SVGID_9_" gradientUnits="userSpaceOnUse" x1="-302.23621" y1="-353.465" x2="-301.23621" y2="-353.465" gradientTransform="matrix(4,0,0,4,1228.9449,1420.86)">
+						<stop offset="0" style="stop-color:#012356" id="stop74"/>
+						<stop offset="0.0198" style="stop-color:#012356" id="stop76"/>
+						<stop offset="1" style="stop-color:#0D3479" id="stop78"/>
 					</linearGradient>
-					<rect
-   x="20"
-   y="4"
-   clip-path="url(#SVGID_8_)"
-   width="4"
-   height="6"
-   id="rect80"
-   style="fill:url(#linearGradient3110)" />
+					<rect x="20" y="4" clip-path="url(#SVGID_8_)" width="4" height="6" id="rect80" style="fill:url(#linearGradient3110)"/>
 				</g>
 			</g>
-		<rect
-   x="6.6991529"
-   y="18.406778"
-   width="19.144068"
-   height="3.3220339"
-   id="rect32-7"
-   style="fill:#ffffff" /><rect
-   x="6.6991525"
-   y="23.016947"
-   width="19.144068"
-   height="3.3220339"
-   id="rect32-4"
-   style="fill:#ffffff" /></g>
+		<rect x="6.6991529" y="18.406778" width="19.144068" height="3.3220339" id="rect32-7" style="fill:#ffffff"/><rect x="6.6991525" y="23.016947" width="19.144068" height="3.3220339" id="rect32-4" style="fill:#ffffff"/></g>
 </svg>
