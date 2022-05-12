@@ -114,7 +114,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 
 		$file = $this->form->getFileUpload('import_file');
 		$mode = $this->form->getInput('import_mode');
-        $comment = ($this->add_comment ?  $this->form->getInput('import_comment') : '');
+        $comment = ($this->add_comment ?  $this->form->getInput('comment') : '');
 
 		$this->plugin->includeClass("batch/class.ilCoSubImport.php");
 		$import = new ilCoSubImport($this->plugin, $this->object, $mode, $comment);

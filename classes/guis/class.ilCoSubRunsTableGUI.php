@@ -38,6 +38,8 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 		$this->addColumn($this->plugin->txt('items_satisfied'), 'items_status');
 
 		$this->addMultiCommand('confirmDeleteRuns', $this->plugin->txt('delete_assignments'));
+
+        $this->setExportFormats(array(ilTable2GUI::EXPORT_EXCEL));
 	}
 
 	/**
@@ -174,4 +176,27 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 		}
 		$this->tpl->parseCurrentBlock();
 	}
+
+
+    /**
+     * Excel Version of Fill Row. Most likely to
+     * be overwritten by derived class.
+     *
+     * @param	ilExcel	$a_excel	excel wrapper
+     * @param	int		$a_row		row counter
+     * @param	array	$a_set		data array
+     */
+    protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set)
+    {
+        ilDatePresentation::setUseRelativeDates(false);
+        $col = 0;
+        $a_excel->setCell($a_row, $col++, $this->parent->object->getRunLabel($a_set['index'])
+            . ': ' . ilDatePresentation::formatDate(new ilDateTime($a_set['start'], IL_CAL_UNIX)));
+        $a_excel->setCell($a_row, $col++, $a_set['details']);
+        $a_excel->setCell($a_row, $col++, $a_set['users_assigned']);
+        $a_excel->setCell($a_row, $col++, $a_set['users_satisfied_full']);
+        $a_excel->setCell($a_row, $col++, $a_set['users_satisfied_medium']);
+        $a_excel->setCell($a_row, $col++, $a_set['users_satisfied_not']);
+        $a_excel->setCell($a_row, $col++, $a_set['items_satisfied']);
+    }
 }
