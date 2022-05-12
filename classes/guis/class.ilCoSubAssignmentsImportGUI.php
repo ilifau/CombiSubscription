@@ -10,6 +10,8 @@
  */
 class ilCoSubAssignmentsImportGUI extends ilCoSubImportBaseGUI
 {
+    protected $add_comment = true;
+
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
@@ -33,6 +35,13 @@ class ilCoSubAssignmentsImportGUI extends ilCoSubImportBaseGUI
 				'failure' => $this->plugin->txt('import_assignments_failed'),
 				'default' => false
 			),
+            ilCoSubImport::MODE_ASS_BY_IDS => array(
+                'title' => $this->plugin->txt('import_mode_ass_by_ids'),
+                'info' => $this->plugin->txt('import_mode_ass_by_ids_info'),
+                'success' => $this->plugin->txt('import_assignments_finished'),
+                'failure' => $this->plugin->txt('import_assignments_failed'),
+                'default' => false
+            ),
 		);
 	}
 }

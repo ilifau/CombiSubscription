@@ -12,6 +12,9 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 	/** @var array  mode => ['title' => string, 'info' => string, 'default' => bool] */
 	var $modes = array();
 
+    /** @var bool add a comment input field to the import form */
+    protected $add_comment = false;
+
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
@@ -77,7 +80,12 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 		$import_mode->setValue($this->object->getPreference(get_class($this), 'import_mode', $default_mode));
 		$this->form->addItem($import_mode);
 
-		$this->form->addCommandButton('doImport', $this->plugin->txt('do_import'));
+        if ($this->add_comment) {
+            $comment = new ilTextInputGUI($this->plugin->txt('import_comment'), 'comment');
+            $this->form->addItem($comment);
+        }
+
+        $this->form->addCommandButton('doImport', $this->plugin->txt('do_import'));
 	}
 
 	/**
@@ -106,9 +114,10 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 
 		$file = $this->form->getFileUpload('import_file');
 		$mode = $this->form->getInput('import_mode');
+        $comment = ($this->add_comment ?  $this->form->getInput('import_comment') : '');
 
 		$this->plugin->includeClass("batch/class.ilCoSubImport.php");
-		$import = new ilCoSubImport($this->plugin, $this->object, $mode);
+		$import = new ilCoSubImport($this->plugin, $this->object, $mode, $comment);
 
 		if ($import->ImportFile($file['tmp_name']))
 		{
