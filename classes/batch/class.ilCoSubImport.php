@@ -21,7 +21,7 @@ class ilCoSubImport
 	const MODE_REG_BY_PRIO = 'reg_by_prio';
 	const MODE_ASS_BY_ITEM = 'ass_by_item';
 	const MODE_ASS_BY_COL = 'ass_by_col';
-
+    const MODE_ASS_BY_IDS = 'ass_by_ids';
 
 	/**
 	 * @var ilCombiSubscriptionPlugin
@@ -39,6 +39,9 @@ class ilCoSubImport
 	/** @var string import mode ('ass_by_item') */
 	protected $mode;
 
+    /** @var string import comment (used for run creation) */
+    protected $comment;
+
 	/** @var ilLanguage $lng */
 	protected $lng;
 
@@ -54,8 +57,11 @@ class ilCoSubImport
 	/** @var  ilCoSubRun */
 	protected $run;
 
-	/** @var ilCoSubItem[] | null (indexed by item_id) */
+	/** @var ilCoSubItem[]  (indexed by item_id) */
 	protected $items = array();
+
+    /** @var array ilCoSubUser[]  (indexed by user_id) */
+    protected $users = array();
 
 	/** @var array title => item_id */
 	protected $items_by_title = array();
@@ -75,13 +81,14 @@ class ilCoSubImport
 	 * @param ilObjCombiSubscription		$object
 	 * @param string						$mode
 	 */
-	public function __construct($plugin, $object, $mode = '')
+	public function __construct($plugin, $object, $mode = '', $comment = '')
 	{
 		global $lng;
 
 		$this->object = $object;
 		$this->plugin  = $plugin;
 		$this->mode = $mode;
+        $this->comment = $comment;
 		$this->lng = $lng;
 
 		$this->plugin->includeClass('models/class.ilCoSubRun.php');
@@ -145,6 +152,11 @@ class ilCoSubImport
 					$this->readData($sheet);
 					$this->readAssignmentsByColumns();
 					break;
+
+                case self::MODE_ASS_BY_IDS;
+                    $this->readData($sheet);
+                    $this->readAssignmentsByIds();
+                    break;
 
 				default:
 					throw new Exception($this->plugin->txt('import_error_mode'));
@@ -402,14 +414,67 @@ class ilCoSubImport
 			{
 				throw new Exception($this->plugin->txt('import_error_multi_ass_entries'));
 			}
-
-			if ($added)
-			{
-				// user is added, so create dummy choices
-				$this->createChoicesForAssignments($assignments);
-			}
 		}
 	}
+
+    /**
+     * Read the assignments from a raw data table having obj_id, user_id and item_id as columns
+     * @throws Exception
+     */
+    public function readAssignmentsByIds()
+    {
+        if (!in_array('obj_id', $this->columns)) {
+            throw new Exception($this->plugin->txt('import_error_obj_id_missing'));
+        }
+        if (!in_array('user_id', $this->columns)) {
+            throw new Exception($this->plugin->txt('import_error_user_id_missing'));
+        }
+        if (!in_array('item_id', $this->columns)) {
+            throw new Exception($this->plugin->txt('import_error_item_id_missing'));
+        }
+
+        $this->loadItemData();
+        $this->loadUserData();
+
+        $assignments = [];
+        $assigned = [];
+
+        foreach ($this->rows as $rowdata)
+        {
+            $obj_id = $rowdata['obj_id'];
+            $user_id = $rowdata['user_id'];
+            $item_id = $rowdata['item_id'];
+
+            if ($obj_id != $this->object->getId()) {
+                throw new Exception(sprintf($this->plugin->txt('import_error_wrong_obj_id'), $obj_id));
+            }
+            if (!isset($this->users[$user_id])) {
+                throw new Exception(sprintf($this->plugin->txt('import_error_wrong_user_id'), $user_id));
+            }
+            if (!isset($this->items[$item_id])) {
+                throw new Exception(sprintf($this->plugin->txt('import_error_wrong_item_id'), $item_id));
+            }
+
+            if (isset($assigned[$user_id]) && !$this->object->getMethodObject()->hasMultipleAssignments()) {
+                throw new Exception($this->plugin->txt('import_error_multi_ass_entries'));
+            }
+
+            $ass = new ilCoSubAssign();
+            $ass->obj_id = $obj_id;
+            $ass->user_id = $user_id;
+            $ass->item_id = $item_id;
+
+            $assignments[] = $ass;
+            $assigned[$user_id] = true;
+        }
+
+        $this->createRun();
+        foreach ($assignments as $ass) {
+            $ass->run_id = $this->run->run_id;
+            $ass->save();
+        }
+    }
+
 
 	public function readItems()
 	{
@@ -518,7 +583,7 @@ class ilCoSubImport
 		$this->run->run_start = new ilDateTime(time(), IL_CAL_UNIX);
 		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
 		$this->run->method = 'import';
-		$this->run->details = sprintf($this->plugin->txt('run_details_import'), $ilUser->getFullname());
+		$this->run->details = (empty($this->comment) ? sprintf($this->plugin->txt('run_details_import'), $ilUser->getFullname()) : $this->comment);
 		$this->run->save();
 	}
 
@@ -614,7 +679,8 @@ class ilCoSubImport
 	 */
 	protected function loadUserData()
 	{
-		$user_ids = array_keys($this->object->getPriorities());
+        $this->users = $this->object->getUsers();
+		$user_ids = array_keys($this->users);
 		if (empty($user_ids))
 		{
 			return;

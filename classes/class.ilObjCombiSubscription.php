@@ -1131,7 +1131,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      *
 	 * @param	array	$a_user_ids (optional)
 	 * @param bool		$a_force 	force the reading of users
-	 * @return	ilCoSubUser[]
+	 * @return	ilCoSubUser[]       indexed by user_id
 	 */
 	public function getUsers($a_user_ids = array(), $a_force = false)
 	{

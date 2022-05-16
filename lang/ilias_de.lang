@@ -410,3 +410,12 @@ list_conflicts#:#Konflikte auflisten
 remove_conflicts#:#Konflikte bereinigen
 remove_conflicts_question#:#Möchten Sie alle Auswahlen, die in Konflikt mit bereits erhaltenen Zuteilungen stehen löschen?
 no_best_run_found#:#Es konnte in %s Berechnungen keine Zuteilung gefunden werden!
+import_comment#:#Kommentar
+import_mode_ass_by_ids#:#Zuteilungen nach IDs
+import_mode_ass_by_ids_info#:#Die erste Zeile enthält die Spaltentitel obj_id, user_id, item_id. Die Werte müssen den vorhandenen IDs im Anmeldeobjekt entsprechen.
+import_error_obj_id_missing#:#Der Spaltentitel obj_id fehlt!
+import_error_user_id_missing#:#Der Spaltentitel user_id fehlt!
+import_error_item_id_missing#:#Der Spaltentitel item_id fehlt!
+import_error_wrong_obj_id#:#Die obj_id %s ist falsch!
+import_error_wrong_user_id#:#Die user_id %s ist in der Anmeldung nicht vorhanden!
+import_error_wrong_item_id#:#Die item_id %s ist in der Anmeldung nicht vorhanden!

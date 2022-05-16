@@ -384,3 +384,12 @@ calculation_workarounds#:#Workarounds
 calculation_workarounds_info#:#Please use these settings only in spacial cases, if the standard calculation does not produce a satisfying result.
 fill_empty_registrations#:#Fill Empty Registrations
 no_best_run_found#:#Thee is no possible assignment found by %s calculations!
+import_comment#:#Comment
+import_mode_ass_by_ids#:#Assignments by IDs
+import_mode_ass_by_ids_info#:#The first row has the column titles obj_id, user_id, item_id. The values must exist.
+import_error_obj_id_missing#:#The column title obj_id is missing!
+import_error_user_id_missing#:#The column title user_id is missing!
+import_error_item_id_missing#:#The column title item_id is missing!
+import_error_wrong_obj_id#:#The obj_id %s is wrong!
+import_error_wrong_user_id#:#the user_id %s is not found in this object!
+import_error_wrong_item_id#:#The item_id %s is not found in this object!
