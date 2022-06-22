@@ -366,6 +366,8 @@ class ilCoSubExport
 	 */
 	protected function getUserColumnData($user)
 	{
+        global $DIC;
+
 		$data = array();
 
 		// basic user values
@@ -382,18 +384,10 @@ class ilCoSubExport
 
 			if ($this->with_studydata)
 			{
-				$studydata = ilStudyAccess::_getDataText($user['usr_id']);
-
-				if ($this->type == self::TYPE_CSV)
-				{
-					$studydata = str_replace('"','',$studydata);
-					$studydata = str_replace("'",'',$studydata);
-					$studydata = str_replace("'",'',$studydata);
-					$studydata = str_replace(",",' ',$studydata);
-					$studydata = str_replace(";",' ',$studydata);
-					$studydata = str_replace("\n",' / ',$studydata);
+                $studydata = $DIC->fau()->user()->getStudiesAsText((int) $user['usr_id']);
+				if ($this->type == self::TYPE_CSV) {
+                    $studydata = $DIC->fau()->tools()->quoteForExport($studydata);
 				}
-
 				$data['studydata'] = $studydata;
 			}
 		}

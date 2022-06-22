@@ -317,6 +317,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function getRegistrationInfos($userObj)
 	{
+        global $DIC;
 
 		$infos = array();
 		if ($this->object->getExplanation())
@@ -383,16 +384,16 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		}
 
 
-		// studydata conditions are avaiable
+		// studydata conditions are available
 		if ($this->plugin->withStudyCond())
 		{
-			if (ilStudyAccess::_hasConditions($this->object->getId()))
+            if ($DIC->fau()->cond()->repo()->checkObjectHasSoftCondition($this->object->getId()))
 			{
-				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'), ilStudyAccess::_getConditionsText($this->object->getId())));
+				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'),
+                    $DIC->fau()->cond()->soft()->getConditionsAsText($this->object->getId())));
 
-				if (!ilStudyAccess::_checkSubscription($this->object->getId(), $userObj->user_id))
-				{
-					ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
+                if (!$DIC->fau()->cond()->soft()->check($this->object->getId(), $userObj->user_id)) {
+                    ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
 				}
 			}
 		}

@@ -175,14 +175,14 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	*/
 	function doDelete()
 	{
-		global $ilDB;
+		global $DIC;
 		
-		$ilDB->manipulate("DELETE FROM rep_robj_xcos_data WHERE ".
-			" obj_id = ".$ilDB->quote($this->getId(), 'integer')
+		$DIC->database()->manipulate("DELETE FROM rep_robj_xcos_data WHERE ".
+			" obj_id = ".$DIC->database()->quote($this->getId(), 'integer')
 			);
 
 		if ($this->plugin->withStudyCond()) {
-		    ilStudyAccess::_deleteConditions($this->getId());
+            $DIC->fau()->cond()->soft()->deleteConditionsOfObject($this->getId());
         }
 	}
 	
@@ -194,6 +194,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
 	{
+        global $DIC;
+
 		$new_obj->setOnline(false);
 		$new_obj->setExplanation($this->getExplanation());
 		$new_obj->setSubscriptionStart($this->getSubscriptionStart());
@@ -227,7 +229,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 
 		if ($this->plugin->withStudyCond())
 		{
-		    ilStudyAccess::_cloneConditions($this->getId(), $new_obj->getId());
+            $DIC->fau()->cond()->soft()->cloneConditions($this->getId(), $new_obj->getId());
 		}
 
         // comment this return to clone users and their choices
@@ -1171,12 +1173,15 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getUsersForStudyCond($a_with_fixed = true)
 	{
+        global $DIC;
+
 		if (!$this->plugin->withStudyCond())
 		{
 			return $this->getUsers();
 		}
 
-		if (!ilStudyAccess::_hasConditions($this->getId())) {
+		if (!$DIC->fau()->cond()->repo()->checkObjectHasSoftCondition($this->getId()))
+        {
 			return $this->getUsers();
 		}
 
@@ -1190,11 +1195,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				continue;
 			}
 
-			if (!ilStudyAccess::_hasData($user_id)) {
+            if (!$DIC->fau()->user()->repo()->checkUserHasPerson($user_id))
+            {
 				continue;
 			}
 
-			if (ilStudyAccess::_checkSubscription($this->getId(), $user_id))
+			if ($DIC->fau()->cond()->soft()->check($this->getId(), $user_id))
 			{
 				$users[$user_id] = $userObj;
 			}
