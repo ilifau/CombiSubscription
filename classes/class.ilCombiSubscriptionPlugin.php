@@ -98,7 +98,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function hasStudyData()
 	{
-		return file_exists('Services/StudyData/classes/class.ilStudyAccess.php');
+		return file_exists('Services/FAU/Study/Service.php');
 	}
 
 
@@ -108,7 +108,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function withStudyCond()
 	{
-		return file_exists('Services/StudyData/classes/class.ilStudyAccess.php');
+		return file_exists('Services/FAU/Cond/Service.php');
 	}
 
 	/**
@@ -129,6 +129,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function withUnivisImport()
 	{
+		return false;
 		return file_exists('Services/UnivIS/classes/class.ilUnivisImport.php');
 	}
 
