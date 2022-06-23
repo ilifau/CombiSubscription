@@ -94,7 +94,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				case 'ilstudycondgui':
 					$this->checkPermission("write");
 					$this->setSubTabs('settings', 'study_conditions');
-					require_once('Services/StudyData/classes/class.ilStudyCondGUI.php');
 					$gui = new ilStudyCondGUI($this);
 					$gui->setHeadline($this->plugin->txt('studycond_headline'));
 					$gui->setInfo($this->plugin->txt('studycond_info'));
