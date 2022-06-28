@@ -28,6 +28,7 @@ class ilCoSubExport
     const MODE_RAW_ITEMS = 'raw_items';
     const MODE_RAW_CHOICES = 'raw_choices';
     const MODE_RAW_SOLUTION = 'raw_solution';
+    const MODE_RAW_SETTINGS = 'raw_settings';
 
 
 	protected $headerStyle = array(
@@ -160,6 +161,11 @@ class ilCoSubExport
                 $name = 'solution';
                 $enclosure = '';
                 break;
+            case self::MODE_RAW_SETTINGS:
+                $this->fillRawSettings($excelObj->getActiveSheet());
+                $name = 'settings';
+                $enclosure = '';
+                break;
 
             case self::MODE_RAW_DATA:
                 $name = ilUtil::getASCIIFilename($this->object->getTitle()) . '_' . $this->object->getRefId();
@@ -169,6 +175,7 @@ class ilCoSubExport
                 $this->buildExportFile($subdir, self::MODE_RAW_ITEMS);
                 $this->buildExportFile($subdir, self::MODE_RAW_CHOICES);
                 $this->buildExportFile($subdir, self::MODE_RAW_SOLUTION);
+                $this->buildExportFile($subdir, self::MODE_RAW_SETTINGS);
 
                 $zipfile = $subdir . '.zip';
                 ilUtil::zip($subdir, $zipfile);
@@ -327,6 +334,31 @@ class ilCoSubExport
 
         $worksheet->setTitle('solution');
     }
+
+    /**
+     * Fill a sheet with raw solution data
+     * @param $worksheet
+     */
+    protected function fillRawSettings($worksheet)
+    {
+        $columns = [
+            'obj_id' => 'obj_id',
+            'num_priorities' => 'num_priorities',
+            'num_assignments' => 'num_assignments'
+        ];
+        $mapping = $this->fillHeaderRow($worksheet, $columns);
+
+        $method = $this->object->getMethodObject();
+
+        $row = 2;
+        $data = [];
+        $data['obj_id'] = $this->object->getId();
+        $data['num_priorities'] = count($method->getPriorities());
+        $data['num_assignments'] = $method->getNumberAssignments();
+        $this->fillRowData($worksheet, $data, $mapping, $row);
+        $worksheet->setTitle('solution');
+    }
+
 
     /**
 	 * Fill the sheet with assignments

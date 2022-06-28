@@ -175,17 +175,23 @@ class ilCoSubChoice
 		{
 			$this->choice_id = $ilDB->nextId('rep_robj_xcos_choices');
 		}
-		$rows = $ilDB->replace('rep_robj_xcos_choices',
-			array(
-				'choice_id' => array('integer', $this->choice_id)
-			),
-			array(
-				'obj_id' => array('integer', $this->obj_id),
-				'user_id' => array('integer', $this->user_id),
-				'item_id' => array('integer', $this->item_id),
-				'priority' => array('integer', $this->priority),
-			)
-		);
+        try {
+            $rows = $ilDB->replace('rep_robj_xcos_choices',
+                array(
+                    'choice_id' => array('integer', $this->choice_id)
+                ),
+                array(
+                    'obj_id' => array('integer', $this->obj_id),
+                    'user_id' => array('integer', $this->user_id),
+                    'item_id' => array('integer', $this->item_id),
+                    'priority' => array('integer', $this->priority),
+                )
+            );
+        }
+        catch (Exception $e) {
+            return 0;
+        }
+
 		return $rows > 0;
 	}
 
