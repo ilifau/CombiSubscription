@@ -55,6 +55,9 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		$option = new ilRadioOption($this->plugin->txt('export_mode_ass_by_item'), ilCoSubExport::MODE_ASS_BY_ITEM);
 		$option->setInfo($this->plugin->txt('export_mode_ass_by_item_info'));
 		$export_mode->addOption($option);
+        $option = new ilRadioOption($this->plugin->txt('export_mode_raw_data'), ilCoSubExport::MODE_RAW_DATA);
+        $option->setInfo($this->plugin->txt('export_mode_raw_data_info'));
+        $export_mode->addOption($option);
 		$export_mode->setValue($this->object->getPreference('ilCoSubExport', 'export_mode', ilCoSubExport::MODE_REG_BY_ITEM));
 		$this->form->addItem($export_mode);
 
@@ -63,7 +66,6 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		$option = new ilRadioOption($this->plugin->txt('export_type_excel'), ilCoSubExport::TYPE_EXCEL);
 		$export_type->addOption($option);
 		$option = new ilRadioOption($this->plugin->txt('export_type_csv'), ilCoSubExport::TYPE_CSV);
-		$export_type->setValue(ilCoSubExport::TYPE_EXCEL);
 		$export_type->addOption($option);
 		$export_type->setValue($this->object->getPreference('ilCoSubExport', 'export_type', ilCoSubExport::TYPE_EXCEL));
 		$this->form->addItem($export_type);
@@ -114,22 +116,25 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		$mode = $_POST['export_mode'];
 		switch ($mode)
 		{
+            case ilCoSubExport::MODE_RAW_DATA:
+                $name = ilUtil::getASCIIFilename($this->object->getTitle());
+                $suffix = '.zip';
+                break;
+
 			case ilCoSubExport::MODE_REG_BY_ITEM:
 			case ilCoSubExport::MODE_REG_BY_PRIO:
 			default:
 				$name = 'registrations';
-				break;
 		}
 
 		// create and send the export file
-		$tempname = ilUtil::ilTempnam();
 		$export = new ilCoSubExport($this->plugin, $this->object, $type, $mode);
-		$export->buildExportFile($tempname);
+        $file = $export->buildExportFile();
 
 
-		if (is_file($tempname))
+		if (is_file($file))
 		{
-			ilUtil::deliverFile($tempname, $name.$suffix);
+			ilUtil::deliverFile($file, basename($file));
 		}
 		else
 		{

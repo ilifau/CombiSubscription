@@ -24,6 +24,11 @@ class ilCoSubExport
 	const MODE_ASS_BY_ITEM = 'ass_by_item';
 	const MODE_ASS_BY_COL = 'ass_by_col';
 
+    const MODE_RAW_DATA = 'raw_data';
+    const MODE_RAW_ITEMS = 'raw_items';
+    const MODE_RAW_CHOICES = 'raw_choices';
+    const MODE_RAW_SOLUTION = 'raw_solution';
+
 
 	protected $headerStyle = array(
 		'font' => array(
@@ -115,43 +120,80 @@ class ilCoSubExport
 
 	/**
 	 * Build an Excel Export file
-	 * @param string	$path	full path of the file to create
+	 * @param string	$directory	directory where the file should be creatred
+     * @return string   full path of the created file
 	 */
-	public function buildExportFile($path)
+	public function buildExportFile($directory = null, $mode = null, $type = null, $delimiter = null, $enclosure = null)
 	{
         $excelObj = new Spreadsheet();
 		//$excelObj->setActiveSheetIndex(0);
 
-		switch($this->mode)
+        $directory = $directory ?? ilUtil::ilTempnam();
+        ilUtil::makeDirParents($directory);
+
+		switch($mode ?? $this->mode)
 		{
 			case self::MODE_REG_BY_ITEM:
 				$this->fillRegistrationsByItem($excelObj->getActiveSheet());
+                $name = 'registrations';
 				break;
 			case self::MODE_REG_BY_PRIO:
 				$this->fillRegistrationsByPrio($excelObj->getActiveSheet());
+                $name = 'registrations';
 				break;
 			case self::MODE_ASS_BY_ITEM:
 				$this->fillAssignmentsByItem($excelObj->getActiveSheet());
+                $name = 'assignments';
 				break;
+            case self::MODE_RAW_ITEMS:
+                $this->fillRawItems($excelObj->getActiveSheet());
+                $name = 'items';
+                $enclosure = '';
+                break;
+            case self::MODE_RAW_CHOICES:
+                $this->fillRawChoices($excelObj->getActiveSheet());
+                $name = 'choices';
+                $enclosure = '';
+                break;
+            case self::MODE_RAW_SOLUTION:
+                $this->fillRawSolution($excelObj->getActiveSheet());
+                $name = 'solution';
+                $enclosure = '';
+                break;
 
+            case self::MODE_RAW_DATA:
+                $name = ilUtil::getASCIIFilename($this->object->getTitle()) . '_' . $this->object->getRefId();
+                $subdir = $directory . '/' . str_replace(' ', '_', $name);
+
+                ilUtil::makeDirParents($subdir);
+                $this->buildExportFile($subdir, self::MODE_RAW_ITEMS);
+                $this->buildExportFile($subdir, self::MODE_RAW_CHOICES);
+                $this->buildExportFile($subdir, self::MODE_RAW_SOLUTION);
+
+                $zipfile = $subdir . '.zip';
+                ilUtil::zip($subdir, $zipfile);
+                return $zipfile;
 		}
 
 		// Save the file
-		ilUtil::makeDirParents(dirname($path));
-		switch ($this->type)
+		switch ($type ?? $this->type)
 		{
 			case self::TYPE_EXCEL:
+                $file = $directory . '/' . $name . '.xlsx';
                 $writer = IOFactory::createWriter($excelObj, 'Xlsx');
-                $writer->save($path);
+                $writer->save($file);
 				break;
+
 			case self::TYPE_CSV:
+                $file = $directory . '/' . $name . '.csv';
                 /** @var Csv $writer */
                 $writer = IOFactory::createWriter($excelObj, 'Csv');
-                $writer->setDelimiter(';');
-                $writer->setEnclosure('"');
-                $writer->save($path);
+                $writer->setDelimiter($delimiter ?? ';');
+                $writer->setEnclosure($enclosure ?? '"');
+                $writer->save($file);
                 break;
 		}
+        return $file;
 	}
 
 
@@ -203,8 +245,90 @@ class ilCoSubExport
 		$this->adjustSizes($worksheet, range('A',  Coordinate::stringFromColumnIndex($basecols)));
 	}
 
+    /**
+     * Fill a sheet with raw item data
+     * @param $worksheet
+     */
+    protected function fillRawItems($worksheet)
+    {
+        $columns = [
+            'obj_id' => 'obj_id',
+            'item_id' => 'item_id',
+            'sub_min' => 'sub_min',
+            'sub_max' => 'sub_max'
+        ];
+        $mapping = $this->fillHeaderRow($worksheet, $columns);
 
-	/**
+        $row = 2;
+        foreach ($this->object->getItems() as $item) {
+            $data = [];
+            $data['obj_id'] = $item->obj_id;
+            $data['item_id'] = $item->item_id;
+            $data['sub_min'] = $item->sub_min;
+            $data['sub_max'] = $item->sub_max;
+            $this->fillRowData($worksheet, $data, $mapping, $row++);
+        }
+        $worksheet->setTitle('items');
+    }
+
+    /**
+     * Fill a sheet with raw choices data
+     * @param $worksheet
+     */
+    protected function fillRawChoices($worksheet)
+    {
+        $columns = [
+            'obj_id' => 'obj_id',
+            'user_id' => 'user_id',
+            'item_id' => 'item_id',
+            'priority' => 'priority'
+        ];
+        $mapping = $this->fillHeaderRow($worksheet, $columns);
+
+        $row = 2;
+        foreach ($this->object->getChoices() as $choice) {
+            $data = [];
+            $data['obj_id'] = $choice->obj_id;
+            $data['user_id'] = $choice->user_id;
+            $data['item_id'] = $choice->item_id;
+            $data['priority'] = $choice->priority;
+            $this->fillRowData($worksheet, $data, $mapping, $row++);
+        }
+        $worksheet->setTitle('choices');
+    }
+
+
+    /**
+     * Fill a sheet with raw solution data
+     * @param $worksheet
+     */
+    protected function fillRawSolution($worksheet)
+    {
+        $columns = [
+            'obj_id' => 'obj_id',
+            'user_id' => 'user_id',
+            'item_id' => 'item_id'
+        ];
+        $mapping = $this->fillHeaderRow($worksheet, $columns);
+
+        //run_id => user_id => item_id => assign_id
+        $assignments = $this->object->getAssignments();
+
+        $row = 2;
+        foreach ((array) $assignments[0] as $user_id => $ass) {
+            foreach ($ass as $item_id => $assign_id) {
+                $data = [];
+                $data['obj_id'] = $this->object->getId();
+                $data['user_id'] = $user_id;
+                $data['item_id'] = $item_id;
+                $this->fillRowData($worksheet, $data, $mapping, $row++);
+            }
+        }
+
+        $worksheet->setTitle('solution');
+    }
+
+    /**
 	 * Fill the sheet with assignments
 	 * Items are columns, assigned items will have a 1 in the cell
 	 * @param Worksheet $worksheet

@@ -228,6 +228,8 @@ export_mode_reg_by_prio#:#Anmeldungen nach Prioritäten
 export_mode_reg_by_prio_info#:#Die Zeilen entsprechen den Personen, die Spalten den Prioritäten. Die ausgewählten Einheiten (Kurse/Gruppen/Sitzungen) sind in den Zellen eingetragen.
 export_mode_ass_by_item#:#Zuteilungen nach Einheiten
 export_mode_ass_by_item_info#:#Die Zeilen entsprechen den Personen, die Spalten den Auswahl-Einheiten (Kurs/Gruppen/Sitzungen). Bei zugeteilten Einheiten ist in der Zelle "1" eingetragen.
+export_mode_raw_data#:#Rohdaten
+export_mode_raw_data_info#:#Exportiert ein ZIP mit den rohen Tabelleninhalten zu auswählbaren Kursen, gewählten Prioritäten und berechneten Zuteilungen
 export_type#:#Datei-Format
 export_type_excel#:#MS Excel 2007
 export_type_csv#:#CSV
