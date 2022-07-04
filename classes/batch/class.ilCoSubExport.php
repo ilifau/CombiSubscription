@@ -29,6 +29,8 @@ class ilCoSubExport
     const MODE_RAW_CHOICES = 'raw_choices';
     const MODE_RAW_SOLUTION = 'raw_solution';
     const MODE_RAW_SETTINGS = 'raw_settings';
+    const MODE_RAW_CATEGORIES = 'raw_categories';
+    const MODE_RAW_COMFLICTS = 'raw_conflicts';
 
 
 	protected $headerStyle = array(
@@ -166,6 +168,16 @@ class ilCoSubExport
                 $name = 'settings';
                 $enclosure = '';
                 break;
+            case self::MODE_RAW_CATEGORIES:
+                $this->fillRawCategories($excelObj->getActiveSheet());
+                $name = 'categories';
+                $enclosure = '';
+                break;
+            case self::MODE_RAW_COMFLICTS:
+                $this->fillRawConflicts($excelObj->getActiveSheet());
+                $name = 'conflicts';
+                $enclosure = '';
+                break;
 
             case self::MODE_RAW_DATA:
                 $name = ilUtil::getASCIIFilename($this->object->getTitle()) . '_' . $this->object->getRefId();
@@ -176,6 +188,8 @@ class ilCoSubExport
                 $this->buildExportFile($subdir, self::MODE_RAW_CHOICES);
                 $this->buildExportFile($subdir, self::MODE_RAW_SOLUTION);
                 $this->buildExportFile($subdir, self::MODE_RAW_SETTINGS);
+                $this->buildExportFile($subdir, self::MODE_RAW_CATEGORIES);
+                $this->buildExportFile($subdir, self::MODE_RAW_COMFLICTS);
 
                 $zipfile = $subdir . '.zip';
                 ilUtil::zip($subdir, $zipfile);
@@ -262,7 +276,8 @@ class ilCoSubExport
             'obj_id' => 'obj_id',
             'item_id' => 'item_id',
             'sub_min' => 'sub_min',
-            'sub_max' => 'sub_max'
+            'sub_max' => 'sub_max',
+            'cat_id' => 'cat_id',
         ];
         $mapping = $this->fillHeaderRow($worksheet, $columns);
 
@@ -273,6 +288,7 @@ class ilCoSubExport
             $data['item_id'] = $item->item_id;
             $data['sub_min'] = $item->sub_min;
             $data['sub_max'] = $item->sub_max;
+            $data['cat_id'] = $item->cat_id;
             $this->fillRowData($worksheet, $data, $mapping, $row++);
         }
         $worksheet->setTitle('items');
@@ -357,6 +373,58 @@ class ilCoSubExport
         $data['num_assignments'] = $method->getNumberAssignments();
         $this->fillRowData($worksheet, $data, $mapping, $row);
         $worksheet->setTitle('solution');
+    }
+
+    /**
+     * Fill a sheet with raw item data
+     * @param $worksheet
+     */
+    protected function fillRawCategories($worksheet)
+    {
+        $columns = [
+            'obj_id' => 'obj_id',
+            'cat_id' => 'cat_id',
+            'max_assignments' => 'max_assignments',
+        ];
+        $mapping = $this->fillHeaderRow($worksheet, $columns);
+
+        $row = 2;
+        foreach ($this->object->getCategories() as $category) {
+            $data = [];
+            $data['obj_id'] = $category->obj_id;
+            $data['cat_id'] = $category->cat_id;
+            $data['max_assignments'] = $category->max_assignments;
+
+            $this->fillRowData($worksheet, $data, $mapping, $row++);
+        }
+        $worksheet->setTitle('categories');
+    }
+
+
+    /**
+     * Fill a sheet with raw item data
+     * @param $worksheet
+     */
+    protected function fillRawConflicts($worksheet)
+    {
+        $columns = [
+            'obj_id' => 'obj_id',
+            'item1_id' => 'item1_id',
+            'item2_id' => "item2_id"
+        ];
+        $mapping = $this->fillHeaderRow($worksheet, $columns);
+
+        $row = 2;
+        foreach ($this->object->getItemsConflicts() as $item1_id => $items2) {
+            foreach ($items2 as $item2_id) {
+                $data = [];
+                $data['obj_id'] = $this->object->getId();
+                $data['item1_id'] = $item1_id;
+                $data['item2_id'] = $item2_id;
+                $this->fillRowData($worksheet, $data, $mapping, $row++);
+            }
+        }
+        $worksheet->setTitle('conflicts');
     }
 
 
