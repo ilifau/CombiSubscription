@@ -198,6 +198,12 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 		$nt->setSize(10);
 		$this->form->addItem($nt);
 
+		$cl = new ilCheckboxInputGUI($this->plugin->txt('clone_with_choices'), 'clone_with_choices');
+		$cl->setInfo($this->plugin->txt('clone_with_choices_info'));
+		$cl->setRequired(false);
+		$cl->setValue(1);
+		$this->form->addItem($cl);
+
 		$this->form->addCommandButton('updateProperties', $this->lng->txt('save'));
 	}
 
@@ -215,6 +221,10 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 
 		$this->form->getItemByPostVar('number_of_tries')->setValue(
 			ilCombiSubscriptionPlugin::_getSetting('number_of_tries', 5));
+
+		$this->form->getItemByPostVar('clone_with_choices')->setChecked(
+			ilCombiSubscriptionPlugin::_getSetting('clone_with_choices', 0));
+
 	}
 
 	/**
@@ -225,6 +235,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('out_of_conflict_time'));
 		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('tolerated_conflict_percentage'));
 		ilCombiSubscriptionPlugin::_setSetting('number_of_tries', $this->form->getInput('number_of_tries'));
+		ilCombiSubscriptionPlugin::_setSetting('clone_with_choices', $this->form->getInput('clone_with_choices'));
 	}
 
 }

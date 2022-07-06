@@ -421,3 +421,5 @@ import_error_item_id_missing#:#Der Spaltentitel item_id fehlt!
 import_error_wrong_obj_id#:#Die obj_id %s ist falsch!
 import_error_wrong_user_id#:#Die user_id %s ist in der Anmeldung nicht vorhanden!
 import_error_wrong_item_id#:#Die item_id %s ist in der Anmeldung nicht vorhanden!
+clone_with_choices#:#Mit Nutzern kopieren
+clone_with_choices_info#:#Bei der Kopie einer kombinierten Anmeldungen sollen die Nutzer und ihre Auswahlen mit kopiert werden

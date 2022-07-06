@@ -395,3 +395,5 @@ import_error_item_id_missing#:#The column title item_id is missing!
 import_error_wrong_obj_id#:#The obj_id %s is wrong!
 import_error_wrong_user_id#:#the user_id %s is not found in this object!
 import_error_wrong_item_id#:#The item_id %s is not found in this object!
+clone_with_choices#:#Copy with Users
+clone_with_choices_info#:#The copy of a combined subscription should also get the users and their choices

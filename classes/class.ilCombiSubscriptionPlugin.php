@@ -246,5 +246,14 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	{
 		return (int) self::_getSetting('number_of_tries', 5);
 	}
+
+	/**
+	 * Get the number of calculation tries for the auto assignment
+	 * @return bool
+	 */
+	public function getCloneWithChoices()
+	{
+		return (bool) self::_getSetting('clone_with_choices', 0);
+	}
 }
 ?>

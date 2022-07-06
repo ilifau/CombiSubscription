@@ -232,20 +232,20 @@ class ilObjCombiSubscription extends ilObjectPlugin
             $DIC->fau()->cond()->soft()->cloneConditions($this->getId(), $new_obj->getId());
 		}
 
-        // comment this return to clone users and their choices
-        return;
+        if ($this->plugin->getCloneWithChoices()) {
 
-        // clone the users
-        foreach ($this->getUsers() as $user)
-        {
-            $user->saveClone($new_obj->getId());
+            // clone the users
+            foreach ($this->getUsers() as $user)
+            {
+                $user->saveClone($new_obj->getId());
+            }
+            // clone the choices
+            foreach ($this->getChoices() as $choice)
+            {
+                $choice->saveClone($new_obj->getId(), $item_map);
+            }
         }
 
-        // clone the choices
-        foreach ($this->getChoices() as $choice)
-        {
-            $choice->saveClone($new_obj->getId(), $item_map);
-        }
 	}
 
 	/**
