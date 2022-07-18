@@ -74,6 +74,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->addMultiCommand('removeUsersConfirmation', $this->plugin->txt('remove_users'));
 		$this->addCommandButton('saveAssignments', $this->plugin->txt('save_assignments'));
 		$this->addCommandButton('saveAssignmentsAsRun', $this->plugin->txt('save_assignments_as_run'));
+        $this->addCommandButton('fixAssignmentsConfirmation', $this->plugin->txt('fix_assignments'));
 	}
 
 	/**

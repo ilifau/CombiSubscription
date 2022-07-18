@@ -502,7 +502,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				if (empty($limit) || $limit > $this->assign_counts_item[$item_id])
 				{
 					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
-					$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	//then sort by existing assignments (highest first)
+                    $key2 = sprintf('%06d', $this->assign_counts_item[$item_id]);	            //then sort by existing assignments (lowest first)
+					//$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	        //then sort by existing assignments (highest first)
 					$key3 = sprintf('%06d', $index);												//then sort by random order
 					$indexed[$key1.$key2.$key3] = $item_id;
 				}

@@ -46,6 +46,8 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 			case 'notifyAssignments':
 			case 'notifyAssignmentsConfirmation':
 			case 'mailToUsers':
+            case 'fixAssignments':
+            case 'fixAssignmentsConfirmation':
 			case 'fixUsers':
 			case 'fixUsersConfirmation':
 			case 'unfixUsers':
@@ -463,7 +465,32 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
-	/**
+    /**
+     * Confirm fthe fixing of assigned users
+     */
+    public function fixAssignmentsConfirmation()
+    {
+        $conf_gui = new ilConfirmationGUI();
+        $conf_gui->setFormAction($this->ctrl->getFormAction($this,'fixAssignments'));
+        $conf_gui->setHeaderText($this->plugin->txt('fix_assignments_confirmation'));
+        $conf_gui->setConfirm($this->plugin->txt('fix_assignments'),'fixAssignments');
+        $conf_gui->setCancel($this->lng->txt('cancel'),'editAssignments');
+
+        $this->tpl->setContent($conf_gui->getHTML());
+        $this->showInfo();
+    }
+
+    /**
+     * Fix the successful assignments of users
+     */
+    public function fixAssignments()
+    {
+        $this->object->fixAssignedUsers();
+        $this->ctrl->redirect($this,'editAssignments');
+    }
+
+
+    /**
 	 * Manual start of auto processing (for testing)
 	 */
 	public function autoProcess()
