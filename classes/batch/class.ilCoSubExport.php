@@ -610,7 +610,7 @@ class ilCoSubExport
 			{
                 $studydata = $DIC->fau()->user()->getStudiesAsText((int) $user['usr_id']);
 				if ($this->type == self::TYPE_CSV) {
-                    $studydata = $DIC->fau()->tools()->quoteForExport($studydata);
+                    $studydata = $DIC->fau()->tools()->convert()->quoteForExport($studydata);
 				}
 				$data['studydata'] = $studydata;
 			}
