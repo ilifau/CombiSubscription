@@ -124,17 +124,6 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
-	 * Check if univis import exists
-	 * @return bool
-	 */
-	public function withUnivisImport()
-	{
-		return false;
-		return file_exists('Services/UnivIS/classes/class.ilUnivisImport.php');
-	}
-
-
-	/**
 	 * Handle a call by the cron job plugin
 	 * @return	int		Number of processed objects
 	 * @throws	Exception
