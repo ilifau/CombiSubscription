@@ -173,6 +173,21 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		{
 			foreach ($_POST['ref_id'] as $ref_id)
 			{
+                // add all parallel groups of a course
+                if ($this->plugin->hasFauService()) {
+                    if ($this->dic->fau()->ilias()->objects()->refHasParallelGroups($ref_id)) {
+                       $category = $targets->getCategoryForTarget($ref_id);
+                       $category->save();
+                    }
+                    foreach ($this->dic->fau()->ilias()->objects()->findChildParallelGroups($ref_id) as $group_ref_id) {
+                        $item = $targets->getItemForTarget($group_ref_id);
+                        $item->cat_id = $category->cat_id;
+                        $item->save();
+                        $items[$item->item_id] = $item;
+                    }
+                    continue;
+                }
+
 				$item = $targets->getItemForTarget($ref_id);
 				$item->save();
 				$items[$item->item_id] = $item;

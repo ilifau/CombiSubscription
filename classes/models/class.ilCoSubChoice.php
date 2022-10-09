@@ -20,6 +20,9 @@ class ilCoSubChoice
 	/** @var  integer */
 	public $priority;
 
+    /** @var integer|null */
+    public $module_id;
+
 
 	/**
 	 * Delete a choice by its id
@@ -149,6 +152,30 @@ class ilCoSubChoice
         return $choices;
     }
 
+    /**
+     * Get the selected module id for a user and items
+     * @param integer $a_obj_id
+     * @param integer $a_user_id
+     * @param int[] $a_item_ids
+     * @return integer|null
+     */
+    public static function _getModuleId($a_obj_id, $a_user_id, $a_item_ids) {
+        global $ilDB;
+
+        $query = 'SELECT module_id FROM rep_robj_xcos_choices'
+            .' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
+            .' AND user_id = '. $ilDB->quote($a_user_id,'integer')
+            .' AND ' . $ilDB->in('item_id', $a_item_ids,false, 'integer');
+        $result = $ilDB->query($query);
+
+        while ($row = $ilDB->fetchAssoc($result)) {
+            if (!empty($row['module_id'])) {
+                return $row['module_id'];
+            }
+        }
+        return null;
+    }
+
 
     /**
 	 * Fill the properties with data from an array
@@ -161,6 +188,7 @@ class ilCoSubChoice
 		$this->user_id = $data['user_id'];
 		$this->item_id = $data['item_id'];
 		$this->priority = $data['priority'];
+        $this->module_id = $data['module_id'];
 	}
 
 	/**
@@ -185,6 +213,7 @@ class ilCoSubChoice
                     'user_id' => array('integer', $this->user_id),
                     'item_id' => array('integer', $this->item_id),
                     'priority' => array('integer', $this->priority),
+                    'module_id' => array('integer', $this->module_id),
                 )
             );
         }

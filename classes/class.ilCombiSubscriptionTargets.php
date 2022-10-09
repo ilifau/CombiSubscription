@@ -246,6 +246,32 @@ class ilCombiSubscriptionTargets
 		return $config;
 	}
 
+    /**
+     * Get a category for a target reference
+     * @param $a_ref_id
+     * @param ilCoSubCategory $category	(an existing category that should be modified)
+     * @return ilCoSubCategory
+     */
+    public function getCategoryForTarget($a_ref_id, $category = null)
+    {
+        $this->plugin->includeClass('models/class.ilCoSubCategory.php');
+        if (!isset($category))
+        {
+            $category = new ilCoSubCategory();
+            $category->obj_id = $this->object->getId();
+            $category->max_assignments = 1;
+        }
+        switch (ilObject::_lookupType($a_ref_id, true)) {
+            case 'crs':
+                $course = new ilObjCourse($a_ref_id, true);
+                $category->title = $course->getTitle();
+                $category->description = $course->getDescription();
+                $category->import_id = $course->getImportId();
+                break;
+        }
+        return $category;
+    }
+
 	/**
 	 * Get an item for a target reference
 	 * @param $a_ref_id
@@ -269,6 +295,7 @@ class ilCombiSubscriptionTargets
 				$course = new ilObjCourse($a_ref_id, true);
 				$item->title = $course->getTitle();
 				$item->description = $course->getDescription();
+                $item->import_id = $course->getImportId();
 				if ($course->isSubscriptionMembershipLimited())
 				{
 					$item->sub_min = $course->getSubscriptionMinMembers();
@@ -280,6 +307,7 @@ class ilCombiSubscriptionTargets
 				$group = new ilObjGroup($a_ref_id, true);
 				$item->title = $group->getTitle();
 				$item->description = $group->getDescription();
+                $item->import_id = $group->getImportId();
 				if($group->isMembershipLimited())
 				{
 					$item->sub_min = $group->getMinMembers();

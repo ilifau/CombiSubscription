@@ -113,7 +113,7 @@ class ilCoSubExport
 		{
 			$this->extended = true;
 
-			if ($this->plugin->hasStudyData())
+			if ($this->plugin->hasFauService())
 			{
 				$this->with_studydata = true;
 			}

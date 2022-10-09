@@ -1,9 +1,15 @@
 <?php
+
+use ILIAS\DI\Container;
+
 /**
  * Base class for combined subscription GUI classes (except tables)
  */
 abstract class ilCoSubBaseGUI
 {
+    /** @var Container */
+    public $dic;
+
 	/** @var ilObjCombiSubscriptionGUI */
 	public $parent;
 
@@ -19,7 +25,7 @@ abstract class ilCoSubBaseGUI
 	/** @var  ilTabsGUI */
 	public $tabs;
 
-	/** @var ilTemplate */
+	/** @var ilGlobalTemplateInterface */
 	public $tpl;
 
 	/** @var ilLanguage */
@@ -37,16 +43,17 @@ abstract class ilCoSubBaseGUI
 	 */
 	public function __construct($a_parent_gui)
 	{
-		global $ilCtrl, $ilTabs, $ilToolbar, $tpl, $lng;
+        global $DIC;
 
+        $this->dic = $DIC;
 		$this->parent = $a_parent_gui;
 		$this->object = $this->parent->object;
 		$this->plugin = $this->parent->plugin;
-		$this->ctrl = $ilCtrl;
-		$this->tabs = $ilTabs;
-		$this->toolbar = $ilToolbar;
-		$this->tpl = $tpl;
-		$this->lng = $lng;
+		$this->ctrl = $this->dic->ctrl();
+		$this->tabs = $this->dic->tabs();
+		$this->toolbar = $this->dic->toolbar();
+		$this->tpl = $this->dic->ui()->mainTemplate();
+		$this->lng = $this->dic->language();
 	}
 
 	/**

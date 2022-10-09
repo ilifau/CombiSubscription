@@ -40,6 +40,9 @@ class ilCoSubItem
 	/** @var  bool */
 	public $selectable = true;
 
+    /** @var string|null  */
+    public $import_id;
+
 	/** @var  ilCoSubSchedule[] */
 	public $schedules = null;
 
@@ -204,6 +207,7 @@ class ilCoSubItem
 		$this->sub_min = $data['sub_min'];
 		$this->sub_max = $data['sub_max'];
 		$this->selectable = (bool) $data['selectable'];
+        $this->import_id = $data['import_id'];
 	}
 
 	/**
@@ -243,7 +247,8 @@ class ilCoSubItem
 				'sort_position' => array('integer', $this->sort_position),
 				'sub_min' => array('integer', $this->sub_min),
 				'sub_max' => array('integer', $this->sub_max),
-				'selectable' => array('integer', $this->selectable)
+				'selectable' => array('integer', $this->selectable),
+                'import_id' => array('string', $this->import_id)
 			)
 		);
 		return $rows > 0;

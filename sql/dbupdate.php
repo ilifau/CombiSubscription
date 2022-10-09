@@ -510,3 +510,24 @@ $ilDB->addTableColumn('rep_robj_xcos_data', 'last_process', array(
 	'default' => null
 ));
 ?>
+<#26>
+<?php
+$ilDB->addTableColumn('rep_robj_xcos_items', 'import_id', array(
+    'type' => 'text',
+    'length' => 250,
+    'notnull' => false,
+));
+$ilDB->addTableColumn('rep_robj_xcos_cats', 'import_id', array(
+    'type' => 'text',
+    'length' => 250,
+    'notnull' => false,
+));
+?>
+<#27>
+<?php
+$ilDB->addTableColumn('rep_robj_xcos_choices', 'module_id', array(
+    'type' => 'integer',
+    'length' => 4,
+    'notnull' => false,
+));
+?>

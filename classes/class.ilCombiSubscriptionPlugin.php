@@ -94,22 +94,14 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 	/**
-	 * Check if the platform has studydata available (StudOn only)
+	 * Check if the FAU service is available (StudOn only)
 	 */
-	public function hasStudyData()
+	public function hasFauService() 
 	{
-		return file_exists('Services/FAU/Study/Service.php');
+		global $DIC;
+		return $DIC->isDependencyAvailable('fau');
 	}
-
-
-	/**
-	 * Check if study conditions are available
-	 * @return bool
-	 */
-	public function withStudyCond()
-	{
-		return file_exists('Services/FAU/Cond/Service.php');
-	}
+	
 
 	/**
 	 * Check if cron job is active

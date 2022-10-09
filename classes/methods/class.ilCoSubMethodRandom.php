@@ -232,7 +232,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->items = $this->object->getItems();
 		$this->conflicts = $this->object->getItemsConflicts();
 		$this->category_limits = $this->object->getCategoryLimits();
-		if ($this->plugin->withStudyCond())
+		if ($this->plugin->hasFauService())
 		{
 			$this->users = $this->object->getUsersForStudyCond();
 		}

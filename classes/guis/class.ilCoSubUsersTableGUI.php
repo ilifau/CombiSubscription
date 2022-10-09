@@ -62,7 +62,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		if ($this->plugin->hasUserDataAccess()) {
             $this->addColumn($this->lng->txt('matriculation'), 'matriculation');
 
-            if ($this->plugin->hasStudyData()) {
+            if ($this->plugin->hasFauService()) {
                 $this->addColumn($this->lng->txt('studydata'), 'studydata');
             }
         }
@@ -107,7 +107,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
         if ($this->plugin->hasUserDataAccess()) {
             $additional[] = 'matriculation';
 
-            if ($this->plugin->hasStudyData()) {
+            if ($this->plugin->hasFauService()) {
                 $additional[] = 'studydata';
             }
         }
@@ -160,7 +160,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
         if ($this->plugin->hasUserDataAccess()) {
             $this->tpl->setVariable('MATRICULATION', $a_set['matriculation'] . '&nbsp;');
 
-            if ($this->plugin->hasStudyData()) {
+            if ($this->plugin->hasFauService()) {
                 $this->tpl->setVariable('STUDYDATA', $a_set['studydata'] . '&nbsp;');
             }
         }

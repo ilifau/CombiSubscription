@@ -384,11 +384,22 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		}
 
 
-		// studydata conditions are available
-		if ($this->plugin->withStudyCond())
+		// check for conditions or restrictions and give info
+		if ($this->plugin->hasFauService())
 		{
-            if ($DIC->fau()->cond()->repo()->checkObjectHasSoftCondition($this->object->getId()))
-			{
+            $passed = 0;
+            $items = $this->object->getItems();
+            foreach ($items as $item) {
+                $target_obj_id = ilObject::_lookupObjId($item->target_ref_id);
+                if ($DIC->fau()->cond()->hard()->checkObject($target_obj_id, $userObj->user_id)) {
+                    $passed++;
+                }
+            }
+            if ($passed < count($items)) {
+                ilUtil::sendInfo($this->plugin->txt('restrictions_msg_not_fulfilled'));
+            }
+
+            if ($DIC->fau()->cond()->repo()->checkObjectHasSoftCondition($this->object->getId())) {
 				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'),
                     $DIC->fau()->cond()->soft()->getConditionsAsText($this->object->getId())));
 
@@ -430,6 +441,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		include_once('Services/Accordion/classes/class.ilAccordionGUI.php');
 		$acc_gui = new ilAccordionGUI();
 		$acc_gui->setAllowMultiOpened(true);
+        $acc_gui->setBehaviour("FirstOpen");
 		$acc_gui->setActiveHeaderClass('ilCoSubRegAccHeaderActive');
 		$acc_gui->head_class_set = true;	// workaround
 
@@ -465,6 +477,51 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				elseif ($category->min_choices > 1) {
 					$infos[] = sprintf($this->plugin->txt('cat_choose_min_one_info'), $category->min_choices);
 				}
+
+                // check for passing of restrictions
+                if ($this->plugin->hasFauService()) {
+                    $import_id = \FAU\Study\Data\ImportId::fromString($category->import_id);
+                    if ($import_id->isForCampo()) {
+                        $hardRestrictions = $this->dic->fau()->cond()->hard();
+                        $hardRestrictionsGUI = fauHardRestrictionsGUI::getInstance();
+                        $matches_restrictions = $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
+                        $modules = $hardRestrictions->getCheckedForbiddenModules();
+
+                        if (!$matches_restrictions) {
+                            if (empty($modules)) {
+                                // if acceptance is needed, use all modules fitting for the study, even if their restrictions failed
+                                // acceptance into the course will be acceptance of the selected module
+                                $modules = $hardRestrictions->getCheckedFittingModules();
+                            }
+
+                            $message = $hardRestrictions->getCheckResultMessage();
+                            $infos[] = $hardRestrictionsGUI->getResultWithModalHtml(
+                                    $matches_restrictions,
+                                    $message,
+                                    $this->dic->user()->getFullname(),
+                                    null,
+                                   null,
+                                    $this->plugin->txt('restrictions_not_fulfilled')
+                                );
+                        }
+
+                        if (!empty($modules)) {
+                            $id = 'cat_' . $category->cat_id . '_module_id';
+                            $html = '<p><label for="'. $id . '">' . $this->lng->txt('fau_module') . ':</label> ';
+                            $html .= "<select id=\"$id\" name=\"$id\">";
+                            $html .= "<option value=\"0\">" . $this->lng->txt('please_select')."</option>\n";
+                            $selected_module_id = ilCoSubChoice::_getModuleId($this->object->getId(), $this->dic->user()->getId(), array_keys($items[$cat_id]));
+                            foreach ($modules as $module) {
+                                $value = $module->getModuleId();
+                                $text = ilUtil::prepareFormOutput( $module->getModuleName() . ' (' . $module->getModuleNr() . ')');
+                                $selected = ($module->getModuleId() == $selected_module_id ? 'selected' : '');
+                                $html .= "<option $selected value=\"$value\">$text</option>\n";
+                            }
+                            $html .="</select></p>";
+                            $infos[] = $html;
+                        }
+                    }
+                }
 
 				$content = '<div class="ilCoSubRegistrationPart">';
 				if (!empty($infos)) {
@@ -530,6 +587,14 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				$choice->user_id = $this->ilias_user->getId();
 				$choice->item_id = $item->item_id;
 				$choice->priority = $priority;
+                if ($this->plugin->hasFauService()) {
+                    if (isset($_POST['cat_' . $item->cat_id . '_module_id'])) {
+                        $choice->module_id = $_POST['cat_' . $item->cat_id . '_module_id'];
+                    }
+                    elseif (isset($_POST['item_' . $item->item_id . '_module_id'])) {
+                        $choice->module_id = $_POST['item_' . $item->item_id . '_module_id'];
+                    }
+                }
 				$choices[] = $choice;
 
 				$cat_counts[(int) $item->cat_id]++;

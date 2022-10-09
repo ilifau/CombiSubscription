@@ -181,7 +181,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			" obj_id = ".$DIC->database()->quote($this->getId(), 'integer')
 			);
 
-		if ($this->plugin->withStudyCond()) {
+		if ($this->plugin->hasFauService()) {
             $DIC->fau()->cond()->soft()->deleteConditionsOfObject($this->getId());
         }
 	}
@@ -227,7 +227,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
             $item_map[$item_id] = $clone->item_id;
 		}
 
-		if ($this->plugin->withStudyCond())
+		if ($this->plugin->hasFauService())
 		{
             $DIC->fau()->cond()->soft()->cloneConditions($this->getId(), $new_obj->getId());
 		}
@@ -1175,7 +1175,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
         global $DIC;
 
-		if (!$this->plugin->withStudyCond())
+		if (!$this->plugin->hasFauService())
 		{
 			return $this->getUsers();
 		}

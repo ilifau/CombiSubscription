@@ -357,7 +357,9 @@ message_too_many_schedule_times#:#The schedule "%s" creates %s appointments. ZCo
 study_conditions#:#Study Conditions
 studycond_headline#:#Edit Study Conditions
 studycond_info#:#Students must satisfy one of the following conditions to be included in the calculation of assignments. Otherwise they may only give their priorities and will be set on the witing lists. Within a condition all criteria must be satisfied to fulfil the condition.
-studycond_msg_not_fulfilled#:#You don't fulfil the required study conditions. You may give yourpriorities but won'T be included in the calculation of assignments. Afterwards you will be set on the waiting lists of the courses or groups.
+studycond_msg_not_fulfilled#:#You don't fulfil the required study conditions. You may give your priorities but won't be included in the calculation of assignments. Afterwards you will be set on the waiting lists of the courses or groups.
+restrictions_msg_not_fulfilled#:#You partially don't fulfil the registration restrictions. That is indicated at the regarding options. You may give your priorities but these options won't be included in the calculation of assignments. If you can't be assigned directly to other options, you will be set on the waiting lists of the courses or groups.
+restrictions_not_fulfilled#:# » Restrictions are not met!
 studycond_intro#:#This subsription has the following study conditions:<p class="small">%s</p>
 studycond_not_fulfilled#:#Study conditions not satisfied!
 mail_notify_removed_conflicts#:#The folowing conflicts were recognized in other subscriptions and the choices were removed. Please check them and choose alternatives.

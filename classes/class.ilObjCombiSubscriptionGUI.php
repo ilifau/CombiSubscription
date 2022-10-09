@@ -308,7 +308,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				$this->tabs_gui->addSubTab('categories', $this->txt('registration_categories'), $this->ctrl->getLinkTargetByClass('ilCoSubCategoriesGUI'));
 				$this->tabs_gui->addSubTab('items', $this->txt('registration_items'), $this->ctrl->getLinkTargetByClass('ilCoSubItemsGUI'));
 
-				if ($this->plugin->withStudyCond())
+				if ($this->plugin->hasFauService())
 				{
 					$this->tabs_gui->addSubTab('study_conditions', $this->plugin->txt('study_conditions'), $this->ctrl->getLinkTargetByClass('ilStudyCondGUI'));
 				}

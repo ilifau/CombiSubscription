@@ -26,8 +26,10 @@ class ilCoSubCategory
 	/** @var  integer|null */
 	public $max_assignments;
 
+    /** @var string|null  */
+    public $import_id;
 
-	/**
+    /**
 	 * Get category by id
 	 * @param integer  $a_id
 	 * @return ilCoSubCategory or null if not exists
@@ -125,6 +127,7 @@ class ilCoSubCategory
 		$this->sort_position = $data['sort_position'];
 		$this->min_choices = $data['min_choices'];
 		$this->max_assignments = $data['assignments'];
+        $this->import_id = $data['import_id'];
 	}
 
 	/**
@@ -161,7 +164,8 @@ class ilCoSubCategory
 				'sort_position' => array('integer', $this->sort_position),
 				'min_choices' => array('integer', $this->min_choices),
 				'assignments' => array('integer', $this->max_assignments),
-			)
+                'import_id' => array('string', $this->import_id)
+            )
 		);
 		return $rows > 0;
 	}
