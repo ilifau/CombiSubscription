@@ -852,6 +852,36 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		return $this->priorities;
 	}
 
+    /**
+     * Get all priorities for items where the restrictions are passed
+     *
+     * @return  array   user_id => item_id => priority
+     */
+    public function getPrioritiesWithPassedRestrictions()
+    {
+        if (!$this->plugin->hasFauService()) {
+            return $this->getPriorities();
+        }
+
+        global $DIC;
+        $hardRestrictions = $DIC->fau()->cond()->hard();
+        $items = $this->getItems();
+
+        $priorities = [];
+        foreach ($this->getPriorities() as $user_id => $item_priorities) {
+            foreach ($item_priorities as $item_id => $priority) {
+                if (isset($items[$item_id])) {
+                    $item = $items[$item_id];
+                    $import_id = \FAU\Study\Data\ImportId::fromString($item->import_id);
+                    if ($hardRestrictions->checkByImportId($import_id, $user_id)) {
+                        $priorities[$user_id][$item_id] = $priority;
+                    }
+                }
+            }
+        }
+        return $priorities;
+    }
+
 
 	/**
 	 * Get the priorities of a user in this object (lazy loading)

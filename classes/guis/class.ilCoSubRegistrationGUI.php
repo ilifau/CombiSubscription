@@ -486,7 +486,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
                         $hardRestrictionsGUI = fauHardRestrictionsGUI::getInstance();
                         $matches_restrictions = $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
                         // todo: change to allowed modules after testing!!
-                        $modules = $hardRestrictions->getCheckedAllowedModules();
+                        $modules = $hardRestrictions->getCheckedForbiddenModules();
 
                         if (!$matches_restrictions) {
                             if (empty($modules)) {

@@ -232,13 +232,15 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->items = $this->object->getItems();
 		$this->conflicts = $this->object->getItemsConflicts();
 		$this->category_limits = $this->object->getCategoryLimits();
-		if ($this->plugin->hasFauService())
+        if ($this->plugin->hasFauService())
 		{
 			$this->users = $this->object->getUsersForStudyCond();
+            $this->priorities = $this->object->getPrioritiesWithPassedRestrictions();
 		}
 		else
 		{
 			$this->users = $this->object->getUsers();
+            $this->priorities = $this->object->getPriorities();
 		}
 
 //		log_var($this->items, 'items');
@@ -252,8 +254,6 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	protected function initCalculationData()
 	{
-		$this->priorities = $this->object->getPriorities();
-
 		$this->assignments = array();
 		$this->assign_counts_item = array();
 		foreach ($this->items as $item)
