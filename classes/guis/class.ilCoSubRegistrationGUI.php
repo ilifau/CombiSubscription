@@ -455,18 +455,9 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$empty_cat->title = $this->plugin->txt('other_items');
 		$this->categories[0] = $empty_cat;
 
-		foreach ($this->categories as $cat_id => $category)
-		{
-			if (!empty($items[$cat_id]))
-			{
-				$table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
-				$table_gui->setDisabled($this->disabled);
-				$table_gui->prepareData(
-					$items[$cat_id],
-					$priorities,
-					$counts,
-					$this->conflicts);
-
+		foreach ($this->categories as $cat_id => $category) {
+			if (!empty($items[$cat_id])) {
+                $intro = '';
 				$infos = array();
 				if ($category->description) {
 					$infos[] = $category->description;
@@ -477,59 +468,35 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				elseif ($category->min_choices > 1) {
 					$infos[] = sprintf($this->plugin->txt('cat_choose_min_one_info'), $category->min_choices);
 				}
+                if (!empty($infos)) {
+                    $intro .= $this->pageInfo(implode('<br />', $infos));
+                }
 
                 // check for passing of restrictions
                 if ($this->plugin->hasFauService()) {
                     $import_id = \FAU\Study\Data\ImportId::fromString($category->import_id);
                     if ($import_id->isForCampo()) {
-                        $hardRestrictions = $this->dic->fau()->cond()->hard();
-                        $hardRestrictionsGUI = fauHardRestrictionsGUI::getInstance();
-                        $matches_restrictions = $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
-                        // todo: change to allowed modules after testing!!
-                        $modules = $hardRestrictions->getCheckedAllowedModules();
-
-                        if (!$matches_restrictions) {
-                            if (empty($modules)) {
-                                // if acceptance is needed, use all modules fitting for the study, even if their restrictions failed
-                                // acceptance into the course will be acceptance of the selected module
-                                $modules = $hardRestrictions->getCheckedFittingModules();
-                            }
-
-                            $message = $hardRestrictions->getCheckResultMessage();
-                            $infos[] = $hardRestrictionsGUI->getResultWithModalHtml(
-                                    $matches_restrictions,
-                                    $message,
-                                    $this->dic->user()->getFullname(),
-                                    null,
-                                   null,
-                                    '<strong>' . $this->plugin->txt('restrictions_not_fulfilled') . '</strong>'
-                                );
-                        }
-
-                        if (!empty($modules)) {
-                            $id = 'cat_' . $category->cat_id . '_module_id';
-                            $html = '<p><label for="'. $id . '">' . $this->lng->txt('fau_module') . ':</label> ';
-                            $html .= "<select id=\"$id\" name=\"$id\">";
-                            $html .= "<option value=\"0\">" . $this->lng->txt('please_select')."</option>\n";
-                            $selected_module_id = ilCoSubChoice::_getModuleId($this->object->getId(), $this->dic->user()->getId(), array_keys($items[$cat_id]));
-                            foreach ($modules as $module) {
-                                $value = $module->getModuleId();
-                                $text = ilUtil::prepareFormOutput( $module->getModuleName() . ' (' . $module->getModuleNr() . ')');
-                                $selected = ($module->getModuleId() == $selected_module_id ? 'selected' : '');
-                                $html .= "<option $selected value=\"$value\">$text</option>\n";
-                            }
-                            $html .="</select></p>";
-                            $infos[] = $html;
-                        }
+                        $intro .= $this->getRestrictionAndModuleHtml(
+                            $category->import_id,
+                            'cat_' . $category->cat_id . '_module_id',
+                            ilCoSubChoice::_getModuleId($this->object->getId(), $this->dic->user()->getId(),
+                                array_keys($items[$cat_id]))
+                        );
                     }
                 }
 
-				$content = '<div class="ilCoSubRegistrationPart">';
-				if (!empty($infos)) {
-					$content .= $this->pageInfo(implode('<br />', $infos));
-				}
-				$content .= $table_gui->getHTML();
-				$content .= '</div>';
+                // get the table with the items
+                $table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
+                $table_gui->setDisabled($this->disabled);
+                $table_gui->prepareData(
+                    $items[$cat_id],
+                    $priorities,
+                    $counts,
+                    $this->conflicts);
+
+                $content = '<div class="ilCoSubRegistrationPart">'
+				    . $intro . $table_gui->getHTML()
+				    . '</div>';
 
 				$acc_gui->addItem($category->title, $content);
 			}
@@ -538,6 +505,56 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		return $acc_gui->getHTML();
 	}
 
+    /**
+     * Get the HTML block to show restrictions and select a module
+     * @param string|null $import_id
+     * @param string      $module_post_var
+     * @param int|null    $selected_module_id
+     * @return string
+     */
+    public function getRestrictionAndModuleHtml(?string $import_id, string $module_post_var, ?int $selected_module_id)
+    {
+        $html = '';
+        $import_id = \FAU\Study\Data\ImportId::fromString($import_id);
+        if ($import_id->isForCampo()) {
+            $hardRestrictions = $this->dic->fau()->cond()->hard();
+            $hardRestrictionsGUI = fauHardRestrictionsGUI::getInstance();
+            $matches_restrictions = $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
+            $modules = $hardRestrictions->getCheckedAllowedModules();
+
+            if (!$matches_restrictions) {
+                if (empty($modules)) {
+                    // if acceptance is needed, use all modules fitting for the study, even if their restrictions failed
+                    // acceptance into the course will be acceptance of the selected module
+                    $modules = $hardRestrictions->getCheckedFittingModules();
+                }
+
+                $message = $hardRestrictions->getCheckResultMessage();
+                $html = $hardRestrictionsGUI->getResultWithModalHtml(
+                    $matches_restrictions,
+                    $message,
+                    $this->dic->user()->getFullname(),
+                    null,
+                    null,
+                    '<strong>' . $this->plugin->txt('restrictions_not_fulfilled') . '</strong>'
+                );
+            }
+
+            if (!empty($modules)) {
+                $html .= '<p><label for="' . $module_post_var . '">' . $this->lng->txt('fau_module') . ':</label> ';
+                $html .= "<select id=\"$module_post_var\" name=\"$module_post_var\">";
+                $html .= "<option value=\"0\">" . $this->lng->txt('please_select') . "</option>\n";
+                foreach ($modules as $module) {
+                    $value = $module->getModuleId();
+                    $text = ilUtil::prepareFormOutput($module->getModuleName() . ' (' . $module->getModuleNr() . ')');
+                    $selected = ($module->getModuleId() == $selected_module_id ? 'selected' : '');
+                    $html .= "<option $selected value=\"$value\">$text</option>\n";
+                }
+                $html .= "</select></p>";
+            }
+        }
+        return $html;
+    }
 
 	/**
 	 * Save the registration of the current user

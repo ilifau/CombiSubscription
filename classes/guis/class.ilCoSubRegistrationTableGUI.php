@@ -6,6 +6,9 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
  */
 class ilCoSubRegistrationTableGUI extends ilTable2GUI
 {
+    /** @var \ILIAS\DI\Container */
+    protected $dic;
+
 	/** @var  ilCtrl */
 	protected $ctrl;
 
@@ -21,6 +24,9 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	/** @var array local_item_id => other_item_id => item */
 	protected $conflicts = [];
 
+    /** @var ilCoSubCategory[] indexed by cat_id  */
+    protected $categories = [];
+
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilCoSubRegistrationGUI    $a_parent_gui
@@ -28,14 +34,15 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	 */
 	function __construct($a_parent_gui, $a_parent_cmd)
 	{
-		global $ilCtrl;
+		global $DIC;
 		parent::__construct($a_parent_gui, $a_parent_cmd);
 
+        $this->dic = $DIC;
+        $this->ctrl = $DIC->ctrl();
 		$this->parent = $a_parent_gui;
 		$this->plugin = $a_parent_gui->plugin;
 		$this->object = $a_parent_gui->object;
-
-		$this->ctrl = $ilCtrl;
+        $this->categories = $this->object->getCategories();
 
 		$this->setOpenFormTag(false);
 		$this->setCloseFormTag(false);
@@ -96,6 +103,8 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 				$row['counts'] = $a_counts[$item->item_id];
 			}
 			$row['period'] = $item->getPeriodInfo();
+            $row['cat_id'] = $item->cat_id;
+            $row['import_id'] = $item->import_id;
 			$data[] = $row;
 
 			$this->max_choices = max($this->max_choices, $item->sub_max);
@@ -163,6 +172,21 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
                 $this->tpl->setVariable('CONFLICTS', implode('', $infos));
             }
 		}
+
+        if ($this->plugin->hasFauService()) {
+            $category = $this->categories[$a_set['cat_id']] ?? null;
+            if (!empty($a_set['import_id']) && (empty($category) || empty($category->import_id))) {
+                $import_id = \FAU\Study\Data\ImportId::fromString($a_set['import_id']);
+                if ($import_id->isForCampo()) {
+                    $this->tpl->setVariable('RESTRICTIONS', $this->parent->getRestrictionAndModuleHtml(
+                        $a_set['import_id'],
+                        'item_' . $a_set['item_id']. '_module_id',
+                        ilCoSubChoice::_getModuleId($this->object->getId(), $this->dic->user()->getId(),
+                            [$a_set['item_id']])
+                    ));
+                }
+            }
+        }
 
 		foreach ($this->options as $value => $text)
 		{

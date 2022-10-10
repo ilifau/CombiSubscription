@@ -373,7 +373,7 @@ study_conditions#:#Studiengangs-Bedingungen
 studycond_headline#:#Studiengangs-Bedingungen bearbeiten
 studycond_info#:#Studenten müssen eine der folgenden Bedingungen erfüllen, um bei der Zuteilung berücksichtigt zu werden. Andernfalls können sie nur ihren Anmeldewunsch abgeben und werden nach der Zuteilung auf die Wartelisten gesetzt. Innerhalb einer Bedingung müssen alle Kriterien erfüllt sein, damit die Bedingung erfüllt ist.
 studycond_msg_not_fulfilled#:#Sie erfüllen leider nicht die notwendigen Studiengangbedingungen. Sie können sich zwar anmelden, werden aber bei der automatischen Zuteilung nicht berücksichtigt, sondern im Anschluss auf die Wartelisten der gewählten Kurse/Gruppen gesetzt.
-restrictions_msg_not_fulfilled#:#Sie erfüllen teilweise nicht die notwendigen Teilnahme-Voraussetzungen. Das wird Ihnen bei den entsprechenden Optionen angezeigt. Dort können Sie sich zwar anmelden, diese Optionen werden aber nicht bei der automatischen Zuteilung berücksichtigt. Sollte keine andere Zureilung möglich sein, werden Sie im Anschluss auf die Wartelisten der gewählten Kurse/Gruppen gesetzt.
+restrictions_msg_not_fulfilled#:#Sie erfüllen teilweise nicht die notwendigen Teilnahme-Voraussetzungen. Das wird Ihnen bei den entsprechenden Optionen angezeigt. Dort können Sie sich zwar anmelden, diese Optionen werden aber nicht bei der automatischen Zuteilung berücksichtigt. Sollte keine andere Zuteilung möglich sein, werden Sie im Anschluss auf die Wartelisten der gewählten Kurse/Gruppen gesetzt.
 restrictions_not_fulfilled#:# » Voraussetzungen sind nicht erfüllt!
 studycond_intro#:#Für diese Anmeldung gelten Studiengang-Bedingungen:<p class="small">%s</p>
 studycond_not_fulfilled#:#Studiengangs-Bedingung nicht erfüllt!
