@@ -485,7 +485,8 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
                         $hardRestrictions = $this->dic->fau()->cond()->hard();
                         $hardRestrictionsGUI = fauHardRestrictionsGUI::getInstance();
                         $matches_restrictions = $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
-                        $modules = $hardRestrictions->getCheckedForbiddenModules();
+                        // todo: change to allowed modules after testing!!
+                        $modules = $hardRestrictions->getCheckedAllowedModules();
 
                         if (!$matches_restrictions) {
                             if (empty($modules)) {
@@ -501,7 +502,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
                                     $this->dic->user()->getFullname(),
                                     null,
                                    null,
-                                    $this->plugin->txt('restrictions_not_fulfilled')
+                                    '<strong>' . $this->plugin->txt('restrictions_not_fulfilled') . '</strong>'
                                 );
                         }
 

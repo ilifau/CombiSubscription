@@ -178,14 +178,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
                     if ($this->dic->fau()->ilias()->objects()->refHasParallelGroups($ref_id)) {
                        $category = $targets->getCategoryForTarget($ref_id);
                        $category->save();
+                        foreach ($this->dic->fau()->ilias()->objects()->findChildParallelGroups($ref_id) as $group_ref_id) {
+                            $item = $targets->getItemForTarget($group_ref_id);
+                            $item->cat_id = $category->cat_id;
+                            $item->save();
+                            $items[$item->item_id] = $item;
+                        }
+                        continue;
                     }
-                    foreach ($this->dic->fau()->ilias()->objects()->findChildParallelGroups($ref_id) as $group_ref_id) {
-                        $item = $targets->getItemForTarget($group_ref_id);
-                        $item->cat_id = $category->cat_id;
-                        $item->save();
-                        $items[$item->item_id] = $item;
-                    }
-                    continue;
                 }
 
 				$item = $targets->getItemForTarget($ref_id);
