@@ -446,6 +446,10 @@ class ilCombiSubscriptionTargets
             if (!empty($item->target_ref_id)) {
                 // get the users to be assigned
                 $users = array_keys($this->object->getAssignmentsOfItem($item->item_id));
+                $module_ids = [];
+                foreach ($users as $user_id => $assign_id) {
+                    $module_ids[$user_id] = ilCoSubChoice::_getModuleId($this->object->getId(), $user_id, [$item->item_id]);
+                }
 
                 // prepare the actions for an object and its parents
                 foreach ($tree->getNodePath($item->target_ref_id) as $node) {
@@ -462,7 +466,9 @@ class ilCombiSubscriptionTargets
                             'ref_id' => $ref_id,
                             'obj_id' => $obj_id,
                             'type' => $type,
-                            'users' => $users
+                            'users' => $users,
+                            // set module ids only for the item object, not for its parents
+                            'module_ids' => $ref_id == $item->target_ref_id ? $module_ids : ''
                         );
                     }
                 }
@@ -524,6 +530,11 @@ class ilCombiSubscriptionTargets
                     $part_obj->add($user_id, $role);
                 } else {
                     $part_obj->add($user_id);
+                }
+                if ($this->plugin->hasFauService()) {
+                    if (isset($action['module_ids'][$user_id])) {
+                        $this->dic->fau()->user()->saveMembership($action['obj_id'], $user_id, $action['module_ids'][$user_id]);
+                    }
                 }
                 $added_members[] = $user_id;
                 $added_users[] = $user_id;
