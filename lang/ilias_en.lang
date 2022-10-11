@@ -400,4 +400,6 @@ import_error_wrong_item_id#:#The item_id %s is not found in this object!
 clone_with_choices#:#Copy with Users
 clone_with_choices_info#:#The copy of a combined subscription should also get the users and their choices
 fix_assignments#:#Fix Assignments
-fix_assignments_confirmation#:#Fix all successful assignnemts?
+fix_assignments_confirmation#:#Fix all successful assignments?
+message_cat_for_event#:#The category %s can only be used for parallel groups of the event %s!
+message_cat_not_mixed#:#The parallel group can only be combined in a category with other groups of the same event.

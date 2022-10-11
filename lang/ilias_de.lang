@@ -427,3 +427,5 @@ clone_with_choices#:#Mit Nutzern kopieren
 clone_with_choices_info#:#Bei der Kopie einer kombinierten Anmeldungen sollen die Nutzer und ihre Auswahlen mit kopiert werden
 fix_assignments#:#Zuteilungen fixieren
 fix_assignments_confirmation#:#Sollen alle erfolgreichen Zuteilungen fixiert werden?
+message_cat_for_event#:#Die Kategorie %s kann nur für Parallelgruppen der Lehrveranstaltung %s verwendet werden!
+message_cat_not_mixed#:#Die Parallelgruppe kann nur mit anderen Parallelgruppen derselben Veranstaltung in einer Kategorie liegen.

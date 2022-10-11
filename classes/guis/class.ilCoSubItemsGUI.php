@@ -32,6 +32,19 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/** @var ilPropertyFormGUI */
 	protected $form;
 
+    /** @var ilCoSubCategory */
+    protected $categories;
+
+    /**
+     * Constructor
+     * @param $a_parent_gui
+     */
+    public function __construct($a_parent_gui)
+    {
+        parent::__construct($a_parent_gui);
+        $this->categories = $this->object->getCategories();
+    }
+
 
 	/**
 	 * Execute a command
@@ -235,6 +248,52 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		return true;
 	}
 
+    /**
+     * Check if a target can be selected for a category
+     * StudOn specific
+     * @param null $target_ref_id
+     * @param null $cat_id
+     * @return bool|void
+     */
+    protected function checkTargetAndCategory($target_ref_id = null, $cat_id = null)
+    {
+        if (!$this->plugin->hasFauService()) {
+            return true;
+        }
+
+        $obj_id = ilObject::_lookupObjId($target_ref_id);
+        $type = (string) ilObject::_lookupType($obj_id);
+        $import_id = $this->dic->fau()->study()->repo()->getImportId($obj_id);
+
+        $category = $this->categories[$cat_id] ?? null;
+        if (isset($category)) {
+            $cat_import_id = \FAU\Study\Data\ImportId::fromString($this->categories[$cat_id]->import_id);
+        }
+        else {
+            $cat_import_id = \FAU\Study\Data\ImportId::fromString('');
+        }
+
+        if ($cat_import_id->isForCampo()) {
+            if ($type != 'grp'
+                || $import_id->getEventId() != $cat_import_id->getEventId()
+                || $import_id->getTermId() != $cat_import_id->getTermId()
+            ) {
+                if (!empty($event = $this->dic->fau()->study()->repo()->getEvent($cat_import_id->getEventId()))) {
+                    ilUtil::sendFailure(sprintf($this->plugin->txt('message_cat_for_event'), $category->title, $event->getTitle()));
+                    return false;
+                }
+            }
+        }
+        elseif ($type == 'grp' && $import_id->isForCampo() && !empty($cat_id)) {
+            $cat_items = $this->object->getItemsByCategory();
+            if (!empty($cat_items[$cat_id])) {
+                ilUtil::sendFailure($this->plugin->txt('message_cat_not_mixed'));
+                return false;
+            }
+        }
+        return true;
+    }
+
 	/**
 	 * Show form to create a new item
 	 */
@@ -250,7 +309,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	protected function saveItem()
 	{
 		$this->initItemForm();
-		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))))
+		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))) &&
+            $this->checkTargetAndCategory($this->form->getInput('target_ref_id'), $this->form->getInput('cat_id')))
 		{
 			$item = new ilCoSubItem();
 			$this->saveItemProperties($item);
@@ -287,7 +347,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$item = ilCoSubItem::_getById($_GET['item_id']);
 		$schedules = ilCoSubSchedule::_getForObject($this->object->getId(), $_GET['item_id']);
 		$this->initItemForm($item, $schedules);
-		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))))
+		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id')))
+            && $this->checkTargetAndCategory($this->form->getInput('target_ref_id'), $this->form->getInput('cat_id')))
 		{
 			$item = ilCoSubItem::_getById($_GET['item_id']);
 			$this->saveItemProperties($item);
@@ -746,6 +807,27 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$a_item->sub_max = empty($sub_max) ? null : $sub_max;
 		}
 		$a_item->selectable = $this->form->getInput('selectable');
+
+        // handle campo relationships
+        if ($this->plugin->hasFauService()) {
+            $obj_id = ilObject::_lookupObjId($a_item->target_ref_id);
+            $type = ilObject::_lookupType($obj_id);
+            $import_id = $this->dic->fau()->study()->repo()->getImportId($obj_id);
+            if ($import_id->isForCampo()) {
+                $a_item->import_id = $import_id->toString();
+                if (!empty($category = $this->categories[$a_item->cat_id])) {
+                    if (empty($category->import_id) && $type == 'grp') {
+                        $cat_import_id = new \FAU\Study\Data\ImportId(
+                            $import_id->getTermId(),
+                            $import_id->getEventId(),
+                            null
+                        );
+                        $category->import_id = $cat_import_id->toString();
+                        $category->save();
+                    }
+                }
+            }
+        }
 		$a_item->save();
 
 
