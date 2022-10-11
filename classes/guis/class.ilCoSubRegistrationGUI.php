@@ -320,32 +320,25 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
         global $DIC;
 
 		$infos = array();
-		if ($this->object->getExplanation())
-		{
-			$infos[] = $this->pageInfo($this->object->getExplanation());
+		if ($this->object->getExplanation()) {
+			$infos[] = $this->messageDetails($this->object->getExplanation());
 		}
-		else
-		{
+		else {
 			$sentences = array();
 			$methodObj = $this->object->getMethodObject();
 
-			if ($methodObj->hasEmptyChoice())
-			{
+			if ($methodObj->hasEmptyChoice()) {
 				$min = $this->object->getMinChoices();
-				if ($min == 1)
-				{
+				if ($min == 1) {
 					$sentences[] = $this->plugin->txt('min_choice_explanation');
 				}
-				elseif ($min > 0)
-				{
+				elseif ($min > 0) {
 					$sentences[] = sprintf($this->plugin->txt('min_choices_explanation'),$min);
 				}
 			}
 
-			if ($methodObj instanceof ilCoSubMethodRandom)
-			{
-				switch($methodObj->priority_choices)
-				{
+			if ($methodObj instanceof ilCoSubMethodRandom) {
+				switch($methodObj->priority_choices) {
 					case ilCoSubMethodRandom::PRIO_CHOICES_UNIQUE:
 						$sentences[] = $methodObj->txt('prio_choices_unique_explanation');
 						break;
@@ -358,26 +351,22 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				}
 
 				$num = $methodObj->getNumberAssignments();
-				if ($num == 1)
-				{
+				if ($num == 1) {
 					$sentences[] = $this->plugin->txt('one_assignment_explanation');
 				}
-				elseif($num > 0)
-				{
+				elseif($num > 0) {
 					$sentences[] = sprintf($this->plugin->txt('num_assignments_explanation'), $num);
 				}
 			}
 
-			if (!empty($sentences))
-			{
-				$infos[] = $this->pageInfo(implode(' ', $sentences));
+			if (!empty($sentences)) {
+				$infos[] = $this->messageDetails(implode(' ', $sentences));
 			}
 
-			foreach ($this->object->getItems() as $item)
-			{
+			foreach ($this->object->getItems() as $item) {
 				if ($item->getSchedules())
 				{
-					$infos[] = $this->pageInfo($this->plugin->txt('conflict_explanation'));
+					$infos[] = $this->messageDetails($this->plugin->txt('conflict_explanation'));
 					break;
 				}
 			}
@@ -385,8 +374,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 
 		// check for conditions or restrictions and give info
-		if ($this->plugin->hasFauService())
-		{
+		if ($this->plugin->hasFauService()) {
             $passed = 0;
             $items = $this->object->getItems();
             foreach ($items as $item) {
@@ -396,15 +384,15 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
                 }
             }
             if ($passed < count($items)) {
-                ilUtil::sendInfo($this->plugin->txt('restrictions_msg_not_fulfilled'));
+                $infos[] = $this->messageDetails($this->plugin->txt('restrictions_msg_not_fulfilled'));
             }
 
             if ($DIC->fau()->cond()->repo()->checkObjectHasSoftCondition($this->object->getId())) {
-				$infos[] = $this->pageInfo(sprintf($this->plugin->txt('studycond_intro'),
+				$infos[] = $this->messageDetails(sprintf($this->plugin->txt('studycond_intro'),
                     $DIC->fau()->cond()->soft()->getConditionsAsText($this->object->getId())));
 
                 if (!$DIC->fau()->cond()->soft()->check($this->object->getId(), $userObj->user_id)) {
-                    ilUtil::sendInfo($this->plugin->txt('studycond_msg_not_fulfilled'));
+                    $infos[] = $this->messageDetails($this->plugin->txt('studycond_msg_not_fulfilled'));
 				}
 			}
 		}

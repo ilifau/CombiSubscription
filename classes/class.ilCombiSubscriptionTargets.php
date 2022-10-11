@@ -447,7 +447,7 @@ class ilCombiSubscriptionTargets
                 // get the users to be assigned
                 $users = array_keys($this->object->getAssignmentsOfItem($item->item_id));
                 $module_ids = [];
-                foreach ($users as $user_id => $assign_id) {
+                foreach ($users as $user_id) {
                     $module_ids[$user_id] = ilCoSubChoice::_getModuleId($this->object->getId(), $user_id, [$item->item_id]);
                 }
 
@@ -462,13 +462,13 @@ class ilCombiSubscriptionTargets
                     if (isset($actions[$ref_id])) {
                         $actions[$ref_id]['users'] = array_unique(array_merge($actions[$ref_id]['users'], $users));
                     } else {
-                        $actions[$node['child']] = array(
+                        $actions[$ref_id] = array(
                             'ref_id' => $ref_id,
                             'obj_id' => $obj_id,
                             'type' => $type,
                             'users' => $users,
                             // set module ids only for the item object, not for its parents
-                            'module_ids' => $ref_id == $item->target_ref_id ? $module_ids : ''
+                            'module_ids' => $ref_id == $item->target_ref_id ? $module_ids : []
                         );
                     }
                 }
@@ -556,6 +556,7 @@ class ilCombiSubscriptionTargets
      */
     public function addNonAssignedUsersAsSubscribers($a_item_ids = array())
     {
+        $num_assignments = $this->object->getMethodObject()->getNumberAssignments();
         $studycond_passed = $this->object->getUsersForStudyCond();
         $restrictions_passed = $this->object->getPrioritiesWithPassedRestrictions();
 
@@ -572,14 +573,20 @@ class ilCombiSubscriptionTargets
                 $users = array();
                 $passed = array();
                 $module_ids = array();
+                $assigned_users = $this->object->getAssignmentsOfItem($item->item_id);
+
                 foreach ($this->object->getPrioritiesOfItem($item->item_id) as $user_id => $priority) {
+                    if (isset($assigned_users[$user_id])) {
+                        continue;
+                    }
+
                     $module_ids[$user_id] = ilCoSubChoice::_getModuleId($this->object->getId(), $user_id, [$item->item_id]);
                     if (isset($studycond_passed[$user_id]) && isset($restrictions_passed[$user_id][$item->item_id])) {
                         $passed[$user_id] = true;
                     }
 
-                    // take those that failed to get any assignment
-                    if (!count($this->object->getAssignmentsOfUser($user_id))) {
+                    // take those that do not have enough assignments
+                    if (count($this->object->getAssignmentsOfUser($user_id)) < $num_assignments) {
                         $users[] = $user_id;
                     }
                 }
