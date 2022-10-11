@@ -495,6 +495,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
     /**
      * Get the HTML block to show restrictions and select a module
+     * StudOn specific
      * @param string|null $import_id
      * @param string      $module_post_var
      * @param int|null    $selected_module_id
@@ -529,7 +530,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
             }
 
             if (!empty($modules)) {
-                $html .= '<p><label for="' . $module_post_var . '">' . $this->lng->txt('fau_module') . ':</label> ';
+                $html .= '<p><label for="' . $module_post_var . '">' . $this->lng->txt('fau_module_select') . ':</label> ';
                 $html .= "<select id=\"$module_post_var\" name=\"$module_post_var\">";
                 $html .= "<option value=\"0\">" . $this->lng->txt('please_select') . "</option>\n";
                 foreach ($modules as $module) {
