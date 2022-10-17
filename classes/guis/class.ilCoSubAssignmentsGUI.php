@@ -230,7 +230,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 			}
 			else
 			{
-				ilUtil::sendFailure($this->plugin->txt('msg_calculation_start_failed')
+				ilUtil::sendFailure($this->plugin->txt('msg_calculation_failed')
 					.'<br />'.$this->object->getMethodObject()->getError(), true);
 			}
 		}

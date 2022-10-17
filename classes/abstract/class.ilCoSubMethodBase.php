@@ -340,7 +340,7 @@ abstract class ilCoSubMethodBase
 		}
         else
         {
-            $this->error = sprintf($this->plugin->txt('no_best_run_of'), $a_tries);
+            $this->error = sprintf($this->plugin->txt('no_best_run_found'), $a_tries);
         }
 
 		return null;
