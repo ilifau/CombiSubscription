@@ -535,7 +535,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
                 $html .= "<option value=\"0\">" . $this->lng->txt('please_select') . "</option>\n";
                 foreach ($modules as $module) {
                     $value = $module->getModuleId();
-                    $text = ilUtil::prepareFormOutput($module->getModuleName() . ' (' . $module->getModuleNr() . ')');
+                    $text = ilUtil::prepareFormOutput($module->getLabel());
                     $selected = ($module->getModuleId() == $selected_module_id ? 'selected' : '');
                     $html .= "<option $selected value=\"$value\">$text</option>\n";
                 }
