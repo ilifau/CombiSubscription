@@ -64,6 +64,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 
             if ($this->plugin->hasFauService()) {
                 $this->addColumn($this->lng->txt('studydata'), 'studydata');
+                $this->addColumn($this->lng->txt('fau_educations'), 'educations');
             }
         }
 		$this->addColumn($this->plugin->txt('selected_items'), 'registrations');
@@ -109,6 +110,8 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 
             if ($this->plugin->hasFauService()) {
                 $additional[] = 'studydata';
+                $additional[] = 'educations';
+                $user_query->setEducationsRefId($this->object->getRefId());
             }
         }
         $user_query->setAdditionalFields($additional);
@@ -129,6 +132,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
 				'matriculation' => $user['matriculation'],
                 'studydata' => $user['studydata'],
+                'educations' => $user['educations'],
 				'is_fixed' => $userObj->is_fixed,
 				// performance killer
 				//'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
@@ -162,6 +166,11 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 
             if ($this->plugin->hasFauService()) {
                 $this->tpl->setVariable('STUDYDATA', $a_set['studydata'] . '&nbsp;');
+                $this->tpl->setVariable('EDUCATIONS', fauTextViewGUI::getInstance()->showWithModal(
+                    nl2br($a_set['educations']),
+                    $this->lng->txt('fau_educations_of') . ' ' . $a_set['user'],
+                    50
+                ));
             }
         }
 //		if (!$a_set['has_access'])

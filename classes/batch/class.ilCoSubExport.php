@@ -91,7 +91,13 @@ class ilCoSubExport
 	protected $with_studydata = false;
 
 
-	/**
+    /**
+     * @var bool platform has educations
+     */
+    protected $with_educations = false;
+
+
+    /**
 	 * Constructor.
 	 * @param ilCombiSubscriptionPlugin		$plugin
 	 * @param ilObjCombiSubscription		$object
@@ -116,6 +122,7 @@ class ilCoSubExport
 			if ($this->plugin->hasFauService())
 			{
 				$this->with_studydata = true;
+                $this->with_educations = true;
 			}
 		}
 	}
@@ -552,6 +559,11 @@ class ilCoSubExport
 			{
 				$columns['studydata'] =  $this->lng->txt('studydata');
 			}
+
+            if ($this->with_educations)
+            {
+                $columns['educations'] =  $this->lng->txt('educations');
+            }
 		}
 
 		return $columns;
@@ -614,6 +626,15 @@ class ilCoSubExport
 				}
 				$data['studydata'] = $studydata;
 			}
+
+            if ($this->with_educations)
+            {
+                $educations = $DIC->fau()->user()->getEducationsAsText((int) $user['usr_id'], (int) $this->object->getRefId());
+                if ($this->type == self::TYPE_CSV) {
+                    $educations = $DIC->fau()->tools()->convert()->quoteForExport($educations);
+                }
+                $data['educations'] = $educations;
+            }
 		}
 
 		return $data;
