@@ -40,7 +40,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 		include_once 'Services/UIComponent/Button/classes/class.ilLinkButton.php';
 		$button = ilLinkButton::getInstance();
 		$button->setUrl($this->ctrl->getLinkTargetByClass('ilRepositorySearchGUI','start'));
-		$button->setCaption('search_users');
+		$button->setCaption($this->plugin->txt('search_users'), false);
 		$this->toolbar->addButtonInstance($button);
 	}
 
