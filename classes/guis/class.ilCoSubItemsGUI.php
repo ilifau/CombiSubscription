@@ -189,8 +189,10 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
                 // add all parallel groups of a course
                 if ($this->plugin->hasFauService()) {
                     if ($this->dic->fau()->ilias()->objects()->refHasParallelGroups($ref_id)) {
-                       $category = $targets->getCategoryForTarget($ref_id);
-                       $category->save();
+                        // category will get the import id of the course
+                        $category = $targets->getCategoryForTarget($ref_id);
+                        $category->save();
+
                         foreach ($this->dic->fau()->ilias()->objects()->findChildParallelGroups($ref_id) as $group_ref_id) {
                             $item = $targets->getItemForTarget($group_ref_id);
                             $item->cat_id = $category->cat_id;
@@ -282,13 +284,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
                     ilUtil::sendFailure(sprintf($this->plugin->txt('message_cat_for_event'), $category->title, $event->getTitle()));
                     return false;
                 }
-            }
-        }
-        elseif ($type == 'grp' && $import_id->isForCampo() && !empty($cat_id)) {
-            $cat_items = $this->object->getItemsByCategory();
-            if (!empty($cat_items[$cat_id])) {
-                ilUtil::sendFailure($this->plugin->txt('message_cat_not_mixed'));
-                return false;
             }
         }
         return true;
@@ -815,17 +810,6 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
             $import_id = $this->dic->fau()->study()->repo()->getImportId($obj_id);
             if ($import_id->isForCampo()) {
                 $a_item->import_id = $import_id->toString();
-                if (!empty($category = $this->categories[$a_item->cat_id])) {
-                    if (empty($category->import_id) && $type == 'grp') {
-                        $cat_import_id = new \FAU\Study\Data\ImportId(
-                            $import_id->getTermId(),
-                            $import_id->getEventId(),
-                            null
-                        );
-                        $category->import_id = $cat_import_id->toString();
-                        $category->save();
-                    }
-                }
             }
         }
 		$a_item->save();

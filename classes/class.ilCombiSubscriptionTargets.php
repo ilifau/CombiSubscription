@@ -240,19 +240,18 @@ class ilCombiSubscriptionTargets
     }
 
     /**
-     * Get a category for a target reference
+     * Get a new category for a target reference
      * @param $a_ref_id
-     * @param ilCoSubCategory $category (an existing category that should be modified)
      * @return ilCoSubCategory
      */
-    public function getCategoryForTarget($a_ref_id, $category = null)
+    public function getCategoryForTarget($a_ref_id)
     {
         $this->plugin->includeClass('models/class.ilCoSubCategory.php');
-        if (!isset($category)) {
-            $category = new ilCoSubCategory();
-            $category->obj_id = $this->object->getId();
-            $category->max_assignments = 1;
-        }
+
+        $category = new ilCoSubCategory();
+        $category->obj_id = $this->object->getId();
+        $category->max_assignments = 1;
+
         switch (ilObject::_lookupType($a_ref_id, true)) {
             case 'crs':
                 $course = new ilObjCourse($a_ref_id, true);
