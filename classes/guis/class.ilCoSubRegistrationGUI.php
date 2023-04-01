@@ -507,37 +507,22 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
         $import_id = \FAU\Study\Data\ImportId::fromString($import_id);
         if ($import_id->isForCampo()) {
             $hardRestrictions = $this->dic->fau()->cond()->hard();
-            $hardRestrictionsGUI = fauHardRestrictionsGUI::getInstance();
-            $matches_restrictions = $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
-            $modules = $hardRestrictions->getCheckedAllowedModules();
+            $hardRestrictions->checkByImportId($import_id, $this->dic->user()->getId());
 
-            if (!$matches_restrictions) {
-                if (empty($modules)) {
-                    // if acceptance is needed, use all modules fitting for the study, even if their restrictions failed
-                    // acceptance into the course will be acceptance of the selected module
-                    $modules = $hardRestrictions->getCheckedFittingModules();
-                }
+            $html = $this->lng->txt('fau_rest_hard_restrictions') . ': '
+                . fauHardRestrictionsGUI::getInstance()->getResultModalLink($hardRestrictions, $selected_module_id);
 
-                $message = $hardRestrictions->getCheckResultMessage();
-                $html = $hardRestrictionsGUI->getResultWithModalHtml(
-                    $matches_restrictions,
-                    $message,
-                    $this->dic->user()->getFullname(),
-                    null,
-                    null,
-                    '<strong>' . $this->plugin->txt('restrictions_not_fulfilled') . '</strong>'
-                );
-            }
-
-            if (!empty($modules)) {
+            $options = $hardRestrictions->getCheckedModuleSelectOptions();
+            $disabled_ids = $hardRestrictions->getCheckedModuleSelectDisabledIds();
+            if (!empty($options)) {
                 $html .= '<p><label for="' . $module_post_var . '">' . $this->lng->txt('fau_module_select') . ':</label> ';
                 $html .= "<select id=\"$module_post_var\" name=\"$module_post_var\">";
                 $html .= "<option value=\"0\">" . $this->lng->txt('please_select') . "</option>\n";
-                foreach ($modules as $module) {
-                    $value = $module->getModuleId();
-                    $text = ilUtil::prepareFormOutput($module->getLabel());
-                    $selected = ($module->getModuleId() == $selected_module_id ? 'selected' : '');
-                    $html .= "<option $selected value=\"$value\">$text</option>\n";
+                foreach ($options as $module_id => $module_label) {
+                    $text = ilUtil::prepareFormOutput($module_label);
+                    $selected = ($module_id == $selected_module_id ? 'selected' : '');
+                    $disabled = (in_array($module_id, $disabled_ids) ? 'disabled="disabled' : '');
+                    $html .= "<option $disabled $selected value=\"$module_id\">$text</option>\n";
                 }
                 $html .= "</select></p>";
             }
