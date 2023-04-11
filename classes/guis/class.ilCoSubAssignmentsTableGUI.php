@@ -6,6 +6,10 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
  */
 class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 {
+    /** @var \ILIAS\DI\Container */
+    protected $dic;
+
+
 	/** @var  ilCtrl */
 	protected $ctrl;
 
@@ -14,6 +18,12 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	 * @var integer[]
 	 */
 	protected $item_ids = array();
+
+    /**
+     * List of import ids for the targets assigned to the items
+     * @var \FAU\Study\Data\ImportId[] indexed by item_id
+     */
+    protected $import_ids = array();
 
 	/**
 	 * List of run_ids
@@ -47,7 +57,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	 */
 	function __construct($a_parent_gui, $a_parent_cmd)
 	{
-		global $ilCtrl;
+		global $DIC;
 
 		$this->setId('il_xcos_ass');
 		parent::__construct($a_parent_gui, $a_parent_cmd);
@@ -55,7 +65,8 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->parent = $a_parent_gui;
 		$this->plugin = $a_parent_gui->plugin;
 		$this->object = $a_parent_gui->object;
-		$this->ctrl = $ilCtrl;
+        $this->dic = $DIC;
+		$this->ctrl = $DIC->ctrl();
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
 		$this->setRowTemplate('tpl.il_xcos_assignments_row.html', $this->plugin->getDirectory());
 
@@ -90,7 +101,14 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		// create the item column headers
 		foreach ($this->object->getItems() as $index => $item)
 		{
-			$this->item_ids[$index] = $item->item_id;
+            if ($this->plugin->hasFauService() && !empty($item->target_ref_id)) {
+                $import_id = $this->dic->fau()->study()->repo()->getImportId(ilObject::_lookupObjId($item->target_ref_id));
+                if ($import_id->isForCampo()) {
+                    $this->import_ids[$item->item_id] = $import_id;
+                }
+            }
+
+            $this->item_ids[$index] = $item->item_id;
 			if (isset($item->sub_min) && isset($item->sub_max))
 			{
 				$limit = sprintf($this->plugin->txt('sub_limit_from_to'), $item->sub_min, $item->sub_max);
@@ -227,7 +245,23 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			{
 				$color = $this->object->getMethodObject()->getPriorityBackgroundColor($a_set['priority'.$item_id]);
 				$this->tpl->setVariable('PRIO_COLOR', 'background-color:'.$color.';');
-			}
+
+                // campo restrictions (only for selected priorities)
+                if ($this->object->getMethodObject()->isSelectedPriority($a_set['priority'.$item_id])
+                    && $this->plugin->hasFauService() && isset($this->import_ids[$item_id]))
+                {
+                    $hardRestrictions = $this->dic->fau()->cond()->hard();
+                    if (!$hardRestrictions->checkByImportId($this->import_ids[$item_id], $user_id)) {
+                        $this->tpl->setVariable('RESTRICTIONS',
+                            fauHardRestrictionsGUI::getInstance()->getResultModalLink(
+                                $hardRestrictions,
+                                null,
+                                '⚠'
+                            )
+                        );
+                    }
+                }
+            }
 
 			// button
 			$this->tpl->setVariable('USER_ID', $user_id);

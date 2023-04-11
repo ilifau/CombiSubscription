@@ -124,6 +124,15 @@ abstract class ilCoSubMethodBase
 	}
 
 
+    /**
+     * Check if a priority is in the range of selected priorities
+     * @return bool
+     */
+    public function isSelectedPriority($a_priority)
+    {
+        return $a_priority >= 0 && $a_priority < count($this->getPriorities());
+    }
+
 	/**
 	 * Get the background colors for a priority index (0 is the highest)
 	 * @return string    css color expression
