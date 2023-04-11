@@ -288,7 +288,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 					$assigned_runs[$label] = true;
 				}
 			}
-			$this->tpl->setVariable('RUNS', implode(' ', $runs));
+			$this->tpl->setVariable('RUNS', '<br>' . implode('&nbsp;', $runs));
 			$this->tpl->parseCurrentBlock();
 		}
 

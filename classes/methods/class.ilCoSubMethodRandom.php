@@ -9,6 +9,9 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	const PRIO_CHOICES_LIMITED = 'limited';
 	const PRIO_CHOICES_UNIQUE = 'unique';
 
+    //
+    // Object and method specific settings
+    //
 
 	/** @var int number of selectable priorities */
 	public $number_priorities = 2;
@@ -32,6 +35,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     public $assume_sub_min_as_limit = false;
 
 
+    //
+    // Calculation basics (unchanged in a calculation run)
+    //
+
 	/** @var  ilCoSubRun */
 	protected $run;
 
@@ -47,10 +54,18 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var array cat_id => (int) limit */
 	protected $category_limits = array();
 
-	/** @var  array     user_id => item_id => priority */
+    /** @var  array     user_id => item_id => priority */
+    protected $inital_priorities = array();
+
+
+    //
+    // Calculation data (changing in a calculation run)
+    //
+
+	/** @var  array    user_id => item_id => priority */
 	protected $priorities = array();
 
-	/** @var array	user_id => item_id => true */
+	/**  @var array	user_id => item_id => true */
 	protected $assignments = array();
 
 	/** @var array  	item_id => count */
@@ -59,7 +74,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var array 		user_id => count */
 	protected $assign_counts_user = array();
 
-	/**
+    /** @var int[] IDs of items that are blocked for further assignments */
+    protected $blocked_item_ids = array();
+
+
+    /**
 	 * Constructor
 	 * @param ilObjCombiSubscription        $a_object
 	 * @param ilCombiSubscriptionPlugin     $a_plugin
@@ -225,7 +244,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	}
 
 	/**
-	 * Initialize the basic data needed for the calculation
+	 * Initialize the basics needed for the calculation
+     * These will not change within a calculation run
 	 */
 	protected function initCalculationBasics()
 	{
@@ -235,41 +255,40 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
         if ($this->plugin->hasFauService())
 		{
 			$this->users = $this->object->getUsersForStudyCond();
-            $this->priorities = $this->object->getPrioritiesWithPassedRestrictions();
+            $this->inital_priorities = $this->object->getPrioritiesWithPassedRestrictions();
 		}
 		else
 		{
 			$this->users = $this->object->getUsers();
-            $this->priorities = $this->object->getPriorities();
+            $this->inital_priorities =  $this->object->getPriorities();
 		}
 
 //		log_var($this->items, 'items');
 //		log_var($this->conflicts, 'conflicts');
 //		log_var($this->category_limits, 'category_limits');
-//		log_var($this->priorities, 'priorities');
+//		log_var($this->initial_priorities, 'initial_priorities');
 	}
 
 	/**
-	 * Initialize the calculated data
+	 * Initialize the calculation variables for a new assignment loop
 	 */
 	protected function initCalculationData()
 	{
-		$this->assignments = array();
-		$this->assign_counts_item = array();
+        $this->priorities = $this->inital_priorities;
+		$this->assignments = [];
+		$this->assign_counts_item = [];
+        $this->assign_counts_user = [];
+
 		foreach ($this->items as $item)
 		{
 			$this->assign_counts_item[$item->item_id] = 0;
 		}
 
-		$this->assign_counts_user = array();
-		foreach (array_keys($this->priorities) as $user_id)
-		{
-			$this->assign_counts_user[$user_id] = 0;
-		}
-
 		// count the fixed assignments
 		foreach ($this->users as $user_id => $user_obj)
 		{
+            $this->assign_counts_user[$user_id] = 0;
+
 			if ($user_obj->is_fixed)
 			{
 				// get the actual assignments (run_id = 0)
@@ -347,23 +366,28 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 		$this->initCalculationBasics();
 
-		// calculate multiple times and remove low filled items
-		for ($try = 1; $try <= $this->plugin->getNumberOfTries(); $try++)
+		// calculcate in multiple rounds to get rid of low filled items
+        // with each round a low filled item is removed from the calculation
+        // stop if no further items can be asigned
+		for ($round = 1; $round <= count($this->items) - count($this->blocked_item_ids); $round++)
 		{
 			$this->initCalculationData();
 			$this->calculateByUsers();
 
-			if ($this->allow_low_filled_items)
+            // low filled items are sorted by the number of their assignments
+            $low_ids = $this->getLowFilledItemIds();
+            if ($this->allow_low_filled_items || empty($low_ids))
 			{
+                // no redistribution needed
 				break;
 			}
 
-			$low_ids = $this->getLowFilledItemIds();
-			if (empty($low_ids))
-			{
-				break;
-			}
-			$this->removeItemsById($low_ids);
+            // give assignments of the lowest filled item free for a redistribution
+            $low_ids = [$low_ids[0]];
+            $this->removeUnfixedAssignments($low_ids);
+
+            // block the lowest filled item for a reassignment
+            $this->blocked_item_ids = array_unique(array_merge($this->blocked_item_ids, $low_ids));
 		}
 
 		$this->saveAssignments();
@@ -453,10 +477,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	{
 		if (!is_array($this->priorities[$a_user_id]))
 		{
-			return array();
+			return [];
 		}
 
-		$indexed = array();
+		$indexed = [];
 
 		// get a random order of items as default
 		if ($this->assume_all_items_selected)
@@ -470,8 +494,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 		shuffle($item_ids);
 
-		foreach ($item_ids as $index => $item_id)
+		foreach ($item_ids as $random => $item_id)
 		{
+            if (in_array($item_id, $this->blocked_item_ids)) {
+                // don't choose a blocked item for assignment
+                continue;
+            }
 
 			if (isset($this->priorities[$a_user_id][$item_id]))
 			{
@@ -504,7 +532,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
                     $key2 = sprintf('%06d', $this->assign_counts_item[$item_id]);	            //then sort by existing assignments (lowest first)
 					//$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	        //then sort by existing assignments (highest first)
-					$key3 = sprintf('%06d', $index);												//then sort by random order
+					$key3 = sprintf('%06d', $random);											//then sort by random order
 					$indexed[$key1.$key2.$key3] = $item_id;
 				}
 			}
@@ -622,27 +650,34 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$ids = array();
 		foreach ($this->items as $item)
 		{
-			if (!empty($item->sub_min) && $this->assign_counts_item[$item->item_id] < $item->sub_min)
+			if (!empty($item->sub_min)
+                && !in_array($item->item_id, $this->blocked_item_ids)
+                && $this->assign_counts_item[$item->item_id] > 0
+                && $this->assign_counts_item[$item->item_id] < $item->sub_min)
 			{
-				$ids[] = $item->item_id;
+                $key = sprintf('#%08d %08d', $this->assign_counts_item[$item->item_id], $item->item_id);
+				$ids[$key] = $item->item_id;
 			}
 		}
-
-		return $ids;
+        ksort($ids);
+        return array_values($ids);
 	}
 
-	/**
-	 * Remove items from the calculation
-	 * @param int[]
-	 */
-	protected function removeItemsById($a_ids)
-	{
-		foreach ($this->items as $item_id => $item)
-		{
-			if (in_array($item_id, $a_ids))
-			{
-				unset($this->items[$item_id]);
-			}
-		}
-	}
+
+    /**
+     * Remove any non-fixed user assignments from an item
+     * @param int[] $a_item_ids
+     */
+    protected function removeUnfixedAssignments($a_item_ids)
+    {
+        foreach ($this->users as $user_id => $user) {
+            foreach ($a_item_ids as $item_id) {
+                if (isset($this->assignments[$user_id][$item_id]) && !$user->is_fixed) {
+                    $this->assign_counts_user[$user_id]--;
+                    $this->assign_counts_item[$item_id]--;
+                }
+                unset($this->assignments[$user_id][$item_id]);
+            }
+        }
+    }
 }
