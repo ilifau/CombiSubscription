@@ -23,9 +23,13 @@ class ilCoSubImport
 	const MODE_ASS_BY_COL = 'ass_by_col';
     const MODE_ASS_BY_IDS = 'ass_by_ids';
 
-	/**
-	 * @var ilCombiSubscriptionPlugin
-	 */
+    /** @var \ILIAS\DI\Container */
+    protected $dic;
+
+    /** @var ilLanguage  */
+    protected $lng;
+
+	/** @var ilCombiSubscriptionPlugin */
 	protected $plugin;
 
 	/**
@@ -41,9 +45,6 @@ class ilCoSubImport
 
     /** @var string import comment (used for run creation) */
     protected $comment;
-
-	/** @var ilLanguage $lng */
-	protected $lng;
 
 	/** @var string $message */
 	protected $message = '';
@@ -83,13 +84,15 @@ class ilCoSubImport
 	 */
 	public function __construct($plugin, $object, $mode = '', $comment = '')
 	{
-		global $lng;
+		global $DIC;
+
+        $this->dic = $DIC;
+        $this->lng = $DIC->language();
 
 		$this->object = $object;
 		$this->plugin  = $plugin;
 		$this->mode = $mode;
         $this->comment = $comment;
-		$this->lng = $lng;
 
 		$this->plugin->includeClass('models/class.ilCoSubRun.php');
 		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
@@ -707,7 +710,7 @@ class ilCoSubImport
 	 */
 	protected function excelTimeToUnix($time)
 	{
-        return Date::excelToTimestamp($time);
+        return Date::excelToTimestamp($time, $this->dic->user()->getTimeZone());
 
 // old implementation
 //		$date = (int) $time;
