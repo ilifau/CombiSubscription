@@ -151,7 +151,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
         foreach ($conflicts as $user_id => $user_conflicts) {
             $this->ctrl->setParameter($this,'user_id', $user_id);
 
-            $lines[] = '<h3>' . ilObjUser::_lookupFullname($user_id) . ' '
+            $lines[] = '<hr><h3>' . ilObjUser::_lookupFullname($user_id) . ' '
                 . '<a class="small" href="' . $this->ctrl->getLinkTarget($this,'editRegistration').'">' . $this->plugin->txt('edit_registration') . '</a></h3>';
 
             foreach ($user_conflicts as $internal_item_id => $other_items) {
