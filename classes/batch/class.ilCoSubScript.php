@@ -23,7 +23,10 @@ class ilCoSubScript
 	const MODE_FTP_EX_MEM = 'ftp_ex_mem';
 	const MODE_FTP_EX_STATUS = 'ftp_ex_status';
 
-	/**
+    /** @var \ILIAS\DI\Container */
+    protected $dic;
+
+    /**
 	 * @var ilCombiSubscriptionPlugin
 	 */
 	protected $plugin;
@@ -95,12 +98,15 @@ class ilCoSubScript
 	 */
 	public function __construct($plugin, $object, $mode = '')
 	{
-		global $lng;
+        global $DIC;
+
+        $this->dic = $DIC;
+        $this->lng = $DIC->language();
 
 		$this->object = $object;
 		$this->plugin  = $plugin;
 		$this->mode = $mode;
-		$this->lng = $lng;
+
 
 		if (!empty($this->owner_login))
 		{
@@ -992,7 +998,7 @@ class ilCoSubScript
      */
     protected function excelTimeToUnix($time)
     {
-        return Date::excelToTimestamp($time);
+        return Date::excelToTimestamp($time, $this->dic->user()->getTimeZone());
 
 // old implementation
 //		$date = (int) $time;
