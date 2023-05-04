@@ -45,10 +45,11 @@ class ilCombiSubscriptionConflicts
 	 * The parameter $a_only_assigned determines which items of the local subscription are checked
      *
      * @param   array   $a_user_ids list of user_ids to treat (or empty for all object users)
-     * @param   bool    $a_only_assigned check only the assigned items of current user ans subscription
+     * @param   bool    $a_only_assigned check only the assigned items of current user and subscription
+     * @param   bool    $a_only_assigned check only colficts with external assignments
      * @return array 	conflicts  user_id => local_item_id => other_item_id => item
      */
-    public function getExternalConflicts($a_user_ids = array(), $a_only_assigned = false)
+    public function getConflicts($a_user_ids = array(), $a_only_assigned = false, $a_only_external = false)
     {
         $conflicts = [];
 
@@ -64,8 +65,8 @@ class ilCombiSubscriptionConflicts
 			// participation of user in other subscriptions
             foreach (ilCoSubUser::_getForUser($user_id) as $subUser)
             {
-                // same object can be ignored
-                if ($subUser->obj_id == $this->object->getId())
+                // same object can be ignored, of only external assignments should be checked
+                if ($subUser->obj_id == $this->object->getId() && $a_only_external)
                 {
                     continue;
                 }
@@ -76,15 +77,18 @@ class ilCombiSubscriptionConflicts
                 foreach ($this->getItems($subUser->obj_id) as $other_item_id => $otherItem)
                 {
 					// item without assignments or schedule can be ignored
-                    if ((!isset($assign_ids[$other_item_id])) || empty($otherItem->getSchedules()))
-                    {
+                    if ((!isset($assign_ids[$other_item_id])) || empty($otherItem->getSchedules())) {
                         continue;
                     }
 
                     foreach ($localItems as $local_item_id => $localItem)
                     {
-                        if ($this->haveConflict($localItem, $otherItem))
-                        {
+                        // no conflict with the same item
+                        if ($local_item_id == $other_item_id) {
+                            continue;
+                        }
+
+                        if ($this->haveConflict($localItem, $otherItem)) {
                             $conflicts[$user_id][$local_item_id][$other_item_id] = $otherItem;
                         }
                     }

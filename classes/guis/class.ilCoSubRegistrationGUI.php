@@ -144,7 +144,8 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
         $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
         $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
-        $conflicts = $conflictsObj->getExternalConflicts(array_keys($this->object->getUsers()), false);
+        $conflicts = $conflictsObj->getConflicts(array_keys($this->object->getUsers()), false, true);
+        $internalItems = $this->object->getItems();
 
         $lines = [];
         foreach ($conflicts as $user_id => $user_conflicts) {
@@ -153,10 +154,13 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
             $lines[] = '<h3>' . ilObjUser::_lookupFullname($user_id) . ' '
                 . '<a class="small" href="' . $this->ctrl->getLinkTarget($this,'editRegistration').'">' . $this->plugin->txt('edit_registration') . '</a></h3>';
 
-            foreach ($user_conflicts as $internal_item_id => $external_items) {
+            foreach ($user_conflicts as $internal_item_id => $other_items) {
                 /** @var  ilCoSubItem $item */
 
-                foreach ($external_items as $item) {
+                $internalItem = $internalItems[$internal_item_id];
+                $lines[] = '<h4>' . $internalItem->title . ' <span class="small">' . $internalItem->getPeriodInfo() . '</span></h4>';
+
+                foreach ($other_items as $item) {
                     $line = '<a href="' . $item->getObjectLink() . '">' .   $item->getObjectTitle() . '</a>: '. $item->title
                         . '<br /><span class="small">' . $item->getPeriodInfo() . '</span><br />';
                     $lines[] = $line;
@@ -201,7 +205,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
         $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
         $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
-        $conflicts = $conflictsObj->getExternalConflicts(array_keys($this->object->getUsers()), false);
+        $conflicts = $conflictsObj->getConflicts(array_keys($this->object->getUsers()), false, true);
 
         foreach ($conflicts as $user_id => $user_conflicts) {
             foreach ($user_conflicts as $internal_item_id => $external_items) {
@@ -224,7 +228,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		// get conflicts
 		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
 		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
-		$conflicts = $conflictsObj->getExternalConflicts([$userObj->user_id], false);
+		$conflicts = $conflictsObj->getConflicts([$userObj->user_id], false, true);
 		if (isset($conflicts[$userObj->user_id]))
 		{
 			$this->conflicts = $conflicts[$userObj->user_id];
