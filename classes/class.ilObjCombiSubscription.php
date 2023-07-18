@@ -1272,8 +1272,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		$priorities = $this->getPrioritiesOfUser($a_user_id);
 		$assignments = $this->getAssignmentsOfUser($a_user_id, $a_run_id);
+        
+        /** @var ilCoSubMethodBase $method */
+        $method = $this->getMethodObject();
 
-		if (count($assignments) > $this->getMethodObject()->getNumberAssignments())
+		if (count($assignments) > $method->getNumberAssignments())
 		{
 			return self::SATISFIED_OVER;
 		}
@@ -1285,9 +1288,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
         {
             return self::SATISFIED_CONFLICT;
         }
-        if (count($assignments) < $this->getMethodObject()->getNumberAssignments())
-        {
-            return self::SATISFIED_NOT;			// not enough assignments
+        if (count($assignments) < $method->getNumberAssignments() 
+            && !($method instanceof ilCoSubMethodRandom && $method->allow_low_filled_users)
+        ) {
+            return self::SATISFIED_NOT;		// not enough assignments and low filling not allowed
         }
 
 		foreach ($assignments as $item_id => $assign_id)
@@ -1301,8 +1305,13 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				return self::SATISFIED_MEDIUM; 	// assigned to item with lower priority
 			}
 		}
-
-		return self::SATISFIED_FULL;			// all assignments are highest priority
+        
+        if (count($assignments) == $method->getNumberAssignments()) {
+            return self::SATISFIED_FULL;	    // all assignments are highest priority
+        }
+        else {
+            return self::SATISFIED_MEDIUM;
+        }
 	}
 
 
