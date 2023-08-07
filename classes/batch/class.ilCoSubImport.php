@@ -512,7 +512,7 @@ class ilCoSubImport
 
 			if (!empty($rowdata['description']))
 			{
-				$item->identifier = $rowdata['description'];
+				$item->description = $rowdata['description'];
 			}
 
 			if (!empty($rowdata['identifier']))
