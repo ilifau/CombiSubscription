@@ -137,7 +137,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('DESCRIPTION', $a_set['description']);
 		$this->tpl->setVariable('PERIOD', $a_set['period']);
 
-		if (!empty($a_set['target_ref_id']) && $ilAccess->checkAccess('visible','', $a_set['target_ref_id']))
+		if (!empty($a_set['target_ref_id']))
 		{
 			require_once('Services/Locator/classes/class.ilLocatorGUI.php');
 			$locator = new ilLocatorGUI();
