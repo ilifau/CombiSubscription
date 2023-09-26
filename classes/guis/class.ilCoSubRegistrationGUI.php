@@ -560,7 +560,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 		// get and validate the posted choices
 		$posted = $this->getPostedPriorities();
-		if (count($posted) > 0 && count($posted) < $min_choices)
+		if (count($posted) < $min_choices)
 		{
 			ilUtil::sendFailure(sprintf($this->plugin->txt('min_choices_alert'), $min_choices));
 			return $this->editRegistration($posted);

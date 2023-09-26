@@ -117,6 +117,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$min_choices->setSize(3);
 		$min_choices->setDecimals(0);
 		$min_choices->setValue(0);
+        $min_choices->setMinValue(0);
 		$this->form->addItem($min_choices);
 
 		// method
