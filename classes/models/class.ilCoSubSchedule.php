@@ -63,26 +63,31 @@ class ilCoSubSchedule
 	 */
 	public static function _deleteById($a_id)
 	{
+        // don't delete an unsaved schedule from campo
+        if ($a_id < 0) {
+            return;
+        }
+        
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_scheds WHERE schedule_id = ' . $ilDB->quote($a_id,'integer'));
 	}
 
 	/**
-	 * Get schedules by parent object id
-	 * @param integer   $a_obj_id
-	 * @param integer   $a_item_id
+	 * Get schedules by parent object id and item id
+     * This gets the schedules thar are directny
+     * 
+	 * @param integer   $a_obj_id   object id of the combined subscription
+	 * @param integer   $a_item_id  item id if the assignment item
 	 * @return ilCoSubSchedule[]	indexed by schedule_id
 	 */
-	public static function _getForObject($a_obj_id, $a_item_id = null)
+	public static function _getForObjectAndItem($a_obj_id, $a_item_id)
 	{
 		global $ilDB;
 
 		$query = 'SELECT * FROM rep_robj_xcos_scheds'
-			.' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer');
-		if (isset($a_item_id))
-		{
-			$query .= ' AND item_id = '. $ilDB->quote($a_item_id,'integer');
-		}
+			.' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
+            .' AND item_id = '. $ilDB->quote($a_item_id,'integer');
+
 		$query 	.= ' ORDER BY period_start ASC';
 
 		$objects = array();
@@ -95,6 +100,40 @@ class ilCoSubSchedule
 		}
 		return $objects;
 	}
+
+    /**
+     * Get the schedules for a campo course
+     * They are derived from the course's individual dates and are not separately saved
+     * Their ids are the negative ids of their individual date to distinct them from the saved schedules of an item
+     *
+     * @param integer   $a_course_id    id of the campo course
+     * @param integer   $a_obj_id       object id of the combined subscription
+     * @param integer   $a_item_id      item id if the assignment item
+     * @return ilCoSubSchedule[]	indexed by schedule_id
+     */
+    public static function _getForCampoCourse($a_course_id, $a_obj_id, $a_item_id) 
+    {
+        global $DIC;
+        
+        $schedules = [];
+        foreach ($DIC->fau()->study()->repo()->getIndividualDatesOfCourse((int) $a_course_id) as $date) {
+            if ($date->getCancelled()) {
+                continue;
+            }
+            
+            $schedule = new ilCoSubSchedule();
+            $schedule->schedule_id = - $date->getIndividualDatesId(); // negative ID to distinct from the saved schedules
+            $schedule->obj_id = (int) $a_obj_id;
+            $schedule->item_id = (int) $a_item_id;
+            $schedule->period_start = $DIC->fau()->tools()->convert()->dbTimestampToUnix($date->getDate() . ' ' . $date->getStarttime());
+            $schedule->period_end = $DIC->fau()->tools()->convert()->dbTimestampToUnix($date->getDate() . ' ' . $date->getEndtime());
+            $schedule->slots = [];
+            $schedule->calculateTimes(); // just takes period start and end because slots are empty
+
+            $schedule[$schedule->schedule_id] = $schedule;
+        }
+        return $schedules;
+    }
 
 	/**
 	 * Delete all schedules for a parent object id
@@ -153,7 +192,12 @@ class ilCoSubSchedule
 		{
 			return false;
 		}
-		if (empty($this->schedule_id))
+        // don't save a virtual schedule from campo
+        if ($this->schedule_id < 0) {
+            return false;
+        }
+        
+        if (empty($this->schedule_id))
 		{
 			$this->schedule_id = $ilDB->nextId('rep_robj_xcos_scheds');
 		}

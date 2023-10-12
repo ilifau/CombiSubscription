@@ -181,8 +181,8 @@ class ilCoSubItem
 		}
 		$clone->save();
 
-		// clone the schedules
-		foreach (ilCoSubSchedule::_getForObject($this->obj_id, $this->item_id) as $schedule) {
+		// clone the saved schedules
+		foreach (ilCoSubSchedule::_getForObjectAndItem($this->obj_id, $this->item_id) as $schedule) {
 			$schedule->saveClone($a_obj_id, array($this->item_id => $clone->item_id));
 		}
 
@@ -254,18 +254,40 @@ class ilCoSubItem
 		return $rows > 0;
 	}
 
+    /**
+     * Get the Campo course id of an item (FAU specific)
+     * @return int|null
+     */
+    public function getCampoCourseId()
+    {
+        if (!empty($this->import_id) && ilCombiSubscriptionPlugin::getInstance()->hasFauService()) {
+            $import_id = \FAU\Study\Data\ImportId::fromString($this->import_id);
+            if (!empty($import_id->getCourseId())) {
+                return $import_id->getCourseId();
+            }
+        }
+        return null;
+    }
+    
+    
 	/**
 	 * Get the schedules of the item
 	 * @return ilCoSubSchedule[]
 	 */
 	public function getSchedules()
 	{
-		if (!isset($this->schedules))
-		{
-			$this->schedules = ilCoSubSchedule::_getForObject($this->obj_id, $this->item_id);
+        // first try to get schedules from the campo course (these should have precedence)
+		if (!isset($this->schedules) && !empty($course_id = $this->getCampoCourseId())) {
+            $this->schedules = ilCoSubSchedule::_getForCampoCourse($course_id, $this->obj_id, $this->item_id);
 		}
 
-		return $this->schedules;
+        // otherwise read the schedules that are individueally saved
+        if (!isset($this->schedules))
+        {
+            $this->schedules = ilCoSubSchedule::_getForObjectAndItem($this->obj_id, $this->item_id);
+        }
+        
+        return $this->schedules;
 	}
 
 
@@ -288,10 +310,17 @@ class ilCoSubItem
 	public function getPeriodInfo()
 	{
 	    if (!isset($this->periodInfoCache)) {
-            $info = array();
-            foreach($this->getSchedules() as $schedule)
-            {
-                $info[] = $schedule->getPeriodInfo();
+
+            if (ilCombiSubscriptionPlugin::getInstance()->hasFauService() && !empty($course_id = $this->getCampoCourseId())) {
+                global $DIC;
+                $info = $DIC->fau()->study()->dates()->getPlannedDatesList($course_id, true);
+            }
+            else {
+                $info = array();
+                foreach($this->getSchedules() as $schedule)
+                {
+                    $info[] = $schedule->getPeriodInfo();
+                }
             }
 
             $this->periodInfoCache =  implode(' | ', $info);

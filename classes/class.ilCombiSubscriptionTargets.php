@@ -599,15 +599,17 @@ class ilCombiSubscriptionTargets
                     'module_ids' => $module_ids
                 );
 
-                if ($parent_ref_id = $this->dic->fau()->ilias()->objects()->findParentIliasCourse($item->target_ref_id)) {
-                    $actions[] = array(
-                        'ref_id' => $parent_ref_id,
-                        'obj_id' => ilObject::_lookupObjId($parent_ref_id),
-                        'type' => ilObject::_lookupType($parent_ref_id, true),
-                        'users' => $users,
-                        'passed' => $passed,
-                        'module_ids' => $module_ids
-                    );
+                if ($this->plugin->hasFauService()) {
+                    if ($parent_ref_id = $this->dic->fau()->ilias()->objects()->findParentIliasCourse($item->target_ref_id)) {
+                        $actions[] = array(
+                            'ref_id' => $parent_ref_id,
+                            'obj_id' => ilObject::_lookupObjId($parent_ref_id),
+                            'type' => ilObject::_lookupType($parent_ref_id, true),
+                            'users' => $users,
+                            'passed' => $passed,
+                            'module_ids' => $module_ids
+                        );
+                    }
                 }
             }
         }
@@ -648,15 +650,19 @@ class ilCombiSubscriptionTargets
                     'module_ids' => $module_ids
                 );
 
-                if ($parent_ref_id = $this->dic->fau()->ilias()->objects()->findParentIliasCourse($item->target_ref_id)) {
-                    $actions[] = array(
-                        'ref_id' => $parent_ref_id,
-                        'obj_id' => ilObject::_lookupObjId($parent_ref_id),
-                        'type' => ilObject::_lookupType($parent_ref_id, true),
-                        'users' => $users,
-                        'passed' => $users,  // assigned users should have passed the conditions and restrictions
-                        'module_ids' => $module_ids
-                    );
+                if ($this->plugin->hasFauService()) {
+                    if ($parent_ref_id = $this->dic->fau()->ilias()->objects()->findParentIliasCourse(
+                        $item->target_ref_id
+                    )) {
+                        $actions[] = array(
+                            'ref_id' => $parent_ref_id,
+                            'obj_id' => ilObject::_lookupObjId($parent_ref_id),
+                            'type' => ilObject::_lookupType($parent_ref_id, true),
+                            'users' => $users,
+                            'passed' => $users,  // assigned users should have passed the conditions and restrictions
+                            'module_ids' => $module_ids
+                        );
+                    }
                 }
             }
         }

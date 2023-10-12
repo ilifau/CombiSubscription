@@ -328,7 +328,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		$this->ctrl->saveParameter($this, 'item_id');
 		$item = ilCoSubItem::_getById($_GET['item_id']);
-		$schedules = ilCoSubSchedule::_getForObject($this->object->getId(), $_GET['item_id']);
+        $schedules = isset($item) ? $item->getSchedules() : [];
 		$this->initItemForm($item, $schedules);
 		$this->tpl->setContent($this->form->getHTML());
 	}
@@ -340,7 +340,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		$this->ctrl->saveParameter($this, 'item_id');
 		$item = ilCoSubItem::_getById($_GET['item_id']);
-		$schedules = ilCoSubSchedule::_getForObject($this->object->getId(), $_GET['item_id']);
+        $schedules = isset($item) ? $item->getSchedules() : [];
 		$this->initItemForm($item, $schedules);
 		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id')))
             && $this->checkTargetAndCategory($this->form->getInput('target_ref_id'), $this->form->getInput('cat_id')))
@@ -623,107 +623,114 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 //		$sh->setTitle($this->plugin->txt('schedules'));
 //		$this->form->addItem($sh);
 
-		include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";
-		$i = 0;
-		foreach ($a_schedules as $schedule)
-		{
-			$i++;
-			$id = (int) $schedule->schedule_id;
+        if ($this->plugin->hasFauService() && !empty($a_item->getCampoCourseId())) {
+            $schedules = new ilNonEditableValueGUI($this->lng->txt('schedules'), '', true);
+            $schedules->setValue($a_item->getPeriodInfo());
+            $this->form->addItem($schedules);
+        }
+        else {
+            include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";
+            $i = 0;
+            foreach ($a_schedules as $schedule)
+            {
+                $i++;
+                $id = (int) $schedule->schedule_id;
 
-			$hidden_id = new ilHiddenInputGUI('schedule_id_'.$i);
-			$hidden_id->setValue($schedule->schedule_id);
-			$this->form->addItem($hidden_id);
+                $hidden_id = new ilHiddenInputGUI('schedule_id_'.$i);
+                $hidden_id->setValue($schedule->schedule_id);
+                $this->form->addItem($hidden_id);
 
-			$group = new ilRadioGroupInputGUI(
-				count($a_schedules) > 1 ? sprintf($this->plugin->txt('schedule_x'),$i) : $this->plugin->txt('schedule'),
-					'schedule_' .$i);
+                $group = new ilRadioGroupInputGUI(
+                    count($a_schedules) > 1 ? sprintf($this->plugin->txt('schedule_x'),$i) : $this->plugin->txt('schedule'),
+                    'schedule_' .$i);
 
-			$none = new ilRadioOption($this->plugin->txt('schedule_none'), 'none');
-			$group->addOption($none);
+                $none = new ilRadioOption($this->plugin->txt('schedule_none'), 'none');
+                $group->addOption($none);
 
-			$single = new ilRadioOption($this->plugin->txt('schedule_single'), 'single');
-				//single start
-				$start = new ilDateTimeInputGUI($this->plugin->txt('period_start'),'period_start_'.$i);
-				if (isset($schedule->period_start)) {
-					$start->setDate(new ilDateTime($schedule->period_start, IL_CAL_UNIX));
-				}
-				else {
-					$start->setDate(new ilDateTime(date('Y-m-d').' 08:00:00',IL_CAL_DATETIME));
-				}
-				$start->setRequired(true);
-				$start->setShowTime(true);
-				$single->addSubItem($start);
+                $single = new ilRadioOption($this->plugin->txt('schedule_single'), 'single');
+                //single start
+                $start = new ilDateTimeInputGUI($this->plugin->txt('period_start'),'period_start_'.$i);
+                if (isset($schedule->period_start)) {
+                    $start->setDate(new ilDateTime($schedule->period_start, IL_CAL_UNIX));
+                }
+                else {
+                    $start->setDate(new ilDateTime(date('Y-m-d').' 08:00:00',IL_CAL_DATETIME));
+                }
+                $start->setRequired(true);
+                $start->setShowTime(true);
+                $single->addSubItem($start);
 
-				// single end
-				$end = new ilDateTimeInputGUI($this->plugin->txt('period_end'),'period_end_'.$i);
-				if (isset($schedule->period_end)) {
-					$end->setDate(new ilDateTime($schedule->period_end, IL_CAL_UNIX));
-				}
-				else {
-					$end->setDate(new ilDateTime(date('Y-m-d').' 16:00:00',IL_CAL_DATETIME));
-				}
-				$end->setRequired(true);
-				$end->setShowTime(true);
-				$end->setInfo($this->plugin->txt('schedule_input_exact'));
-				$single->addSubItem($end);
+                // single end
+                $end = new ilDateTimeInputGUI($this->plugin->txt('period_end'),'period_end_'.$i);
+                if (isset($schedule->period_end)) {
+                    $end->setDate(new ilDateTime($schedule->period_end, IL_CAL_UNIX));
+                }
+                else {
+                    $end->setDate(new ilDateTime(date('Y-m-d').' 16:00:00',IL_CAL_DATETIME));
+                }
+                $end->setRequired(true);
+                $end->setShowTime(true);
+                $end->setInfo($this->plugin->txt('schedule_input_exact'));
+                $single->addSubItem($end);
 
-			$group->addOption($single);
+                $group->addOption($single);
 
-			$multi = new ilRadioOption($this->plugin->txt('schedule_multi'), 'multi');
+                $multi = new ilRadioOption($this->plugin->txt('schedule_multi'), 'multi');
 
-				// multi first
-				$first = new ilDateTimeInputGUI($this->plugin->txt('period_first'),'period_first_'.$i);
-				if (isset($schedule->period_start)) {
-					$first->setDate(ilCoSubSchedule::_dayDate($schedule->period_start));
-				}
-				else {
-					$first->setDate(new ilDate(date('Y-m-d'),IL_CAL_DATE));
-				}
-				$first->setRequired(true);
-				$first->setShowTime(false);
-				$multi->addSubItem($first);
+                // multi first
+                $first = new ilDateTimeInputGUI($this->plugin->txt('period_first'),'period_first_'.$i);
+                if (isset($schedule->period_start)) {
+                    $first->setDate(ilCoSubSchedule::_dayDate($schedule->period_start));
+                }
+                else {
+                    $first->setDate(new ilDate(date('Y-m-d'),IL_CAL_DATE));
+                }
+                $first->setRequired(true);
+                $first->setShowTime(false);
+                $multi->addSubItem($first);
 
-				// multi last
-				$last = new ilDateTimeInputGUI($this->plugin->txt('period_last'),'period_last_'.$i);
-				if (isset($schedule->period_start)) {
-					$last->setDate(ilCoSubSchedule::_dayDate($schedule->period_end));
-				}
-				else {
-					$last->setDate(new ilDate(date('Y-m-d'),IL_CAL_DATE));
-				}
-				$last->setRequired(true);
-				$last->setShowTime(false);
-				$multi->addSubItem($last);
+                // multi last
+                $last = new ilDateTimeInputGUI($this->plugin->txt('period_last'),'period_last_'.$i);
+                if (isset($schedule->period_start)) {
+                    $last->setDate(ilCoSubSchedule::_dayDate($schedule->period_end));
+                }
+                else {
+                    $last->setDate(new ilDate(date('Y-m-d'),IL_CAL_DATE));
+                }
+                $last->setRequired(true);
+                $last->setShowTime(false);
+                $multi->addSubItem($last);
 
 
-				$slots = new ilScheduleInputGUI($this->plugin->txt("period_slots"), "slots_".$i);
-				$slots->setRequired(true);
-				$slots->setValue($schedule->getSlotsForInput());
-				require_once('Services/Calendar/classes/class.ilTimeZone.php');
-				require_once('Services/Calendar/classes/class.ilCalendarUtil.php');
-				$tz = ilTimeZone::_getDefaultTimeZone();
-				$tzlist = ilCalendarUtil::_getShortTimeZoneList();
-				$slots->setInfo(sprintf($this->plugin->txt('slot_input_timezone'), $tzlist[$tz])
-				.' '.$this->plugin->txt('schedule_input_exact'));
+                $slots = new ilScheduleInputGUI($this->plugin->txt("period_slots"), "slots_".$i);
+                $slots->setRequired(true);
+                $slots->setValue($schedule->getSlotsForInput());
+                require_once('Services/Calendar/classes/class.ilTimeZone.php');
+                require_once('Services/Calendar/classes/class.ilCalendarUtil.php');
+                $tz = ilTimeZone::_getDefaultTimeZone();
+                $tzlist = ilCalendarUtil::_getShortTimeZoneList();
+                $slots->setInfo(sprintf($this->plugin->txt('slot_input_timezone'), $tzlist[$tz])
+                    .' '.$this->plugin->txt('schedule_input_exact'));
 
-				$multi->addSubItem($slots);
+                $multi->addSubItem($slots);
 
-			$group->addOption($multi);
+                $group->addOption($multi);
 
-			if (empty($schedule->period_start)) {
-				$group->setValue('none');
-			}
-			elseif (empty($schedule->slots)) {
-				$group->setValue('single');
-			}
-			else {
-				$group->setValue('multi');
-			}
-			$this->form->addItem($group);
-		}
-		$count = new ilHiddenInputGUI('schedules_count');
-		$count->setValue($i);
-		$this->form->addItem($count);
+                if (empty($schedule->period_start)) {
+                    $group->setValue('none');
+                }
+                elseif (empty($schedule->slots)) {
+                    $group->setValue('single');
+                }
+                else {
+                    $group->setValue('multi');
+                }
+                $this->form->addItem($group);
+            }
+            $count = new ilHiddenInputGUI('schedules_count');
+            $count->setValue($i);
+            $this->form->addItem($count);
+        }
 
 		if (empty($a_item->item_id))
 		{
@@ -834,6 +841,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	{
 		include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";
 
+        if (!empty($a_item->getCampoCourseId())) {
+            // schedules of campo courses don't need to be saved
+            return true;
+        }
+        
 		$count = (int) $_POST['schedules_count'];
 
 		// save the posted schedules

@@ -14,6 +14,20 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	/** @var  ilSetting[]  $settings  */
 	protected static $settings;
 
+	/** @var self */
+	protected static $instance;
+
+	/**
+	 * Get the plugin instance
+	 * @return self
+	 */
+	public static function getInstance() {
+		if (!isset(self::$instance)) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
 
 	function getPluginName()
 	{
