@@ -130,7 +130,7 @@ class ilCoSubSchedule
             $schedule->slots = [];
             $schedule->calculateTimes(); // just takes period start and end because slots are empty
 
-            $schedule[$schedule->schedule_id] = $schedule;
+            $schedules[$schedule->schedule_id] = $schedule;
         }
         return $schedules;
     }

@@ -623,10 +623,14 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 //		$sh->setTitle($this->plugin->txt('schedules'));
 //		$this->form->addItem($sh);
 
-        if ($this->plugin->hasFauService() && !empty($a_item->getCampoCourseId())) {
-            $schedules = new ilNonEditableValueGUI($this->lng->txt('schedules'), '', true);
-            $schedules->setValue($a_item->getPeriodInfo());
-            $this->form->addItem($schedules);
+        if ($this->plugin->hasFauService() && !empty($course_id = $a_item->getCampoCourseId())) {
+            $planned = new ilNonEditableValueGUI($this->lng->txt('fau_dates_planned'), '', true);
+            $planned->setValue($this->dic->fau()->tools()->format()->list($this->dic->fau()->study()->dates()->getPlannedDatesList($course_id, true)));
+            $this->form->addItem($planned);
+            $indiv = new ilNonEditableValueGUI($this->lng->txt('fau_dates_indiv'), '', true);
+            $indiv->setValue($this->dic->fau()->tools()->format()->list($this->dic->fau()->study()->dates()->getIndividualDatesList($course_id, true)));
+            $this->form->addItem($indiv);
+
         }
         else {
             include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";

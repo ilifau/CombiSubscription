@@ -178,6 +178,9 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
             if (!empty($a_set['import_id']) && (empty($category) || empty($category->import_id))) {
                 $import_id = \FAU\Study\Data\ImportId::fromString($a_set['import_id']);
                 if ($import_id->isForCampo()) {
+                    $this->tpl->setVariable('INFO', 
+                        $this->dic->fau()->study()->info()->getDetailsLink($import_id, (int) $a_set['target_ref_id'], $this->lng->txt('fau_details_link'))
+                    );
                     $this->tpl->setVariable('RESTRICTIONS', $this->parent->getRestrictionAndModuleHtml(
                         $a_set['import_id'],
                         'item_' . $a_set['item_id']. '_module_id',

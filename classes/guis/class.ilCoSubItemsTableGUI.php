@@ -10,6 +10,9 @@ require_once('Modules/Session/classes/class.ilObjSessionListGUI.php');
  */
 class ilCoSubItemsTableGUI extends ilTable2GUI
 {
+    /** @var ilContainer */
+    protected $dic;
+    
 	/** @var  ilCtrl */
 	protected $ctrl;
 
@@ -32,13 +35,14 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 	 */
 	function __construct($a_parent_gui, $a_parent_cmd)
 	{
-		global $ilCtrl;
+		global $DIC;
 		parent::__construct($a_parent_gui, $a_parent_cmd);
 
 		$this->parent = $a_parent_gui;
 		$this->plugin = $a_parent_gui->plugin;
 		$this->categories = $this->parent->object->getCategories();
-		$this->ctrl = $ilCtrl;
+        $this->dic = $DIC;
+		$this->ctrl = $DIC->ctrl();
 
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$this->targets = new ilCombiSubscriptionTargets($this->parent->object, $this->plugin);
@@ -185,7 +189,17 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 				$this->tpl->parseCurrentBlock();
 
 			}
-
+            
+            if ($this->plugin->hasFauService() && !empty($a_set['target_ref_id'] && !empty($a_set['import_id']))) {
+                $import_id = \FAU\Study\Data\ImportId::fromString($a_set['import_id']);
+                $this->tpl->setCurrentBlock('info');
+                $this->tpl->setVariable('INFO', 
+                    $this->dic->fau()->study()->info()->getDetailsLink($import_id, $ref_id, $this->lng->txt('fau_details_link'))
+                );
+                $this->tpl->parseCurrentBlock();
+                
+            }
+            
 			$locator = new ilLocatorGUI();
 			$locator->addContextItems($ref_id);
 			$this->tpl->setCurrentBlock('target');
