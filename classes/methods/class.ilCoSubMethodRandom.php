@@ -442,6 +442,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			{
 				foreach ($selected as $item_id => $item)
 				{
+                    // log_line("assign $user_id to $item_id");
 					$this->assignUser($user_id, $item_id);
 				}
 			}
@@ -572,6 +573,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			//log_line('number assignments not reachable (start)');
 			return array();
 		}
+        
+        $preferred_selection = array();
 
 		// try all items as next one
 		foreach ($a_available as $item_id => $item)
@@ -580,12 +583,14 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$available = $a_available;
 			$catlimits = $a_catlimits;
 
-			// add item to the selected ones
+            // log_line("available: ". implode(',', array_keys($available)));
+
+            // add item to the selected ones
 			$selected[$item_id] = $item;
 			unset($available[$item_id]);
-
+            
 			//log_line("selected: ". implode(',', array_keys($selected)));
-			//log_line("available: ". implode(',', array_keys($available)));
+            //log_line("available: ". implode(',', array_keys($available)). " (after selection)");
 
 			// remove conflicting items from the current available list
 			foreach ($this->conflicts[$item_id] as $conflict_item_id)
@@ -631,15 +636,26 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				//log_line('number assignments reached (after)');
 				return $selected;
 			}
+            elseif (count($selected) > count($preferred_selection)) 
+            {
+                $preferred_selection = $selected;
+            }
 
 			// remove this item from the available list of this function
 			// it will not be an option for the other items, too
 			unset ($a_available[$item_id]);
 		}
 
-		//log_line('no item fits (after)');
-		return array();
-	}
+        
+        if ($this->allow_low_filled_users) {
+            //log_line('low filled users possible(after)');
+            return $preferred_selection;
+        }	
+        else {
+            //log_line('not enough assignments reached (after)');
+            return array();
+        }
+    }
 
 	/**
 	 * Get the items with less than minimum assignments
