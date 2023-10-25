@@ -725,11 +725,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
             // first remove the non-fixed assignments from the given items
             foreach ($a_item_ids as $item_id) {
                 if (isset($this->assignments[$user_id][$item_id]) 
-                    && !isset($this->fixed_assignments[$user_id][$item_id])) {
+                    && !isset($this->fixed_assignments[$user_id][$item_id])
+                ) {
                     $this->assign_counts_user[$user_id]--;
                     $this->assign_counts_item[$item_id]--;
+                    unset($this->assignments[$user_id][$item_id]);
                 }
-                unset($this->assignments[$user_id][$item_id]);
             }
             
             // then check the number of remaining assignments of the user
@@ -739,11 +740,13 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
                 
                 $user_item_ids = array_keys($this->assignments[$user_id] ?? []);
                 foreach ($user_item_ids as $item_id) {
-                    if (!isset($this->fixed_assignments[$user_id][$item_id])) {
+                    if (isset($this->assignments[$user_id][$item_id])
+                        && !isset($this->fixed_assignments[$user_id][$item_id])
+                    ) {
                         $this->assign_counts_user[$user_id]--;
                         $this->assign_counts_item[$item_id]--;
+                        unset($this->assignments[$user_id][$item_id]);
                     }
-                    unset($this->assignments[$user_id][$item_id]);
                 }
             }
         }
