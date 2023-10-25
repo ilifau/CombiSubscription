@@ -185,6 +185,8 @@ ilcosubmethodrandom_assume_all_items_selected#:#Zuteilung erzwingen
 ilcosubmethodrandom_assume_all_items_selected_info#:#Erlaubt pro Nutzer die Zuteilung aller Einheiten. Nicht gewählte Einheiten werden unterhalb der geringsten Priorität behandelt. Das kann in einem zweiten Berechnungslauf verwendet werden, um leer ausgegangene Benutzer doch zuzuteilen. Vorher sollten die zugeteilten Nutzer des ersten Laufs fixiert worden sein.
 ilcosubmethodrandom_assume_sub_min_as_limit#:#Minimum als Maximum
 ilcosubmethodrandom_assume_sub_min_as_limit_info#:#Begrenzt die Zuteilungen pro Einheit auf den als "Minimale Zuteilungen" angegebenen Wert. Das kann in einem ersten Berechnungs-Schritt verwendet werden, um eine möglichst gleichmäßige Verteilung zu erwirken. Die zugeteilten Nutzer sollten anschließend fixiert und die Berechnung in einem zweiten Schritt ohne diesen Schalter mit der echten Maximalzahl pro Einheit erneut durchgeführt werden.
+ilcosubmethodrandom_fill_fixed_users#:#Fixierungen auffüllen
+ilcosubmethodrandom_fill_fixed_users_info#:#Fügt bei unvollständigen fixierten Zuteilungen noch fehlende Zuteilungen auf.
 show_bars#:#Balken zeigen
 show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben

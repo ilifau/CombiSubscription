@@ -33,8 +33,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 	/** @var bool tweak: calculate as if the maximum per item is limited by the minimum */
     public $assume_sub_min_as_limit = false;
-
-
+    
+    /** @var bool tweak: allow to fill up missing assignments of fixed users */
+    public $fill_fixed_users = false;
+    
+    
     //
     // Calculation basics (unchanged in a calculation run)
     //
@@ -57,7 +60,9 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     /** @var  array     user_id => item_id => priority */
     protected $inital_priorities = array();
 
-
+    /**  @var array	user_id => item_id => true */
+    protected $fixed_assignments = array();
+    
     //
     // Calculation data (changing in a calculation run)
     //
@@ -294,8 +299,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				// get the actual assignments (run_id = 0)
 				foreach ($this->object->getAssignmentsOfUser($user_id) as $item_id => $assign_id)
 				{
-					// assign also in the new run
-					$this->assignUser($user_id, $item_id);
+					// assign as fixed in the new run
+					$this->assignUser($user_id, $item_id, true);
 				}
 			}
 		}
@@ -305,11 +310,16 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * Assign a user to an item and remove it from the priority lists
 	 * @param integer	$a_user_id
 	 * @param integer	$a_item_id
+     * @param integer	$a_fixed    add this assignment to the list of fixed assignments
 	 */
-	protected function assignUser($a_user_id, $a_item_id)
+	protected function assignUser($a_user_id, $a_item_id, $a_fixed = false)
 	{
 		// note the assignments
 		$this->assignments[$a_user_id][$a_item_id] = true;
+        
+        if ($a_fixed) {
+            $this->fixed_assignments[$a_user_id][$a_item_id] = true;
+        }
 
 		// increase the assignment counters
 		$this->assign_counts_user[$a_user_id]++;
@@ -431,6 +441,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		foreach ($this->getShuffledUserIds() as $user_id)
 		{
 			$selected = array();
+            if (isset($this->fixed_assignments[$user_id])) {
+                foreach ($this->fixed_assignments[$user_id] as $item_id => $assigned) {
+                    $selected[$item_id] = $this->items[$item_id];
+                }
+            }
+            
 			$available = $this->getSortedItemsForUser($user_id);
 			$catlimits = $this->category_limits;
 
@@ -457,7 +473,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$user_ids = array();
 		foreach ($this->users as $user_id => $user)
 		{
-			if (!$user->is_fixed)
+			if (!$user->is_fixed || $this->fill_fixed_users)
 			{
 				$user_ids[] = $user_id;
 			}
@@ -688,7 +704,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     {
         foreach ($this->users as $user_id => $user) {
             foreach ($a_item_ids as $item_id) {
-                if (isset($this->assignments[$user_id][$item_id]) && !$user->is_fixed) {
+                if (isset($this->assignments[$user_id][$item_id]) 
+                    && !isset($this->fixed_assignments[$user_id][$item_id])) {
                     $this->assign_counts_user[$user_id]--;
                     $this->assign_counts_item[$item_id]--;
                 }

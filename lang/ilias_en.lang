@@ -172,6 +172,8 @@ ilcosubmethodrandom_out_of_conflict_time#:#Minimum Appointment Distance
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimum time between Appointments that should not produce a conflict. It must be longer thant %s minutes.
 ilcosubmethodrandom_assume_sub_min_as_limit#:#Minimum as Maximum
 ilcosubmethodrandom_assume_sub_min_as_limit_info#:#Limits the assignments per item to the value of "minimum assignments". This can be used in a first calculation run to reach a homogeneous filling uf items. The assigned users should be fixed afterwards and the calculation be called again without this setting to assign the remaining usrs.
+ilcosubmethodrandom_fill_fixed_users#:#Fill Fixed Assignments
+ilcosubmethodrandom_fill_fixed_users_info#:#Adds missing assignments to users with fixed assignments.
 show_bars#:#Show Bars
 show_bars_info#:#The registration screen shows bars with the mumber of existing registrations for each priority. The users will see how popular an item is.
 mail_to_users#:#Send E-Mail

@@ -188,7 +188,13 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$asm = new ilCheckboxInputGUI($this->method->txt('assume_sub_min_as_limit'),'assume_sub_min_as_limit');
 		$asm->setInfo($this->method->txt('assume_sub_min_as_limit_info'));
 		$work->addSubItem($asm);
-	}
+
+        // fill fixed users
+        $ffu = new ilCheckboxInputGUI($this->method->txt('fill_fixed_users'),'fill_fixed_users');
+        $ffu->setInfo($this->method->txt('fill_fixed_users_info'));
+        $work->addSubItem($ffu);
+
+    }
 
 	/**
 	 * Apply the specific settings fom a posted properties form
@@ -200,6 +206,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$this->method->allow_low_filled_users = (bool) $form->getInput('allow_low_filled_users');
 		$this->method->assume_all_items_selected = (bool) $form->getInput('assume_all_items_selected');
 		$this->method->assume_sub_min_as_limit = (bool) $form->getInput('assume_sub_min_as_limit');
+        $this->method->fill_fixed_users = (bool) $form->getInput('fill_fixed_users');
 	}
 
 

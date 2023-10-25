@@ -282,6 +282,9 @@ abstract class ilCoSubMethodBase
 			return null;
 		}
 
+        //$a_tries = 1;
+        //$a_cleanup = false;
+        
 		$this->plugin->includeClass('models/class.ilCoSubRun.php');
 		$runs = array();
 		for ($try = 1; $try <= $a_tries; $try++)
@@ -301,12 +304,17 @@ abstract class ilCoSubMethodBase
 		$best_run_id = null;
 		$max_full_satisfied = 0;
 		$max_satisfied = 0;
+        $max_assignments = 0;
 		foreach (array_keys($runs) as $run_id)
 		{
 			$satisfied = 0;
 			$full_satisfied = 0;
+            $assignments = 0;
+            
 			foreach (array_keys($this->object->getUsers()) as $user_id)
 			{
+                $assignments += count($this->object->getAssignmentsOfUser($user_id, $run_id));
+                
 				switch ($this->object->getUserSatisfaction($user_id, $run_id))
 				{
 					case ilObjCombiSubscription::SATISFIED_FULL:
@@ -324,11 +332,20 @@ abstract class ilCoSubMethodBase
 				$best_run_id = $run_id;
 				$max_satisfied = $satisfied;
 			}
-			elseif ($satisfied == $max_satisfied && $full_satisfied > $max_full_satisfied)
+			elseif ($satisfied == $max_satisfied 
+                && $full_satisfied > $max_full_satisfied)
 			{
 				$best_run_id = $run_id;
 				$max_full_satisfied = $full_satisfied;
 			}
+            elseif ($satisfied == $max_satisfied 
+                && $full_satisfied == $max_full_satisfied
+                && $assignments > $max_assignments
+            )
+            {
+                $best_run_id = $run_id;
+                $max_assignments = $assignments;
+            }
 		}
 
         // cleanup all runs which are not the best
