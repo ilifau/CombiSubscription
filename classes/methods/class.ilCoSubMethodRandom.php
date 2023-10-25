@@ -22,6 +22,9 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var int number of items to assign in the calculation */
 	public $number_assignments = 1;
 
+    /** @var bool tweak: prefer filling single items instead of equal distribution */
+    public $prefer_filled_items = false;
+    
 	/** @var bool tweak: allow less than sub_min assignments per item */
 	public $allow_low_filled_items = false;
 
@@ -547,8 +550,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				if (empty($limit) || $limit > $this->assign_counts_item[$item_id])
 				{
 					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
-                    $key2 = sprintf('%06d', $this->assign_counts_item[$item_id]);	            //then sort by existing assignments (lowest first)
-					//$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	        //then sort by existing assignments (highest first)
+                    $key2 = $this->prefer_filled_items 
+                        ? sprintf('%06d', 999999 - $this->assign_counts_item[$item_id])     // then sort by existing assignments (highest first)
+                        : sprintf('%06d', $this->assign_counts_item[$item_id]);                     // or sort by existing assignments (lowest first)
+                    
 					$key3 = sprintf('%06d', $random);											//then sort by random order
 					$indexed[$key1.$key2.$key3] = $item_id;
 				}

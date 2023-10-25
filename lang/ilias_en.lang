@@ -170,6 +170,14 @@ ilcosubmethodrandom_sub_min_info#:#Items with fewer assignments will be indicate
 ilcosubmethodrandom_sub_max_info#:#The calculation will not assign more than these subscriptions.
 ilcosubmethodrandom_out_of_conflict_time#:#Minimum Appointment Distance
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimum time between Appointments that should not produce a conflict. It must be longer thant %s minutes.
+ilcosubmethodrandom_prefer_filled_items#:#Prefer Filling Up
+ilcosubmethodrandom_prefer_filled_items_info#:#Favors filling individual items to their maximum rather than distributing allocations more evenly among items.
+ilcosubmethodrandom_allow_low_filled_items#:#Underused Items
+ilcosubmethodrandom_allow_low_filled_items_info#:#Allows less than the minimum number of assignments per item.
+ilcosubmethodrandom_allow_low_filled_users#:#Partial Assignments
+ilcosubmethodrandom_allow_low_filled_users_info#:#Allows less than the specified number of assignments per user.
+ilcosubmethodrandom_assume_all_items_selected#:#Force Assignments
+ilcosubmethodrandom_assume_all_items_selected_info#:#Allows per user an assignment of all items. Unselected items are treated below the lowest priority. This can be used in a second calculation run to assign users that went empty after all. Before that, the assignments of the first run should have been fixed.
 ilcosubmethodrandom_assume_sub_min_as_limit#:#Minimum as Maximum
 ilcosubmethodrandom_assume_sub_min_as_limit_info#:#Limits the assignments per item to the value of "minimum assignments". This can be used in a first calculation run to reach a homogeneous filling uf items. The assigned users should be fixed afterwards and the calculation be called again without this setting to assign the remaining usrs.
 ilcosubmethodrandom_fill_fixed_users#:#Fill Fixed Assignments

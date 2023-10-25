@@ -169,7 +169,12 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$work->setInfo($this->plugin->txt('calculation_workarounds_info'));
 		$form->addItem($work);
 
-		// allow low filled items
+        // allow low filled items
+        $pfil = new ilCheckboxInputGUI($this->method->txt('prefer_filled_items'),'prefer_filled_items');
+        $pfil->setInfo($this->method->txt('prefer_filled_items_info'));
+        $work->addSubItem($pfil);
+
+        // allow low filled items
 		$lowi = new ilCheckboxInputGUI($this->method->txt('allow_low_filled_items'),'allow_low_filled_items');
 		$lowi->setInfo($this->method->txt('allow_low_filled_items_info'));
 		$work->addSubItem($lowi);
@@ -202,6 +207,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	 */
 	public function applyCalculationSettings(ilPropertyFormGUI $form)
 	{
+        $this->method->prefer_filled_items = (bool) $form->getInput('prefer_filled_items');
 		$this->method->allow_low_filled_items = (bool) $form->getInput('allow_low_filled_items');
 		$this->method->allow_low_filled_users = (bool) $form->getInput('allow_low_filled_users');
 		$this->method->assume_all_items_selected = (bool) $form->getInput('assume_all_items_selected');

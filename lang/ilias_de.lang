@@ -177,6 +177,8 @@ ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen,
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimale Zeitspanne zwischen Terminen, die nicht als Konflikt erkannt werden sollen. Sie muss größer oder gleich %s Minuten sein.
+ilcosubmethodrandom_prefer_filled_items#:#Auffüllen bevorzugen
+ilcosubmethodrandom_prefer_filled_items_info#:#Bevorzugt das Auffüllen einzelner Einheiten bis zu ihrem Maximum anstatt einer gleichmäßigeren Verteilung der Zuteilungen auf die Einheiten.
 ilcosubmethodrandom_allow_low_filled_items#:#Unterbelegte Einheiten
 ilcosubmethodrandom_allow_low_filled_items_info#:#Erlaubt pro Einheit weniger als die minimale Anzahl an Zuteilungen.
 ilcosubmethodrandom_allow_low_filled_users#:#Teilweise Zuteilungen
