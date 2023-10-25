@@ -406,6 +406,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->saveAssignments();
 
 		$details = [];
+        if ($this->prefer_filled_items)
+        {
+            $details[] = $this->txt('prefer_filled_items');
+        }
 		if ($this->allow_low_filled_items)
 		{
 			$details[] = $this->txt('allow_low_filled_items');
@@ -422,6 +426,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		{
 			$details[] = $this->txt('assume_sub_min_as_limit');
 		}
+        if ($this->fill_fixed_users)
+        {
+            $details[] = $this->txt('fill_fixed_users');
+        }
 
 		$this->run->details = implode(', ', $details);
 		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
