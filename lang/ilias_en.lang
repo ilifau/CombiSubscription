@@ -172,9 +172,11 @@ ilcosubmethodrandom_out_of_conflict_time#:#Minimum Appointment Distance
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimum time between Appointments that should not produce a conflict. It must be longer thant %s minutes.
 ilcosubmethodrandom_prefer_filled_items#:#Prefer Filling Up
 ilcosubmethodrandom_prefer_filled_items_info#:#Favors filling individual items to their maximum rather than distributing allocations more evenly among items.
-ilcosubmethodrandom_allow_low_filled_items#:#Underused Items
-ilcosubmethodrandom_allow_low_filled_items_info#:#Allows less than the minimum number of assignments per item.
-ilcosubmethodrandom_allow_low_filled_users#:#Partial Assignments
+ilcosubmethodrandom_forced_item_minimum#:#Minimum Assignments per Item
+ilcosubmethodrandom_forced_item_minimum_info#:#Uses common minimum assignments on all items, instead of the minimum assignments specified there. If it is 0, no minimum assignment is checked.
+ilcosubmethodrandom_forced_item_minimum_num#:#Minimum
+ilcosubmethodrandom_forced_item_minimum_details#:#Minimum Assignments per Item: %s
+ilcosubmethodrandom_allow_low_filled_users#:#Partial Assignments per User
 ilcosubmethodrandom_allow_low_filled_users_info#:#Allows less than the specified number of assignments per user.
 ilcosubmethodrandom_assume_all_items_selected#:#Force Assignments
 ilcosubmethodrandom_assume_all_items_selected_info#:#Allows per user an assignment of all items. Unselected items are treated below the lowest priority. This can be used in a second calculation run to assign users that went empty after all. Before that, the assignments of the first run should have been fixed.

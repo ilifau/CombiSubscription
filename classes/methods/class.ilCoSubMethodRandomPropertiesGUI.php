@@ -169,17 +169,22 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 		$work->setInfo($this->plugin->txt('calculation_workarounds_info'));
 		$form->addItem($work);
 
-        // allow low filled items
+        // prefer filled items
         $pfil = new ilCheckboxInputGUI($this->method->txt('prefer_filled_items'),'prefer_filled_items');
         $pfil->setInfo($this->method->txt('prefer_filled_items_info'));
         $work->addSubItem($pfil);
 
-        // allow low filled items
-		$lowi = new ilCheckboxInputGUI($this->method->txt('allow_low_filled_items'),'allow_low_filled_items');
-		$lowi->setInfo($this->method->txt('allow_low_filled_items_info'));
-		$work->addSubItem($lowi);
-
-		// allow low filled users
+        // forced item minimum
+        $fmin = new ilCheckboxInputGUI($this->method->txt('forced_item_minimum'),'forced_item_minimum');
+        $fmin->setInfo($this->method->txt('forced_item_minimum_info'));
+            $fmin_num = new ilNumberInputGUI($this->method->txt('forced_item_minimum_num'), 'forced_item_minimum_num');
+            $fmin_num->allowDecimals(false);
+            $fmin_num->setMinValue(0);
+            $fmin_num->setValue(0);
+            $fmin->addSubItem($fmin_num);
+        $work->addSubItem($fmin);
+        
+        // allow low filled users
 		$lowu = new ilCheckboxInputGUI($this->method->txt('allow_low_filled_users'),'allow_low_filled_users');
 		$lowu->setInfo($this->method->txt('allow_low_filled_users_info'));
 		$work->addSubItem($lowu);
@@ -208,7 +213,9 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	public function applyCalculationSettings(ilPropertyFormGUI $form)
 	{
         $this->method->prefer_filled_items = (bool) $form->getInput('prefer_filled_items');
-		$this->method->allow_low_filled_items = (bool) $form->getInput('allow_low_filled_items');
+        if ($form->getInput('forced_item_minimum')) {
+            $this->method->forced_item_minimum = (int) $form->getInput('forced_item_minimum_num');
+        }
 		$this->method->allow_low_filled_users = (bool) $form->getInput('allow_low_filled_users');
 		$this->method->assume_all_items_selected = (bool) $form->getInput('assume_all_items_selected');
 		$this->method->assume_sub_min_as_limit = (bool) $form->getInput('assume_sub_min_as_limit');
