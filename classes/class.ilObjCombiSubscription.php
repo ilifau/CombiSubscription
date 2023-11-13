@@ -1105,10 +1105,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 *
 	 * @param int	$a_source_run
 	 * @param int 	$a_target_run
+     * @param bool $a_keep_fixed
 	 */
-	public function copyAssignments($a_source_run, $a_target_run)
+	public function copyAssignments($a_source_run, $a_target_run, $a_keep_fixed = true)
 	{
-		$fixed_ids = $this->getFixedUserIds();
+        $fixed_ids = ($a_keep_fixed ?  $this->getFixedUserIds() : []);
 
 		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run, $fixed_ids);

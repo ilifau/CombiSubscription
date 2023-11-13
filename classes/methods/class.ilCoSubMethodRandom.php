@@ -22,9 +22,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/** @var int number of items to assign in the calculation */
 	public $number_assignments = 1;
 
-	/** @var bool tweak: allow less than sub_min assignments per item */
-	public $allow_low_filled_items = false;
+    /** @var bool tweak: prefer filling single items instead of equal distribution */
+    public $prefer_filled_items = false;
 
+    /** @var int|null tweak: forced minimum number of assignments */
+    public $forced_item_minimum = null;
+    
 	/** @var bool tewak: allow less than number_assignments per user */
     public $allow_low_filled_users = false;
 
@@ -33,8 +36,11 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 	/** @var bool tweak: calculate as if the maximum per item is limited by the minimum */
     public $assume_sub_min_as_limit = false;
-
-
+    
+    /** @var bool tweak: allow to fill up missing assignments of fixed users */
+    public $fill_fixed_users = false;
+    
+    
     //
     // Calculation basics (unchanged in a calculation run)
     //
@@ -57,7 +63,9 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     /** @var  array     user_id => item_id => priority */
     protected $inital_priorities = array();
 
-
+    /**  @var array	user_id => item_id => true */
+    protected $fixed_assignments = array();
+    
     //
     // Calculation data (changing in a calculation run)
     //
@@ -294,8 +302,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				// get the actual assignments (run_id = 0)
 				foreach ($this->object->getAssignmentsOfUser($user_id) as $item_id => $assign_id)
 				{
-					// assign also in the new run
-					$this->assignUser($user_id, $item_id);
+					// assign as fixed in the new run
+					$this->assignUser($user_id, $item_id, true);
 				}
 			}
 		}
@@ -305,11 +313,16 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * Assign a user to an item and remove it from the priority lists
 	 * @param integer	$a_user_id
 	 * @param integer	$a_item_id
+     * @param integer	$a_fixed    add this assignment to the list of fixed assignments
 	 */
-	protected function assignUser($a_user_id, $a_item_id)
+	protected function assignUser($a_user_id, $a_item_id, $a_fixed = false)
 	{
 		// note the assignments
 		$this->assignments[$a_user_id][$a_item_id] = true;
+        
+        if ($a_fixed) {
+            $this->fixed_assignments[$a_user_id][$a_item_id] = true;
+        }
 
 		// increase the assignment counters
 		$this->assign_counts_user[$a_user_id]++;
@@ -376,7 +389,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
             // low filled items are sorted by the number of their assignments
             $low_ids = $this->getLowFilledItemIds();
-            if ($this->allow_low_filled_items || empty($low_ids))
+            if (empty($low_ids))
 			{
                 // no redistribution needed
 				break;
@@ -393,9 +406,13 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$this->saveAssignments();
 
 		$details = [];
-		if ($this->allow_low_filled_items)
+        if ($this->prefer_filled_items)
+        {
+            $details[] = $this->txt('prefer_filled_items');
+        }
+        if (isset($this->forced_item_minimum))
 		{
-			$details[] = $this->txt('allow_low_filled_items');
+			$details[] = sprintf($this->txt('forced_item_minimum_details'), $this->forced_item_minimum);
 		}
 		if ($this->allow_low_filled_users)
 		{
@@ -409,6 +426,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		{
 			$details[] = $this->txt('assume_sub_min_as_limit');
 		}
+        if ($this->fill_fixed_users)
+        {
+            $details[] = $this->txt('fill_fixed_users');
+        }
 
 		$this->run->details = implode(', ', $details);
 		$this->run->run_end = new ilDateTime(time(), IL_CAL_UNIX);
@@ -431,6 +452,12 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		foreach ($this->getShuffledUserIds() as $user_id)
 		{
 			$selected = array();
+            if (isset($this->fixed_assignments[$user_id])) {
+                foreach ($this->fixed_assignments[$user_id] as $item_id => $assigned) {
+                    $selected[$item_id] = $this->items[$item_id];
+                }
+            }
+            
 			$available = $this->getSortedItemsForUser($user_id);
 			$catlimits = $this->category_limits;
 
@@ -442,6 +469,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			{
 				foreach ($selected as $item_id => $item)
 				{
+                    // log_line("assign $user_id to $item_id");
 					$this->assignUser($user_id, $item_id);
 				}
 			}
@@ -456,7 +484,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$user_ids = array();
 		foreach ($this->users as $user_id => $user)
 		{
-			if (!$user->is_fixed)
+			if (!$user->is_fixed || $this->fill_fixed_users)
 			{
 				$user_ids[] = $user_id;
 			}
@@ -530,8 +558,10 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				if (empty($limit) || $limit > $this->assign_counts_item[$item_id])
 				{
 					$key1 = sprintf('%06d', $priority);											//sort first by priority (0 is highest priority)
-                    $key2 = sprintf('%06d', $this->assign_counts_item[$item_id]);	            //then sort by existing assignments (lowest first)
-					//$key2 = sprintf('%06d', 999999 - $this->assign_counts_item[$item_id]);	        //then sort by existing assignments (highest first)
+                    $key2 = $this->prefer_filled_items 
+                        ? sprintf('%06d', 999999 - $this->assign_counts_item[$item_id])     // then sort by existing assignments (highest first)
+                        : sprintf('%06d', $this->assign_counts_item[$item_id]);                     // or sort by existing assignments (lowest first)
+                    
 					$key3 = sprintf('%06d', $random);											//then sort by random order
 					$indexed[$key1.$key2.$key3] = $item_id;
 				}
@@ -572,6 +602,8 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			//log_line('number assignments not reachable (start)');
 			return array();
 		}
+        
+        $preferred_selection = array();
 
 		// try all items as next one
 		foreach ($a_available as $item_id => $item)
@@ -580,12 +612,14 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 			$available = $a_available;
 			$catlimits = $a_catlimits;
 
-			// add item to the selected ones
+            // log_line("available: ". implode(',', array_keys($available)));
+
+            // add item to the selected ones
 			$selected[$item_id] = $item;
 			unset($available[$item_id]);
-
+            
 			//log_line("selected: ". implode(',', array_keys($selected)));
-			//log_line("available: ". implode(',', array_keys($available)));
+            //log_line("available: ". implode(',', array_keys($available)). " (after selection)");
 
 			// remove conflicting items from the current available list
 			foreach ($this->conflicts[$item_id] as $conflict_item_id)
@@ -631,15 +665,26 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 				//log_line('number assignments reached (after)');
 				return $selected;
 			}
+            elseif (count($selected) > count($preferred_selection)) 
+            {
+                $preferred_selection = $selected;
+            }
 
 			// remove this item from the available list of this function
 			// it will not be an option for the other items, too
 			unset ($a_available[$item_id]);
 		}
 
-		//log_line('no item fits (after)');
-		return array();
-	}
+        
+        if ($this->allow_low_filled_users) {
+            //log_line('low filled users possible(after)');
+            return $preferred_selection;
+        }	
+        else {
+            //log_line('not enough assignments reached (after)');
+            return array();
+        }
+    }
 
 	/**
 	 * Get the items with less than minimum assignments
@@ -650,10 +695,15 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 		$ids = array();
 		foreach ($this->items as $item)
 		{
-			if (!empty($item->sub_min)
+            $minimum = $item->sub_min;
+            if (isset($this->forced_item_minimum)) {
+                $minimum = $this->forced_item_minimum;
+            }
+            
+			if (!empty($minimum)
                 && !in_array($item->item_id, $this->blocked_item_ids)
                 && $this->assign_counts_item[$item->item_id] > 0
-                && $this->assign_counts_item[$item->item_id] < $item->sub_min)
+                && $this->assign_counts_item[$item->item_id] < $minimum)
 			{
                 $key = sprintf('#%08d %08d', $this->assign_counts_item[$item->item_id], $item->item_id);
 				$ids[$key] = $item->item_id;
@@ -665,18 +715,39 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 
 
     /**
-     * Remove any non-fixed user assignments from an item
+     * Remove any non-fixed user assignments from items that should not be used (e.g. because they are low-filled)
      * @param int[] $a_item_ids
      */
     protected function removeUnfixedAssignments($a_item_ids)
     {
         foreach ($this->users as $user_id => $user) {
+            
+            // first remove the non-fixed assignments from the given items
             foreach ($a_item_ids as $item_id) {
-                if (isset($this->assignments[$user_id][$item_id]) && !$user->is_fixed) {
+                if (isset($this->assignments[$user_id][$item_id]) 
+                    && !isset($this->fixed_assignments[$user_id][$item_id])
+                ) {
                     $this->assign_counts_user[$user_id]--;
                     $this->assign_counts_item[$item_id]--;
+                    unset($this->assignments[$user_id][$item_id]);
                 }
-                unset($this->assignments[$user_id][$item_id]);
+            }
+            
+            // then check the number of remaining assignments of the user
+            // remove all unfixed assignments, if the required number is not reached 
+            if (count($this->assignments[$user_id] ?? []) < $this->number_assignments 
+                && !$this->allow_low_filled_users) {
+                
+                $user_item_ids = array_keys($this->assignments[$user_id] ?? []);
+                foreach ($user_item_ids as $item_id) {
+                    if (isset($this->assignments[$user_id][$item_id])
+                        && !isset($this->fixed_assignments[$user_id][$item_id])
+                    ) {
+                        $this->assign_counts_user[$user_id]--;
+                        $this->assign_counts_item[$item_id]--;
+                        unset($this->assignments[$user_id][$item_id]);
+                    }
+                }
             }
         }
     }

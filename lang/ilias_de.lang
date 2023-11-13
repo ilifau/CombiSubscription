@@ -177,14 +177,20 @@ ilcosubmethodrandom_sub_min_info#:#Hat die Einheit weniger Zuteilungen bekommen,
 ilcosubmethodrandom_sub_max_info#:#Die Berechnung wird nicht mehr als diese Anmeldungen zuteilen.
 ilcosubmethodrandom_out_of_conflict_time#:#Mimimaler Termin-Abstand
 ilcosubmethodrandom_out_of_conflict_time_info#:#Minimale Zeitspanne zwischen Terminen, die nicht als Konflikt erkannt werden sollen. Sie muss größer oder gleich %s Minuten sein.
-ilcosubmethodrandom_allow_low_filled_items#:#Unterbelegte Einheiten
-ilcosubmethodrandom_allow_low_filled_items_info#:#Erlaubt pro Einheit weniger als die minimale Anzahl an Zuteilungen.
-ilcosubmethodrandom_allow_low_filled_users#:#Teilweise Zuteilungen
+ilcosubmethodrandom_prefer_filled_items#:#Auffüllen bevorzugen
+ilcosubmethodrandom_prefer_filled_items_info#:#Bevorzugt das Auffüllen einzelner Einheiten bis zu ihrem Maximum anstatt einer gleichmäßigeren Verteilung der Zuteilungen auf die Einheiten.
+ilcosubmethodrandom_forced_item_minimum#:#Minimale Zuteilung pro Einheit
+ilcosubmethodrandom_forced_item_minimum_info#:#Verwendet eine einheitliche minimale Zuteilung bei allen Einheiten, statt der dort angegebenen minimalen Zuteilungen. Wenn sie 0 ist, wird keine minimale Zuteilung geprüft.
+ilcosubmethodrandom_forced_item_minimum_num#:#Minimum
+ilcosubmethodrandom_forced_item_minimum_details#:#Minimale Zuteilung pro Einheit: %s
+ilcosubmethodrandom_allow_low_filled_users#:#Teilweise Zuteilungen pro Nutzer
 ilcosubmethodrandom_allow_low_filled_users_info#:#Erlaubt pro Nutzer weniger als die vorgegeben Anzahl an Zuteilungen.
 ilcosubmethodrandom_assume_all_items_selected#:#Zuteilung erzwingen
 ilcosubmethodrandom_assume_all_items_selected_info#:#Erlaubt pro Nutzer die Zuteilung aller Einheiten. Nicht gewählte Einheiten werden unterhalb der geringsten Priorität behandelt. Das kann in einem zweiten Berechnungslauf verwendet werden, um leer ausgegangene Benutzer doch zuzuteilen. Vorher sollten die zugeteilten Nutzer des ersten Laufs fixiert worden sein.
 ilcosubmethodrandom_assume_sub_min_as_limit#:#Minimum als Maximum
 ilcosubmethodrandom_assume_sub_min_as_limit_info#:#Begrenzt die Zuteilungen pro Einheit auf den als "Minimale Zuteilungen" angegebenen Wert. Das kann in einem ersten Berechnungs-Schritt verwendet werden, um eine möglichst gleichmäßige Verteilung zu erwirken. Die zugeteilten Nutzer sollten anschließend fixiert und die Berechnung in einem zweiten Schritt ohne diesen Schalter mit der echten Maximalzahl pro Einheit erneut durchgeführt werden.
+ilcosubmethodrandom_fill_fixed_users#:#Fixierungen auffüllen
+ilcosubmethodrandom_fill_fixed_users_info#:#Fügt bei unvollständigen fixierten Zuteilungen noch fehlende Zuteilungen auf.
 show_bars#:#Balken zeigen
 show_bars_info#:#Auf dem Anmeldebildschirm werden Balken mit der Anzahl bisheriger Auswahlen zu jeder Priorität angezeigt. Die Teilnehmer sehen dadurch, wie begehrt jede Auswahl-Einheit ist.
 mail_to_users#:#E-Mail schreiben

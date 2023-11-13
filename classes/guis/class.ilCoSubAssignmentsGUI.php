@@ -219,7 +219,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 					$date = ilDatePresentation::formatDate($run->run_start);
 
 					// copy the calculated assignments of the run to the current assignments
-					$this->object->copyAssignments($run->run_id, 0);
+					$this->object->copyAssignments($run->run_id, 0, !$method->fill_fixed_users);
 					$this->object->setClassProperty(get_class($this), 'source_run', $run->run_id);
 					ilUtil::sendSuccess(sprintf($this->plugin->txt('msg_calculation_finished'), $letter, $date), true);
 				}
