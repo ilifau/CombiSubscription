@@ -17,6 +17,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	const SATISFIED_OVER = 3;
 	const SATISFIED_CONFLICT = -1;
 	const SATISFIED_EMPTY = -2;
+    const SATISFIED_UNKNOWN = -3;
 	# endregion
 
 	# region class variables
@@ -762,40 +763,38 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	}
 
 	/**
-	 * Check if items have mutual conflicts
+	 * Get a list of items with conflicts
+     * Result is a list of item pairs
+     * 
 	 * @param int[] $a_item_ids
-	 * @return bool
+	 * @return array [[item_id1, item_id2], ..]
 	 */
-	public function itemsHaveConflicts($a_item_ids)
+	public function getConflictPairs($a_item_ids)
 	{
-		$conflicts = $this->getItemsConflicts();
+        $conflicts = $this->getItemsConflicts();
 
-		foreach ($a_item_ids as $item_id)
-		{
-			if (empty($conflicts[$item_id]))
-			{
-				return false;
-			}
-			$found = array_intersect($conflicts[$item_id], $a_item_ids);
-			if (!empty($found))
-			{
-				return true;
-			}
-		}
-		return false;
+        $pairs = [];
+        foreach ($a_item_ids as $item_id1) {
+            foreach ($conflicts[$item_id1] ?? [] as $item_id2) {
+                if (in_array($item_id2, $a_item_ids) && !isset($pairs['#'.$item_id2.'#'.$item_id1])) {
+                    $pairs['#'.$item_id1.'#'.$item_id2] = [$item_id1, $item_id2];
+                }
+            }
+        }
+        return array_values($pairs);
 	}
 
 	/**
-	 * Check if a list of items exceeds the assignment limits defined by their categories
-	 * @param int[] $a_item_ids
-	 * @return bool
+	 * Check if a list of assigned item_ids exceeds the assignment limits defined by their categories
+	 * @param int[] $a_item_ids assigned item ids
+	 * @return array    cat_id => number of assigned item_ids
 	 */
-	public function itemsOverCategoryLimits($a_item_ids)
+	public function categoriesOverAssignmentLimit($a_item_ids)
 	{
 		$items = $this->getItems();
 		$limits = $this->getCategoryLimits();
 
-		$catcounts = array();
+		$catcounts = [];
 		foreach ($a_item_ids as $item_id)
 		{
 			if (!empty($items[$item_id]))
@@ -807,14 +806,16 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				}
 			}
 		}
+        
+        $exceeded = [];
 		foreach ($catcounts as $cat_id => $count)
 		{
 			if (isset($limits[$cat_id]) && $count > $limits[$cat_id])
 			{
-				return true;
+                $exceeded[$cat_id] = $count;
 			}
 		}
-		return false;
+		return $exceeded;
 	}
 
 
@@ -1271,50 +1272,131 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getUserSatisfaction($a_user_id, $a_run_id = 0)
 	{
-		$priorities = $this->getPrioritiesOfUser($a_user_id);
-		$assignments = $this->getAssignmentsOfUser($a_user_id, $a_run_id);
-        
-        /** @var ilCoSubMethodBase $method */
-        $method = $this->getMethodObject();
-
-		if (count($assignments) > $method->getNumberAssignments())
-		{
-			return self::SATISFIED_OVER;
-		}
-		if ($this->itemsOverCategoryLimits(array_keys($assignments)))
-		{
-			return self::SATISFIED_OVER;
-		}
-        if ($this->itemsHaveConflicts(array_keys($assignments)))
-        {
+        $details = $this->getUserSatisfactionDetails($a_user_id, $a_run_id = 0);
+        if (isset($details['total_assignments_exceeded'])) {
+            return self::SATISFIED_OVER;
+        }
+        if (isset($details['category_limits_exceeded'])) {
+            return self::SATISFIED_OVER;
+        }
+        if (isset($details['assignments_with_conflicts'])) {
             return self::SATISFIED_CONFLICT;
+        } 
+        if (isset($details['total_assignments_not_reached'])) {
+            return self::SATISFIED_NOT;
         }
-        if (count($assignments) < $method->getNumberAssignments() 
-            && !($method instanceof ilCoSubMethodRandom && $method->allow_low_filled_users)
-        ) {
-            return self::SATISFIED_NOT;		// not enough assignments and low filling not allowed
+        if (isset($details['assignments_not_chosen'])) {
+            return self::SATISFIED_NOT;
         }
-
-		foreach ($assignments as $item_id => $assign_id)
-		{
-			if (!isset($priorities[$item_id]))
-			{
-				return self::SATISFIED_NOT;		// assigned to an item without priority
-			}
-			elseif ($priorities[$item_id] > 0)
-			{
-				return self::SATISFIED_MEDIUM; 	// assigned to item with lower priority
-			}
-		}
-        
-        if (count($assignments) == $method->getNumberAssignments()) {
-            return self::SATISFIED_FULL;	    // all assignments are highest priority
-        }
-        else {
+        if (isset($details['assignments_with_lower_priority'])) {
             return self::SATISFIED_MEDIUM;
         }
+        if (isset($details['assignments_with_highest_priority'])) {
+            return self::SATISFIED_FULL;
+        }
+        return self::SATISFIED_UNKNOWN;
 	}
 
+    /**
+     * Get the satisfaction of a user's choices by a certain run
+     * @param integer   $a_user_id
+     * @param integer   $a_run_id (default 0 for the chosen assignments)
+     * @return array  
+     */
+    public function getUserSatisfactionDetails($a_user_id, $a_run_id = 0)
+    {
+        /** @var ilCoSubMethodBase $method */
+        $method = $this->getMethodObject();
+        $priorities = $this->getPrioritiesOfUser($a_user_id);
+        $assignments = $this->getAssignmentsOfUser($a_user_id, $a_run_id);
+        $categories = $this->getCategories();
+        $items = $this->getItems();
+
+        $details = [];
+        if (count($assignments) > $method->getNumberAssignments()) {
+            $list = [
+                sprintf($this->plugin->txt('total_assignments_details'), $method->getNumberAssignments(), count($assignments))
+            ];
+            $details['total_assignments_exceeded'] = [
+                'status' => self::SATISFIED_OVER,
+                'text' => $this->plugin->txt('total_assignments_exceeded'),
+                'list' => $list
+            ];
+        }
+        if (!empty($exceeded = $this->categoriesOverAssignmentLimit(array_keys($assignments)))) {
+            $list = [];
+            foreach ($exceeded as $cat_id => $num_assigned) {
+                $category = $categories[$cat_id];
+                $list[] = sprintf($this->plugin->txt('category_limits_exceeded_details'), 
+                    $category->title, $category->max_assignments, $num_assigned);
+            }
+            $details['category_limits_exceeded'] = [
+                'status' => self::SATISFIED_OVER,
+                'text' => $this->plugin->txt('category_limits_exceeded'),
+                'list' => $list
+            ];
+        }
+        if (!empty($pairs = $this->getConflictPairs(array_keys($assignments)))) {
+            $list = [];
+            foreach ($pairs as $pair) {
+                $list[] = $items[$pair[0]]->title . ' - <br/>' . $items[$pair[1]]->title;
+            }
+            $details['assignments_with_conflicts'] = [
+                'status' => self::SATISFIED_CONFLICT,
+                'text' => $this->plugin->txt('assignments_with_conflicts'),
+                'list' => $list
+            ];
+        }
+        if (count($assignments) < $method->getNumberAssignments()
+            && !($method instanceof ilCoSubMethodRandom && $method->allow_low_filled_users)) {
+            $list = [
+                sprintf($this->plugin->txt('total_assignments_details'), $method->getNumberAssignments(), count($assignments))
+            ];
+            $details['total_assignments_not_reached'] = [
+                'status' => self::SATISFIED_NOT,
+                'text' => $this->plugin->txt('total_assignments_not_reached'),
+                'list' => $list
+            ];
+        }
+
+        $not_chosen = [];
+        $lower_priority = [];
+        $highest_priority = [];
+        foreach ($assignments as $item_id => $assign_id) {
+            if (!isset($priorities[$item_id])) {
+                $not_chosen[] = $this->items[$item_id]->title;         
+            } 
+            elseif ($priorities[$item_id] > 0) {
+                $lower_priority[] = $this->items[$item_id]->title;
+            }
+            else {
+                $highest_priority[] = $this->items[$item_id]->title;      
+            }
+        }
+        if (!empty($not_chosen)) {
+            $details['assignments_not_chosen'] = [
+                'status' => self::SATISFIED_NOT,
+                'text' => $this->plugin->txt('assignments_not_chosen'),
+                'list' => $not_chosen
+            ];
+        }
+        if (!empty($lower_priority)) {
+            $details['assignments_with_lower_priority'] = [
+                'status' => self::SATISFIED_MEDIUM,
+                'text' => $this->plugin->txt('assignments_with_lower_priority'),
+                'list' => $lower_priority
+            ];
+        }
+        if (!empty($highest_priority)) {
+            $details['assignments_with_highest_priority'] = [
+                'status' => self::SATISFIED_FULL,
+                'text' => $this->plugin->txt('assignments_with_highest_priority'),
+                'list' => $highest_priority
+            ];
+        }
+        
+        return $details;
+    }
 
 	/**
 	 * Get the user ids of fixed users

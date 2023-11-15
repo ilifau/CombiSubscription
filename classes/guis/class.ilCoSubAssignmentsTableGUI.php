@@ -134,6 +134,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$tpl->setVariable('SUM_LABEL', $this->plugin->txt('item_assignment_sum_label'));
 			$tpl->setVariable('SUM', $sum);
 
+            // category satisfactions
 			if ($sum == 0)
 			{
 				$tpl->setVariable('SUM_IMAGE', $this->parent->parent->getSatisfactionImageUrl(ilObjCombiSubscription::SATISFIED_EMPTY));
@@ -324,6 +325,39 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		}
 		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
 		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
+        $this->tpl->setVariable('RESULT_LINK', $this->getSatisfactionDetailsLinkHtml($a_set['user_id'], $a_set['user']));
+        
 		$this->tpl->setVariable('ASSIGNMENTS', $a_set['assignments']);
 	}
+    
+    
+    protected function getSatisfactionDetailsLinkHtml($user_id, $user_name) 
+    {
+        $factory = $this->dic->ui()->factory();
+        $renderer = $this->dic->ui()->renderer();
+        $details = $this->parent->object->getUserSatisfactionDetails($user_id);
+
+        $items = [];
+        foreach ($details as $detail) {
+
+            $list = $renderer->render($factory->listing()->unordered($detail['list']));
+            
+            $icon = $factory->symbol()->icon()->custom(
+                $this->parent->parent->getSatisfactionImageUrl($detail['status']),
+                $this->parent->parent->getSatisfactionTitle($detail['status']));
+            
+            $items[] = $factory->item()->standard($detail['text'])
+                ->withLeadIcon($icon)
+                ->withDescription($list);
+        }
+        
+        $group = $factory->item()->group('', $items);
+        $panel = $factory->panel()->listing()->standard($user_name, [$group]);
+        $modal = $factory->modal()->roundtrip($this->plugin->txt('satisfaction'), $panel);
+        $button = $factory->button()->shy($this->plugin->txt('details'), '#')
+                                ->withOnClick($modal->getShowSignal());
+        
+        return $renderer->render([$modal, $button]);
+    }
+    
 }

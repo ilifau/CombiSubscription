@@ -435,3 +435,13 @@ fix_assignments#:#Zuteilungen fixieren
 fix_assignments_confirmation#:#Sollen alle erfolgreichen Zuteilungen fixiert werden?
 message_cat_for_event#:#Die Kategorie %s kann nur für Parallelgruppen der Lehrveranstaltung %s verwendet werden!
 message_cat_not_mixed#:#Die Parallelgruppe kann nur mit anderen Parallelgruppen derselben Veranstaltung in einer Kategorie liegen.
+total_assignments_exceeded#:#Gesamtzahl an Zuteilungen überschritten
+total_assignments_not_reached#:#Gesamztahl an Zuteilungen nicht erreicht
+total_assignments_details#:#erfordert: %s, zugeteilt: %s
+category_limits_exceeded#:#Zuteilungen in Auswahl-Kategorien überschritten
+category_limits_exceeded_details#:#%s - maximal: %s, zugeteilt: %s
+assignments_with_conflicts#:#Termin-Konflikte
+assignments_not_chosen#:#Zuteilungen ohne Auswahl
+assignments_with_lower_priority#:#Zuteilungen mit niedriger Priorität
+assignments_with_highest_priority#:#Zuteilungen mit höchster Priorität
+details#:#Details

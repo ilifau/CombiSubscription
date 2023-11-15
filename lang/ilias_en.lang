@@ -415,3 +415,13 @@ fix_assignments#:#Fix Assignments
 fix_assignments_confirmation#:#Fix all successful assignments?
 message_cat_for_event#:#The category %s can only be used for parallel groups of the event %s!
 message_cat_not_mixed#:#The parallel group can only be combined in a category with other groups of the same event.
+total_assignments_exceeded#:#Total number of assignments exceeded
+total_assignments_not_reached#:#Total number of assignments not reached
+total_assignments_details#:#required: %s, assigned: %s
+category_limits_exceeded#:#Assignments in categories exceeded
+category_limits_exceeded_details#:#%s - maximum: %s, assigned: %s
+assignments_with_conflicts#:#Schedule conflicts
+assignments_not_chosen#:#Assignments without selection
+assignments_with_lower_priority#:#Assignments with lower priority
+assignments_with_highest_priority#:#Assignments with highest priority
+details#:#Details
