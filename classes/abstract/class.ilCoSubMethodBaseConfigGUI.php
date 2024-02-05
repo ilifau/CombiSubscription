@@ -5,26 +5,26 @@
 abstract class ilCoSubMethodBaseConfigGUI
 {
 	/** @var  ilCombiSubscriptionPlugin */
-	public $plugin;
+	public ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  ilCtrl */
-	public $ctrl;
+	public ilCtrl $ctrl;
 
 	/** @var ilTemplate */
-	public $tpl;
+	public ilTemplate $tpl;
 
 	/** @var ilLanguage */
-	public $lng;
+	public ilLanguage $lng;
 
 	/** @var ilPropertyFormGUI */
-	protected $form;
+	protected ilPropertyFormGUI $form;
 
 
 	/**
 	 * Constructor
 	 * @param ilCombiSubscriptionPlugin     $a_plugin
 	 */
-	public function __construct($a_plugin)
+	public function __construct(ilCombiSubscriptionPlugin $a_plugin)
 	{
 		global $ilCtrl, $tpl, $lng;
 
@@ -38,7 +38,7 @@ abstract class ilCoSubMethodBaseConfigGUI
 	 * Get the id (classname) of the assigned method
 	 * @return string
 	 */
-	abstract public function getMethodId();
+	abstract public function getMethodId(): string;
 
 	/**
 	 * Execute a command
@@ -46,7 +46,7 @@ abstract class ilCoSubMethodBaseConfigGUI
 	 * note: permissions are already checked in parent gui
 	 *
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('xxx');
 		switch ($cmd)
@@ -72,7 +72,7 @@ abstract class ilCoSubMethodBaseConfigGUI
 	 * @param string	$a_langvar	language variable
 	 * @return string
 	 */
-	public function txt($a_langvar)
+	public function txt(string $a_langvar): string
 	{
 		return $this->plugin->txt(strtolower($this->getMethodId()).'_'.$a_langvar);
 	}

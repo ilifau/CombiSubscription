@@ -14,7 +14,7 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$this->plugin->includeClass('models/class.ilCoSubRun.php');
 
@@ -38,7 +38,7 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	/**
 	 * List the calculation runs
 	 */
-	protected function listRuns()
+	protected function listRuns(): void
 	{
 		global $ilToolbar;
 
@@ -54,7 +54,7 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	/**
 	 * Delete selected runs
 	 */
-	protected function confirmDeleteRuns()
+	protected function confirmDeleteRuns(): void
 	{
 		if (empty($_POST['run_ids']))
 		{
@@ -81,7 +81,7 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	/**
 	 * Delete selected runs
 	 */
-	protected function deleteRuns()
+	protected function deleteRuns(): void
 	{
 		if (isset($_POST['run_ids']))
 		{

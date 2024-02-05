@@ -11,32 +11,29 @@
 class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 {
 	/** @var ilObjCombiSubscriptionGUI */
-	public $parent;
+	public ilObjCombiSubscriptionGUI $parent;
 
 	/** @var  ilObjCombiSubscription */
-	public $object;
+	public ilObjCombiSubscription $object;
 
 	/** @var  ilCombiSubscriptionPlugin */
-	public $plugin;
+	public ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  ilCtrl */
-	public $ctrl;
-
-	/** @var ilTemplate */
-	public $tpl;
+	public ilCtrl $ctrl;
 
 	/** @var ilLanguage */
-	public $lng;
+	public ilLanguage $lng;
 
 	/** @var ilPropertyFormGUI */
-	protected $form;
+	protected ilPropertyFormGUI $form;
 
 
 	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$this->plugin->includeClass('models/class.ilCoSubCategory.php');
 
@@ -65,7 +62,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * List the categories
 	 */
-	protected function listCategories()
+	protected function listCategories(): void
 	{
 		global $ilToolbar;
 		/** @var ilToolbarGUI $ilToolbar */
@@ -83,7 +80,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Show form to create a new category
 	 */
-	protected function createCategory()
+	protected function createCategory(): void
 	{
 		$this->initCategoryForm('create');
 		$this->tpl->setContent($this->form->getHTML());
@@ -92,7 +89,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Save a new category
 	 */
-	protected function saveCategory()
+	protected function saveCategory(): void
 	{
 		$this->initCategoryForm('create');
 		if ($this->form->checkInput())
@@ -112,7 +109,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Show form to edit a category
 	 */
-	protected function editCategory()
+	protected function editCategory(): void
 	{
 		$this->ctrl->saveParameter($this, 'cat_id');
 		$category = ilCoSubCategory::_getById($_GET['cat_id']);
@@ -124,7 +121,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Update an existing category
 	 */
-	protected function updateCategory()
+	protected function updateCategory(): void
 	{
 		$this->ctrl->saveParameter($this, 'cat_id');
 		$this->initCategoryForm('edit');
@@ -145,7 +142,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Confirm the ddeletion of items
 	 */
-	protected function confirmDeleteCategories()
+	protected function confirmDeleteCategories(): void
 	{
 		if (empty($_POST['cat_ids']))
 		{
@@ -173,7 +170,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Delete confirmed items
 	 */
-	protected function deleteCategories()
+	protected function deleteCategories(): void
 	{
 		foreach($_POST['cat_ids'] as $cat_id)
 		{
@@ -186,7 +183,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	/**
 	 * Save the sorting
 	 */
-	protected function saveSorting()
+	protected function saveSorting(): void
 	{
 		$sort = $_POST['category_sort'];
 		asort($sort, SORT_NUMERIC);
@@ -208,7 +205,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 * Init the category form
 	 * @param string $a_mode    'edit' or 'create'
 	 */
-	protected function initCategoryForm($a_mode = 'edit')
+	protected function initCategoryForm(string $a_mode = 'edit'): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -261,7 +258,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 * Load the properties of a category to the form
 	 * @param ilCoSubCategory   $a_category
 	 */
-	protected function loadCategoryProperties($a_category)
+	protected function loadCategoryProperties(ilCoSubCategory $a_category): void
 	{
 		$this->form->setValuesByArray(
 			array(
@@ -278,7 +275,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 * @param   ilCoSubCategory   $a_category
 	 * @return  boolean       success
 	 */
-	protected function saveCategoryProperties($a_category)
+	protected function saveCategoryProperties(ilCoSubCategory $a_category): bool
 	{
 		$a_category->obj_id = $this->object->getId();
 		$a_category->title = $this->form->getInput('title');

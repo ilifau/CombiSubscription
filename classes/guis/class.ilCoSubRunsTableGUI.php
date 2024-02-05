@@ -7,14 +7,14 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
 class ilCoSubRunsTableGUI extends ilTable2GUI
 {
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
-	function __construct($a_parent_gui, $a_parent_cmd)
+	function __construct(ilObjCombiSubscriptionGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
 		$this->setId('il_xcos_runs');
@@ -46,7 +46,7 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 	 * Prepare the data to be displayed
 	 * @param   ilCoSubRun[]   $a_runs
 	 */
-	public function prepareData($a_runs)
+	public function prepareData(array $a_runs): void
 	{
 		$assignments = $this->parent->object->getAssignments();
 		$priorities = $this->parent->object->getPriorities();
@@ -126,7 +126,7 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 	/**
 	 * Fill a single data row
 	 */
-	protected function fillRow($a_set)
+	protected function fillRow(array $a_set): void
 	{
 		$this->tpl->setVariable('RUN_ID',$a_set['run_id']);
 
@@ -186,7 +186,7 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
      * @param	int		$a_row		row counter
      * @param	array	$a_set		data array
      */
-    protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set)
+    protected function fillRowExcel(ilExcel $a_excel, int &$a_row, array $a_set): void
     {
         ilDatePresentation::setUseRelativeDates(false);
         $col = 0;

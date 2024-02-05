@@ -12,34 +12,31 @@
 class ilCoSubItemsGUI extends ilCoSubBaseGUI
 {
 	/** @var ilObjCombiSubscriptionGUI */
-	public $parent;
+	public ilObjCombiSubscriptionGUI $parent;
 
 	/** @var  ilObjCombiSubscription */
-	public $object;
+	public ilObjCombiSubscription $object;
 
 	/** @var  ilCombiSubscriptionPlugin */
-	public $plugin;
+	public ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  ilCtrl */
-	public $ctrl;
-
-	/** @var ilTemplate */
-	public $tpl;
+	public ilCtrl $ctrl;
 
 	/** @var ilLanguage */
-	public $lng;
+	public ilLanguage $lng;
 
 	/** @var ilPropertyFormGUI */
-	protected $form;
+	protected ilPropertyFormGUI $form;
 
     /** @var ilCoSubCategory */
-    protected $categories;
+    protected ilCoSubCategory $categories;
 
     /**
      * Constructor
      * @param $a_parent_gui
      */
-    public function __construct($a_parent_gui)
+    public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
     {
         parent::__construct($a_parent_gui);
         $this->categories = $this->object->getCategories();
@@ -50,7 +47,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$this->plugin->includeClass('models/class.ilCoSubItem.php');
 		$this->plugin->includeClass('models/class.ilCoSubSchedule.php');
@@ -110,7 +107,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * List the registration items
 	 */
-	protected function listItems()
+	protected function listItems(): void
 	{
 		global $ilToolbar;
 		/** @var ilToolbarGUI $ilToolbar */
@@ -142,7 +139,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Select multiple repository objects to be added as items in one setp
 	 */
-	protected function addRepositoryItems()
+	protected function addRepositoryItems(): void
 	{
 		require_once('Services/Form/classes/class.ilFormGUI.php');
 		$form_gui = new ilFormGUI();
@@ -175,7 +172,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * save the items for the selected repository objects
 	 */
-	protected function saveRepositoryItems()
+	protected function saveRepositoryItems(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
@@ -230,7 +227,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 * @param bool $a_redirect		keep message for redirect
 	 * @return bool
 	 */
-	protected function checkTargetsWritable($a_ref_ids = array(), $a_redirect = false)
+	protected function checkTargetsWritable(array $a_ref_ids = [], $a_redirect = false)
 	{
 		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
@@ -257,7 +254,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
      * @param null $cat_id
      * @return bool|void
      */
-    protected function checkTargetAndCategory($target_ref_id = null, $cat_id = null)
+    protected function checkTargetAndCategory(?int $target_ref_id = null, ?int $cat_id = null): bool
     {
         if (!$this->plugin->hasFauService()) {
             return true;
@@ -292,7 +289,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Show form to create a new item
 	 */
-	protected function createItem()
+	protected function createItem(): void
 	{
 		$this->initItemForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -301,7 +298,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Save a new item
 	 */
-	protected function saveItem()
+	protected function saveItem(): void
 	{
 		$this->initItemForm();
 		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))) &&
@@ -324,7 +321,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Show form to edit an item
 	 */
-	protected function editItem()
+	protected function editItem(): void
 	{
 		$this->ctrl->saveParameter($this, 'item_id');
 		$item = ilCoSubItem::_getById($_GET['item_id']);
@@ -336,7 +333,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Update an existing item
 	 */
-	protected function updateItem()
+	protected function updateItem(): void
 	{
 		$this->ctrl->saveParameter($this, 'item_id');
 		$item = ilCoSubItem::_getById($_GET['item_id']);
@@ -361,7 +358,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Confirm the deletion of items
 	 */
-	protected function confirmDeleteItems()
+	protected function confirmDeleteItems(): void
 	{
 		if (empty($_POST['item_ids']))
 		{
@@ -388,7 +385,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
     /**
      * Confirm the transfer of assignments
      */
-    protected function confirmTransferAssignments()
+    protected function confirmTransferAssignments(): void
     {
         if (empty($_POST['item_ids']))
         {
@@ -428,7 +425,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
     /**
      * Transfer the assignments to the selected items
      */
-    protected function transferAssignments()
+    protected function transferAssignments(): void
     {
 
         $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
@@ -459,7 +456,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Delete confirmed items
 	 */
-	protected function deleteItems()
+	protected function deleteItems(): void
 	{
 		foreach($_POST['item_ids'] as $item_id)
 		{
@@ -472,7 +469,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Save the sorting
 	 */
-	protected function saveSorting()
+	protected function saveSorting(): void
 	{
 		$sort = $_POST['item_sort'];
 		asort($sort, SORT_NUMERIC);
@@ -493,7 +490,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Set the target object
 	 */
-	protected function setTargetObject()
+	protected function setTargetObject(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
@@ -538,7 +535,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 * @param ilCoSubItem $a_item
 	 * @param ilCoSubSchedule[] $a_schedules
 	 */
-	protected function initItemForm($a_item = null, $a_schedules = array())
+	protected function initItemForm(ilCoSubItem $a_item = null, array $a_schedules = [])
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		include_once('Services/Form/classes/class.ilRepositorySelectorInputGUI.php');
@@ -757,7 +754,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 * @var string $a_type	target object type or 'auto' for auto assignment configuration
 	 * @var int[]	$a_item_ids		posted item_ids that should be kept for next post
 	 */
-	protected function initTargetsForm($a_type, $a_item_ids = array())
+	protected function initTargetsForm(string $a_type, array $a_item_ids = []): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 
@@ -791,7 +788,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 * Save the properties from the form to an item
 	 * @param   ilCoSubItem   $a_item
 	 */
-	protected function saveItemProperties($a_item)
+	protected function saveItemProperties(ilCoSubItem $a_item): void
 	{
 		$old_target_ref_id = $a_item->target_ref_id;
 
@@ -841,7 +838,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 * @param ilCoSubSchedule[] $a_schedules (indexed by schedule_id)
 	 * @return  boolean       success
 	 */
-	protected function saveSchedulesProperties($a_item, $a_schedules = array())
+	protected function saveSchedulesProperties(ilCoSubItem $a_item, array $a_schedules = [])
 	{
 		include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";
 
@@ -920,7 +917,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Show the form to configure the target objects
 	 */
-	protected function configureTargets()
+	protected function configureTargets(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 
@@ -957,7 +954,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Commonly save the targets config
 	 */
-	protected function saveTargetsConfig()
+	protected function saveTargetsConfig(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
@@ -992,7 +989,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * add a grouping to the targets
 	 */
-	protected function addGrouping()
+	protected function addGrouping(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 
@@ -1029,7 +1026,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * remove grouping of targets
 	 */
-	protected function removeGrouping()
+	protected function removeGrouping(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 
@@ -1060,7 +1057,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	/**
 	 * Show a list of item conflicts
 	 */
-	protected function showConflicts()
+	protected function showConflicts(): void
 	{
 		$conflicts = $this->object->getItemsConflicts();
 		$items = $this->object->getItems();

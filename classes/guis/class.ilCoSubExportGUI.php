@@ -14,7 +14,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('showExportForm');
 		switch ($cmd)
@@ -35,7 +35,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 	/**
 	 * Initialize the form with export settings
 	 */
-	protected function initExportForm()
+	protected function initExportForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -76,7 +76,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 	/**
 	 * Show the form with export settings
 	 */
-	public function showExportForm()
+	public function showExportForm(): void
 	{
 		$this->initExportForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -85,7 +85,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 	/**
 	 * Do the export
 	 */
-	public function doExport()
+	public function doExport(): void
 	{
 		$this->initExportForm();
 		if (!$this->form->checkInput())

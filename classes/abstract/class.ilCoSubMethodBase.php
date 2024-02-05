@@ -11,23 +11,23 @@ abstract class ilCoSubMethodBase
 {
 
 	/** @var int minimum seconds between appointments without conflict */
-	public $out_of_conflict_time = 3600;
+	public int $out_of_conflict_time = 3600;
 
 	/** @var int tolerated percentage of schedule time being in conflict with other item */
-	public $tolerated_conflict_percentage = 20;
+	public int $tolerated_conflict_percentage = 20;
 
 	/** @var  ilObjCombiSubscription */
-	protected $object;
+	protected ilObjCombiSubscription $object;
 
 	/** @var ilCombiSubscriptionPlugin  */
-	protected $plugin;
+	protected ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  string error message */
-	protected $error;
+	protected string $error;
 
 
 	/** @var  array raw object properties  */
-	private $object_properties;
+	private array $object_properties;
 
 
 	/**
@@ -35,7 +35,7 @@ abstract class ilCoSubMethodBase
 	 * @param ilObjCombiSubscription        $a_object
 	 * @param ilCombiSubscriptionPlugin     $a_plugin
 	 */
-	public function __construct($a_object, $a_plugin)
+	public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
 	{
 		$this->object = $a_object;
 		$this->plugin = $a_plugin;
@@ -45,7 +45,7 @@ abstract class ilCoSubMethodBase
 	 * Get the unique id of the method
 	 * @return string
 	 */
-	final public static function _getId()
+	final public static function _getId(): string
 	{
 		return get_called_class();
 	}
@@ -54,7 +54,7 @@ abstract class ilCoSubMethodBase
 	 * Get the unique id of the method
 	 * @return string
 	 */
-	final public function getId()
+	final public function getId(): string
 	{
 		return static::_getId();
 	}
@@ -64,7 +64,7 @@ abstract class ilCoSubMethodBase
 	 * (oberwrite this if no properties GUI is provided)
 	 * @return string
 	 */
-	public function getPropertiesGuiName()
+	public function getPropertiesGuiName(): string
 	{
 		return get_class($this) . 'PropertiesGUI';
 	}
@@ -74,7 +74,7 @@ abstract class ilCoSubMethodBase
 	 * (overwrite this if no properties GUI is provided)
 	 * @return string
 	 */
-	public function getPropertiesGuiPath()
+	public function getPropertiesGuiPath(): string
 	{
 		if ($classname = $this->getPropertiesGuiName())
 		{
@@ -87,7 +87,7 @@ abstract class ilCoSubMethodBase
 	 * Get the title of the method (to be used in lists or as headline)
 	 * @return string
 	 */
-	public function getTitle()
+	public function getTitle(): string
 	{
 		return $this->txt('title');
 	}
@@ -96,7 +96,7 @@ abstract class ilCoSubMethodBase
 	 * Get a description of the method (shown as tooltip or info text)
 	 * @return string
 	 */
-	public function getDescription()
+	public function getDescription(): string
 	{
 		return $this->txt('description');
 	}
@@ -105,7 +105,7 @@ abstract class ilCoSubMethodBase
 	 * Get an explanation that is shown to the assigning participants
 	 * @return string   html codes allowed
 	 */
-	public function getExplanation()
+	public function getExplanation(): string
 	{
 		return $this->txt('explanation');
 	}
@@ -115,7 +115,7 @@ abstract class ilCoSubMethodBase
 	 * (0 is the highest)
 	 * @return array    number => name
 	 */
-	public function getPriorities()
+	public function getPriorities(): array
 	{
 		return array(
 			0 => $this->txt('select_prio1'),
@@ -128,7 +128,7 @@ abstract class ilCoSubMethodBase
      * Check if a priority is in the range of selected priorities
      * @return bool
      */
-    public function isSelectedPriority($a_priority)
+    public function isSelectedPriority(int $a_priority): bool
     {
         return $a_priority >= 0 && $a_priority < count($this->getPriorities());
     }
@@ -137,7 +137,7 @@ abstract class ilCoSubMethodBase
 	 * Get the background colors for a priority index (0 is the highest)
 	 * @return string    css color expression
 	 */
-	public function getPriorityBackgroundColor($a_priority)
+	public function getPriorityBackgroundColor(string $a_priority): string
 	{
 
 		$low = array(210, 240, 202);
@@ -166,7 +166,7 @@ abstract class ilCoSubMethodBase
 	/**
 	 * Get the text for no selection
 	 */
-	public function getNotSelected()
+	public function getNotSelected(): string
 	{
 		return $this->txt('select_not');
 	}
@@ -176,7 +176,7 @@ abstract class ilCoSubMethodBase
 	 * Get the minimum seconds between appointments without conflict
 	 * @eturn int;
 	 */
-	public function getOutOfConflictTime()
+	public function getOutOfConflictTime(): int
 	{
 		return $this->out_of_conflict_time;
 	}
@@ -185,7 +185,7 @@ abstract class ilCoSubMethodBase
 	 * Get the tolerated percentage of schedule time being in conflict with other item
 	 * @eturn int;
 	 */
-	public function getToleratedConflictPercentage()
+	public function getToleratedConflictPercentage(): int
 	{
 		return $this->tolerated_conflict_percentage;
 	}
@@ -194,7 +194,7 @@ abstract class ilCoSubMethodBase
 	 * Get the number of assignments that are done by this method
 	 * @return int	(default: 1)
 	 */
-	public function getNumberAssignments()
+	public function getNumberAssignments(): int
 	{
 		return 1;
 	}
@@ -202,7 +202,7 @@ abstract class ilCoSubMethodBase
 	/**
 	 * This method allows multiple assignments of items to a user
 	 */
-	public function hasMultipleAssignments()
+	public function hasMultipleAssignments(): bool
 	{
 		return false;
 	}
@@ -211,7 +211,7 @@ abstract class ilCoSubMethodBase
 	 * This methods allows multiple selections per priority
 	 * @return bool
 	 */
-	public function hasMultipleChoice()
+	public function hasMultipleChoice(): bool
 	{
 		return false;
 	}
@@ -220,7 +220,7 @@ abstract class ilCoSubMethodBase
 	 * This method allows a priority not being selected
 	 * @return bool
 	 */
-	public function hasEmptyChoice()
+	public function hasEmptyChoice(): bool
 	{
 		return true;
 	}
@@ -229,7 +229,7 @@ abstract class ilCoSubMethodBase
 	 * This method allows a selection of peers
 	 * @return bool
 	 */
-	public function hasPeerSelection()
+	public function hasPeerSelection(): bool
 	{
 		return false;
 	}
@@ -238,7 +238,7 @@ abstract class ilCoSubMethodBase
 	 * This methods respects minimum subscriptions per assignment
 	 * @return bool
 	 */
-	public function hasMinSubscription()
+	public function hasMinSubscription(): bool
 	{
 		return false;
 	}
@@ -247,7 +247,7 @@ abstract class ilCoSubMethodBase
 	 * This methods respects maximum subscriptions per assignment
 	 * @return bool
 	 */
-	public function hasMaxSubscription()
+	public function hasMaxSubscription(): bool
 	{
 		return true;
 	}
@@ -255,7 +255,7 @@ abstract class ilCoSubMethodBase
 	/**
 	 * This method provides the result of calculateAssignments instantly
 	 */
-	public function hasInstantResult()
+	public function hasInstantResult(): bool
 	{
 		return false;
 	}
@@ -264,7 +264,7 @@ abstract class ilCoSubMethodBase
 	 * This method is active
 	 * @return bool
 	 */
-	public function isActive()
+	public function isActive(): bool
 	{
 		return false;
 	}
@@ -275,7 +275,7 @@ abstract class ilCoSubMethodBase
      * @param	bool		delete other runs except the best
 	 * @return 	ilCoSubRun|null
 	 */
-	public function getBestCalculationRun($a_tries, $a_cleanup = false)
+	public function getBestCalculationRun(int $a_tries, bool $a_cleanup = false): ?ilCoSubRun
 	{
 		if (!$this->hasInstantResult())
 		{
@@ -381,7 +381,7 @@ abstract class ilCoSubMethodBase
 	 * @param ilCoSubRun    $a_run
 	 * @return bool         true: calculation is started, false: an error occurred, see getError()
 	 */
-	public function calculateAssignments($a_run)
+	public function calculateAssignments(ilCoSubRun $a_run): bool
 	{
 		return false;
 	}
@@ -395,7 +395,7 @@ abstract class ilCoSubMethodBase
 	 * @param ilCoSubRun    $a_run
 	 * @return bool         true: result is available, false: result is not availeble or an error occurred, see getError()
 	 */
-	public function checkForResult($a_run)
+	public function checkForResult(ilCoSubRun $a_run): bool
 	{
 		return false;
 	}
@@ -404,7 +404,7 @@ abstract class ilCoSubMethodBase
 	 * Get the error message from calculateAssignments() or  checkForResult()
 	 * @return string
 	 */
-	public function getError()
+	public function getError(): string
 	{
 		return $this->error;
 	}
@@ -416,7 +416,7 @@ abstract class ilCoSubMethodBase
 	 * @param string	$a_langvar	language variable
 	 * @return string
 	 */
-	public function txt($a_langvar)
+	public function txt(string $a_langvar): string
 	{
 		return $this->plugin->txt(strtolower($this->getId()).'_'.$a_langvar);
 	}
@@ -428,7 +428,7 @@ abstract class ilCoSubMethodBase
 	 * @param   string  $a_default_value
 	 * @return string	value
 	 */
-	public static function _getSetting($a_key, $a_default_value = '')
+	public static function _getSetting(string $a_key, string $a_default_value = ''): string
 	{
 		return ilCombiSubscriptionPlugin::_getClassSetting(static::_getId(), $a_key, $a_default_value);
 	}
@@ -438,7 +438,7 @@ abstract class ilCoSubMethodBase
 	 * @param string  $a_key
 	 * @param string  $a_value
 	 */
-	public static function _setSetting($a_key, $a_value)
+	public static function _setSetting(string $a_key, string $a_value): void
 	{
 		ilCombiSubscriptionPlugin::_setClassSetting(static::_getId(), $a_key, $a_value);
 	}
@@ -449,7 +449,7 @@ abstract class ilCoSubMethodBase
 	 * @param   string  $a_default_value
 	 * @return string	value
 	 */
-	protected function getProperty($a_key, $a_default_value)
+	protected function getProperty(string $a_key, string $a_default_value): string
 	{
 		return $this->object->getClassProperty(get_class($this), $a_key, $a_default_value);
 	}
@@ -459,7 +459,7 @@ abstract class ilCoSubMethodBase
 	 * @param string  $a_key
 	 * @param string  $a_value
 	 */
-	protected function setProperty($a_key, $a_value)
+	protected function setProperty(string $a_key, string $a_value): void
 	{
 		$this->object->setClassProperty(get_class($this), $a_key, $a_value);
 	}

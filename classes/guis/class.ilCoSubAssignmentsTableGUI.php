@@ -7,55 +7,55 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
 class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 {
     /** @var \ILIAS\DI\Container */
-    protected $dic;
+    protected \ILIAS\DI\Container $dic;
 
 
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
 	/**
 	 * List of item ids
 	 * @var integer[]
 	 */
-	protected $item_ids = array();
+	protected array $item_ids = [];
 
     /**
      * List of import ids for the targets assigned to the items
      * @var \FAU\Study\Data\ImportId[] indexed by item_id
      */
-    protected $import_ids = array();
+    protected array $import_ids = [];
 
 	/**
 	 * List of run_ids
 	 * @var array   label => run_id
 	 */
-	protected $run_ids = array();
+	protected array $run_ids = [];
 
 	/**
 	 * List of users (indexed by user_id)
 	 * @var ilCoSubUser[];
 	 */
-	protected $users;
+	protected array $users;
 
 
 	/**
 	 * User priorities
 	 * @var array  (user_id => item_id => priority)
 	 */
-	protected $priorities;
+	protected array $priorities;
 
 	/**
 	 * Run assignments
 	 * @var array   (run_id => user_id => item_id => assign_id)
 	 */
-	protected $assignments;
+	protected array $assignments;
 
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilCoSubAssignmentsGUI     $a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
-	function __construct($a_parent_gui, $a_parent_cmd)
+	function __construct(ilCoSubAssignmentsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $DIC;
 
@@ -91,7 +91,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	/**
 	 * Prepare the data to be displayed
 	 */
-	public function prepareData()
+	public function prepareData(): void
 	{
 		/** @var ilAccessHandler  $ilAccess*/
 		global $ilAccess;
@@ -230,7 +230,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	 *                  'user' => string
 	 *                  'result' => integer, e.g. SATISFIED_FULL ]
 	 */
-	protected function fillRow($a_set)
+	protected function fillRow(array $a_set): void
 	{
 		$user_id = $a_set['user_id'];
 		$multiple_assignments = $this->object->getMethodObject()->hasMultipleAssignments();
@@ -331,7 +331,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 	}
     
     
-    protected function getSatisfactionDetailsLinkHtml($user_id, $user_name) 
+    protected function getSatisfactionDetailsLinkHtml(int $user_id, string $user_name) 
     {
         $factory = $this->dic->ui()->factory();
         $renderer = $this->dic->ui()->renderer();

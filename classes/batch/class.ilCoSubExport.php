@@ -33,7 +33,7 @@ class ilCoSubExport
     const MODE_RAW_COMFLICTS = 'raw_conflicts';
 
 
-	protected $headerStyle = array(
+	protected array $headerStyle = array(
 		'font' => array(
 			'bold' => true
 		),
@@ -43,7 +43,7 @@ class ilCoSubExport
 		)
 	);
 
-	protected $rowStyles = array(
+	protected array $rowStyles = array(
 		0 => array(
 			'fill' => array(
 				'type' => 'solid',
@@ -60,41 +60,41 @@ class ilCoSubExport
 	/**
 	 * @var ilCombiSubscriptionPlugin
 	 */
-	protected $plugin;
+	protected ilCombiSubscriptionPlugin $plugin;
 
 	/**
 	 * @var ilObjCombiSubscription
 	 */
-	protected $object;
+	protected ilObjCombiSubscription $object;
 
 
 	/** @var  string Writer Type ('excel' or 'csv') */
-	protected $type;
+	protected string $type;
 
 
 	/** @var string export mode ('reg_by_item') */
-	protected $mode;
+	protected string $mode;
 
 
 	/** @var ilLanguage $lng */
-	protected $lng;
+	protected ilLanguage $lng;
 
 	/**
 	 * @var bool user has extended user data access
 	 */
-	protected $extended = false;
+	protected bool $extended = false;
 
 
 	/**
 	 * @var bool platform has studydata
 	 */
-	protected $with_studydata = false;
+	protected bool $with_studydata = false;
 
 
     /**
      * @var bool platform has educations
      */
-    protected $with_educations = false;
+    protected bool $with_educations = false;
 
 
     /**
@@ -104,7 +104,7 @@ class ilCoSubExport
 	 * @param string						$type
 	 * @param string						$mode
 	 */
-	public function __construct($plugin, $object, $type = self::TYPE_EXCEL, $mode = '')
+	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $type = self::TYPE_EXCEL, string $mode = '')
 	{
 		global $lng;
 
@@ -133,7 +133,7 @@ class ilCoSubExport
 	 * @param string	$directory	directory where the file should be creatred
      * @return string   full path of the created file
 	 */
-	public function buildExportFile($directory = null, $mode = null, $type = null, $delimiter = null, $enclosure = null)
+	public function buildExportFile(?string $directory = null, ?string $mode = null, ?string $type = null, ?string $delimiter = null, ?string $enclosure = null): string
 	{
         $excelObj = new Spreadsheet();
 		//$excelObj->setActiveSheetIndex(0);
@@ -230,7 +230,7 @@ class ilCoSubExport
 	 * Items are columns, the priorities are values
 	 * @param Worksheet $worksheet
 	 */
-	protected function fillRegistrationsByItem($worksheet)
+	protected function fillRegistrationsByItem(Worksheet $worksheet): void
 	{
 		// Column definition and header
 		$columns = $this->getUserColumns();
@@ -277,7 +277,7 @@ class ilCoSubExport
      * Fill a sheet with raw item data
      * @param $worksheet
      */
-    protected function fillRawItems($worksheet)
+    protected function fillRawItems(Worksheet $worksheet): void
     {
         $columns = [
             'obj_id' => 'obj_id',
@@ -305,7 +305,7 @@ class ilCoSubExport
      * Fill a sheet with raw choices data
      * @param $worksheet
      */
-    protected function fillRawChoices($worksheet)
+    protected function fillRawChoices(Worksheet $worksheet): void
     {
         $columns = [
             'obj_id' => 'obj_id',
@@ -332,7 +332,7 @@ class ilCoSubExport
      * Fill a sheet with raw solution data
      * @param $worksheet
      */
-    protected function fillRawSolution($worksheet)
+    protected function fillRawSolution(Worksheet $worksheet): void
     {
         $columns = [
             'obj_id' => 'obj_id',
@@ -362,7 +362,7 @@ class ilCoSubExport
      * Fill a sheet with raw solution data
      * @param $worksheet
      */
-    protected function fillRawSettings($worksheet)
+    protected function fillRawSettings(Worksheet $worksheet): void
     {
         $columns = [
             'obj_id' => 'obj_id',
@@ -386,7 +386,7 @@ class ilCoSubExport
      * Fill a sheet with raw item data
      * @param $worksheet
      */
-    protected function fillRawCategories($worksheet)
+    protected function fillRawCategories(Worksheet $worksheet): void
     {
         $columns = [
             'obj_id' => 'obj_id',
@@ -412,7 +412,7 @@ class ilCoSubExport
      * Fill a sheet with raw item data
      * @param $worksheet
      */
-    protected function fillRawConflicts($worksheet)
+    protected function fillRawConflicts(Worksheet $worksheet): void
     {
         $columns = [
             'obj_id' => 'obj_id',
@@ -440,7 +440,7 @@ class ilCoSubExport
 	 * Items are columns, assigned items will have a 1 in the cell
 	 * @param Worksheet $worksheet
 	 */
-	protected function fillAssignmentsByItem($worksheet)
+	protected function fillAssignmentsByItem(Worksheet $worksheet): void
 	{
 		// Column definition and header
 		$columns = $this->getUserColumns();
@@ -489,7 +489,7 @@ class ilCoSubExport
 	 * Priorities are columns, the items are listed as values
 	 * @param Worksheet $worksheet
 	 */
-	protected function fillRegistrationsByPrio($worksheet)
+	protected function fillRegistrationsByPrio(Worksheet $worksheet): void
 	{
 		// Column definition and header
 		$columns = $this->getUserColumns();
@@ -537,7 +537,7 @@ class ilCoSubExport
 	 * Get the definition of the user columns
 	 * @return array
 	 */
-	protected function getUserColumns()
+	protected function getUserColumns(): array
 	{
 		// basic user header
 		$columns = array(
@@ -575,7 +575,7 @@ class ilCoSubExport
 	 *
 	 * @return array ('cnt', 'set')
 	 */
-	protected function getUserQueryResult()
+	protected function getUserQueryResult(): array
 	{
 		$user_ids = array_keys($this->object->getPriorities());
 		if (empty($user_ids))
@@ -600,7 +600,7 @@ class ilCoSubExport
 	 * @param array 	$user 	(single user part of getUserQueryResult())
 	 * @return array 	data for the user columns of a row
 	 */
-	protected function getUserColumnData($user)
+	protected function getUserColumnData(array $user): array
 	{
         global $DIC;
 
@@ -647,7 +647,7 @@ class ilCoSubExport
 	 * @param array	$columns
 	 * @return array	column key => column letter
 	 */
-	protected function fillHeaderRow($worksheet, $columns)
+	protected function fillHeaderRow(Worksheet $worksheet, array $columns): array
 	{
 		$col = 1;
 		$mapping = array();
@@ -671,7 +671,7 @@ class ilCoSubExport
 	 * @param array					$mapping 	key => letter
 	 * @param int					$row 		row number
 	 */
-	protected function fillRowData($worksheet, $data, $mapping, $row)
+	protected function fillRowData(Worksheet $worksheet, array $data, array $mapping, int $row): void
 	{
 		foreach ($data as $key => $value)
 		{
@@ -685,7 +685,7 @@ class ilCoSubExport
 	/**
 	 * @param Worksheet	$worksheet
 	 */
-	protected function adjustSizes($worksheet, $range = null)
+	protected function adjustSizes(Worksheet $worksheet, ?array $range = null)
 	{
 		$range = isset($range) ? $range : range('A', $worksheet->getHighestColumn());
 		foreach ($range as $columnID)

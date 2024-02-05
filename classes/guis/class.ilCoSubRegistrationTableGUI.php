@@ -7,32 +7,32 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
 class ilCoSubRegistrationTableGUI extends ilTable2GUI
 {
     /** @var \ILIAS\DI\Container */
-    protected $dic;
+    protected \ILIAS\DI\Container $dic;
 
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
 	/** @var array   $value => $text */
-	protected $options = array();
+	protected array $options = [];
 
 	/** @var int maximum choices count of all item priorities */
-	protected $max_choices = 0;
+	protected int $max_choices = 0;
 
 	/** @var bool	setting choices is disabled  */
-	protected $disabled = false;
+	protected bool $disabled = false;
 
 	/** @var array local_item_id => other_item_id => item */
-	protected $conflicts = [];
+	protected array $conflicts = [];
 
     /** @var ilCoSubCategory[] indexed by cat_id  */
-    protected $categories = [];
+    protected array $categories = [];
 
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilCoSubRegistrationGUI    $a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
-	function __construct($a_parent_gui, $a_parent_cmd)
+	function __construct(ilCoSubRegistrationGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $DIC;
 		parent::__construct($a_parent_gui, $a_parent_cmd);
@@ -66,7 +66,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	 * Set the disabled status
 	 * @param bool $a_disabled
 	 */
-	public function setDisabled($a_disabled)
+	public function setDisabled(bool $a_disabled): void
 	{
 		$this->disabled = $a_disabled;
 	}
@@ -78,7 +78,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	 * @param   array           $a_counts       item_id => priority => count
 	 * @param   array           $a_conflicts    local_item_id => other_item_id => item
 	 */
-	public function prepareData($a_items, $a_priorities, $a_counts, $a_conflicts = [])
+	public function prepareData(array $a_items, array $a_priorities, array $a_counts, array $a_conflicts = []): void
 	{
 		// get the available options
 		$method = $this->object->getMethodObject();
@@ -126,7 +126,7 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 	/**
 	 * Fill a single data row
 	 */
-	protected function fillRow($a_set)
+	protected function fillRow(array $a_set): void
 	{
 		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;

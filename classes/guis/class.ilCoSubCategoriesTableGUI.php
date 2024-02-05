@@ -8,14 +8,14 @@ require_once('Services/Locator/classes/class.ilLocatorGUI.php');
 class ilCoSubCategoriesTableGUI extends ilTable2GUI
 {
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
 	/**
 	 * ilCoSubCategoriesTableGUI constructor.
 	 * @param ilCoSubCategoriesGUI $a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
-	function __construct($a_parent_gui, $a_parent_cmd)
+	function __construct(ilCoSubCategoriesGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
 		parent::__construct($a_parent_gui, $a_parent_cmd);
@@ -45,7 +45,7 @@ class ilCoSubCategoriesTableGUI extends ilTable2GUI
 	 * Prepare the data to be displayed
 	 * @param   ilCoSubCategory[]   $a_categories
 	 */
-	public function prepareData($a_categories)
+	public function prepareData(array $a_categories): void
 	{
 		$data = array();
 		$sort = 10;
@@ -62,7 +62,7 @@ class ilCoSubCategoriesTableGUI extends ilTable2GUI
 	/**
 	 * Fill a single data row
 	 */
-	protected function fillRow($a_set)
+	protected function fillRow(array $a_set): void
 	{
 		$this->tpl->setCurrentBlock('checkbox');
 		$this->tpl->setVariable('CAT_ID',$a_set['cat_id']);

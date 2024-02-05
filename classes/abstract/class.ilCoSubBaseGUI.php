@@ -8,40 +8,40 @@ use ILIAS\DI\Container;
 abstract class ilCoSubBaseGUI
 {
     /** @var Container */
-    public $dic;
+    public Container $dic;
 
 	/** @var ilObjCombiSubscriptionGUI */
-	public $parent;
+	public ilObjCombiSubscriptionGUI $parent;
 
 	/** @var  ilObjCombiSubscription */
-	public $object;
+	public ilObjCombiSubscription $object;
 
 	/** @var  ilCombiSubscriptionPlugin */
-	public $plugin;
+	public ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  ilCtrl */
-	public $ctrl;
+	public ilCtrl $ctrl;
 
 	/** @var  ilTabsGUI */
-	public $tabs;
+	public ilTabsGUI $tabs;
 
 	/** @var ilGlobalTemplateInterface */
-	public $tpl;
+	public ilGlobalTemplateInterface $tpl;
 
 	/** @var ilLanguage */
-	public $lng;
+	public ilLanguage $lng;
 
 	/** @var ilPropertyFormGUI */
-	protected $form;
+	protected ilPropertyFormGUI $form;
 
 	/** @var ilToolbarGUI */
-	protected $toolbar;
+	protected ilToolbarGUI $toolbar;
 
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI     $a_parent_gui
 	 */
-	public function __construct($a_parent_gui)
+	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
         global $DIC;
 
@@ -62,7 +62,7 @@ abstract class ilCoSubBaseGUI
 	 * note: permissions are already checked in parent gui
 	 *
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('xxx');
 		switch ($cmd)
@@ -84,7 +84,7 @@ abstract class ilCoSubBaseGUI
 	 * @param $text
 	 * @return string
 	 */
-	public function pageInfo($text)
+	public function pageInfo(string $text): string
 	{
 		return '<p class="small">'.$text.'</p><br />';
 	}
@@ -94,7 +94,7 @@ abstract class ilCoSubBaseGUI
 	 * @param $text
 	 * @return string
 	 */
-	public function messageDetails($text)
+	public function messageDetails(string $text): string
 	{
 		return '<p class="small">'.$text.'</p>';
 	}

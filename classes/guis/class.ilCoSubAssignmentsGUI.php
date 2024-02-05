@@ -10,13 +10,13 @@
 class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 {
 	/** @var string command to show the list of users */
-	protected $cmdUserList = 'editAssignments';
+	protected string $cmdUserList = 'editAssignments';
 
 	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$next_class = $this->ctrl->getNextClass();
 		switch ($next_class)
@@ -68,7 +68,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Set the toolbar for the assignments screen
 	 */
-	protected function setAssignmentsToolbar()
+	protected function setAssignmentsToolbar(): void
 	{
 		global $ilToolbar;
 
@@ -129,7 +129,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Edit the registration of the current user
 	 */
-	public function editAssignments()
+	public function editAssignments(): void
 	{
 		$this->parent->checkUnfinishedRuns();
 		$this->setAssignmentsToolbar();
@@ -147,7 +147,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Confirm the transfer of assignments to target objects
 	 */
-	public function calculateAssignmentsConfirmation()
+	public function calculateAssignmentsConfirmation(): void
 	{
 		ilUtil::sendQuestion($this->plugin->txt('calculate_assignments_confirmation')
 			. $this->messageDetails($this->plugin->txt('calculate_assignments_confirmation_details')));
@@ -175,7 +175,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Calculate new assignments
 	 */
-	protected function calculateAssignments()
+	protected function calculateAssignments(): void
 	{
 		if (!$this->object->getMethodObject()->isActive())
 		{
@@ -241,7 +241,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Save the assignments of the displayed users
 	 */
-	public function saveAssignments()
+	public function saveAssignments(): void
 	{
 		$this->savePostedAssignments();
 		ilUtil::sendSuccess($this->plugin->txt('msg_assignments_saved'), true);
@@ -252,7 +252,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Save the manual assignments as a new calculation run
 	 */
-	public function saveAssignmentsAsRun()
+	public function saveAssignmentsAsRun(): void
 	{
 		/** @var ilObjUser $ilUser */
 		global $ilUser;
@@ -282,7 +282,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 * Save the posted assignments
 	 * Helper function for saveAssignments and saveAssignmentsAsRun
 	 */
-	public function savePostedAssignments()
+	public function savePostedAssignments(): void
 	{
 		foreach ($this->object->getUsers() as $user_id => $userObj)
 		{
@@ -321,7 +321,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Set the assignments from a run
 	 */
-	public function setRunAssignments()
+	public function setRunAssignments(): void
 	{
 		if (!empty($_POST['run_id']))
 		{
@@ -335,7 +335,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Confirm the transfer of assignments to target objects
 	 */
-	public function transferAssignmentsConfirmation()
+	public function transferAssignmentsConfirmation(): void
 	{
         $targets = [];
         foreach ($this->object->getItems() as $item)
@@ -388,7 +388,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 * This fixes the assigned users and removes their conflicting subscriptions in other objects
 	 * The assigned users are notified
 	 */
-	public function transferAssignments()
+	public function transferAssignments(): void
 	{
         $form = new ilPropertyFormGUI();
         $form->checkInput();
@@ -429,7 +429,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Confirm the transfer of assignments to target objects
 	 */
-	public function notifyAssignmentsConfirmation()
+	public function notifyAssignmentsConfirmation(): void
 	{
 		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 
@@ -447,7 +447,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 * Notify the users about their Assignments
 	 * This fixes the assigned users and removes their conflicting subscriptions in other objects
 	 */
-	public function notifyAssignments()
+	public function notifyAssignments(): void
 	{
 		$this->object->fixAssignedUsers();
 		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
@@ -467,7 +467,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
     /**
      * Confirm fthe fixing of assigned users
      */
-    public function fixAssignmentsConfirmation()
+    public function fixAssignmentsConfirmation(): void
     {
         $conf_gui = new ilConfirmationGUI();
         $conf_gui->setFormAction($this->ctrl->getFormAction($this,'fixAssignments'));
@@ -482,7 +482,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
     /**
      * Fix the successful assignments of users
      */
-    public function fixAssignments()
+    public function fixAssignments(): void
     {
         $this->object->fixAssignedUsers();
         $this->ctrl->redirect($this,'editAssignments');
@@ -492,7 +492,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
     /**
 	 * Manual start of auto processing (for testing)
 	 */
-	public function autoProcess()
+	public function autoProcess(): void
 	{
 		$this->object->handleAutoProcess();
 		$this->ctrl->redirect($this,'editAssignments');

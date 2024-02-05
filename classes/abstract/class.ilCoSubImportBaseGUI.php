@@ -10,16 +10,16 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 {
 
 	/** @var array  mode => ['title' => string, 'info' => string, 'default' => bool] */
-	var $modes = array();
+	private array $modes = [];
 
     /** @var bool add a comment input field to the import form */
-    protected $add_comment = false;
+    protected bool $add_comment = false;
 
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
 	 */
-	public function __construct($a_parent_gui)
+	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
 		$this->plugin->includeClass('batch/class.ilCoSubImport.php');
@@ -30,7 +30,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('showImportForm');
 		switch ($cmd)
@@ -51,7 +51,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Initialize the form with export settings
 	 */
-	protected function initImportForm()
+	protected function initImportForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -91,7 +91,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Show the form with export settings
 	 */
-	public function showImportForm()
+	public function showImportForm(): void
 	{
 		$this->initImportForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -100,7 +100,7 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Do the export
 	 */
-	public function doImport()
+	public function doImport(): void
 	{
 		$this->initImportForm();
 		if (!$this->form->checkInput() || !$this->form->hasFileUpload('import_file'))

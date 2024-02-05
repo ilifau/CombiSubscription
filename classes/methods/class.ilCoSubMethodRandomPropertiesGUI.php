@@ -11,13 +11,13 @@
 class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 {
 	/** @var ilCoSubMethodRandom */
-	protected $method;
+	protected ilCoSubMethodRandom $method;
 
 	/**
 	 * ilCoSubMethodRandomPropertiesGUI constructor.
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
 	 */
-	public function __construct($a_parent_gui)
+	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
 
@@ -28,7 +28,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('editProperties');
 		switch ($cmd)
@@ -48,7 +48,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Edit the properties
 	 */
-	protected function editProperties()
+	protected function editProperties(): void
 	{
 		$this->initPropertiesForm();
 		$this->loadPropertiesValues();
@@ -61,7 +61,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Update the properties
 	 */
-	protected function updateProperties()
+	protected function updateProperties(): void
 	{
 		$this->initPropertiesForm();
 		if ($this->form->checkInput())
@@ -81,7 +81,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Inot the properties form
 	 */
-	protected function initPropertiesForm()
+	protected function initPropertiesForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -162,7 +162,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	 * Add spcific calculation settings to a properties form
 	 * @param ilPropertyFormGUI $form
 	 */
-	public function addCalculationSettings(ilPropertyFormGUI $form)
+	public function addCalculationSettings(ilPropertyFormGUI $form): void
 	{
 		// workarounds switch
 		$work = new ilCheckboxInputGUI($this->plugin->txt('calculation_workarounds'),'');
@@ -210,7 +210,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	 * Apply the specific settings fom a posted properties form
 	 * @param ilPropertyFormGUI $form
 	 */
-	public function applyCalculationSettings(ilPropertyFormGUI $form)
+	public function applyCalculationSettings(ilPropertyFormGUI $form): void
 	{
         $this->method->prefer_filled_items = (bool) $form->getInput('prefer_filled_items');
         if ($form->getInput('forced_item_minimum')) {
@@ -226,7 +226,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Load the properties values in the form
 	 */
-	protected function loadPropertiesValues()
+	protected function loadPropertiesValues(): void
 	{
 		$this->form->getItemByPostVar('number_priorities')->setValue($this->method->number_priorities);
 		$this->form->getItemByPostVar('priority_choices')->setValue($this->method->priority_choices);
@@ -245,7 +245,7 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Save the properties values from the form
 	 */
-	protected function savePropertiesValues()
+	protected function savePropertiesValues(): void
 	{
 		$this->method->number_priorities = (int) $this->form->getInput('number_priorities');
 		$this->method->priority_choices = (string) $this->form->getInput('priority_choices');

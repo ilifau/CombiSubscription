@@ -11,29 +11,29 @@ require_once('Modules/Session/classes/class.ilObjSessionListGUI.php');
 class ilCoSubItemsTableGUI extends ilTable2GUI
 {
     /** @var ilContainer */
-    protected $dic;
+    protected ilContainer $dic;
     
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
 	/** @var ilCoSubItemsGUI  */
-	protected $parent;
+	protected ilCoSubItemsGUI $parent;
 
 	/** @var ilCombiSubscriptionPlugin  */
-	protected $plugin;
+	protected ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  ilCoSubCategory[]	indexed by cat_id */
-	protected $categories;
+	protected array $categories;
 
 	/** @var ilCombiSubscriptionTargets */
-	protected $targets;
+	protected ilCombiSubscriptionTargets $targets;
 
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilCoSubItemsGUI 			$a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
-	function __construct($a_parent_gui, $a_parent_cmd)
+	function __construct(ilCoSubItemsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $DIC;
 		parent::__construct($a_parent_gui, $a_parent_cmd);
@@ -87,7 +87,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 	 * Prepare the data to be displayed
 	 * @param   ilCoSubItem[]   $a_items
 	 */
-	public function prepareData($a_items)
+	public function prepareData(array $a_items): void
 	{
 		$data = array();
 		$sort = 10;
@@ -110,7 +110,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 	/**
 	 * Fill a single data row
 	 */
-	protected function fillRow($a_set)
+	protected function fillRow(array $a_set): void
 	{
 		global $lng;
 

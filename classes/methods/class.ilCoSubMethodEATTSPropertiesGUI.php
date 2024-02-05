@@ -17,7 +17,7 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$this->method = $this->object->getMethodObject();
 
@@ -39,7 +39,7 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Edit the properties
 	 */
-	protected function editProperties()
+	protected function editProperties(): void
 	{
 		$this->initPropertiesForm();
 		$this->loadPropertiesValues();
@@ -51,7 +51,7 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Update the properties
 	 */
-	protected function updateProperties()
+	protected function updateProperties(): void
 	{
 		$this->initPropertiesForm();
 		if ($this->form->checkInput())
@@ -70,7 +70,7 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Inot the properties form
 	 */
-	protected function initPropertiesForm()
+	protected function initPropertiesForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -139,7 +139,7 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Load the properties values in the form
 	 */
-	protected function loadPropertiesValues()
+	protected function loadPropertiesValues(): void
 	{
 		$hours = floor($this->method->time_limit / 3600);
 		$rest = $this->method->time_limit % 3600;
@@ -169,7 +169,7 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Save the properties values from the form
 	 */
-	protected function savePropertiesValues()
+	protected function savePropertiesValues(): void
 	{
 		$limit = $this->form->getInput('time_limit');
 		$this->method->time_limit = $limit['hh']*3600 + $limit['mm']*60 + $limit['ss'];

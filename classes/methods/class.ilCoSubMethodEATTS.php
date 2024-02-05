@@ -18,38 +18,38 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	# region class variables
 
 	/** @var string eatts server url */
-	public $server_url;
+	public string $server_url;
 
 	/** @var string license server url  */
-	public $license_url;
+	public string $license_url;
 
 	/** @var string license */
-	public $license;
+	public string $license;
 
 	/** @var string  */
-	public $log_level;
+	public string $log_level;
 
 	/** @var int maximum iterations */
-	public $max_iterations;
+	public int $max_iterations;
 
 	/** @var int time limit in seconds */
-	public $time_limit;
+	public int $time_limit;
 
 	/** @var float weight of priorities */
-	public $priority_weight;
+	public float $priority_weight;
 
 	/** @var float weight of maximum subscriptions */
-	public $sub_max_weight;
+	public float $sub_max_weight;
 
 	/** @var float weight of minimum subscriptions */
-	public $sub_min_weight;
+	public float $sub_min_weight;
 
 	/** @var float weight peer selections */
-	public $peers_weight;
+	public float $peers_weight;
 
 
 	/** @var  ilCoSubRun */
-	protected $run;
+	protected ilCoSubRun $run;
 
 	# endregion
 
@@ -58,7 +58,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * @param ilObjCombiSubscription        $a_object
 	 * @param ilCombiSubscriptionPlugin     $a_plugin
 	 */
-	public function __construct($a_object, $a_plugin)
+	public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
 	{
 		parent::__construct($a_object, $a_plugin);
 
@@ -78,7 +78,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	/**
 	 * Save the properties
 	 */
-	public function saveProperties()
+	public function saveProperties(): void
 	{
 		$this->setProperty('max_iterations', sprintf('%d', $this->max_iterations));
 		$this->setProperty('time_limit', sprintf('%d', $this->time_limit));
@@ -93,7 +93,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * (0 is the highest)
 	 * @return array    number => name
 	 */
-	public function getPriorities()
+	public function getPriorities(): array
 	{
 		return array(
 			0 => $this->txt('select_preferred'),
@@ -104,7 +104,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	/**
 	 * Get the text for no selection
 	 */
-	public function getNotSelected()
+	public function getNotSelected(): string
 	{
 		return $this->txt('select_not');
 	}
@@ -113,7 +113,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * This methods allows multipe selections per oriority
 	 * @return bool
 	 */
-	public function hasMultipleChoice()
+	public function hasMultipleChoice(): bool
 	{
 		return true;
 	}
@@ -122,7 +122,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * This method allows a selection of peers
 	 * @return bool
 	 */
-	public function hasPeerSelection()
+	public function hasPeerSelection(): bool
 	{
 		return false;
 	}
@@ -131,7 +131,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * This methods respects minimum subscriptions per assignment
 	 * @return bool
 	 */
-	public function hasMinSubscription()
+	public function hasMinSubscription(): bool
 	{
 		return false;
 	}
@@ -141,7 +141,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * This methods respects maximum subscriptions per assignment
 	 * @return bool
 	 */
-	public function hasMaxSubscription()
+	public function hasMaxSubscription(): bool
 	{
 		return true;
 	}
@@ -151,7 +151,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * This method is active
 	 * @return bool
 	 */
-	public function isActive()
+	public function isActive(): bool
 	{
 		return false;
 	}
@@ -164,7 +164,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * @param ilCoSubRun    $a_run
 	 * @return bool         true: calculation is started, false: an error occurred, see getError()
 	 */
-	public function calculateAssignments($a_run)
+	public function calculateAssignments(ilCoSubRun $a_run): bool
 	{
 		$this->run = $a_run;
 		$this->error = '';
@@ -222,7 +222,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * @param ilCoSubRun    $a_run
 	 * @return bool         true: result is available, false: result is not available or an error occurred, see getError()
 	 */
-	public function checkForResult($a_run)
+	public function checkForResult(ilCoSubRun $a_run): bool
 	{
 		$this->run = $a_run;
 		$this->error = '';
@@ -290,7 +290,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * Get details of the calculation parameters
 	 * @return string
 	 */
-	protected function getParameterDetails()
+	protected function getParameterDetails(): string
 	{
 		require_once('Services/Utilities/classes/class.ilFormat.php');
 
@@ -315,7 +315,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * Get the XML code of the choices
 	 * @return string xml code for EATTS
 	 */
-	protected function getRegistrationsAsXML()
+	protected function getRegistrationsAsXML(): string|false
 	{
 		$body = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
 			.'<COURSEINPUT></COURSEINPUT>';
@@ -376,7 +376,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * Create assignments from the xml provided by EATTS
 	 * @param string    xml code from EATTS
 	 */
-	protected function createAssignmentsFromXML($a_xml)
+	protected function createAssignmentsFromXML(string $a_xml)
 	{
 		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 

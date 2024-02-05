@@ -13,19 +13,19 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 {
 
 	/** @var  ilCombiSubscriptionPlugin */
-	protected $plugin;
+	protected ilCombiSubscriptionPlugin $plugin;
 
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
 	/** @var ilTemplate */
-	protected $tpl;
+	protected ilTemplate $tpl;
 
 	/** @var ilLanguage */
-	protected $lng;
+	protected ilLanguage $lng;
 
 	/** @var ilPropertyFormGUI */
-	protected $form;
+	protected ilPropertyFormGUI $form;
 
 
 
@@ -44,7 +44,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Handles all commmands, default is "configure"
 	 */
-	function performCommand($cmd)
+	function performCommand(string $cmd): void
 	{
 		// now available
 		$this->plugin = $this->getPluginObject();

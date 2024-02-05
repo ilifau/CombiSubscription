@@ -8,12 +8,12 @@
  */
 abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 {
-	protected $cmdUserList = '';
+	protected string $cmdUserList = '';
 
 	/**
 	 * Redirect to the list of users
 	 */
-	protected function redirectToUserList()
+	protected function redirectToUserList(): void
 	{
 		$this->ctrl->redirect($this, $this->cmdUserList);
 	}
@@ -21,7 +21,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * add a user search to the toobar
 	 */
-	protected function provideUserSearch()
+	protected function provideUserSearch(): void
 	{
 		// add member
 		include_once './Services/Search/classes/class.ilRepositorySearchGUI.php';
@@ -48,7 +48,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 * Perform the user search
 	 * @throws ilCtrlException
 	 */
-	protected function performUserSearch()
+	protected function performUserSearch(): void
 	{
 		include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
 		$rep_search = new ilRepositorySearchGUI();
@@ -66,7 +66,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 * @param mixed $a_type
 	 * @return bool
 	 */
-	public function addUsers($user_ids, $a_type = null)
+	public function addUsers(array $user_ids, ?int $a_type = null): bool
 	{
 		if (empty($user_ids[0]))
 		{

@@ -14,31 +14,31 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     //
 
 	/** @var int number of selectable priorities */
-	public $number_priorities = 2;
+	public int $number_priorities = 2;
 
 	/** @var string mode of selecting priorities */
-	public $priority_choices = 'free';
+	public string $priority_choices = 'free';
 
 	/** @var int number of items to assign in the calculation */
-	public $number_assignments = 1;
+	public int $number_assignments = 1;
 
     /** @var bool tweak: prefer filling single items instead of equal distribution */
-    public $prefer_filled_items = false;
+    public bool $prefer_filled_items = false;
 
     /** @var int|null tweak: forced minimum number of assignments */
-    public $forced_item_minimum = null;
+    public ?int $forced_item_minimum = null;
     
 	/** @var bool tewak: allow less than number_assignments per user */
-    public $allow_low_filled_users = false;
+    public bool $allow_low_filled_users = false;
 
 	/** @var bool tweak: calculate as if all items were selected by the users */
-    public $assume_all_items_selected = false;
+    public bool $assume_all_items_selected = false;
 
 	/** @var bool tweak: calculate as if the maximum per item is limited by the minimum */
-    public $assume_sub_min_as_limit = false;
+    public bool $assume_sub_min_as_limit = false;
     
     /** @var bool tweak: allow to fill up missing assignments of fixed users */
-    public $fill_fixed_users = false;
+    public bool $fill_fixed_users = false;
     
     
     //
@@ -46,44 +46,44 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     //
 
 	/** @var  ilCoSubRun */
-	protected $run;
+	protected ilCoSubRun $run;
 
 	/**	@var ilCoSubUser[] (indexed by user_id) */
-	protected $users;
+	protected array $users;
 
 	/** @var ilCoSubItem[] (indexed by item_id) */
-	protected $items = array();
+	protected array $items = [];
 
 	/** @var  array 	item_id => item_id[] */
-	protected $conflicts;
+	protected array $conflicts;
 	
 	/** @var array cat_id => (int) limit */
-	protected $category_limits = array();
+	protected array $category_limits = [];
 
     /** @var  array     user_id => item_id => priority */
-    protected $inital_priorities = array();
+    protected array $inital_priorities = [];
 
     /**  @var array	user_id => item_id => true */
-    protected $fixed_assignments = array();
+    protected array $fixed_assignments = [];
     
     //
     // Calculation data (changing in a calculation run)
     //
 
 	/** @var  array    user_id => item_id => priority */
-	protected $priorities = array();
+	protected array $priorities = [];
 
 	/**  @var array	user_id => item_id => true */
-	protected $assignments = array();
+	protected array $assignments = [];
 
 	/** @var array  	item_id => count */
-	protected $assign_counts_item = array();
+	protected array $assign_counts_item = [];
 	
 	/** @var array 		user_id => count */
-	protected $assign_counts_user = array();
+	protected array $assign_counts_user = [];
 
     /** @var int[] IDs of items that are blocked for further assignments */
-    protected $blocked_item_ids = array();
+    protected array $blocked_item_ids = [];
 
 
     /**
@@ -91,7 +91,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * @param ilObjCombiSubscription        $a_object
 	 * @param ilCombiSubscriptionPlugin     $a_plugin
 	 */
-	public function __construct($a_object, $a_plugin)
+	public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
 	{
 		parent::__construct($a_object, $a_plugin);
 
@@ -108,7 +108,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Save the properties
 	 */
-	public function saveProperties()
+	public function saveProperties(): void
 	{
 		$this->setProperty('number_priorities', sprintf('%d', $this->number_priorities));
 		$this->setProperty('priority_choices', sprintf('%s', (string) $this->priority_choices));
@@ -134,7 +134,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * (0 is the highest)
 	 * @return array    number => name
 	 */
-	public function getPriorities()
+	public function getPriorities(): array
 	{
 		switch ($this->number_priorities)
 		{
@@ -162,7 +162,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Get the text for no selection
 	 */
-	public function getNotSelected()
+	public function getNotSelected(): string
 	{
 		return $this->txt('select_not');
 	}
@@ -172,7 +172,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * Get the number of assignments that are done by this method
 	 * @return int	(default: 1)
 	 */
-	public function getNumberAssignments()
+	public function getNumberAssignments(): int
 	{
 		return $this->number_assignments;
 	}
@@ -180,7 +180,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * This method allows multiple assignments of items to a user
 	 */
-	public function hasMultipleAssignments()
+	public function hasMultipleAssignments(): bool
 	{
 		return $this->number_assignments > 1;
 	}
@@ -190,7 +190,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * This methods allows multiple selections per priority
 	 * @return bool
 	 */
-	public function hasMultipleChoice()
+	public function hasMultipleChoice(): bool
 	{
 		return ($this->priority_choices == self::PRIO_CHOICES_FREE);
 	}
@@ -200,7 +200,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * This method allows a priority not being selected
 	 * @return bool
 	 */
-	public function hasEmptyChoice()
+	public function hasEmptyChoice(): bool
 	{
 		return ($this->priority_choices != self::PRIO_CHOICES_UNIQUE);
 	}
@@ -210,7 +210,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * This method allows a selection of peers
 	 * @return bool
 	 */
-	public function hasPeerSelection()
+	public function hasPeerSelection(): bool
 	{
 		return false;
 	}
@@ -219,7 +219,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * This methods respects minimum subscriptions per assignment
 	 * @return bool
 	 */
-	public function hasMinSubscription()
+	public function hasMinSubscription(): bool
 	{
 		return true;
 	}
@@ -228,7 +228,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * This methods respects maximum subscriptions per assignment
 	 * @return bool
 	 */
-	public function hasMaxSubscription()
+	public function hasMaxSubscription(): bool
 	{
 		return true;
 	}
@@ -236,7 +236,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * This method provides the result of calculateAssignments instantly
 	 */
-	public function hasInstantResult()
+	public function hasInstantResult(): bool
 	{
 		return true;
 	}
@@ -246,7 +246,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * This method is active
 	 * @return bool
 	 */
-	public function isActive()
+	public function isActive(): bool
 	{
 		return true;
 	}
@@ -255,7 +255,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * Initialize the basics needed for the calculation
      * These will not change within a calculation run
 	 */
-	protected function initCalculationBasics()
+	protected function initCalculationBasics(): void
 	{
 		$this->items = $this->object->getItems();
 		$this->conflicts = $this->object->getItemsConflicts();
@@ -280,7 +280,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Initialize the calculation variables for a new assignment loop
 	 */
-	protected function initCalculationData()
+	protected function initCalculationData(): void
 	{
         $this->priorities = $this->inital_priorities;
 		$this->assignments = [];
@@ -315,7 +315,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * @param integer	$a_item_id
      * @param integer	$a_fixed    add this assignment to the list of fixed assignments
 	 */
-	protected function assignUser($a_user_id, $a_item_id, $a_fixed = false)
+	protected function assignUser(int $a_user_id, int $a_item_id, bool $a_fixed = false): void
 	{
 		// note the assignments
 		$this->assignments[$a_user_id][$a_item_id] = true;
@@ -342,7 +342,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Save the calculated assignments
 	 */
-	protected function saveAssignments()
+	protected function saveAssignments(): void
 	{
 		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 
@@ -369,7 +369,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * @param ilCoSubRun    $a_run
 	 * @return bool         true: calculation is started, false: an error occurred, see getError()
 	 */
-	public function calculateAssignments($a_run)
+	public function calculateAssignments(ilCoSubRun $a_run): bool
 	{
 		include_once('include/inc.debug.php');
 
@@ -447,7 +447,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * - support period conflicts
 	 * - leaves only fully or not assigned users
 	 */
-	protected function calculateByUsers()
+	protected function calculateByUsers(): void
 	{
 		foreach ($this->getShuffledUserIds() as $user_id)
 		{
@@ -479,7 +479,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	/**
 	 * Get a randomly sorted list of users
 	 */
-	protected function getShuffledUserIds()
+	protected function getShuffledUserIds(): array
 	{
 		$user_ids = array();
 		foreach ($this->users as $user_id => $user)
@@ -501,7 +501,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * @param	int				$a_user_id
 	 * @return	ilCoSubItem[]	item_id => item
 	 */
-	protected function getSortedItemsForUser($a_user_id)
+	protected function getSortedItemsForUser(int $a_user_id): array
 	{
 		if (!is_array($this->priorities[$a_user_id]))
 		{
@@ -585,7 +585,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * @param $a_catlimits	int[]		 	item_id => limit	still available selections per category
 	 * @return 				ilCoSubItem[]	item_id => item		selected items
 	 */
-	protected function getRecursiveItemSelectionForUser($a_selected, $a_available, $a_catlimits)
+	protected function getRecursiveItemSelectionForUser(array $a_selected, array $a_available, array $a_catlimits): array
 	{
 		//log_line('getRecursiveItemSelectionForUser');
 
@@ -690,7 +690,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 * Get the items with less than minimum assignments
 	 * @return int[]
 	 */
-	protected function getLowFilledItemIds()
+	protected function getLowFilledItemIds(): array
 	{
 		$ids = array();
 		foreach ($this->items as $item)
@@ -718,7 +718,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
      * Remove any non-fixed user assignments from items that should not be used (e.g. because they are low-filled)
      * @param int[] $a_item_ids
      */
-    protected function removeUnfixedAssignments($a_item_ids)
+    protected function removeUnfixedAssignments(array $a_item_ids): void
     {
         foreach ($this->users as $user_id => $user) {
             

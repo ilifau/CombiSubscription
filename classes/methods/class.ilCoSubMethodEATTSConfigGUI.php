@@ -14,7 +14,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('editProperties');
 		switch ($cmd)
@@ -35,7 +35,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	 * Get the classname of the assigned method
 	 * @return string
 	 */
-	public function getMethodId()
+	public function getMethodId(): string
 	{
 		return 'ilCoSubMethodEATTS';
 	}
@@ -43,7 +43,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	/**
 	 * Edit the properties
 	 */
-	protected function editProperties()
+	protected function editProperties(): void
 	{
 		$this->initPropertiesForm();
 		$this->loadPropertiesValues();
@@ -54,7 +54,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	/**
 	 * Update the properties
 	 */
-	protected function updateProperties()
+	protected function updateProperties(): void
 	{
 		$this->initPropertiesForm();
 		if ($this->form->checkInput())
@@ -73,7 +73,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	/**
 	 * Inot the properties form
 	 */
-	protected function initPropertiesForm()
+	protected function initPropertiesForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -107,7 +107,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	/**
 	 * Load the properties values in the form
 	 */
-	protected function loadPropertiesValues()
+	protected function loadPropertiesValues(): void
 	{
 		/** @var ilCoSubMethodBase $method */
 		$method = $this->getMethodId();
@@ -121,7 +121,7 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	/**
 	 * Save the properties values from the form
 	 */
-	protected function savePropertiesValues()
+	protected function savePropertiesValues(): void
 	{
 		/** @var ilCoSubMethodBase $method */
 		$method = $this->getMethodId();

@@ -11,16 +11,16 @@
 class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 {
 	/** @var  ilCoSubScript */
-	var $script;
+	private ilCoSubScript $script;
 
 	/** @var array  mode => ['title' => string, 'info' => string, 'default' => bool] */
-	var $modes = array();
+	private array  $modes = array();
 
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
 	 */
-	public function __construct($a_parent_gui)
+	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
 		$this->plugin->includeClass("batch/class.ilCoSubScript.php");
@@ -33,7 +33,7 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('showImportForm');
 		switch ($cmd)
@@ -54,7 +54,7 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	/**
 	 * Initialize the form with settings
 	 */
-	protected function initImportForm()
+	protected function initImportForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -89,7 +89,7 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	/**
 	 * Show the form with export settings
 	 */
-	public function showImportForm()
+	public function showImportForm(): void
 	{
 		$this->initImportForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -98,7 +98,7 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	/**
 	 * Do the export
 	 */
-	public function processFile()
+	public function processFile(): void
 	{
 		$this->initImportForm();
 		if (!$this->form->checkInput() || !$this->form->hasFileUpload('import_file'))

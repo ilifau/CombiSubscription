@@ -11,26 +11,26 @@
 class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 {
 	/** @var string command to show the list of users */
-	protected $cmdUserList = 'listRegistrations';
+	protected string $cmdUserList = 'listRegistrations';
 
 	/** @var ilCoSubCategory[] */
-	protected $categories = [];
+	protected array $categories = [];
 
 	/** @var bool registration is disabled */
-	protected $disabled = false;
+	protected bool $disabled = false;
 
 	/** @var ilObjUser ilias_user */
-	protected $ilias_user = null;
+	protected ?ilObjUser $ilias_user = null;
 
 	/** @var array local_item_id => other_item_id => item */
-	protected $conflicts = [];
+	protected array $conflicts = [];
 
 	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 * @throws ilCtrlException
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$next_class = $this->ctrl->getNextClass();
 		switch ($next_class)
@@ -80,7 +80,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Show a list of registered users
 	 */
-	public function listRegistrations()
+	public function listRegistrations(): void
 	{
 		/**
 		 * @var ilAccessHandler $ilAccess
@@ -129,7 +129,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
     /**
      * list conflicts with external assignments
      */
-    public function listConflicts()
+    public function listConflicts(): void
     {
         /**
          * @var ilErrorHandling $ilErr
@@ -176,7 +176,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
     /**
      * Show the confirmation message for removing conflicts
      */
-    public function confirmRemoveConflicts()
+    public function confirmRemoveConflicts(): void
     {
         $this->tabs->activateSubTab('list_registrations');
 
@@ -192,7 +192,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
     /**
      * Remove choices that have conflicts with external assignments
      */
-    public function removeConflicts()
+    public function removeConflicts(): void
     {
         /**
          * @var ilErrorHandling $ilErr
@@ -220,7 +220,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 * Edit the registration of the current user
 	 * @param array|null	posted priorities to be set (item_id => priority)
 	 */
-	public function editRegistration($priorities = null)
+	public function editRegistration(?array $priorities = null): void
 	{
 		// get the user for checking if it is fixed
 		$userObj = $this->object->getUser($this->ilias_user->getId());
@@ -319,7 +319,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 * @param ilCoSubUser $userObj
 	 * @return array
 	 */
-	public function getRegistrationInfos($userObj)
+	public function getRegistrationInfos(ilCoSubUser $userObj): array
 	{
         global $DIC;
 
@@ -409,7 +409,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 * @param array|null	$priorities priorities to be set (item_id => priority)
 	 * @return string
 	 */
-	protected function getFlatRegisterHTML($priorities)
+	protected function getFlatRegisterHTML(?array $priorities): string
 	{
 		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 		$table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
@@ -428,7 +428,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 * @param array|null	$priorities priorities to be set (item_id => priority)
 	 * @return string
 	 */
-	protected function getCatRegisterHTML($priorities)
+	protected function getCatRegisterHTML(?array $priorities): string
 	{
 		include_once('Services/Accordion/classes/class.ilAccordionGUI.php');
 		$acc_gui = new ilAccordionGUI();
@@ -505,7 +505,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
      * @param int|null    $selected_module_id
      * @return string
      */
-    public function getRestrictionAndModuleHtml(?string $import_id, string $module_post_var, ?int $selected_module_id)
+    public function getRestrictionAndModuleHtml(?string $import_id, string $module_post_var, ?int $selected_module_id): string
     {
         $html = '';
         $import_id = \FAU\Study\Data\ImportId::fromString($import_id);
@@ -537,7 +537,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Save the registration of the current user
 	 */
-	public function saveRegistration()
+	public function saveRegistration(): void
 	{
 		$userObj = $this->object->getUser($this->ilias_user->getId());
 
@@ -563,7 +563,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		if (count($posted) < $min_choices)
 		{
 			ilUtil::sendFailure(sprintf($this->plugin->txt('min_choices_alert'), $min_choices));
-			return $this->editRegistration($posted);
+			$this->editRegistration($posted);
 		}
 
 		// create choice objects to be saved
@@ -575,7 +575,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				if (isset($used_prio[$priority]) && !$has_mc)
 				{
 					ilUtil::sendFailure($this->plugin->txt('multiple_choice_alert'));
-					return $this->editRegistration($posted);
+					$this->editRegistration($posted);
 				}
 
 				$choice = new ilCoSubChoice();
@@ -602,7 +602,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		if (count($used_prio) <= $max_prio && !$has_ec)
 		{
 			ilUtil::sendFailure($this->plugin->txt('empty_choice_alert'));
-			return $this->editRegistration($posted);
+			$this->editRegistration($posted);
 		}
 
 		// check for mimimum choices in categories
@@ -617,7 +617,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		if (!empty($catmess))
 		{
 			ilUtil::sendFailure(implode('<br />', $catmess));
-			return $this->editRegistration($posted);
+			$this->editRegistration($posted);
 		}
 
 		// finally save the choices
@@ -653,7 +653,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Send an email with the subscriotion info
 	 */
-	public function sendSubscriptionEmail()
+	public function sendSubscriptionEmail(): void
 	{
 		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
@@ -667,7 +667,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Show the confirmation message for deleting the registration
 	 */
-	public function confirmDeleteRegistration()
+	public function confirmDeleteRegistration(): void
 	{
 		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 		$gui = new ilConfirmationGUI();
@@ -681,7 +681,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Delete the whole registration
 	 */
-	public function deleteRegistration()
+	public function deleteRegistration(): void
 	{
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 		$this->plugin->includeClass('models/class.ilCoSubUser.php');
@@ -701,7 +701,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Cancel the registration
 	 */
-	public function  cancelRegistration()
+	public function  cancelRegistration(): void
 	{
 		if ($this->isOwnRegistration())
 		{
@@ -716,7 +716,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
     /**
      * Select all items as choice for users who don't have a choice
      */
-	public function fillEmptyRegistrations()
+	public function fillEmptyRegistrations(): void
     {
         $users = $this->object->getUsers();
         $items = $this->object->getItems();
@@ -748,7 +748,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 * The 'not selected' options are filtered out
 	 * @return array	item_id => priority
 	 */
-	protected function getPostedPriorities()
+	protected function getPostedPriorities(): array
 	{
 		$priorities = array();
 		foreach ((array) $_POST['priority'] as $item_id => $priority)
@@ -764,7 +764,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Get the currently treated user object
 	 */
-	protected function loadIliasUser()
+	protected function loadIliasUser(): void
 	{
 		/**
 		 * @var ilObjUser $ilUser
@@ -790,7 +790,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Check if the the registration is down for oneseof
 	 */
-	protected function isOwnRegistration()
+	protected function isOwnRegistration(): bool
 	{
 		return empty($_GET['user_id']);
 	}
@@ -799,7 +799,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 * Get the information about the currently treated user
 	 * @return string
 	 */
-	protected function getUserInfoHTML()
+	protected function getUserInfoHTML(): string
 	{
 		if ($this->isOwnRegistration())
 		{

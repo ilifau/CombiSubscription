@@ -14,7 +14,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
 	 */
-	public function executeCommand()
+	public function executeCommand(): void
 	{
 		$cmd = $this->ctrl->getCmd('editProperties');
 		switch ($cmd)
@@ -34,7 +34,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Edit poperties
 	 */
-	protected function editProperties()
+	protected function editProperties(): void
 	{
 		$this->initPropertiesForm();
 		$this->loadPropertiesValues();
@@ -44,7 +44,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Update properties
 	 */
-	protected function updateProperties()
+	protected function updateProperties(): void
 	{
 		$this->initPropertiesForm();
 		if ($this->form->checkInput())
@@ -63,7 +63,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Init the form
 	 */
-	protected function initPropertiesForm()
+	protected function initPropertiesForm(): void
 	{
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
@@ -187,7 +187,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Load the properties values in the form
 	 */
-	protected function loadPropertiesValues()
+	protected function loadPropertiesValues(): void
 	{
 		$this->form->getItemByPostVar('title')->setValue($this->object->getTitle());
 		$this->form->getItemByPostVar('description')->setValue($this->object->getDescription());
@@ -208,7 +208,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	/**
 	 * Save the properties values from the form
 	 */
-	protected function savePropertiesValues()
+	protected function savePropertiesValues(): void
 	{
 		/** @var ilDateTimeInputGUI $start */
 		$start = $this->form->getItemByPostVar('sub_start');

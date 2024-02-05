@@ -24,65 +24,65 @@ class ilCoSubScript
 	const MODE_FTP_EX_STATUS = 'ftp_ex_status';
 
     /** @var \ILIAS\DI\Container */
-    protected $dic;
+    protected \ILIAS\DI\Container $dic;
 
     /**
 	 * @var ilCombiSubscriptionPlugin
 	 */
-	protected $plugin;
+	protected ilCombiSubscriptionPlugin $plugin;
 
 	/**
 	 * @var ilObjCombiSubscription
 	 */
-	protected $object;
+	protected ilObjCombiSubscription $object;
 
 	/** @var  string Writer Type ('excel' or 'csv') */
-	protected $type;
+	protected string $type;
 
 	/** @var array  list of mode definition (see constructor) */
-	protected $modes;
+	protected array $modes;
 
 	/** @var string import mode ('ass_by_item') */
-	protected $mode;
+	protected string $mode;
 
 	/** @var ilLanguage $lng */
-	protected $lng;
+	protected ilLanguage $lng;
 
 	/** @var string $message */
-	protected $message = '';
+	protected string $message = '';
 
 	/** @var array [colname, colnname, ...] */
-	protected $columns = array();
+	protected array $columns = [];
 
 	/** @var array [ [colname => value, ...], ... ] */
-	protected $rows = array();
+	protected array $rows = [];
 
 	/** @var  ilCoSubRun */
-	protected $run;
+	protected ilCoSubRun $run;
 
 	/** @var ilCoSubItem[] | null (indexed by item_id) */
-	protected $items = array();
+	protected array $items = [];
 
 	/** @var array title => item_id */
-	protected $items_by_title = array();
+	protected array $items_by_title = [];
 
 	/** @var array identifier => item_id */
-	protected $items_by_identifier = array();
+	protected array $items_by_identifier = [];
 
 	/** @var  ilLPObjSettings	 */
-	protected $obj_settings;
+	protected ilLPObjSettings $obj_settings;
 
 	/** @var  ilObjectLP */
-	protected $obj_lp;
+	protected ilObjectLP $obj_lp;
 
 	/** @var array item_id => (int) sum of assignments */
-	protected $assignment_sums = array();
+	protected array $assignment_sums = [];
 
 	/** @var bool tweak: don't create objects for items without assignments*/
-	protected $ignore_unassigned_items = true;
+	protected bool $ignore_unassigned_items = true;
 
 	/** @var  int tweak: owner of created objects */
-	protected $owner_id = 6;
+	protected int $owner_id = 6;
 
 	/** @var  string tweak: owner of created objects (higher precedence as owner_id) */
 	//protected $owner_login = 'root';
@@ -96,7 +96,7 @@ class ilCoSubScript
 	 * @param ilObjCombiSubscription		$object
 	 * @param string						$mode
 	 */
-	public function __construct($plugin, $object, $mode = '')
+	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $mode = '')
 	{
         global $DIC;
 
@@ -163,7 +163,7 @@ class ilCoSubScript
 	/**
 	 * Get the list of available modes
 	 */
-	public function getModes()
+	public function getModes(): array
 	{
 		return $this->modes;
 	}
@@ -172,7 +172,7 @@ class ilCoSubScript
 	 * Set the script mode
 	 * @param $mode
 	 */
-	public function setMode($mode)
+	public function setMode(string $mode): void
 	{
 		$this->mode = $mode;
 	}
@@ -183,7 +183,7 @@ class ilCoSubScript
 	 * @param string $resultFile
 	 * @return bool
 	 */
-	public function ProcessFile($inputFile, $resultFile)
+	public function ProcessFile(string $inputFile, string $resultFile): bool
 	{
 		$this->message = '';
 		try
@@ -272,7 +272,7 @@ class ilCoSubScript
 	 * @param Worksheet $sheet
 	 * @throws Exception	if columns are not named or unique, or if id column is missing
 	 */
-	protected function readData($sheet)
+	protected function readData(Worksheet $sheet): void
 	{
 
 		$data = $sheet->toArray(null, true, false, false);
@@ -326,7 +326,7 @@ class ilCoSubScript
 	 * @param Worksheet $sheet
 	 * @throws Exception	if columns are not named or unique, or if id column is missing
 	 */
-	protected function writeData($sheet)
+	protected function writeData(Worksheet $sheet): void
 	{
 		$data = array();
 
@@ -357,7 +357,7 @@ class ilCoSubScript
 	}
 
 
-	protected function createFtpStructure()
+	protected function createFtpStructure(): void
 	{
 		$this->loadItemData();
 		$this->checkFtpStructure();
@@ -607,7 +607,7 @@ class ilCoSubScript
      * Add the participants to their exercises and build teams
      * @throws Exception
      */
-	protected function createFtpExerciseTeams()
+	protected function createFtpExerciseTeams(): void
 	{
 		$this->loadItemData();
 		$this->checkFtpStructure();
@@ -679,7 +679,7 @@ class ilCoSubScript
 	 * - users are matched by matriculation numbers
 	 * - status can be 'notgraded', 'passed' or 'failed'
 	 */
-	protected function insertFtpExStatus()
+	protected function insertFtpExStatus(): void
 	{
 		/** ilTree $tree */
 		global $ilDB, $tree;
@@ -760,7 +760,7 @@ class ilCoSubScript
 	/**
 	 * Replace the 'Antestat' test by an exercise with manual LP setting
 	 */
-	protected function adjustFtpObjects()
+	protected function adjustFtpObjects(): void
 	{
 		require_once('Modules/Session/classes/class.ilEventItems.php');
 		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
@@ -880,7 +880,7 @@ class ilCoSubScript
 	/**
 	 * Replace the 'Antestat' test by an exercise with manual LP setting
 	 */
-	protected function adjustFtpTestObjects()
+	protected function adjustFtpTestObjects(): void
 	{
 		foreach ($this->rows as $r => $rowdata)
 		{
@@ -924,7 +924,7 @@ class ilCoSubScript
 	 * Remove the conditions of a target triggered by deleted objects
 	 * @param $ref_id
 	 */
-	protected function cleanupCoditionsOfTarget($ref_id)
+	protected function cleanupCoditionsOfTarget(int $ref_id): void
 	{
 		$obj_id = ilObject::_lookupObjectId($ref_id);
 		$type = ilObject::_lookupType($obj_id);
@@ -941,7 +941,7 @@ class ilCoSubScript
 	}
 
 
-	protected function checkFtpStructure()
+	protected function checkFtpStructure(): void
 	{
 		foreach ($this->rows as $r => $rowdata)
 		{
@@ -981,7 +981,7 @@ class ilCoSubScript
 	/**
 	 * Get import errors
 	 */
-	public function getMessage()
+	public function getMessage(): string
 	{
 		return $this->message;
 	}
@@ -989,7 +989,7 @@ class ilCoSubScript
 	/**
 	 * Load the titles and identifiers of items
 	 */
-	protected function loadItemData()
+	protected function loadItemData(): void
 	{
 		$this->items = $this->object->getItems();
 		$this->assignment_sums = $this->object->getAssignmentsSums();
@@ -1013,7 +1013,7 @@ class ilCoSubScript
      * @param $time
      * @return int
      */
-    protected function excelTimeToUnix($time)
+    protected function excelTimeToUnix($time): int
     {
         return Date::excelToTimestamp($time, $this->dic->user()->getTimeZone());
 

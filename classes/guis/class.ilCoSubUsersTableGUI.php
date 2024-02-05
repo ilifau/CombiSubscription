@@ -7,41 +7,41 @@ require_once('Services/Table/classes/class.ilTable2GUI.php');
 class ilCoSubUsersTableGUI extends ilTable2GUI
 {
 	/** @var  ilCtrl */
-	protected $ctrl;
+	protected ilCtrl $ctrl;
 
     /**
      * @var ilObjCombiSubscription
      */
-    protected $object;
+    protected ilObjCombiSubscription $object;
 
     /** @var ilCombiSubscriptionPlugin  */
-    protected $plugin;
+    protected ilCombiSubscriptionPlugin $plugin;
 
     /**
 	 * List of users (indexed by user_id)
 	 * @var ilCoSubUser[];
 	 */
-	protected $users;
+	protected array $users;
 
 
 	/**
 	 * User priorities
 	 * @var array  (user_id => item_id => priority)
 	 */
-	protected $priorities;
+	protected array $priorities;
 
 	/**
 	 * Run assignments
 	 * @var array   (run_id => user_id => item_id => assign_id)
 	 */
-	protected $assignments;
+	protected array $assignments;
 
 	/**
 	 * ilCoSubItemsTableGUI constructor.
 	 * @param ilCoSubAssignmentsGUI     $a_parent_gui
 	 * @param string                    $a_parent_cmd
 	 */
-	function __construct($a_parent_gui, $a_parent_cmd)
+	function __construct(ilCoSubAssignmentsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
 
@@ -82,7 +82,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 	/**
 	 * Prepare the data to be displayed
 	 */
-	public function prepareData()
+	public function prepareData(): void
 	{
 		/** @var ilAccessHandler  $ilAccess*/
 		global $ilAccess;
@@ -155,7 +155,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 	 *                  'user' => string
 	 *                  'result' => integer, e.g. SATISFIED_FULL ]
 	 */
-	protected function fillRow($a_set)
+	protected function fillRow(array $a_set): void
 	{
 		$this->tpl->setVariable('ID', $a_set['user_id']);
 		$this->tpl->setVariable('FIXED', $a_set['is_fixed'] ? $this->lng->txt('yes') : $this->lng->txt('no'));

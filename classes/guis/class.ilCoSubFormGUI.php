@@ -8,8 +8,8 @@ require_once('Services/UIComponent/Toolbar/classes/class.ilToolbarGUI.php');
  */
 class ilCoSubFormGUI extends ilFormGUI
 {
-	protected $content;
-	protected $toolbar;
+	protected string $content;
+	protected ilToolbarGUI $toolbar;
 
 
 	public function __construct()
@@ -20,17 +20,17 @@ class ilCoSubFormGUI extends ilFormGUI
 		$this->toolbar->setPreventDoubleSubmission(true);
 	}
 
-	public function setContent($a_content)
+	public function setContent(string $a_content): void
 	{
 		$this->content = $a_content;
 	}
 
-	public function addSeparator()
+	public function addSeparator(): void
 	{
 		$this->toolbar->addSeparator();
 	}
 
-	public function addCommandButton($a_cmd, $a_txt)
+	public function addCommandButton(string $a_cmd, string$a_txt): void
 	{
 		$button = ilSubmitButton::getInstance();
 		$button->setCommand($a_cmd);
@@ -38,7 +38,7 @@ class ilCoSubFormGUI extends ilFormGUI
 		$this->toolbar->addButtonInstance($button);
 	}
 
-	function getContent()
+	function getContent(): string
 	{
 		return $this->toolbar->getHTML() . $this->content . $this->toolbar->getHTML();
 	}

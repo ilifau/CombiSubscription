@@ -24,57 +24,57 @@ class ilCoSubImport
     const MODE_ASS_BY_IDS = 'ass_by_ids';
 
     /** @var \ILIAS\DI\Container */
-    protected $dic;
+    protected \ILIAS\DI\Container $dic;
 
     /** @var ilLanguage  */
-    protected $lng;
+    protected ilLanguage $lng;
 
 	/** @var ilCombiSubscriptionPlugin */
-	protected $plugin;
+	protected ilCombiSubscriptionPlugin $plugin;
 
 	/**
 	 * @var ilObjCombiSubscription
 	 */
-	protected $object;
+	protected ilObjCombiSubscription $object;
 
 	/** @var  string Writer Type ('excel' or 'csv') */
-	protected $type;
+	protected string $type;
 
 	/** @var string import mode ('ass_by_item') */
-	protected $mode;
+	protected string $mode;
 
     /** @var string import comment (used for run creation) */
-    protected $comment;
+    protected string $comment;
 
 	/** @var string $message */
-	protected $message = '';
+	protected string $message = '';
 
 	/** @var array [colname, colnname, ...] */
-	protected $columns = array();
+	protected array $columns = [];
 
 	/** @var array [ [colname => value, ...], ... ] */
-	protected $rows = array();
+	protected array $rows = [];
 
 	/** @var  ilCoSubRun */
-	protected $run;
+	protected ilCoSubRun $run;
 
 	/** @var ilCoSubItem[]  (indexed by item_id) */
-	protected $items = array();
+	protected array $items = [];
 
     /** @var array ilCoSubUser[]  (indexed by user_id) */
-    protected $users = array();
+    protected array $users = [];
 
 	/** @var array title => item_id */
-	protected $items_by_title = array();
+	protected array $items_by_title = [];
 
 	/** @var array identifier => item_id */
-	protected $items_by_identifier = array();
+	protected array $items_by_identifier = [];
 
 	/** @var array login => user_id */
-	protected $users_by_login = array();
+	protected array $users_by_login = [];
 
 	/** @var array login => user_id */
-	protected $new_users_by_login = array();
+	protected array $new_users_by_login = [];
 
 	/**
 	 * Constructor.
@@ -82,7 +82,7 @@ class ilCoSubImport
 	 * @param ilObjCombiSubscription		$object
 	 * @param string						$mode
 	 */
-	public function __construct($plugin, $object, $mode = '', $comment = '')
+	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $mode = '', string $comment = '')
 	{
 		global $DIC;
 
@@ -103,7 +103,7 @@ class ilCoSubImport
 	 * @param string $file
 	 * @return bool
 	 */
-	public function ImportFile($file)
+	public function ImportFile(string $file): bool
 	{
 		$this->message = '';
 		try
@@ -202,7 +202,7 @@ class ilCoSubImport
 	 * @param Worksheet $sheet
 	 * @throws Exception	if columns are not named or unique, or if id column is missing
 	 */
-	protected function readData($sheet)
+	protected function readData(Worksheet $sheet): void
 	{
 
 		$data = $sheet->toArray(null, true, false, false);
@@ -247,7 +247,7 @@ class ilCoSubImport
 	 * Column 'ID' column has the username
 	 * Columns '1', '2', '3', have the items identifiers or titles
 	 */
-	public function readAssignmentsByColumns()
+	public function readAssignmentsByColumns(): void
 	{
 		if (!in_array('ID', $this->columns))
 		{
@@ -342,7 +342,7 @@ class ilCoSubImport
 	 * Column 'ID' column has the username
 	 * Columns named by item titles or identifiers ar not empty if an item is assigned
 	 */
-	public function readAssignmentsByItems()
+	public function readAssignmentsByItems(): void
 	{
 		if (!in_array('ID', $this->columns))
 		{
@@ -424,7 +424,7 @@ class ilCoSubImport
      * Read the assignments from a raw data table having obj_id, user_id and item_id as columns
      * @throws Exception
      */
-    public function readAssignmentsByIds()
+    public function readAssignmentsByIds(): void
     {
         if (!in_array('obj_id', $this->columns)) {
             throw new Exception($this->plugin->txt('import_error_obj_id_missing'));
@@ -479,7 +479,7 @@ class ilCoSubImport
     }
 
 
-	public function readItems()
+	public function readItems(): void
 	{
 		$this->loadItemData();
 
@@ -577,7 +577,7 @@ class ilCoSubImport
 	/**
 	 * Create the run to which the assignments should be related
 	 */
-	public function createRun()
+	public function createRun(): void
 	{
 		global $ilUser;
 
@@ -595,7 +595,7 @@ class ilCoSubImport
 	 * This is done for users who don't have an assignment
 	 * @param ilCoSubAssign[] $a_assignments
 	 */
-	public function createChoicesForAssignments($a_assignments)
+	public function createChoicesForAssignments(ilCoSubAssign $a_assignments): void
 	{
 		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 		$method = $this->object->getMethodObject();
@@ -630,7 +630,7 @@ class ilCoSubImport
 	 * @param $a_login
 	 * @return array|bool
 	 */
-	public function adddUserByLogin($a_login)
+	public function adddUserByLogin(string $a_login): array|bool
 	{
 		$user_id = ilObjUser::_lookupId($a_login);
 		if (!empty($user_id))
@@ -645,7 +645,7 @@ class ilCoSubImport
 	/**
 	 * Get import errors
 	 */
-	public function getMessage()
+	public function getMessage(): string
 	{
 		return $this->message;
 	}
@@ -654,7 +654,7 @@ class ilCoSubImport
 	 * Get the assignments run
 	 * @return ilCoSubRun
 	 */
-	public function getRun()
+	public function getRun(): ilCoSubRun
 	{
 		return $this->run;
 	}
@@ -663,7 +663,7 @@ class ilCoSubImport
 	/**
 	 * Load the titles and identifiers of items
 	 */
-	protected function loadItemData()
+	protected function loadItemData(): void
 	{
 		$this->items = $this->object->getItems();
 		foreach ($this->object->getItems() as $item_id => $item)
@@ -680,7 +680,7 @@ class ilCoSubImport
 	/**
 	 * Load the logins and names of users
 	 */
-	protected function loadUserData()
+	protected function loadUserData(): void
 	{
         $this->users = $this->object->getUsers();
 		$user_ids = array_keys($this->users);
@@ -708,7 +708,7 @@ class ilCoSubImport
 	 * @param $time
 	 * @return int
 	 */
-	protected function excelTimeToUnix($time)
+	protected function excelTimeToUnix(float|int $time): int
 	{
         return Date::excelToTimestamp($time, $this->dic->user()->getTimeZone());
 

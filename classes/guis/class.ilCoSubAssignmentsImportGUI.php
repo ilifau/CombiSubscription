@@ -10,13 +10,13 @@
  */
 class ilCoSubAssignmentsImportGUI extends ilCoSubImportBaseGUI
 {
-    protected $add_comment = true;
+    protected bool $add_comment = true;
 
 	/**
 	 * Constructor
 	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
 	 */
-	public function __construct($a_parent_gui)
+	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
 
