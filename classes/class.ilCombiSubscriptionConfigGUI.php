@@ -5,7 +5,8 @@
  *
  * @author Fred Neumann fred.neumann@fau.de>
  * @version $Id$
- *
+ * @ilCtrl_Calls: ilCombiSubscriptionConfigGUI: ilPropertyFormGUI
+ * @ilCtrl_isCalledBy ilCombiSubscriptionConfigGUI: ilObjComponentSettingsGUI
  */
 class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 {
