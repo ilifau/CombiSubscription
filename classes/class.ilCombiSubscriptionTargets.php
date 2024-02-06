@@ -6,28 +6,15 @@
  */
 class ilCombiSubscriptionTargets
 {
-    /** @var \ILIAS\DI\Container */
-    protected $dic;
+    protected \ILIAS\DI\Container $dic;
+    protected ilObjCombiSubscription $object;
+    protected ilCombiSubscriptionPlugin $plugin;
 
-    /** @var  ilObjCombiSubscription */
-    protected $object;
+    /** ilCoSubItem[] (indexed by item_id) */
+    protected array $items = [];
+    /** [['grouping' => ilObjCourseGrouping, 'conditions' => array], ...] */
+    protected ?array $groupings = null;
 
-    /** @var ilCombiSubscriptionPlugin */
-    protected $plugin;
-
-    /** @var  ilCoSubItem[] (indexed by item_id) */
-    protected $items = array();
-
-    /**
-     * @var array [['grouping' => ilObjCourseGrouping, 'conditions' => array], ...]
-     */
-    protected $groupings = null;
-
-    /**
-     * Constructor
-     * @param ilObjCombiSubscription $a_object
-     * @param ilCombiSubscriptionPlugin $a_plugin
-     */
     public function __construct($a_object, $a_plugin)
     {
         global $DIC;
@@ -37,46 +24,37 @@ class ilCombiSubscriptionTargets
         $this->plugin = $a_plugin;
 
         $this->items = $this->object->getItems();
-        $this->plugin->includeClass('models/class.ilCoSubTargetsConfig.php');
     }
 
 
     /**
      * Check if a target type supports a subscriptionPeriod
-     * @param string $a_type
-     * @return bool
-     */
-    public function hasSubscriptionPeriod($a_type)
+    */
+    public function hasSubscriptionPeriod(string $a_type): bool
     {
         return in_array($a_type, array('crs', 'grp', 'auto'));
     }
 
     /**
      * Check if a target type supports minimum subscriptions
-     * @param string $a_type
-     * @return bool
      */
-    public function hasMinSubscriptions($a_type)
+    public function hasMinSubscriptions(string $a_type): bool
     {
         return in_array($a_type, array('crs', 'grp'));
     }
 
     /**
      * Check if a target type supports minimum subscriptions
-     * @param string $a_type
-     * @return bool
      */
-    public function hasMaxSubscriptions($a_type)
+    public function hasMaxSubscriptions(string $a_type): bool
     {
         return in_array($a_type, array('crs', 'grp', 'sess'));
     }
 
     /**
      * Check if a target type supports membership limitation groupings
-     * @param string $a_type
-     * @return bool
      */
-    public static function hasMemLimitGrouping($a_type)
+    public static function hasMemLimitGrouping(string $a_type): bool
     {
         return in_array($a_type, array('crs', 'grp'));
     }
@@ -85,10 +63,9 @@ class ilCombiSubscriptionTargets
     /**
      * Get the form properties for setting the targets config
      * @param string $a_type target object type or 'auto' for auto assignment configuration
-     * @param ilCoSubTargetsConfig $a_config
      * @return array
      */
-    public function getFormProperties($a_type, $a_config)
+    public function getFormProperties(string $a_type, ilCoSubTargetsConfig $a_config): array
     {
         $properties = array();
 
@@ -188,12 +165,9 @@ class ilCombiSubscriptionTargets
 
     /**
      * Get the inputs from the properties form
-     * @param ilPropertyFormGUI $form
      * @param string $a_type target type
-     * @param ilCoSubTargetsConfig $config
-     * @return ilCoSubTargetsConfig
      */
-    public function getFormInputs($form, $a_type, $config = null)
+    public function getFormInputs(ilPropertyFormGUI $form, string $a_type, ?ilCoSubTargetsConfig $config = null): ilCoSubTargetsConfig
     {
         if (!isset($config)) {
             $config = new ilCoSubTargetsConfig($this->object);
@@ -241,13 +215,9 @@ class ilCombiSubscriptionTargets
 
     /**
      * Get a new category for a target reference
-     * @param $a_ref_id
-     * @return ilCoSubCategory
      */
-    public function getCategoryForTarget($a_ref_id)
+    public function getCategoryForTarget(int $a_ref_id): ilCoSubCategory
     {
-        $this->plugin->includeClass('models/class.ilCoSubCategory.php');
-
         $category = new ilCoSubCategory();
         $category->obj_id = $this->object->getId();
         $category->max_assignments = 1;
@@ -265,14 +235,10 @@ class ilCombiSubscriptionTargets
 
     /**
      * Get an item for a target reference
-     * @param $a_ref_id
      * @param ilCoSubItem $item (an existing item that should be modified)
-     * @return ilCoSubItem
      */
-    public function getItemForTarget($a_ref_id, $item = null)
+    public function getItemForTarget(int $a_ref_id, ?ilCoSubItem $item = null): ilCoSubItem
     {
-        $this->plugin->includeClass('models/class.ilCoSubItem.php');
-
         if (!isset($item)) {
             $item = new ilCoSubItem;
             $item->obj_id = $this->object->getId();
@@ -321,7 +287,7 @@ class ilCombiSubscriptionTargets
      * - Course members will be added as users with fixed assignments
      * - Maximum assignments is set to the lower value of the subscription and the target
      */
-    public function syncFromTargetsBeforeCalculation()
+    public function syncFromTargetsBeforeCalculation(): void
     {
         $users = $this->object->getUsers();
         $assignments = $this->object->getAssignments();
@@ -391,13 +357,10 @@ class ilCombiSubscriptionTargets
     /**
      * Get a list of unsaved schedules for a target object
      *
-     * @param $a_ref_id
      * @return ilCoSubSchedule[]
      */
-    public function getSchedulesForTarget($a_ref_id)
+    public function getSchedulesForTarget(int $a_ref_id): array
     {
-        $this->plugin->includeClass('models/class.ilCoSubSchedule.php');
-
         $schedules = array();
         switch (ilObject::_lookupType($a_ref_id, true)) {
             case 'sess':
@@ -419,10 +382,10 @@ class ilCombiSubscriptionTargets
     /**
      * Add the assigned users as members to the target objects
      * @param array $a_item_ids list if item ids to tread
-     * @param bool $send_target_emails send notification e-mails for the target objects
+     * @param ?bool $send_target_emails send notification e-mails for the target objects
      * @return array    list of added user_ids
      */
-    public function addAssignedUsersAsMembers($a_item_ids = array(), $send_target_emails = null)
+    public function addAssignedUsersAsMembers(array $a_item_ids = [], ?bool $send_target_emails = null): array
     {
         global $tree;
 
@@ -553,7 +516,7 @@ class ilCombiSubscriptionTargets
      * @param array $a_item_ids list if item ids to tread
      * @return array    list of added user_ids
      */
-    public function addNonAssignedUsersAsSubscribers($a_item_ids = array())
+    public function addNonAssignedUsersAsSubscribers(array $a_item_ids = []): array
     {
         $num_assignments = $this->object->getMethodObject()->getNumberAssignments();
         $studycond_passed = $this->object->getUsersForStudyCond();
@@ -622,7 +585,7 @@ class ilCombiSubscriptionTargets
      * @param array $a_item_ids list if item ids to tread
      * @return array    list of added user_ids
      */
-    public function addAssignedUsersAsSubscribers($a_item_ids = array())
+    public function addAssignedUsersAsSubscribers(array $a_item_ids = []): array
     {
         // collect the actions to be done
         $actions = array();
@@ -676,7 +639,7 @@ class ilCombiSubscriptionTargets
      * @param array     [[ref_id => int, obj_id => int, type => string, users => int[] ], ...]
      * @return array    list of added user_ids
      */
-    protected function addSubscribersByActions($actions)
+    protected function addSubscribersByActions(array $actions): array
     {
         $added_users = array();
 
@@ -744,7 +707,7 @@ class ilCombiSubscriptionTargets
     /**
      * Read the list of groupings for the item targets
      */
-    public function getGroupingData()
+    public function getGroupingData(): ilCombiSubscriptionTargets
     {
         if (!isset($this->groupings)) {
             $this->groupings = array();
@@ -764,10 +727,9 @@ class ilCombiSubscriptionTargets
 
     /**
      * Get the groupings of an item
-     * @param ilCoSubItem $a_item
      * @return ilObjCourseGrouping[]
      */
-    public function getGroupingsOfItem($a_item)
+    public function getGroupingsOfItem(ilCoSubItem $a_item): array
     {
         if (!isset($a_item->target_ref_id)) {
             return array();
@@ -786,7 +748,7 @@ class ilCombiSubscriptionTargets
     /**
      * Add a grouping for the items
      */
-    public function addGrouping()
+    public function addGrouping(): void
     {
         $grouping = new ilObjCourseGrouping();
         $ref_ids = $this->getTargetRefIds();
@@ -813,7 +775,7 @@ class ilCombiSubscriptionTargets
     /**
      * Remove a course grouping from the items
      */
-    public function removeGrouping()
+    public function removeGrouping(): void
     {
         foreach ($this->items as $item) {
             foreach ($this->getGroupingsOfItem($item) as $grouping) {
@@ -833,11 +795,9 @@ class ilCombiSubscriptionTargets
     /**
      * Get grouping conditions of a container object
      *
-     * @param int $a_obj_id
-     * @param string $a_type
      * @return    array   assoc: grouping conditions
      */
-    static function _getGroupingConditions($a_obj_id, $a_type)
+    static function _getGroupingConditions(int $a_obj_id, string $a_type): array
     {
         global $tree;
 
@@ -877,12 +837,10 @@ class ilCombiSubscriptionTargets
     /**
      * Check the grouping conditions for a user
      *
-     * @param int $user_id
      * @param string $type 'grp' or 'crs'
-     * @param array $conditions
      * @return   string     obj_id
      */
-    static function _findGroupingMembership($user_id, $type, $conditions)
+    static function _findGroupingMembership(int $user_id, string $type, array $conditions): string
     {
         foreach ($conditions as $condition) {
             if ($type == 'crs') {
@@ -903,7 +861,7 @@ class ilCombiSubscriptionTargets
     /**
      * Check if items with targets exist
      */
-    public function targetsExist()
+    public function targetsExist(): bool
     {
         $ref_ids = $this->getTargetRefIds();
         return !empty($ref_ids);
@@ -912,7 +870,7 @@ class ilCombiSubscriptionTargets
     /**
      * Check if all existing targets are writable
      */
-    public function targetsWritable()
+    public function targetsWritable(): bool
     {
         /** @var ilAccessHandler $ilAccess */
         global $ilAccess;
@@ -929,7 +887,7 @@ class ilCombiSubscriptionTargets
      * get the common type of the targets
      * @return string|null        type or null if they have different types
      */
-    public function getCommonType()
+    public function getCommonType(): ?string
     {
         $type = null;
         foreach ($this->getTargetRefIds() as $ref_id) {
@@ -947,7 +905,7 @@ class ilCombiSubscriptionTargets
      * Get the ref_ids of all targets
      * @return int[]
      */
-    public function getTargetRefIds()
+    public function getTargetRefIds(): array
     {
         $ref_ids = array();
         foreach ($this->items as $item) {
@@ -959,10 +917,10 @@ class ilCombiSubscriptionTargets
     }
 
     /**
-     * Set the items by an array of item_ids
-     * @var int[]
+     * Set the items by an array of item_ids \
+     * $a_item_ids int[]
      */
-    public function setItemsByIds($a_item_ids)
+    public function setItemsByIds(array $a_item_ids): void
     {
         $this->items = array();
         foreach ($this->object->getItems() as $item) {
@@ -974,9 +932,9 @@ class ilCombiSubscriptionTargets
 
     /**
      * Set the items to be treated
-     * @var ilCoSubItem[]
+     * - $a_item ilCoSubItem[]
      */
-    public function setItems($a_items)
+    public function setItems(array $a_items): void
     {
         $this->items = array();
         foreach ($a_items as $item) {
@@ -987,7 +945,7 @@ class ilCombiSubscriptionTargets
     /**
      * Restrict the list of items to those with writable targets
      */
-    public function filterWritableTargets()
+    public function filterWritableTargets(): void
     {
         /** @var ilAccessHandler $ilAccess */
         global $ilAccess;
@@ -1002,7 +960,7 @@ class ilCombiSubscriptionTargets
     /**
      * Restrict the list of items to existing, untrashed targets
      */
-    public function filterUntrashedTargets()
+    public function filterUntrashedTargets(): void
     {
         foreach ($this->items as $item_id => $item) {
             if (!ilObject::_exists($item->target_ref_id, true) || ilObject::_isInTrash($item->target_ref_id)) {
@@ -1016,10 +974,8 @@ class ilCombiSubscriptionTargets
      * This is done when new target objects are connected
      * - the subscription type is set to the combined subscription
      * - the subscription period is set to the period of the combined subscription
-     * @param $items
-     * @return bool
      */
-    public function applyDefaultTargetsConfig()
+    public function applyDefaultTargetsConfig(): bool
     {
         $config = new ilCoSubTargetsConfig($this->object);
         $config->set_sub_type = true;
@@ -1041,10 +997,9 @@ class ilCombiSubscriptionTargets
 
     /**
      * Apply configuration settings to the target objects
-     * @param ilCoSubTargetsConfig $config
      * @throws Exception
      */
-    public function applyTargetsConfig($config)
+    public function applyTargetsConfig(ilCoSubTargetsConfig $config): void
     {
         $targets = array();
         $parents = array();
@@ -1104,11 +1059,8 @@ class ilCombiSubscriptionTargets
 
     /**
      * Apply a configuration to a target course
-     * @param ilObjCourse $target
-     * @param ilCoSubTargetsConfig $config
-     * @param ilCoSubItem $item
      */
-    protected function applyTargetCourseConfig(ilObjCourse $target, ilCoSubTargetsConfig $config, ilCoSubItem $item)
+    protected function applyTargetCourseConfig(ilObjCourse $target, ilCoSubTargetsConfig $config, ilCoSubItem $item): void
     {
         if ($config->set_sub_type) {
             switch ($config->sub_type) {
@@ -1179,11 +1131,8 @@ class ilCombiSubscriptionTargets
 
     /**
      * Apply a configuration to a target group
-     * @param ilObjGroup $target
-     * @param ilCoSubTargetsConfig $config
-     * @param ilCoSubItem $item
      */
-    protected function applyTargetGroupConfig(ilObjGroup $target, ilCoSubTargetsConfig $config, ilCoSubItem $item)
+    protected function applyTargetGroupConfig(ilObjGroup $target, ilCoSubTargetsConfig $config, ilCoSubItem $item): void
     {
         if ($config->set_sub_type) {
             switch ($config->sub_type) {
@@ -1254,11 +1203,8 @@ class ilCombiSubscriptionTargets
 
     /**
      * Apply a configuration to a target session
-     * @param ilObjGroup $target
-     * @param ilCoSubTargetsConfig $config
-     * @param ilCoSubItem $item
      */
-    protected function applyTargetSessionConfig(ilObjSession $target, ilCoSubTargetsConfig $config, ilCoSubItem $item)
+    protected function applyTargetSessionConfig(ilObjSession $target, ilCoSubTargetsConfig $config, ilCoSubItem $item): void
     {
         if ($config->set_sub_type) {
             switch ($config->sub_type) {

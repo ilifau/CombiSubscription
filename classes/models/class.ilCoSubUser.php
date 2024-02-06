@@ -5,23 +5,15 @@
  */
 class ilCoSubUser
 {
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  integer */
-	public $user_id;
-
-	/** @var  bool */
-	public $is_fixed = false;
+	public int $obj_id;
+	public int $user_id;
+	public bool $is_fixed = false;
 
 
 	/**
 	 * Get user by id
-	 * @param integer  $a_obj_id
-	 * @param integer  $a_user_id
-	 * @return ilCoSubUser | null
 	 */
-	public static function _getById($a_obj_id, $a_user_id)
+public static function _getById(int $a_obj_id, int $a_user_id): ?ilCoSubUser
 	{
 		global $ilDB;
 
@@ -45,10 +37,9 @@ class ilCoSubUser
 
 	/**
 	 * Get all users for an object as an indexed array
-	 * @param integer       	$a_obj_id
-	 * @return array        user_id => ilCoSubUser
+	 * return array        user_id => ilCoSubUser
 	 */
-	public static function _getForObject($a_obj_id)
+	public static function _getForObject(int $a_obj_id): array
 	{
 		global $ilDB;
 
@@ -69,10 +60,9 @@ class ilCoSubUser
 
 	/**
 	 * Get all users for an user as an indexed array
-	 * @param integer       	$a_user_id
-	 * @return ilCoSubUser[]    (indexed by obj_id)
+	 * return ilCoSubUser[]    (indexed by obj_id)
 	 */
-	public static function _getForUser($a_user_id)
+	public static function _getForUser(int $a_user_id): array
 	{
 		global $ilDB;
 
@@ -94,10 +84,8 @@ class ilCoSubUser
 
 	/**
 	 * Delete all users for an object
-	 * @param integer $a_obj_id
-	 * @param integer|null      $a_user_id (optional)
 	 */
-	public static function _deleteForObject($a_obj_id, $a_user_id = null)
+	public static function _deleteForObject(int $a_obj_id, ?int $a_user_id = null): void
 	{
 		global $ilDB;
 
@@ -115,9 +103,8 @@ class ilCoSubUser
 
 	/**
 	 * Fill the properties with data from an array
-	 * @param array  $data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->obj_id = $data['obj_id'];
 		$this->user_id = $data['user_id'];
@@ -127,9 +114,9 @@ class ilCoSubUser
 
 	/**
 	 * Save the user data
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 
@@ -148,10 +135,8 @@ class ilCoSubUser
 
     /**
      * Clone the user for a new object
-     * @param int	$a_obj_id
-     * @return self
      */
-    public function saveClone($a_obj_id)
+    public function saveClone(int $a_obj_id): self
     {
         $clone = clone $this;
         $clone->obj_id = $a_obj_id;

@@ -10,20 +10,13 @@
  */
 class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 {
-	/** @var  ilCoSubScript */
 	private ilCoSubScript $script;
-
-	/** @var array  mode => ['title' => string, 'info' => string, 'default' => bool] */
+	/** mode => ['title' => string, 'info' => string, 'default' => bool] */ 
 	private array  $modes = array();
 
-	/**
-	 * Constructor
-	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
-	 */
 	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
-		$this->plugin->includeClass("batch/class.ilCoSubScript.php");
 		$this->script = new ilCoSubScript($this->plugin, $this->object);
 		$this->modes = $this->script->getModes();
 	}
@@ -56,7 +49,6 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	 */
 	protected function initImportForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setFormAction($this->ctrl->getFormAction($this, 'doImport'));
 		$this->form->setPreventDoubleSubmission(false);

@@ -4,26 +4,12 @@
  */
 abstract class ilCoSubMethodBaseConfigGUI
 {
-	/** @var  ilCombiSubscriptionPlugin */
 	public ilCombiSubscriptionPlugin $plugin;
-
-	/** @var  ilCtrl */
 	public ilCtrl $ctrl;
-
-	/** @var ilTemplate */
-	public ilTemplate $tpl;
-
-	/** @var ilLanguage */
+	public ilGlobalTemplateInterface $tpl;
 	public ilLanguage $lng;
-
-	/** @var ilPropertyFormGUI */
 	protected ilPropertyFormGUI $form;
 
-
-	/**
-	 * Constructor
-	 * @param ilCombiSubscriptionPlugin     $a_plugin
-	 */
 	public function __construct(ilCombiSubscriptionPlugin $a_plugin)
 	{
 		global $ilCtrl, $tpl, $lng;

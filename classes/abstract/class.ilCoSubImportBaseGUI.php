@@ -9,22 +9,15 @@
 abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 {
 
-	/** @var array  mode => ['title' => string, 'info' => string, 'default' => bool] */
-	private array $modes = [];
-
-    /** @var bool add a comment input field to the import form */
+	/** mode => ['title' => string, 'info' => string, 'default' => bool] */
+	protected array $modes = [];
+    /** add a comment input field to the import form */
     protected bool $add_comment = false;
 
-	/**
-	 * Constructor
-	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
-	 */
 	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
-		$this->plugin->includeClass('batch/class.ilCoSubImport.php');
 	}
-
 
 	/**
 	 * Execute a command
@@ -47,13 +40,11 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 		}
 	}
 
-
 	/**
 	 * Initialize the form with export settings
 	 */
 	protected function initImportForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setFormAction($this->ctrl->getFormAction($this, 'doImport'));
 		$this->form->setPreventDoubleSubmission(false);
@@ -116,7 +107,6 @@ abstract class ilCoSubImportBaseGUI extends ilCoSubBaseGUI
 		$mode = $this->form->getInput('import_mode');
         $comment = ($this->add_comment ?  $this->form->getInput('comment') : '');
 
-		$this->plugin->includeClass("batch/class.ilCoSubImport.php");
 		$import = new ilCoSubImport($this->plugin, $this->object, $mode, $comment);
 
 		if ($import->ImportFile($file['tmp_name']))

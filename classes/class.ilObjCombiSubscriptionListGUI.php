@@ -1,7 +1,5 @@
 <?php
 
-include_once './Services/Repository/classes/class.ilObjectPluginListGUI.php';
-
 /**
 * ListGUI implementation for combined subscription object plugin. This one
 * handles the presentation in container items (categories, courses, ...)
@@ -19,7 +17,7 @@ class ilObjCombiSubscriptionListGUI extends ilObjectPluginListGUI
 	/**
 	* Init type
 	*/
-	function initType()
+	function initType(): void
 	{
 		$this->setType('xcos');
 	}
@@ -27,7 +25,7 @@ class ilObjCombiSubscriptionListGUI extends ilObjectPluginListGUI
 	/**
 	* Get name of gui class handling the commands
 	*/
-	function getGuiClass()
+	function getGuiClass(): string
 	{
 		return 'ilObjCombiSubscriptionGUI';
 	}
@@ -35,7 +33,7 @@ class ilObjCombiSubscriptionListGUI extends ilObjectPluginListGUI
 	/**
 	* Get commands
 	*/
-	function initCommands()
+	function initCommands(): array
 	{
 		return array
 		(
@@ -59,13 +57,12 @@ class ilObjCombiSubscriptionListGUI extends ilObjectPluginListGUI
 	*						'property' (string) => property name
 	*						'value' (string) => property value
 	*/
-	function getProperties()
+	function getProperties(): array
 	{
 		global $lng, $ilUser;
 
 		$props = array();
 		
-		$this->plugin->includeClass('class.ilObjCombiSubscriptionAccess.php');
 		if (!ilObjCombiSubscriptionAccess::checkOnline($this->obj_id))
 		{
 			$props[] = array('alert' => true, 'property' => $this->txt('status'),

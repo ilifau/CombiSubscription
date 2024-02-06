@@ -5,31 +5,18 @@
  */
 class ilCoSubRun
 {
-	/** @var  integer */
-	public $run_id;
-
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  ilDateTime */
-	public $run_start;
-
-	/** @var  ilDateTime */
-	public $run_end;
-
-	/** @var  string */
-	public $method;
-
-	/** @var  string */
-	public $details;
+	public int $run_id;
+	public int $obj_id;
+	public ilDateTime $run_start;
+	public ilDateTime $run_end;
+	public string $method;
+	public string $details;
 
 
 	/**
 	 * Get item by id
-	 * @param integer  item id
-	 * @return ilCoSubRun or null if not exists
 	 */
-	public static function _getById($a_id)
+	public static function _getById(int $a_id): ?ilCoSubRun
 	{
 		global $ilDB;
 
@@ -51,9 +38,8 @@ class ilCoSubRun
 
 	/**
 	 * Delete an item by its id
-	 * @param integer item id
 	 */
-	public static function _deleteById($a_id)
+	public static function _deleteById(int $a_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_runs WHERE run_id = ' . $ilDB->quote($a_id,'integer'));
@@ -61,10 +47,9 @@ class ilCoSubRun
 
 	/**
 	 * Get items by parent object id
-	 * @param integer   object id
-	 * @return ilCoSubRun[]
+	 * return ilCoSubRun[]
 	 */
-	public static function _getForObject($a_obj_id)
+	public static function _getForObject(int $a_obj_id): array
 	{
 		global $ilDB;
 
@@ -85,9 +70,8 @@ class ilCoSubRun
 
 	/**
 	 * Delete all items for a parent object id
-	 * @param integer object id
 	 */
-	public static function _deleteForObject($a_obj_id)
+	public static function _deleteForObject(int $a_obj_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_runs WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer'));
@@ -95,9 +79,8 @@ class ilCoSubRun
 
 	/**
 	 * Fill the properties with data from an array
-	 * @param array assoc data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->run_id = $data['run_id'];
 		$this->obj_id = $data['obj_id'];
@@ -109,9 +92,9 @@ class ilCoSubRun
 
 	/**
 	 * Save an item object
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 

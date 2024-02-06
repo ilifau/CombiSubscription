@@ -10,8 +10,7 @@
  */
 class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 {
-	/** @var ilCoSubMethodEATTS */
-	protected $method;
+	protected ilCoSubMethodEATTS $method;
 
 	/**
 	 * Execute a command
@@ -72,7 +71,6 @@ class ilCoSubMethodEATTSPropertiesGUI extends ilCoSubBaseGUI
 	 */
 	protected function initPropertiesForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->setTitle($this->method->txt('calculation_properties'));

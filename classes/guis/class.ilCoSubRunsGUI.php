@@ -16,8 +16,6 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	 */
 	public function executeCommand(): void
 	{
-		$this->plugin->includeClass('models/class.ilCoSubRun.php');
-
 		$cmd = $this->ctrl->getCmd('listRuns');
 		switch ($cmd)
 		{
@@ -44,7 +42,6 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 
 		$this->parent->checkUnfinishedRuns();
 
-		$this->plugin->includeClass('guis/class.ilCoSubRunsTableGUI.php');
 		$table_gui = new ilCoSubRunsTableGUI($this, 'listRuns');
 		$table_gui->prepareData($this->object->getRuns());
 		$this->tpl->setContent($table_gui->getHTML());
@@ -62,7 +59,6 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 			$this->ctrl->redirect($this,'listRuns');
 		}
 
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 		$conf_gui = new ilConfirmationGUI();
 		$conf_gui->setFormAction($this->ctrl->getFormAction($this));
 		$conf_gui->setHeaderText($this->plugin->txt('confirm_delete_assignments'));
@@ -85,9 +81,6 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	{
 		if (isset($_POST['run_ids']))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-			$this->plugin->includeClass('models/class.ilCoSubRun.php');
-
 			foreach ($_POST['run_ids'] as $run_id)
 			{
 				ilCoSubAssign::_deleteForObject($this->object->getId(), $run_id);

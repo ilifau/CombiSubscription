@@ -1,37 +1,26 @@
 <?php
 
-require_once('Services/Table/classes/class.ilTable2GUI.php');
 /**
  * Table GUI for registration items
  */
 class ilCoSubRegistrationTableGUI extends ilTable2GUI
 {
-    /** @var \ILIAS\DI\Container */
     protected \ILIAS\DI\Container $dic;
-
-	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
-
-	/** @var array   $value => $text */
+	/** $value => $text */
 	protected array $options = [];
-
-	/** @var int maximum choices count of all item priorities */
+	/** maximum choices count of all item priorities */
 	protected int $max_choices = 0;
-
-	/** @var bool	setting choices is disabled  */
+	/** setting choices is disabled */ 
 	protected bool $disabled = false;
-
-	/** @var array local_item_id => other_item_id => item */
+	/** local_item_id => other_item_id => item */
 	protected array $conflicts = [];
-
-    /** @var ilCoSubCategory[] indexed by cat_id  */
+    /** ilCoSubCategory[] indexed by cat_id */  
     protected array $categories = [];
+	protected ilCoSubRegistrationGUI $parent;
+	protected ilObjCombiSubscription $object;
+	protected ilCombiSubscriptionPlugin $plugin;
 
-	/**
-	 * ilCoSubItemsTableGUI constructor.
-	 * @param ilCoSubRegistrationGUI    $a_parent_gui
-	 * @param string                    $a_parent_cmd
-	 */
 	function __construct(ilCoSubRegistrationGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $DIC;
@@ -73,10 +62,9 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 
 	/**
 	 * Prepare the data to be displayed
-	 * @param   ilCoSubItem[]   $a_items
-	 * @param   array           $a_priorities   item_id => priority
-	 * @param   array           $a_counts       item_id => priority => count
-	 * @param   array           $a_conflicts    local_item_id => other_item_id => item
+	 * $a_priorities   item_id => priority
+	 * $a_counts       item_id => priority => count
+	 * $a_conflicts    local_item_id => other_item_id => item
 	 */
 	public function prepareData(array $a_items, array $a_priorities, array $a_counts, array $a_conflicts = []): void
 	{
@@ -131,15 +119,12 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
 
-		require_once('Services/Locator/classes/class.ilLocatorGUI.php');
-
 		$this->tpl->setVariable('TITLE', $a_set['title']);
 		$this->tpl->setVariable('DESCRIPTION', $a_set['description']);
 		$this->tpl->setVariable('PERIOD', $a_set['period']);
 
 		if (!empty($a_set['target_ref_id']))
 		{
-			require_once('Services/Locator/classes/class.ilLocatorGUI.php');
 			$locator = new ilLocatorGUI();
 			$locator->addContextItems($a_set['target_ref_id']);
 			$this->tpl->setVariable('PATH', $locator->getHTML());

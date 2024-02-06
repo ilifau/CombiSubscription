@@ -10,25 +10,19 @@
  */
 class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 {
-	/** @var string command to show the list of users */
+	/** command to show the list of users */
 	protected string $cmdUserList = 'listRegistrations';
-
-	/** @var ilCoSubCategory[] */
+	/** ilCoSubCategory[] */ 
 	protected array $categories = [];
-
-	/** @var bool registration is disabled */
+	/** registration is disabled */ 
 	protected bool $disabled = false;
-
-	/** @var ilObjUser ilias_user */
 	protected ?ilObjUser $ilias_user = null;
-
-	/** @var array local_item_id => other_item_id => item */
+	/** local_item_id => other_item_id => item */ 
 	protected array $conflicts = [];
 
 	/**
 	 * Execute a command
 	 * note: permissions are already checked in parent gui
-	 * @throws ilCtrlException
 	 */
 	public function executeCommand(): void
 	{
@@ -95,7 +89,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 		$this->tabs->activateSubTab('list_registrations');
 
-		$this->plugin->includeClass('guis/class.ilCoSubUsersTableGUI.php');
 		$table_gui = new ilCoSubUsersTableGUI($this, 'listRegistrations');
 		$table_gui->prepareData();
 
@@ -142,7 +135,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
             $ilErr->raiseError($this->lng->txt('permission_denied'));
         }
 
-        $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
         $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
         $conflicts = $conflictsObj->getConflicts(array_keys($this->object->getUsers()), false, true);
         $internalItems = $this->object->getItems();
@@ -180,7 +172,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
     {
         $this->tabs->activateSubTab('list_registrations');
 
-        require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
         $gui = new ilConfirmationGUI();
         $gui->setFormAction($this->ctrl->getFormAction($this));
         $gui->setHeaderText($this->plugin->txt('remove_conflicts_question'));
@@ -203,7 +194,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
             $ilErr->raiseError($this->lng->txt('permission_denied'));
         }
 
-        $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
         $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
         $conflicts = $conflictsObj->getConflicts(array_keys($this->object->getUsers()), false, true);
 
@@ -218,7 +208,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 	/**
 	 * Edit the registration of the current user
-	 * @param array|null	posted priorities to be set (item_id => priority)
+	 * $priorities posted priorities to be set (item_id => priority)
 	 */
 	public function editRegistration(?array $priorities = null): void
 	{
@@ -226,7 +216,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$userObj = $this->object->getUser($this->ilias_user->getId());
 
 		// get conflicts
-		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
 		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
 		$conflicts = $conflictsObj->getConflicts([$userObj->user_id], false, true);
 		if (isset($conflicts[$userObj->user_id]))
@@ -279,7 +268,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			}
 		}
 
-		$this->plugin->includeClass('guis/class.ilCoSubFormGUI.php');
 		$form = new ilCoSubFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		if (!$this->disabled)
@@ -315,10 +303,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$this->tpl->addOnLoadCode('il.CombiSubscription.init('.json_encode($colors).')');
 	}
 
-	/**
-	 * @param ilCoSubUser $userObj
-	 * @return array
-	 */
 	public function getRegistrationInfos(ilCoSubUser $userObj): array
 	{
         global $DIC;
@@ -406,12 +390,10 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 	/**
 	 * Get the Html code of flat registrations
-	 * @param array|null	$priorities priorities to be set (item_id => priority)
-	 * @return string
+	 * $priorities priorities to be set (item_id => priority)
 	 */
 	protected function getFlatRegisterHTML(?array $priorities): string
 	{
-		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 		$table_gui = new ilCoSubRegistrationTableGUI($this, 'editRegistration');
 		$table_gui->setDisabled($this->disabled);
 		$table_gui->prepareData(
@@ -425,19 +407,15 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 	/**
 	 * Get the Html code of categorized registrations
-	 * @param array|null	$priorities priorities to be set (item_id => priority)
-	 * @return string
+	 * $priorities priorities to be set (item_id => priority)
 	 */
 	protected function getCatRegisterHTML(?array $priorities): string
 	{
-		include_once('Services/Accordion/classes/class.ilAccordionGUI.php');
 		$acc_gui = new ilAccordionGUI();
 		$acc_gui->setAllowMultiOpened(true);
         $acc_gui->setBehaviour("FirstOpen");
 		$acc_gui->setActiveHeaderClass('ilCoSubRegAccHeaderActive');
 		$acc_gui->head_class_set = true;	// workaround
-
-		$this->plugin->includeClass('guis/class.ilCoSubRegistrationTableGUI.php');
 
 		$items = $this->object->getItemsByCategory('selectable');
 		$counts = $this->object->getPriorityCounts();
@@ -500,10 +478,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
     /**
      * Get the HTML block to show restrictions and select a module
      * StudOn specific
-     * @param string|null $import_id
-     * @param string      $module_post_var
-     * @param int|null    $selected_module_id
-     * @return string
      */
     public function getRestrictionAndModuleHtml(?string $import_id, string $module_post_var, ?int $selected_module_id): string
     {
@@ -546,8 +520,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		{
 			$this->ctrl->redirect($this,'editRegistration');
 		}
-
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 
 		$method = $this->object->getMethodObject();
 		$min_choices = $this->object->getMinChoices();
@@ -637,7 +609,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		}
 		else
 		{
-			$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 			$notification = new ilCombiSubscriptionMailNotification();
 			$notification->setPlugin($this->plugin);
 			$notification->setObject($this->object);
@@ -655,7 +626,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function sendSubscriptionEmail(): void
 	{
-		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this->object);
@@ -669,7 +639,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function confirmDeleteRegistration(): void
 	{
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 		$gui = new ilConfirmationGUI();
 		$gui->setFormAction($this->ctrl->getFormAction($this));
 		$gui->setHeaderText($this->plugin->txt('delete_registration_question'));
@@ -683,8 +652,6 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function deleteRegistration(): void
 	{
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
-		$this->plugin->includeClass('models/class.ilCoSubUser.php');
 		ilCoSubChoice::_deleteForObject($this->object->getId(), $this->ilias_user->getId());
 		ilCoSubUser::_deleteForObject($this->object->getId(), $this->ilias_user->getId());
 		ilUtil::sendSuccess($this->plugin->txt('registration_deleted'), true);
@@ -746,7 +713,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	/**
 	 * Get the posted priority slection of a user
 	 * The 'not selected' options are filtered out
-	 * @return array	item_id => priority
+	 * return array item_id => priority
 	 */
 	protected function getPostedPriorities(): array
 	{

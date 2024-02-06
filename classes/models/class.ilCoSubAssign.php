@@ -6,28 +6,18 @@
  */
 class ilCoSubAssign
 {
-	/** @var  integer */
-	public $assign_id;
-
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  integer */
-	public $run_id;
-
-	/** @var  integer */
-	public $user_id;
-
-	/** @var  integer */
-	public $item_id;
+	public int $assign_id;
+	public int $obj_id;
+	public int $run_id;
+	public int $user_id;
+	public int $item_id;
 
 
 	/**
 	 * Get assignment by id
-	 * @param integer  assign id
-	 * @return ilCoSubAssign | null
+	 * $a_id  assign id
 	 */
-	public static function _getById($a_id)
+	public static function _getById(int $a_id): ? ilCoSubAssign
 	{
 		global $ilDB;
 
@@ -49,9 +39,8 @@ class ilCoSubAssign
 
 	/**
 	 * Delete an assignment by its id
-	 * @param integer $a_id
 	 */
-	public static function _deleteById($a_id)
+	public static function _deleteById(int $a_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_ass WHERE assign_id = ' . $ilDB->quote($a_id,'integer'));
@@ -60,10 +49,10 @@ class ilCoSubAssign
 
 	/**
 	 * Get all assignments for an object as an indexed array
-	 * @param integer       object id
-	 * @return array        run_id => user_id => item_id => assign_id (run_id = 0 for the chosen assignments)
+	 * $a_obj_id      object id
+	 * return array        run_id => user_id => item_id => assign_id (run_id = 0 for the chosen assignments)
 	 */
-	public static function _getForObjectAsArray($a_obj_id)
+	public static function _getForObjectAsArray(int $a_obj_id): array
 	{
 		global $ilDB;
 
@@ -82,12 +71,9 @@ class ilCoSubAssign
 
 	/**
 	 * Get all assignment ids for an object and user as an indexed array
-	 * @param integer       $a_obj_id
-	 * @param integer		$a_user_id
-     * @param integer		$a_run_id
-	 * @return array       item_id => run_id => assign_id (run_id = 0 for the chosen assignments)
+	 * return array       item_id => run_id => assign_id (run_id = 0 for the chosen assignments)
 	 */
-	public static function _getIdsByItemAndRun($a_obj_id, $a_user_id, $a_run_id = null)
+	public static function _getIdsByItemAndRun(int $a_obj_id, int $a_user_id, ?int $a_run_id = null): array
 	{
 		global $ilDB;
 
@@ -120,11 +106,11 @@ class ilCoSubAssign
 
 	/**
 	 * Delete all assignments for a parent object id
-	 * @param integer object id
-	 * @param integer|null      run id (optional, 0 is for the selected assignments)
-	 * @param integer[]|null	list of user_ids for which the assignments shoud be kept
+	 * $a_obj_id object id
+	 * $a_run_id     run id (optional, 0 is for the selected assignments)
+	 * $a_keep_user_ids	list of user_ids for which the assignments shoud be kept
 	 */
-	public static function _deleteForObject($a_obj_id, $a_run_id = null, $a_keep_user_ids = array())
+	public static function _deleteForObject(int $a_obj_id, ?int $a_run_id = null, ?array $a_keep_user_ids = []): void
 	{
 		global $ilDB;
 
@@ -154,10 +140,8 @@ class ilCoSubAssign
 
 	/**
 	 * Delete all assignments for a parent object id
-	 * @param integer object id
-	 * @param integer user id
 	 */
-	public static function _deleteByObjectAndUser($a_obj_id, $a_user_id)
+	public static function _deleteByObjectAndUser(int $a_obj_id, int $a_user_id): void
 	{
 		global $ilDB;
 
@@ -169,9 +153,9 @@ class ilCoSubAssign
 
 	/**
 	 * Fill the properties with data from an array
-	 * @param array assoc data
+	 * $data array assoc data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->assign_id = $data['assign_id'];
 		$this->obj_id = $data['obj_id'];
@@ -182,9 +166,9 @@ class ilCoSubAssign
 
 	/**
 	 * Save a choice object
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 

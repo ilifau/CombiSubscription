@@ -1,60 +1,46 @@
 <?php
 
-require_once('Services/Table/classes/class.ilTable2GUI.php');
 /**
  * Table GUI for registration items
  */
 class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 {
-    /** @var \ILIAS\DI\Container */
     protected \ILIAS\DI\Container $dic;
-
-
-	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
+	protected ilObjCombiSubscription $object;
+	protected ilCombiSubscriptionPlugin $plugin;
+	protected ilCoSubAssignmentsGUI $parent;
 
-	/**
-	 * List of item ids
-	 * @var integer[]
-	 */
+	/** List of item ids (int) */
 	protected array $item_ids = [];
 
     /**
      * List of import ids for the targets assigned to the items
-     * @var \FAU\Study\Data\ImportId[] indexed by item_id
+     * \FAU\Study\Data\ImportId[] indexed by item_id
      */
     protected array $import_ids = [];
-
+	
 	/**
 	 * List of run_ids
-	 * @var array   label => run_id
+	 * label => run_id
 	 */
 	protected array $run_ids = [];
-
-	/**
-	 * List of users (indexed by user_id)
-	 * @var ilCoSubUser[];
-	 */
+	
+	/** List of users (indexed by user_id) */
 	protected array $users;
-
-
+	
 	/**
-	 * User priorities
-	 * @var array  (user_id => item_id => priority)
+	 * User priorities 
+	 * (user_id => item_id => priority)
 	 */
-	protected array $priorities;
-
-	/**
+	 protected array $priorities;
+	
+	 /**
 	 * Run assignments
-	 * @var array   (run_id => user_id => item_id => assign_id)
+	 * (run_id => user_id => item_id => assign_id)
 	 */
 	protected array $assignments;
 
-	/**
-	 * ilCoSubItemsTableGUI constructor.
-	 * @param ilCoSubAssignmentsGUI     $a_parent_gui
-	 * @param string                    $a_parent_cmd
-	 */
 	function __construct(ilCoSubAssignmentsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $DIC;
@@ -182,7 +168,6 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		}
 
 		// query for users
-		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setLimit($this->plugin->getUserQueryLimit());
 		$user_query->setUserFilter(array_keys($this->users));

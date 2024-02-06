@@ -33,7 +33,6 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 
 	/**
 	 * Get the classname of the assigned method
-	 * @return string
 	 */
 	public function getMethodId(): string
 	{
@@ -75,7 +74,6 @@ class ilCoSubMethodEATTSConfigGUI extends ilCoSubMethodBaseConfigGUI
 	 */
 	protected function initPropertiesForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->setTitle($this->txt('title'));

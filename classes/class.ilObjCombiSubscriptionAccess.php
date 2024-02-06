@@ -11,10 +11,8 @@
 */
 class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 {
-	/**
-	 * @var array   obj_id => row
-	 */
-	static $status_data = array();
+	/** obj_id => row */
+	static array $status_data = [];
 
 	/**
 	* Checks wether a user may invoke a command or not
@@ -22,29 +20,22 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	*
 	* Please do not check any preconditions handled by
 	* ilConditionHandler here. Also don't do usual RBAC checks.
-	*
-	* @param	string		$a_cmd			command (not permission!)
- 	* @param	string		$a_permission	permission
-	* @param	int			$a_ref_id		reference id
-	* @param	int			$a_obj_id		object id
-	* @param	int			$a_user_id		user id (if not provided, current user is taken)
-	*
-	* @return	boolean		true, if everything is ok
+
 	*/
-	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '')
+	function _checkAccess(string $cmd, string $permission, int $ref_id, int $obj_id, ?int $user_id = null): bool
 	{
 		global $DIC;
 
-		if ($a_user_id == '')
+		if ($user_id == null)
 		{
-			$a_user_id = $DIC->user()->getId();
+			$user_id = $DIC->user()->getId();
 		}
 
-		switch ($a_permission)
+		switch ($permission)
 		{
 			case 'read':
-				if (!self::checkOnline($a_obj_id) &&
-					!$DIC->access()->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id))
+				if (!self::checkOnline($obj_id) &&
+					!$DIC->access()->checkAccessOfUser($user_id, 'write', '', $ref_id))
 				{
 					return false;
 				}
@@ -57,7 +48,7 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	/**
 	* Check online status of example object
 	*/
-	static function checkOnline($a_obj_id)
+	static function checkOnline(int $a_obj_id): bool
 	{
 		$rec  = self::getStatusData($a_obj_id);
 		return (boolean) $rec['is_online'];
@@ -66,7 +57,7 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	/**
 	 * Get the subscription start
 	 */
-	static function getSubscriptionStart($a_obj_id)
+	static function getSubscriptionStart(int $a_obj_id): ilDateTime
 	{
 		$rec  = self::getStatusData($a_obj_id);
 		return new ilDateTime($rec['sub_start'],IL_CAL_DATETIME);
@@ -75,7 +66,7 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	/**
 	 * Get the subscription end
 	 */
-	static function getSubscriptionEnd($a_obj_id)
+	static function getSubscriptionEnd(int $a_obj_id): ilDateTime
 	{
 		$rec  = self::getStatusData($a_obj_id);
 		return new ilDateTime($rec['sub_end'],IL_CAL_DATETIME);
@@ -86,7 +77,7 @@ class ilObjCombiSubscriptionAccess extends ilObjectPluginAccess
 	 * @param   int         object id
 	 * @return  array       is_online, sub_start, sub_end
 	 */
-	private static function getStatusData($a_obj_id)
+	private static function getStatusData(int $a_obj_id): array
 	{
 		global $DIC;
 		$ilDB = $DIC->database();

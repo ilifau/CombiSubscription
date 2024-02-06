@@ -1,14 +1,9 @@
 <?php
 
-include_once './Services/Mail/classes/class.ilMailNotification.php';
-
 class ilCombiSubscriptionMailNotification extends ilMailNotification
 {
-	/** @var  ilCombiSubscriptionPlugin */
-	var $plugin;
-
-	/** @var  ilObjCombiSubscription */
-	var $object;
+	private ilCombiSubscriptionPlugin $plugin;
+	private ilObjCombiSubscription $object;
 
 	/**
 	 * Constructor
@@ -18,30 +13,22 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 		parent::__construct();
 	}
 
-	/**
-	 * @param ilObjCombiSubscription $a_object
-	 */
-	public function setObject($a_object)
+	public function setObject(ilObjCombiSubscription $a_object): void
 	{
 		$this->object = $a_object;
 		$this->setObjId($this->object->getId());
 		$this->setRefId($this->object->getRefId());
 	}
 
-	/**
-	 * @param ilCombiSubscriptionPlugin $a_plugin
-	 */
-	public function setPlugin($a_plugin)
+	public function setPlugin(ilCombiSubscriptionPlugin $a_plugin): void
 	{
 		$this->plugin = $a_plugin;
 	}
 
 	/**
 	 * Send a registration confirmation to the user
-	 * @param	int	$user_id
-	 * @param	bool $by_admin
 	 */
-	public function sendRegistration($user_id, $by_admin = false)
+	public function sendRegistration(int $user_id, bool $by_admin = false): void
 	{
 		global $ilUser;
 
@@ -101,12 +88,11 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 	/**
 	 * Send the notifications about Assignments
 	 * Object and plugin must be set before
-	 * @param array 	$removedConflicts  user_id => obj_id => item
-     * @param array     $users  list of specific users to treat: user_id[]
+	 * array 	$removedConflicts  user_id => obj_id => item
+     * array     $users  list of specific users to treat: user_id[]
 	 */
-	public function sendAssignments($removedConflicts = array(), $users = array())
+	public function sendAssignments(array $removedConflicts = [], array $users = []): void
 	{
-		require_once('Services/Link/classes/class.ilLink.php');
 
 		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
@@ -191,9 +177,9 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 	/**
 	 * Send the notifications about being removed
 	 * Object and plugin must be set before
-	 * @param int[] $a_users
+	 * int[] $a_users
 	 */
-	public function sendRemoval($a_users)
+	public function sendRemoval(array $a_users): void
 	{
 		foreach($a_users as $user_id)
 		{
@@ -216,9 +202,8 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 
 	/**
 	 * Init language
-	 * @param int $a_usr_id
 	 */
-	protected function initLanguage($a_usr_id)
+	protected function initLanguage(int $a_usr_id): void
 	{
 		$this->language = $this->getUserLanguage($a_usr_id);
 		$this->language->loadLanguageModule($this->plugin->getPrefix());
@@ -227,10 +212,8 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 
 	/**
 	 * Get a localized text
-	 * @param string $a_keyword
-	 * @return string
 	 */
-	protected function txt($a_keyword)
+	protected function txt(string $a_keyword): string
 	{
 		return str_replace('\n', "\n",
 			$this->getLanguage()->txt(

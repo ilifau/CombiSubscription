@@ -1,38 +1,18 @@
 <?php
 
-require_once('Services/Table/classes/class.ilTable2GUI.php');
-require_once('Services/Locator/classes/class.ilLocatorGUI.php');
-require_once('Modules/Course/classes/class.ilObjCourseListGUI.php');
-require_once('Modules/Group/classes/class.ilObjGroupListGUI.php');
-require_once('Modules/Session/classes/class.ilObjSessionListGUI.php');
 /**
  * Table GUI for registration items
  */
 class ilCoSubItemsTableGUI extends ilTable2GUI
 {
-    /** @var ilContainer */
     protected ilContainer $dic;
-    
-	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
-
-	/** @var ilCoSubItemsGUI  */
 	protected ilCoSubItemsGUI $parent;
-
-	/** @var ilCombiSubscriptionPlugin  */
 	protected ilCombiSubscriptionPlugin $plugin;
-
-	/** @var  ilCoSubCategory[]	indexed by cat_id */
+	/** ilCoSubCategory[]	indexed by cat_id */
 	protected array $categories;
-
-	/** @var ilCombiSubscriptionTargets */
 	protected ilCombiSubscriptionTargets $targets;
 
-	/**
-	 * ilCoSubItemsTableGUI constructor.
-	 * @param ilCoSubItemsGUI 			$a_parent_gui
-	 * @param string                    $a_parent_cmd
-	 */
 	function __construct(ilCoSubItemsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $DIC;
@@ -44,7 +24,6 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
         $this->dic = $DIC;
 		$this->ctrl = $DIC->ctrl();
 
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$this->targets = new ilCombiSubscriptionTargets($this->parent->object, $this->plugin);
 
 		$this->setFormAction($this->ctrl->getFormAction($this->parent));
@@ -85,7 +64,6 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 
 	/**
 	 * Prepare the data to be displayed
-	 * @param   ilCoSubItem[]   $a_items
 	 */
 	public function prepareData(array $a_items): void
 	{

@@ -5,30 +5,18 @@
  */
 class ilCoSubChoice
 {
-	/** @var  integer */
-	public $choice_id;
-
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  integer */
-	public $user_id;
-
-	/** @var  integer */
-	public $item_id;
-
-	/** @var  integer */
-	public $priority;
-
-    /** @var integer|null */
-    public $module_id;
+	public int $choice_id;
+	public int $obj_id;
+	public int $user_id;
+	public int $item_id;
+	public int $priority;
+    public ?int $module_id;
 
 
 	/**
 	 * Delete a choice by its id
-	 * @param integer $a_id
 	 */
-	public static function _deleteById($a_id)
+	public static function _deleteById(int $a_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_choices WHERE choice_id = ' . $ilDB->quote($a_id,'integer'));
@@ -36,10 +24,8 @@ class ilCoSubChoice
 
 	/**
 	 * Delete all choices for a parent object id
-	 * @param integer object id
-	 * @param integer|null      user id (optional)
 	 */
-	public static function _deleteForObject($a_obj_id, $a_user_id = null)
+	public static function _deleteForObject(int $a_obj_id, ?int $a_user_id = null)
 	{
 		global $ilDB;
 
@@ -57,11 +43,9 @@ class ilCoSubChoice
 
 	/**
 	 * Get all choices for an object and user as an indexed array
-	 * @param integer       $a_obj_id
-	 * @param integer		$a_user_id
-	 * @return array       item_id => choice_id
+	 * return array       item_id => choice_id
 	 */
-	public static function _getIdsByItem($a_obj_id, $a_user_id)
+	public static function _getIdsByItem(int $a_obj_id, int $a_user_id): array
 	{
 		global $ilDB;
 
@@ -80,11 +64,9 @@ class ilCoSubChoice
 
 	/**
 	 * Get the user priorities for an object as an indexed array
-	 * @param integer       object id
-	 * @param integer|null  user_id (optional)
-	 * @return array        user_id => item_id => priority
+	 * return array        user_id => item_id => priority
 	 */
-	public static function _getPriorities($a_obj_id, $a_user_id = null)
+	public static function _getPriorities(int $a_obj_id, ?int $a_user_id = null): array
 	{
 		global $ilDB;
 
@@ -108,10 +90,9 @@ class ilCoSubChoice
 
 	/**
 	 * Get the count of priorities for each item
-	 * @param integer   $a_obj_id
-	 * @return array    item_id => priority => count
+	 * return array    item_id => priority => count
 	 */
-	public static function _getPriorityCounts($a_obj_id)
+	public static function _getPriorityCounts(int $a_obj_id): array
 	{
 		global $ilDB;
 
@@ -131,10 +112,9 @@ class ilCoSubChoice
 
     /**
      * Get all choices for an object as an indexed array
-     * @param integer       	$a_obj_id
-     * @return array        choice_id => ilCoSubChoice
+     * return array        choice_id => ilCoSubChoice
      */
-    public static function _getForObject($a_obj_id)
+    public static function _getForObject(int $a_obj_id): array
     {
         global $ilDB;
 
@@ -154,12 +134,9 @@ class ilCoSubChoice
 
     /**
      * Get the selected module id for a user and items
-     * @param integer $a_obj_id
-     * @param integer $a_user_id
-     * @param int[] $a_item_ids
-     * @return integer|null
+     * int[] $a_item_ids
      */
-    public static function _getModuleId($a_obj_id, $a_user_id, $a_item_ids) {
+    public static function _getModuleId(int $a_obj_id, int $a_user_id, array $a_item_ids): ?int {
         global $ilDB;
 
         $query = 'SELECT module_id FROM rep_robj_xcos_choices'
@@ -179,9 +156,9 @@ class ilCoSubChoice
 
     /**
 	 * Fill the properties with data from an array
-	 * @param array assoc data
+	 * $data array assoc data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->choice_id = $data['choice_id'];
 		$this->obj_id = $data['obj_id'];
@@ -193,9 +170,9 @@ class ilCoSubChoice
 
 	/**
 	 * Save a choice object
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 
@@ -226,11 +203,9 @@ class ilCoSubChoice
 
     /**
      * Clone the choice for a new object
-     * @param int	$a_obj_id
-     * @param array	$a_item_map (old_item_id => new_item_id)
-     * @return self
+     * array $a_item_map (old_item_id => new_item_id)
      */
-    public function saveClone($a_obj_id, $a_item_map)
+    public function saveClone(int $a_obj_id, array $a_item_map): self
     {
         $clone = clone $this;
         $clone->obj_id = $a_obj_id;

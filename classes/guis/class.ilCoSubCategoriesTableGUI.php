@@ -1,7 +1,5 @@
 <?php
 
-require_once('Services/Table/classes/class.ilTable2GUI.php');
-require_once('Services/Locator/classes/class.ilLocatorGUI.php');
 /**
  * Table GUI for registration cetegories
  */
@@ -9,12 +7,10 @@ class ilCoSubCategoriesTableGUI extends ilTable2GUI
 {
 	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
+	protected ilObjCombiSubscription $object;
+	protected ilCombiSubscriptionPlugin $plugin;
+	protected ilCoSubCategoriesGUI $parent;
 
-	/**
-	 * ilCoSubCategoriesTableGUI constructor.
-	 * @param ilCoSubCategoriesGUI $a_parent_gui
-	 * @param string                    $a_parent_cmd
-	 */
 	function __construct(ilCoSubCategoriesGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
@@ -43,7 +39,6 @@ class ilCoSubCategoriesTableGUI extends ilTable2GUI
 
 	/**
 	 * Prepare the data to be displayed
-	 * @param   ilCoSubCategory[]   $a_categories
 	 */
 	public function prepareData(array $a_categories): void
 	{

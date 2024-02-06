@@ -1,7 +1,5 @@
 <?php
 
-include_once('./Services/Component/classes/class.ilPluginConfigGUI.php');
- 
 /**
  * Configuration user interface class for combined subscription
  *
@@ -11,20 +9,10 @@ include_once('./Services/Component/classes/class.ilPluginConfigGUI.php');
  */
 class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 {
-
-	/** @var  ilCombiSubscriptionPlugin */
 	protected ilCombiSubscriptionPlugin $plugin;
-
-	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
-
-	/** @var ilTemplate */
-	protected ilTemplate $tpl;
-
-	/** @var ilLanguage */
+	protected ilGlobalTemplateInterface $tpl;
 	protected ilLanguage $lng;
-
-	/** @var ilPropertyFormGUI */
 	protected ilPropertyFormGUI $form;
 
 
@@ -54,15 +42,11 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 		$next_class = $this->ctrl->getNextClass();
 		if (!empty($next_class))
 		{
-			$this->plugin->includeClass('abstract/class.ilCoSubMethodBaseConfigGUI.php');
 
 			switch ($next_class)
 			{
 				case 'ilcosubmethodeattsconfiggui':
 					$this->setSubTabs('methods','eatts');
-					$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
-					$this->plugin->includeClass('methods/class.ilCoSubMethodEATTS.php');
-					$this->plugin->includeClass('methods/class.ilCoSubMethodEATTSConfigGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubMethodEATTSConfigGUI($this->plugin));
 					return;
 
@@ -100,7 +84,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Set tabs
 	 */
-	protected function setTabs()
+	protected function setTabs(): void
 	{
 		global $ilTabs;
 
@@ -111,10 +95,10 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Activate a tab and set its sub tabs
 	 *
-	 * @param string $a_tab     name of the tab (will be activated)
-	 * @param string $a_subtab  name of the subtab (will be activated)
+	 * string $a_tab     name of the tab (will be activated)
+	 * string $a_subtab  name of the subtab (will be activated)
 	 */
-	protected function setSubTabs($a_tab, $a_subtab = '')
+	protected function setSubTabs(string $a_tab, string $a_subtab = ''): void
 	{
 		global $ilTabs;
 
@@ -139,7 +123,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Configure screen
 	 */
-	function configure()
+	function configure(): void
 	{
 		$this->initPropertiesForm();
 		$this->loadPropertiesValues();
@@ -150,7 +134,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Update the properties
 	 */
-	protected function updateProperties()
+	protected function updateProperties(): void
 	{
 		$this->initPropertiesForm();
 		if ($this->form->checkInput())
@@ -169,9 +153,8 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Inot the properties form
 	 */
-	protected function initPropertiesForm()
+	protected function initPropertiesForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->setTitle($this->plugin->txt('plugin_configuration'));
@@ -211,7 +194,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Load the properties values in the form
 	 */
-	protected function loadPropertiesValues()
+	protected function loadPropertiesValues(): void
 	{
 		$this->form->getItemByPostVar('out_of_conflict_time')->setValue(
 			ilCombiSubscriptionPlugin::_getSetting('out_of_conflict_time', 900));
@@ -230,7 +213,7 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	/**
 	 * Save the properties values from the form
 	 */
-	protected function savePropertiesValues()
+	protected function savePropertiesValues(): void
 	{
 		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('out_of_conflict_time'));
 		ilCombiSubscriptionPlugin::_setSetting('out_of_conflict_time', $this->form->getInput('tolerated_conflict_percentage'));

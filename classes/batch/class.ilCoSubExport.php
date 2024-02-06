@@ -56,54 +56,20 @@ class ilCoSubExport
 			)),
 	);
 
-
-	/**
-	 * @var ilCombiSubscriptionPlugin
-	 */
 	protected ilCombiSubscriptionPlugin $plugin;
-
-	/**
-	 * @var ilObjCombiSubscription
-	 */
 	protected ilObjCombiSubscription $object;
-
-
-	/** @var  string Writer Type ('excel' or 'csv') */
+	/** Writer Type ('excel' or 'csv') */
 	protected string $type;
-
-
-	/** @var string export mode ('reg_by_item') */
+	/** export mode ('reg_by_item') */
 	protected string $mode;
-
-
-	/** @var ilLanguage $lng */
 	protected ilLanguage $lng;
-
-	/**
-	 * @var bool user has extended user data access
-	 */
+	/** user has extended user data access */
 	protected bool $extended = false;
-
-
-	/**
-	 * @var bool platform has studydata
-	 */
+	/**  platform has studydata */
 	protected bool $with_studydata = false;
-
-
-    /**
-     * @var bool platform has educations
-     */
+    /** platform has educations */
     protected bool $with_educations = false;
 
-
-    /**
-	 * Constructor.
-	 * @param ilCombiSubscriptionPlugin		$plugin
-	 * @param ilObjCombiSubscription		$object
-	 * @param string						$type
-	 * @param string						$mode
-	 */
 	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $type = self::TYPE_EXCEL, string $mode = '')
 	{
 		global $lng;
@@ -130,8 +96,8 @@ class ilCoSubExport
 
 	/**
 	 * Build an Excel Export file
-	 * @param string	$directory	directory where the file should be creatred
-     * @return string   full path of the created file
+	 * $directory	directory where the file should be creatred
+     * return full path of the created file
 	 */
 	public function buildExportFile(?string $directory = null, ?string $mode = null, ?string $type = null, ?string $delimiter = null, ?string $enclosure = null): string
 	{
@@ -224,11 +190,9 @@ class ilCoSubExport
         return $file;
 	}
 
-
 	/**
 	 * Fill the sheet with user registrations
 	 * Items are columns, the priorities are values
-	 * @param Worksheet $worksheet
 	 */
 	protected function fillRegistrationsByItem(Worksheet $worksheet): void
 	{
@@ -275,7 +239,6 @@ class ilCoSubExport
 
     /**
      * Fill a sheet with raw item data
-     * @param $worksheet
      */
     protected function fillRawItems(Worksheet $worksheet): void
     {
@@ -303,7 +266,6 @@ class ilCoSubExport
 
     /**
      * Fill a sheet with raw choices data
-     * @param $worksheet
      */
     protected function fillRawChoices(Worksheet $worksheet): void
     {
@@ -330,7 +292,6 @@ class ilCoSubExport
 
     /**
      * Fill a sheet with raw solution data
-     * @param $worksheet
      */
     protected function fillRawSolution(Worksheet $worksheet): void
     {
@@ -360,7 +321,6 @@ class ilCoSubExport
 
     /**
      * Fill a sheet with raw solution data
-     * @param $worksheet
      */
     protected function fillRawSettings(Worksheet $worksheet): void
     {
@@ -384,7 +344,6 @@ class ilCoSubExport
 
     /**
      * Fill a sheet with raw item data
-     * @param $worksheet
      */
     protected function fillRawCategories(Worksheet $worksheet): void
     {
@@ -410,7 +369,6 @@ class ilCoSubExport
 
     /**
      * Fill a sheet with raw item data
-     * @param $worksheet
      */
     protected function fillRawConflicts(Worksheet $worksheet): void
     {
@@ -438,7 +396,6 @@ class ilCoSubExport
     /**
 	 * Fill the sheet with assignments
 	 * Items are columns, assigned items will have a 1 in the cell
-	 * @param Worksheet $worksheet
 	 */
 	protected function fillAssignmentsByItem(Worksheet $worksheet): void
 	{
@@ -487,7 +444,6 @@ class ilCoSubExport
 	/**
 	 * Fill the sheet with user registrations
 	 * Priorities are columns, the items are listed as values
-	 * @param Worksheet $worksheet
 	 */
 	protected function fillRegistrationsByPrio(Worksheet $worksheet): void
 	{
@@ -535,7 +491,6 @@ class ilCoSubExport
 
 	/**
 	 * Get the definition of the user columns
-	 * @return array
 	 */
 	protected function getUserColumns(): array
 	{
@@ -571,8 +526,6 @@ class ilCoSubExport
 
 	/**
 	 * Get the result of hte user quers
-	 * @see ilUserQuery::query()
-	 *
 	 * @return array ('cnt', 'set')
 	 */
 	protected function getUserQueryResult(): array
@@ -584,7 +537,6 @@ class ilCoSubExport
 		}
 
 		// query for users
-		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setLimit($this->plugin->getUserQueryLimit());
 		$user_query->setUserFilter($user_ids);
@@ -597,8 +549,8 @@ class ilCoSubExport
 	/**
 	 * Get the data of the user columns for a row
 	 *
-	 * @param array 	$user 	(single user part of getUserQueryResult())
-	 * @return array 	data for the user columns of a row
+	 * @param $user 	(single user part of getUserQueryResult())
+	 * @return array data for the user columns of a row
 	 */
 	protected function getUserColumnData(array $user): array
 	{
@@ -643,8 +595,6 @@ class ilCoSubExport
 
 	/**
 	 * Fill the header Row of a sheet
-	 * @param Worksheet	$worksheet
-	 * @param array	$columns
 	 * @return array	column key => column letter
 	 */
 	protected function fillHeaderRow(Worksheet $worksheet, array $columns): array
@@ -666,10 +616,9 @@ class ilCoSubExport
 
 	/**
 	 * Fill a row of a sheet with data
-	 * @param Worksheet	$worksheet
-	 * @param array 				$data		key => value
-	 * @param array					$mapping 	key => letter
-	 * @param int					$row 		row number
+	 * @param $data		key => value
+	 * @param $mapping 	key => letter
+	 * @param $row 		row number
 	 */
 	protected function fillRowData(Worksheet $worksheet, array $data, array $mapping, int $row): void
 	{
@@ -682,9 +631,6 @@ class ilCoSubExport
 		}
 	}
 
-	/**
-	 * @param Worksheet	$worksheet
-	 */
 	protected function adjustSizes(Worksheet $worksheet, ?array $range = null)
 	{
 		$range = isset($range) ? $range : range('A', $worksheet->getHighestColumn());

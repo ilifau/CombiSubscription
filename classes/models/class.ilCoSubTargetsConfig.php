@@ -17,35 +17,28 @@ class ilCoSubTargetsConfig
 	const SET_BY_ITEM = 'item';
 	const SET_BY_INPUT = 'input';
 
+	protected ilObjCombiSubscription $object;
 
-	/** @var ilObjCombiSubscription */
-	protected $object;
+	public bool $set_sub_type = false;
+	public bool $set_sub_period = false;
+	public bool $set_sub_min = false;
+	public bool $set_sub_max = false;
+	public bool $set_sub_wait = false;
 
-	public $set_sub_type = false;
-	public $set_sub_period = false;
-	public $set_sub_min = false;
-	public $set_sub_max = false;
-	public $set_sub_wait = false;
+	public string $sub_type;
+	public int $sub_period_start;
+	public int $sub_period_end;
+	public string $sub_wait;
 
-	public $sub_type;
-	public $sub_period_start;
-	public $sub_period_end;
-	public $sub_wait;
-
-	public $sub_min_by = self::SET_BY_ITEM;
-    public $sub_max_by = self::SET_BY_ITEM;
-    public $sub_min;
-    public $sub_max;
+	public string $sub_min_by = self::SET_BY_ITEM;
+    public string $sub_max_by = self::SET_BY_ITEM;
+    public int $sub_min;
+    public int $sub_max;
 
 
-    /** @var bool send the standard emails for user assignments in groups etc */
-	public $send_target_emails = false;
+    /** send the standard emails for user assignments in groups etc */
+	public bool $send_target_emails = false;
 
-
-	/**
-	 * ilCoSubTargetsConfig constructor.
-	 * @param $object
-	 */
 	public function __construct($object)
 	{
 		$this->object = $object;
@@ -54,7 +47,7 @@ class ilCoSubTargetsConfig
 	/**
 	 * Save config in user session (for manual configuration of target objects)
 	 */
-	public function saveInSession()
+	public function saveInSession(): void
 	{
 		$this->object->setPreference('ilCoSubTargetsConfig', 'set_sub_type', $this->set_sub_type);
 		$this->object->setPreference('ilCoSubTargetsConfig', 'set_sub_period', $this->set_sub_period);
@@ -74,7 +67,7 @@ class ilCoSubTargetsConfig
 	/**
 	 * Read config from user session (for manual configuration of target objects)
 	 */
-	public function readFromSession()
+	public function readFromSession(): void
 	{
 		$this->set_sub_type = (bool) $this->object->getPreference('ilCoSubTargetsConfig', 'set_sub_type', false);
 		$this->set_sub_period = (bool) $this->object->getPreference('ilCoSubTargetsConfig', 'set_sub_period', false);
@@ -96,7 +89,7 @@ class ilCoSubTargetsConfig
 	/**
 	 * Save config for object (for auto assignment)
 	 */
-	public function saveInObject()
+	public function saveInObject(): void
 	{
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'set_sub_type', $this->set_sub_type);
 		$this->object->setClassProperty('ilCoSubTargetsConfig', 'set_sub_period', $this->set_sub_period);
@@ -120,7 +113,7 @@ class ilCoSubTargetsConfig
 	/**
 	 * Read config from object (for auto assignment)
 	 */
-	public function readFromObject()
+	public function readFromObject(): void
 	{
 		$this->set_sub_type = (bool) $this->object->getClassProperty('ilCoSubTargetsConfig', 'set_sub_type', false);
 		$this->set_sub_period = (bool) $this->object->getClassProperty('ilCoSubTargetsConfig', 'set_sub_period', false);

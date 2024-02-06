@@ -7,37 +7,25 @@ class ilCoSubSchedule
 {
 	const MAX_TIMES = 200;
 
-	/** @var  integer */
-	public $schedule_id;
-
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  integer */
-	public $item_id;
-
-	/** @var  integer|null */
-	public $period_start;
-
-	/** @var  integer|null */
-	public $period_end;
-
-	/** @var array  '10:00-12:00' => ['mo', 'tu', ...] */
-	public $slots = array();
+	public int $schedule_id;
+	public int $obj_id;
+	public int $item_id;
+	public ?int $period_start;
+	public ?int $period_end;
+	/** array  '10:00-12:00' => ['mo', 'tu', ...] */ 
+	public array $slots = [];
 
 	/**
 	 * Calculated times from the period and slots
 	 * 200 times can be stored per schedule
 	 * @var array  [[(int) start, (int) end], ... ]
 	 */
-	protected $times = array();
+	protected array $times = [];
 
 	/**
 	 * Get schedule by id
-	 * @param integer  $a_id
-	 * @return ilCoSubSchedule|null
 	 */
-	public static function _getById($a_id)
+	public static function _getById(int $a_id): ?ilCoSubSchedule
 	{
 		global $ilDB;
 
@@ -59,9 +47,8 @@ class ilCoSubSchedule
 
 	/**
 	 * Delete an item by its id
-	 * @param integer $a_id
 	 */
-	public static function _deleteById($a_id)
+	public static function _deleteById(int $a_id): void
 	{
         // don't delete an unsaved schedule from campo
         if ($a_id < 0) {
@@ -76,11 +63,11 @@ class ilCoSubSchedule
 	 * Get schedules by parent object id and item id
      * This gets the schedules thar are directny
      * 
-	 * @param integer   $a_obj_id   object id of the combined subscription
-	 * @param integer   $a_item_id  item id if the assignment item
-	 * @return ilCoSubSchedule[]	indexed by schedule_id
+	 * int   $a_obj_id   object id of the combined subscription
+	 * int   $a_item_id  item id if the assignment item
+	 * return ilCoSubSchedule[]	indexed by schedule_id
 	 */
-	public static function _getForObjectAndItem($a_obj_id, $a_item_id)
+	public static function _getForObjectAndItem(int $a_obj_id, int $a_item_id): array
 	{
 		global $ilDB;
 
@@ -106,12 +93,12 @@ class ilCoSubSchedule
      * They are derived from the course's individual dates and are not separately saved
      * Their ids are the negative ids of their individual date to distinct them from the saved schedules of an item
      *
-     * @param integer   $a_course_id    id of the campo course
-     * @param integer   $a_obj_id       object id of the combined subscription
-     * @param integer   $a_item_id      item id if the assignment item
-     * @return ilCoSubSchedule[]	indexed by schedule_id
+     * int   $a_course_id    id of the campo course
+     * int   $a_obj_id       object id of the combined subscription
+     * int   $a_item_id      item id if the assignment item
+     * return ilCoSubSchedule[]	indexed by schedule_id
      */
-    public static function _getForCampoCourse($a_course_id, $a_obj_id, $a_item_id) 
+    public static function _getForCampoCourse(int $a_course_id, int $a_obj_id, int $a_item_id): array 
     {
         global $DIC;
         
@@ -137,9 +124,8 @@ class ilCoSubSchedule
 
 	/**
 	 * Delete all schedules for a parent object id
-	 * @param integer object id
 	 */
-	public static function _deleteForObject($a_obj_id)
+	public static function _deleteForObject(int $a_obj_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_scheds WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer'));
@@ -147,11 +133,9 @@ class ilCoSubSchedule
 
 	/**
 	 * Clone the schedule for a new object
-	 * @param int	$a_obj_id
-	 * @param array	$a_item_map (old_item_id => new_item_id)
-	 * @return self
+	 * array	$a_item_map (old_item_id => new_item_id)
 	 */
-	public function saveClone($a_obj_id,$a_item_map)
+	public function saveClone(int $a_obj_id, array $a_item_map): self
 	{
 		$clone = clone $this;
 		$clone->obj_id = $a_obj_id;
@@ -164,9 +148,9 @@ class ilCoSubSchedule
 
 	/**
 	 * Fill the properties with data from an array
-	 * @param array $data assoc data
+     * array $data assoc data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->schedule_id = $data['schedule_id'];
 		$this->obj_id = $data['obj_id'];
@@ -182,9 +166,9 @@ class ilCoSubSchedule
 
 	/**
 	 * Save a schedule object
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 
@@ -223,20 +207,17 @@ class ilCoSubSchedule
 	/**
 	 * Delete a schedule object
 	 */
-	public function delete()
+	public function delete(): void
 	{
 		self::_deleteById($this->schedule_id);
 	}
 
 	/**
 	 * Get info about a period
-	 * @return string
 	 */
-	public function getPeriodInfo()
+	public function getPeriodInfo(): string
 	{
 		global $lng;
-
-		require_once('Services/Calendar/classes/class.ilDatePresentation.php');
 
 		// no schedule
 		if (empty($this->period_start) || empty($this->period_end))
@@ -279,9 +260,8 @@ class ilCoSubSchedule
 	/**
 	 * Get a complete list of times calculated from the period and slots
 	 */
-	public function getTimesInfo()
+	public function getTimesInfo(): string
 	{
-		require_once('Services/Calendar/classes/class.ilDatePresentation.php');
 
 		$info = array();
 		foreach ($this->times as $time)
@@ -296,16 +276,16 @@ class ilCoSubSchedule
 	/**
 	 * Get the number of calculated times
 	 */
-	public function getTimesCount()
+	public function getTimesCount(): int
 	{
 		return count($this->times);
 	}
 
 	/**
 	 * Get the sum of times of this schedule
-	 * @return int	sum in seconds
+	 * return int	sum in seconds
 	 */
-	public function getSumOfTimes()
+	public function getSumOfTimes(): int
 	{
 		$sum = 0;
 		foreach ($this->times as $time)
@@ -319,17 +299,16 @@ class ilCoSubSchedule
 	 * Get the slots for ilScheduleInputGUI
 	 * @see ilScheduleInputGUI
 	 */
-	public function getSlotsForInput()
+	public function getSlotsForInput(): array
 	{
 		return $this->slots;
 	}
 
 	/**
 	 * Set the slots from ilScheduleInputGUI
-	 * @param array $a_slots
 	 * @see ilScheduleInputGUI
 	 */
-	public function setSlotsFromInput($a_slots)
+	public function setSlotsFromInput(array $a_slots): void
 	{
 		$this->slots = $a_slots;
 	}
@@ -338,7 +317,7 @@ class ilCoSubSchedule
 	/**
 	 * Calculate the actual times from the defined slots
 	 */
-	protected function calculateTimes()
+	protected function calculateTimes(): void
 	{
 		// single schedule
 		if (empty($this->slots))
@@ -391,9 +370,9 @@ class ilCoSubSchedule
 	 * Translate the slots for date comparison
 	 * Wekedays are numbered alike getdate() function
 	 *
-	 * @return array ['start' => day_seconds, 'end' => day_seconds, 'wdays => [weekday_number, weekday_number, ...], ...]
+	 * return array ['start' => day_seconds, 'end' => day_seconds, 'wdays => [weekday_number, weekday_number, ...], ...]
 	 */
-	protected function translateSlots()
+	protected function translateSlots(): array
 	{
 		$daymap = array('mo' => 1, 'tu' => 2, 'we' => 3, 'th' => 4, 'fr' => 5, 'sa' => 6, 'su' => 0);
 		$trans = array();
@@ -414,11 +393,10 @@ class ilCoSubSchedule
 	/**
 	 * Get a date object fot the start of the day, related to a timezone
 	 *
-	 * @param int $timestamp
-	 * @param string $tz timezone identifier
-	 * @return ilDateTime
+	 * string $tz timezone identifier
+	 * return ilDateTime
 	 */
-	public static function _dayStart($timestamp, $tz = '')
+	public static function _dayStart(int $timestamp, string $tz = ''): ilDateTime
 	{
 		$orig = new ilDateTime($timestamp, IL_CAL_UNIX);
 		return new ilDateTime($orig->get(IL_CAL_DATE, $tz). ' 00:00:00', IL_CAL_DATETIME, $tz);
@@ -429,11 +407,10 @@ class ilCoSubSchedule
 	 * Get a date object that is able to be displayed without for period format
 	 * The date without time (in given timezone) is returned to a date object (in UTC)
 	 *
-	 * @param int $timestamp
 	 * @param string $tz timezone identifier
 	 * @return ilDate
 	 */
-	public static function _dayDate($timestamp, $tz = '')
+	public static function _dayDate(int $timestamp, string $tz = ''): ilDate
 	{
 		$orig = new ilDateTime($timestamp, IL_CAL_UNIX);
 		return new ilDate($orig->get(IL_CAL_DATE, $tz), IL_CAL_DATE);
@@ -441,12 +418,10 @@ class ilCoSubSchedule
 
 	/**
 	 * Get the sum of conflicting time between two schedules
-	 * @param self $schedule1
-	 * @param self $schedule2
-	 * @param int $buffer		needed free time between appointments in seconds
-	 * @return int				conflicting time in seconds
+	 * int $buffer		needed free time between appointments in seconds
+	 * int				conflicting time in seconds
 	 */
-	public static function _getConflictTime($schedule1, $schedule2, $buffer = 0)
+	public static function _getConflictTime(self $schedule1, self $schedule2, int $buffer = 0): int
 	{
 		$conflict = 0;
 
@@ -475,10 +450,8 @@ class ilCoSubSchedule
 	/**
 	 * Get a string representation of times
 	 * (one timespan needs 20 characters)
-	 * @param array
-	 * @return string
 	 */
-	public static function _timesToString($times)
+	public static function _timesToString(array $times): string
 	{
 		$string = '';
 		foreach ($times as $time)
@@ -491,10 +464,8 @@ class ilCoSubSchedule
 
 	/**
 	 * Get the times from a string representation
-	 * @param string
-	 * @return array
 	 */
-	public static function _timesFromString($string)
+	public static function _timesFromString(string $string): array
 	{
 		if (empty($string)) {
 			return array();

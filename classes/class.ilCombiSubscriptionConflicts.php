@@ -5,34 +5,23 @@
  */
 class ilCombiSubscriptionConflicts
 {
-    /** @var  ilObjCombiSubscription */
-    protected $object;
-
-    /** @var ilCombiSubscriptionPlugin  */
-    protected $plugin;
-
-    /** @var array obj_id => item_id => item) */
-    protected $itemCache = [];
-
-	/** @var array obj_id => property_name => (mixed) property */
-	protected $propertyCache = [];
-
-    /** @var array local_item_id => other_item_id  => conflict (true|false|null) */
-    protected $conflictCache = [];
+    protected  ilObjCombiSubscription $object;
+    protected ilCombiSubscriptionPlugin $plugin;
+    /** array obj_id => item_id => item) */ 
+    protected array $itemCache = [];
+	/** array obj_id => property_name => (mixed) property */ 
+	protected array $propertyCache = [];
+    /** array local_item_id => other_item_id  => conflict (true|false|null) */ 
+    protected array $conflictCache = [];
 
 
     /**
      * Constructor
-     * @param ilObjCombiSubscription        $a_object
-     * @param ilCombiSubscriptionPlugin     $a_plugin
      */
-    public function __construct($a_object, $a_plugin)
+    public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
     {
         $this->object = $a_object;
         $this->plugin = $a_plugin;
-
-        $this->plugin->includeClass('models/class.ilCoSubAssign.php');
-        $this->plugin->includeClass('models/class.ilCoSubChoice.php');
 
         // init the item cache with the local items
         $this->itemCache[$this->object->getId()] = $this->object->getItems();
@@ -44,12 +33,12 @@ class ilCombiSubscriptionConflicts
 	 * This checks only the assigned items of other subscriptions
 	 * The parameter $a_only_assigned determines which items of the local subscription are checked
      *
-     * @param   array   $a_user_ids list of user_ids to treat (or empty for all object users)
-     * @param   bool    $a_only_assigned check only the assigned items of current user and subscription
-     * @param   bool    $a_only_assigned check only colficts with external assignments
-     * @return array 	conflicts  user_id => local_item_id => other_item_id => item
+     * array   $a_user_ids list of user_ids to treat (or empty for all object users)
+     * bool    $a_only_assigned check only the assigned items of current user and subscription
+     * bool    $a_only_assigned check only colficts with external assignments
+     * return array 	conflicts  user_id => local_item_id => other_item_id => item
      */
-    public function getConflicts($a_user_ids = array(), $a_only_assigned = false, $a_only_external = false)
+    public function getConflicts(array $a_user_ids = [], bool $a_only_assigned = false, bool $a_only_external = false): array
     {
         $conflicts = [];
 
@@ -105,10 +94,10 @@ class ilCombiSubscriptionConflicts
 	 * It will remove all which are conflicting with assigned local items
 	 * Called when the user is notified or when the assignments are transferred
 	 *
-	 * @param   array   $a_user_ids list of specific user_ids to treat
-	 * @return array 	removed conflicts  user_id => obj_id => item
+	 * array   $a_user_ids list of specific user_ids to treat
+	 * array 	removed conflicts  user_id => obj_id => item
 	 */
-	public function removeConflicts($a_user_ids = array())
+	public function removeConflicts(array $a_user_ids = []): array
 	{
 		/** @var array user_id => obj_id => item  */
 		$removed= [];
@@ -174,10 +163,9 @@ class ilCombiSubscriptionConflicts
 
 	/**
 	 * get items of an object (cached)
-	 * @param int $obj_id
-	 * @return ilCosubItem[] (indexed by item_id)
+	 * return ilCosubItem[] (indexed by item_id)
 	 */
-	protected function getItems($obj_id)
+	protected function getItems(int $obj_id): array
 	{
 		if (!isset($this->itemCache[$obj_id]))
 		{
@@ -189,11 +177,10 @@ class ilCombiSubscriptionConflicts
 
 	/**
 	 * Get the local items with schedules that are relevant for a user
-	 * @param int $user_id
-	 * @param bool $only_assigned get only the assigned items
-	 * @return ilCosubItem[] (indexed by item_id)
+	 * bool $only_assigned get only the assigned items
+	 * return ilCosubItem[] (indexed by item_id)
 	 */
-	protected function getScheduledItemsOfUser($user_id, $only_assigned = false)
+	protected function getScheduledItemsOfUser(int $user_id, bool $only_assigned = false): array
 	{
 		$localItems = [];
 		$assignments = $only_assigned ? $this->object->getAssignmentsOfUser($user_id) : [];
@@ -211,11 +198,8 @@ class ilCombiSubscriptionConflicts
 
 	/**
 	 * Check if two items have a conflict (cached)
-	 * @param ilCoSubItem $item1
-	 * @param ilCoSubItem $item2
-	 * @return bool
 	 */
-	protected function haveConflict($item1, $item2)
+	protected function haveConflict(ilCoSubItem $item1, ilCoSubItem $item2): bool
 	{
 		if (!isset($this->conflictCache[$item1->item_id][$item2->item_id]))
 		{
@@ -233,32 +217,24 @@ class ilCombiSubscriptionConflicts
 
 	/**
 	 * Get the conflict buffer of an object (cached)
-	 * @param $obj_id
-	 * @return integer
 	 */
-	protected function getBuffer($obj_id)
+	protected function getBuffer(int $obj_id): int
 	{
 		return $this->getMethodProperty($obj_id, 'out_of_conflict_time', $this->plugin->getToleratedConflictPercentage());
 	}
 
 	/**
 	 * Get the conflict tolerance of an object (cached)
-	 * @param $obj_id
-	 * @return integer
 	 */
-	protected function getTolerance($obj_id)
+	protected function getTolerance(int $obj_id): int
 	{
 		return $this->getMethodProperty($obj_id, 'tolerated_conflict_percentage', $this->plugin->getToleratedConflictPercentage());
 	}
 
 	/**
 	 * Get a method property of an object (cached)
-	 * @param int $obj_id
-	 * @param string $prop_name
-	 * @param mixed $default_value
-	 * @return integer
 	 */
-	protected function getMethodProperty($obj_id, $prop_name, $default_value)
+	protected function getMethodProperty(int $obj_id, string $prop_name, string $default_value): int
 	{
 		global $DIC;
 

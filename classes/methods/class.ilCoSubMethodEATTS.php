@@ -17,47 +17,27 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	# region class variables
 
-	/** @var string eatts server url */
+	/** eatts server url */
 	public string $server_url;
-
-	/** @var string license server url  */
+	/** @var string license server url */
 	public string $license_url;
-
-	/** @var string license */
 	public string $license;
-
-	/** @var string  */
 	public string $log_level;
-
-	/** @var int maximum iterations */
 	public int $max_iterations;
-
-	/** @var int time limit in seconds */
+	/** time limit in seconds */
 	public int $time_limit;
-
-	/** @var float weight of priorities */
+	/** weight of priorities */ 
 	public float $priority_weight;
-
-	/** @var float weight of maximum subscriptions */
+	/** weight of maximum subscriptions */ 
 	public float $sub_max_weight;
-
-	/** @var float weight of minimum subscriptions */
+	/** weight of minimum subscriptions */
 	public float $sub_min_weight;
-
-	/** @var float weight peer selections */
+    /** weight peer selections */
 	public float $peers_weight;
-
-
-	/** @var  ilCoSubRun */
 	protected ilCoSubRun $run;
 
 	# endregion
 
-	/**
-	 * Constructor
-	 * @param ilObjCombiSubscription        $a_object
-	 * @param ilCombiSubscriptionPlugin     $a_plugin
-	 */
 	public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
 	{
 		parent::__construct($a_object, $a_plugin);
@@ -91,7 +71,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	/**
 	 * Get the supported priorities
 	 * (0 is the highest)
-	 * @return array    number => name
+	 * return array number => name
 	 */
 	public function getPriorities(): array
 	{
@@ -111,7 +91,6 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * This methods allows multipe selections per oriority
-	 * @return bool
 	 */
 	public function hasMultipleChoice(): bool
 	{
@@ -120,7 +99,6 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * This method allows a selection of peers
-	 * @return bool
 	 */
 	public function hasPeerSelection(): bool
 	{
@@ -129,7 +107,6 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * This methods respects minimum subscriptions per assignment
-	 * @return bool
 	 */
 	public function hasMinSubscription(): bool
 	{
@@ -139,7 +116,6 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * This methods respects maximum subscriptions per assignment
-	 * @return bool
 	 */
 	public function hasMaxSubscription(): bool
 	{
@@ -149,7 +125,6 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * This method is active
-	 * @return bool
 	 */
 	public function isActive(): bool
 	{
@@ -161,8 +136,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * - Should create the run assignments when it is finished
 	 * - Should set the run_end date and save the run when it is finished
 	 *
-	 * @param ilCoSubRun    $a_run
-	 * @return bool         true: calculation is started, false: an error occurred, see getError()
+	 * return bool         true: calculation is started, false: an error occurred, see getError()
 	 */
 	public function calculateAssignments(ilCoSubRun $a_run): bool
 	{
@@ -219,8 +193,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 	 * - Should create the run assignments when it is finished
 	 * - Should set the run_end date and save the run when it is finished
 	 *
-	 * @param ilCoSubRun    $a_run
-	 * @return bool         true: result is available, false: result is not available or an error occurred, see getError()
+	 * return bool  true: result is available, false: result is not available or an error occurred, see getError()
 	 */
 	public function checkForResult(ilCoSubRun $a_run): bool
 	{
@@ -288,11 +261,9 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * Get details of the calculation parameters
-	 * @return string
 	 */
 	protected function getParameterDetails(): string
 	{
-		require_once('Services/Utilities/classes/class.ilFormat.php');
 
 		$details = array();
 		$details[] = $this->txt('time_limit') .': '. ilFormat::_secondsToString($this->time_limit);
@@ -313,7 +284,7 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * Get the XML code of the choices
-	 * @return string xml code for EATTS
+	 * return string xml code for EATTS
 	 */
 	protected function getRegistrationsAsXML(): string|false
 	{
@@ -374,12 +345,10 @@ class ilCoSubMethodEATTS extends ilCoSubMethodBase
 
 	/**
 	 * Create assignments from the xml provided by EATTS
-	 * @param string    xml code from EATTS
+	 * $a_xml    xml code from EATTS
 	 */
-	protected function createAssignmentsFromXML(string $a_xml)
+	protected function createAssignmentsFromXML(string $a_xml): void
 	{
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-
 		$xml = new SimpleXMLElement($a_xml);
 		foreach ($xml->COURSES->COURSE as $course)
 		{

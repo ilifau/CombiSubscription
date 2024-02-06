@@ -23,65 +23,35 @@ class ilCoSubImport
 	const MODE_ASS_BY_COL = 'ass_by_col';
     const MODE_ASS_BY_IDS = 'ass_by_ids';
 
-    /** @var \ILIAS\DI\Container */
     protected \ILIAS\DI\Container $dic;
-
-    /** @var ilLanguage  */
     protected ilLanguage $lng;
-
-	/** @var ilCombiSubscriptionPlugin */
 	protected ilCombiSubscriptionPlugin $plugin;
-
-	/**
-	 * @var ilObjCombiSubscription
-	 */
 	protected ilObjCombiSubscription $object;
-
-	/** @var  string Writer Type ('excel' or 'csv') */
+	/** Writer Type ('excel' or 'csv') */
 	protected string $type;
-
-	/** @var string import mode ('ass_by_item') */
+	/** import mode ('ass_by_item') */
 	protected string $mode;
-
-    /** @var string import comment (used for run creation) */
+    /** import comment (used for run creation) */ 
     protected string $comment;
-
-	/** @var string $message */
 	protected string $message = '';
-
-	/** @var array [colname, colnname, ...] */
+	/** [colname, colname, ...] */
 	protected array $columns = [];
-
-	/** @var array [ [colname => value, ...], ... ] */
+	/** [ [colname => value, ...], ... ] */ 
 	protected array $rows = [];
-
-	/** @var  ilCoSubRun */
 	protected ilCoSubRun $run;
-
-	/** @var ilCoSubItem[]  (indexed by item_id) */
+	/** (indexed by item_id) */ 
 	protected array $items = [];
-
-    /** @var array ilCoSubUser[]  (indexed by user_id) */
+    /** (indexed by user_id) */ 
     protected array $users = [];
-
-	/** @var array title => item_id */
+	/** title => item_id */
 	protected array $items_by_title = [];
-
-	/** @var array identifier => item_id */
+	/** identifier => item_id */
 	protected array $items_by_identifier = [];
-
-	/** @var array login => user_id */
+	/** login => user_id */ 
 	protected array $users_by_login = [];
-
-	/** @var array login => user_id */
+	/** login => user_id */
 	protected array $new_users_by_login = [];
 
-	/**
-	 * Constructor.
-	 * @param ilCombiSubscriptionPlugin		$plugin
-	 * @param ilObjCombiSubscription		$object
-	 * @param string						$mode
-	 */
 	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $mode = '', string $comment = '')
 	{
 		global $DIC;
@@ -93,15 +63,10 @@ class ilCoSubImport
 		$this->plugin  = $plugin;
 		$this->mode = $mode;
         $this->comment = $comment;
-
-		$this->plugin->includeClass('models/class.ilCoSubRun.php');
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 	}
 
 	/**
 	 * Import a data file
-	 * @param string $file
-	 * @return bool
 	 */
 	public function ImportFile(string $file): bool
 	{
@@ -198,9 +163,8 @@ class ilCoSubImport
 	 * Read the data of the imported sheet
 	 * Prepare the column list
 	 * Prepare the row data list of arrays (indexed by column names)
-	 *
-	 * @param Worksheet $sheet
-	 * @throws Exception	if columns are not named or unique, or if id column is missing
+     *
+	 * throws Exception if columns are not named or unique, or if id column is missing
 	 */
 	protected function readData(Worksheet $sheet): void
 	{
@@ -422,7 +386,6 @@ class ilCoSubImport
 
     /**
      * Read the assignments from a raw data table having obj_id, user_id and item_id as columns
-     * @throws Exception
      */
     public function readAssignmentsByIds(): void
     {
@@ -488,8 +451,6 @@ class ilCoSubImport
 			throw new Exception($this->plugin->txt('import_error_title_missing'));
 		}
 
-		$this->plugin->includeClass('models/class.ilCoSubItem.php');
-
 		$categories = array();
 		foreach ($this->object->getCategories() as $cat_id => $category)
 		{
@@ -544,7 +505,6 @@ class ilCoSubImport
 
 			$item->deleteSchedules();
 
-			$this->plugin->includeClass('models/class.ilCoSubSchedule.php');
 			$schedule = new ilCoSubSchedule();
 			$schedule->obj_id = $item->obj_id;
 			$schedule->item_id = $item->item_id;
@@ -593,11 +553,9 @@ class ilCoSubImport
 	/**
 	 * Create choices for assignments
 	 * This is done for users who don't have an assignment
-	 * @param ilCoSubAssign[] $a_assignments
 	 */
 	public function createChoicesForAssignments(ilCoSubAssign $a_assignments): void
 	{
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 		$method = $this->object->getMethodObject();
 		$has_mc = $method->hasMultipleChoice();
 		$max_prio = count($method->getPriorities()) -1;
@@ -627,8 +585,6 @@ class ilCoSubImport
 	/**
 	 * search for the user id of a user by login
 	 * and add it to the list of new users
-	 * @param $a_login
-	 * @return array|bool
 	 */
 	public function adddUserByLogin(string $a_login): array|bool
 	{
@@ -690,7 +646,6 @@ class ilCoSubImport
 		}
 
 		// query for users
-		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter($user_ids);
 
@@ -704,9 +659,6 @@ class ilCoSubImport
 	/**
 	 * Convert an excel time to unix
 	 * todo: check if the date conversion is ok
-	 *
-	 * @param $time
-	 * @return int
 	 */
 	protected function excelTimeToUnix(float|int $time): int
 	{

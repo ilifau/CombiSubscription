@@ -1,7 +1,5 @@
 <?php
 
-include_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
-
 /**
  * User Interface class for combined subscription repository object
  *
@@ -16,26 +14,17 @@ include_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
  */
 class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 {
-	/** @var ilPropertyFormGUI */
-	protected $form = null;
-
-	/** @var ilObjCombiSubscription */
-	public $object;
-
-	/** @var  ilCombiSubscriptionPlugin */
-	public $plugin;
-
-	/** @var  ilTabsGUI */
-	public $tabs_gui;
-
-	/** @var  ilCtrl */
-	public $ctrl;
+	protected ?ilPropertyFormGUI $form = null;
+	public ?ilObjCombiSubscription $object;
+	public ?ilCombiSubscriptionPlugin $plugin;
+	public ilTabsGUI $tabs_gui;/
+	public ilCtrl $ctrl;
 
 
 	/**
 	* Initialisation
 	*/
-	protected function afterConstructor()
+	protected function afterConstructor(): void
 	{
 		// Description is not shown by ilObjectPluginGUI
 		if (isset($this->object))
@@ -63,7 +52,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	* Get type.
 	*/
-	final function getType()
+	final function getType(): string
 	{
 		return 'xcos';
 	}
@@ -74,20 +63,17 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	 * @param	string		$cmd 	command to be executed
 	 * @param	string		$class	(optional) class that should handle the command
 	 */
-	function performCommand($cmd, $class = '')
+	function performCommand(string $cmd, string $class = ''): void
 	{
 		$next_class = $class ? $class : $this->ctrl->getNextClass();
 
 		if (!empty($next_class))
 		{
-			$this->plugin->includeClass('abstract/class.ilCoSubBaseGUI.php');
-
 			switch ($next_class)
 			{
 				case 'ilcosubpropertiesgui':
 					$this->checkPermission('write');
 					$this->setSubTabs('settings','properties');
-					$this->plugin->includeClass('guis/class.ilCoSubPropertiesGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubPropertiesGUI($this));
 					return;
 
@@ -105,7 +91,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->checkPermission("write");
 					$this->checkMethodAvailable();
 					$this->setSubTabs('settings', 'categories');
-					$this->plugin->includeClass('guis/class.ilCoSubCategoriesGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubCategoriesGUI($this));
 					return;
 
@@ -113,7 +98,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->checkPermission("write");
 					$this->checkMethodAvailable();
 					$this->setSubTabs('settings', 'items');
-					$this->plugin->includeClass('guis/class.ilCoSubItemsGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubItemsGUI($this));
 					return;
 
@@ -121,8 +105,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->checkPermission('read');
 					$this->checkMethodAvailable();
 					$this->setSubTabs('registration','own_registration');
-					$this->plugin->includeClass('abstract/class.ilCoSubUserManagementBaseGUI.php');
-					$this->plugin->includeClass('guis/class.ilCoSubRegistrationGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubRegistrationGUI($this));
 					return;
 
@@ -130,8 +112,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->checkPermission('write');
 					$this->checkMethodAvailable();
 					$this->setSubTabs('assignments','assignments');
-					$this->plugin->includeClass('abstract/class.ilCoSubUserManagementBaseGUI.php');
-					$this->plugin->includeClass('guis/class.ilCoSubAssignmentsGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubAssignmentsGUI($this));
 					return;
 
@@ -139,14 +119,12 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->checkPermission('write');
 					$this->checkMethodAvailable();
 					$this->setSubTabs('assignments','runs');
-					$this->plugin->includeClass('guis/class.ilCoSubRunsGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubRunsGUI($this));
 					return;
 
 				case 'ilcosubexportgui':
 					$this->checkPermission('write');
 					$this->setSubTabs('assignments','export');
-					$this->plugin->includeClass('guis/class.ilCoSubExportGUI.php');
 					$this->ctrl->forwardCommand(new ilCoSubExportGUI($this));
 					return;
 
@@ -154,7 +132,6 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					if ($this->plugin->hasAdminAccess())
 					{
 						$this->setSubTabs('settings','scripts');
-						$this->plugin->includeClass('guis/class.ilCoSubScriptsGUI.php');
 						$this->ctrl->forwardCommand(new ilCoSubScriptsGUI($this));
 						return;
 					}
@@ -206,10 +183,9 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	 * Return to the uper object
 	 */
-	public function returnToContainer()
+	public function returnToContainer(): void
 	{
 		global $tree;
-		require_once('Services/Link/classes/class.ilLink.php');
 		ilUtil::redirect(ilLink::_getLink($tree->getParentId($this->object->getRefId())));
 	}
 
@@ -217,7 +193,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	* After object has been created -> jump to this command
 	*/
-	function getAfterCreationCmd()
+	function getAfterCreationCmd(): string
 	{
 		return 'editProperties';
 	}
@@ -225,7 +201,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	* Get standard command
 	*/
-	function getStandardCmd()
+	function getStandardCmd(): string
 	{
 		return 'editRegistration';
 	}
@@ -233,7 +209,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	 * Check the availability of an assignment method
 	 */
-	protected function checkMethodAvailable()
+	protected function checkMethodAvailable(): void 
 	{
 		if (!$this->object->getMethodObject())
 		{
@@ -252,7 +228,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	 * Set tabs (called from ilObjectPluginGUI)
 	 */
-	protected function setTabs()
+	protected function setTabs(): void
 	{
 		// student registration
 		if ($this->checkPermissionBool('read', '', $this->getType(), $this->object->getRefId()))
@@ -284,7 +260,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	 * @param string $a_tab     name of the tab (will be activated)
 	 * @param string $a_subtab  name of the subtab (will be activated)
 	 */
-	protected function setSubTabs($a_tab, $a_subtab = '')
+	protected function setSubTabs(string $a_tab, string $a_subtab = ''): void
 	{
 		switch ($a_tab)
 		{
@@ -336,10 +312,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 	/**
 	 * Get the url of a satisfaction image
-	 * @param $a_satisfaction
-	 * @return string
 	 */
-	public function getSatisfactionImageUrl($a_satisfaction)
+	public function getSatisfactionImageUrl(int $a_satisfaction): string
 	{
 		switch ($a_satisfaction)
 		{
@@ -361,10 +335,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 	/**
 	 * Get the satisfaction title
-	 * @param $a_satisfaction
-	 * @return string
 	 */
-	public function getSatisfactionTitle($a_satisfaction)
+	public function getSatisfactionTitle(int $a_satisfaction): string
 	{
 		switch ($a_satisfaction)
 		{
@@ -390,7 +362,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	/**
 	 * Check the unfinished runs if results are available
 	 */
-	public function checkUnfinishedRuns()
+	public function checkUnfinishedRuns(): void
 	{
 		$success_messages = array();
 		$failure_messages = array();

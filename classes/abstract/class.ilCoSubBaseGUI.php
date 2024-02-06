@@ -7,40 +7,17 @@ use ILIAS\DI\Container;
  */
 abstract class ilCoSubBaseGUI
 {
-    /** @var Container */
     public Container $dic;
-
-	/** @var ilObjCombiSubscriptionGUI */
 	public ilObjCombiSubscriptionGUI $parent;
-
-	/** @var  ilObjCombiSubscription */
 	public ilObjCombiSubscription $object;
-
-	/** @var  ilCombiSubscriptionPlugin */
 	public ilCombiSubscriptionPlugin $plugin;
-
-	/** @var  ilCtrl */
 	public ilCtrl $ctrl;
-
-	/** @var  ilTabsGUI */
 	public ilTabsGUI $tabs;
-
-	/** @var ilGlobalTemplateInterface */
 	public ilGlobalTemplateInterface $tpl;
-
-	/** @var ilLanguage */
 	public ilLanguage $lng;
-
-	/** @var ilPropertyFormGUI */
 	protected ilPropertyFormGUI $form;
-
-	/** @var ilToolbarGUI */
 	protected ilToolbarGUI $toolbar;
 
-	/**
-	 * Constructor
-	 * @param ilObjCombiSubscriptionGUI     $a_parent_gui
-	 */
 	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
         global $DIC;

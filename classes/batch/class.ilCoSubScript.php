@@ -23,79 +23,41 @@ class ilCoSubScript
 	const MODE_FTP_EX_MEM = 'ftp_ex_mem';
 	const MODE_FTP_EX_STATUS = 'ftp_ex_status';
 
-    /** @var \ILIAS\DI\Container */
     protected \ILIAS\DI\Container $dic;
-
-    /**
-	 * @var ilCombiSubscriptionPlugin
-	 */
 	protected ilCombiSubscriptionPlugin $plugin;
-
-	/**
-	 * @var ilObjCombiSubscription
-	 */
 	protected ilObjCombiSubscription $object;
-
-	/** @var  string Writer Type ('excel' or 'csv') */
+	/** Writer Type ('excel' or 'csv') */
 	protected string $type;
-
-	/** @var array  list of mode definition (see constructor) */
+	/** list of mode definition (see constructor) */ 
 	protected array $modes;
-
 	/** @var string import mode ('ass_by_item') */
 	protected string $mode;
-
-	/** @var ilLanguage $lng */
 	protected ilLanguage $lng;
-
-	/** @var string $message */
 	protected string $message = '';
-
-	/** @var array [colname, colnname, ...] */
+	/** [colname, colnname, ...] */ 
 	protected array $columns = [];
-
-	/** @var array [ [colname => value, ...], ... ] */
+	/** [ [colname => value, ...], ... ] */
 	protected array $rows = [];
-
-	/** @var  ilCoSubRun */
 	protected ilCoSubRun $run;
-
-	/** @var ilCoSubItem[] | null (indexed by item_id) */
-	protected array $items = [];
-
-	/** @var array title => item_id */
+	/** (indexed by item_id) */ 
+	protected ?array $items = [];
+	/** title => item_id */
 	protected array $items_by_title = [];
-
-	/** @var array identifier => item_id */
+	/** identifier => item_id */ 
 	protected array $items_by_identifier = [];
-
-	/** @var  ilLPObjSettings	 */
 	protected ilLPObjSettings $obj_settings;
-
-	/** @var  ilObjectLP */
 	protected ilObjectLP $obj_lp;
-
-	/** @var array item_id => (int) sum of assignments */
+	/** item_id => (int) sum of assignments */ 
 	protected array $assignment_sums = [];
-
-	/** @var bool tweak: don't create objects for items without assignments*/
+	/** tweak: don't create objects for items without assignments */
 	protected bool $ignore_unassigned_items = true;
-
-	/** @var  int tweak: owner of created objects */
+	/** tweak: owner of created objects */ 
 	protected int $owner_id = 6;
-
-	/** @var  string tweak: owner of created objects (higher precedence as owner_id) */
+	/** tweak: owner of created objects (higher precedence as owner_id) */ 
 	//protected $owner_login = 'root';
     //protected $owner_login = 'martin.killmann';
     //protected $owner_login = 'andreas.rohrmoser';
 
-
-	/**
-	 * Constructor.
-	 * @param ilCombiSubscriptionPlugin		$plugin
-	 * @param ilObjCombiSubscription		$object
-	 * @param string						$mode
-	 */
 	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $mode = '')
 	{
         global $DIC;
@@ -170,7 +132,6 @@ class ilCoSubScript
 
 	/**
 	 * Set the script mode
-	 * @param $mode
 	 */
 	public function setMode(string $mode): void
 	{
@@ -179,9 +140,6 @@ class ilCoSubScript
 
 	/**
 	 * Import a data file
-	 * @param string $inputFile
-	 * @param string $resultFile
-	 * @return bool
 	 */
 	public function ProcessFile(string $inputFile, string $resultFile): bool
 	{
@@ -269,8 +227,7 @@ class ilCoSubScript
 	 * Prepare the column list
 	 * Prepare the row data list of arrays (indexed by column names)
 	 *
-	 * @param Worksheet $sheet
-	 * @throws Exception	if columns are not named or unique, or if id column is missing
+	 * Exception if columns are not named or unique, or if id column is missing
 	 */
 	protected function readData(Worksheet $sheet): void
 	{
@@ -323,8 +280,7 @@ class ilCoSubScript
 	/**
 	 * Write the data to a sheet
 	 *
-	 * @param Worksheet $sheet
-	 * @throws Exception	if columns are not named or unique, or if id column is missing
+	 * Exception if columns are not named or unique, or if id column is missing
 	 */
 	protected function writeData(Worksheet $sheet): void
 	{
@@ -605,7 +561,6 @@ class ilCoSubScript
 
     /**
      * Add the participants to their exercises and build teams
-     * @throws Exception
      */
 	protected function createFtpExerciseTeams(): void
 	{
@@ -684,10 +639,6 @@ class ilCoSubScript
 		/** ilTree $tree */
 		global $ilDB, $tree;
 
-		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
-		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
-		require_once('Services/Tracking/classes/class.ilLPObjSettings.php');
-
 		$group_id = null;
 		$ex_title = null;
 
@@ -762,13 +713,6 @@ class ilCoSubScript
 	 */
 	protected function adjustFtpObjects(): void
 	{
-		require_once('Modules/Session/classes/class.ilEventItems.php');
-		require_once('Modules/Exercise/classes/class.ilObjExercise.php');
-		require_once('Modules/Exercise/classes/class.ilExerciseMembers.php');
-		require_once('Modules/Test/classes/class.ilObjTest.php');
-		require_once('Services/AccessControl/classes/class.ilConditionHandler.php');
-		require_once('Services/Tracking/classes/class.ilLPObjSettings.php');
-
 		$this->loadItemData();
 		$this->checkFtpStructure();
 
@@ -922,7 +866,6 @@ class ilCoSubScript
 
 	/**
 	 * Remove the conditions of a target triggered by deleted objects
-	 * @param $ref_id
 	 */
 	protected function cleanupCoditionsOfTarget(int $ref_id): void
 	{

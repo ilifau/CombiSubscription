@@ -5,36 +5,16 @@
  */
 class ilCoSubCategory
 {
-	/** @var  integer */
-	public $cat_id;
+	public int $cat_id;
+	public int $obj_id;
+	public string $title;
+	public string $description;
+	public int $sort_position;
+	public ?int $min_choices;
+	public ?int $max_assignments;
+    public ?string $import_id;
 
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  string */
-	public $title;
-
-	/** @var  string */
-	public $description;
-
-	/** @var  integer */
-	public $sort_position;
-
-	/** @var  integer|null */
-	public $min_choices;
-
-	/** @var  integer|null */
-	public $max_assignments;
-
-    /** @var string|null  */
-    public $import_id;
-
-    /**
-	 * Get category by id
-	 * @param integer  $a_id
-	 * @return ilCoSubCategory or null if not exists
-	 */
-	public static function _getById($a_id)
+	public static function _getById(int $a_id): ?ilCoSubCategory
 	{
 		global $ilDB;
 
@@ -56,9 +36,8 @@ class ilCoSubCategory
 
 	/**
 	 * Delete a category by its id
-	 * @param integer $a_id
 	 */
-	public static function _deleteById($a_id)
+	public static function _deleteById(int $a_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_cats WHERE cat_id = ' . $ilDB->quote($a_id,'integer'));
@@ -67,10 +46,10 @@ class ilCoSubCategory
 
 	/**
 	 * Get categories by parent object id
-	 * @param integer   object id
-	 * @return ilCoSubCategory[]	indexed by cat_id
+	 * $a_obj_id   object id
+	 * return ilCoSubCategory[]	indexed by cat_id
 	 */
-	public static function _getForObject($a_obj_id)
+	public static function _getForObject(int $a_obj_id): array
 	{
 		global $ilDB;
 
@@ -91,9 +70,8 @@ class ilCoSubCategory
 
 	/**
 	 * Delete all categories for a parent object id
-	 * @param integer object id
 	 */
-	public static function _deleteForObject($a_obj_id)
+	public static function _deleteForObjectint (int $a_obj_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_cats WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer'));
@@ -101,10 +79,8 @@ class ilCoSubCategory
 
 	/**
 	 * Clone the item for a new object
-	 * @param int	$a_obj_id
-	 * @return self
 	 */
-	public function saveClone($a_obj_id)
+	public function saveClone(int $a_obj_id): self
 	{
 		$clone = clone $this;
 		$clone->obj_id = $a_obj_id;
@@ -116,9 +92,9 @@ class ilCoSubCategory
 
 	/**
 	 * Fill the properties with data from an array
-	 * @param array $data assoc data
+	 * array $data assoc data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->cat_id = $data['cat_id'];
 		$this->obj_id = $data['obj_id'];
@@ -132,9 +108,9 @@ class ilCoSubCategory
 
 	/**
 	 * Save an item object
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 

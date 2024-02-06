@@ -1,8 +1,5 @@
 <?php
 
-require_once('Services/Form/classes/class.ilFormGUI.php');
-require_once('Services/UIComponent/Toolbar/classes/class.ilToolbarGUI.php');
-
 /**
  * Class ilCoSubFormGUI
  */

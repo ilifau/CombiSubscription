@@ -24,7 +24,6 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	protected function provideUserSearch(): void
 	{
 		// add member
-		include_once './Services/Search/classes/class.ilRepositorySearchGUI.php';
 		ilRepositorySearchGUI::fillAutoCompleteToolbar(
 			$this,
 			$this->toolbar,
@@ -37,7 +36,6 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 		$this->toolbar->addSeparator();
 
 		// search users button
-		include_once 'Services/UIComponent/Button/classes/class.ilLinkButton.php';
 		$button = ilLinkButton::getInstance();
 		$button->setUrl($this->ctrl->getLinkTargetByClass('ilRepositorySearchGUI','start'));
 		$button->setCaption($this->plugin->txt('search_users'), false);
@@ -50,7 +48,6 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	protected function performUserSearch(): void
 	{
-		include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
 		$rep_search = new ilRepositorySearchGUI();
 		$rep_search->setTitle($this->plugin->txt("add_users"));
 		$rep_search->setCallback($this,'addUsers');
@@ -78,7 +75,6 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 		$users = $this->object->getUsers();
         $items = $this->object->getItems();
 
-        $this->plugin->includeClass('models/class.ilCoSubChoice.php');
         $preselect = ($this->object->getPreSelect() && $this->object->getMethodObject()->hasMultipleChoice());
 
 		$added = 0;
@@ -112,7 +108,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Show info about date when the assignments were already transferred ure users were notified
 	 */
-	public function showInfo()
+	public function showInfo(): void
 	{
 		$messages = array();
 		$transfer_time = $this->object->getClassProperty('ilCoSubAssignmentsGUI', 'transfer_time', 0);
@@ -137,15 +133,13 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Confirm the fixation of users
 	 */
-	public function fixUsersConfirmation()
+	public function fixUsersConfirmation(): void
 	{
 		if (empty($_POST['ids']))
 		{
 			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
-
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 
 		$conf_gui = new ilConfirmationGUI();
 		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'fixUsers'));
@@ -165,7 +159,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Fix the assignments of selected users
 	 */
-	public function fixUsers()
+	public function fixUsers(): void
 	{
 		if (empty($_POST['ids']))
 		{
@@ -186,15 +180,13 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Confirm the unfixation of users
 	 */
-	public function unfixUsersConfirmation()
+	public function unfixUsersConfirmation(): void
 	{
 		if (empty($_POST['ids']))
 		{
 			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
-
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 
 		$conf_gui = new ilConfirmationGUI();
 		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'unfixUsers'));
@@ -214,7 +206,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Fix the assignments of selected users
 	 */
-	public function unfixUsers()
+	public function unfixUsers(): void
 	{
 		if (empty($_POST['ids']))
 		{
@@ -236,7 +228,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Send an e-mail to selected users
 	 */
-	public function mailToUsers()
+	public function mailToUsers(): void
 	{
 		if (empty($_POST['ids']))
 		{
@@ -249,8 +241,6 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 			$rcps[] = ilObjUser::_lookupLogin($usr_id);
 		}
 
-		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
-		require_once 'Services/Link/classes/class.ilLink.php';
 		ilMailFormCall::setRecipients($rcps);
 
 		$signature = "\n\n" . $this->plugin->txt('mail_signature') . "\n" . ilLink::_getStaticLink($this->object->getRefId());
@@ -268,15 +258,13 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Confirm the removing of users
 	 */
-	public function removeUsersConfirmation()
+	public function removeUsersConfirmation(): void
 	{
 		if (empty($_POST['ids']))
 		{
 			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
-
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 
 		$conf_gui = new ilConfirmationGUI();
 		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'removeUsers'));
@@ -297,19 +285,13 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Fix the assignments of selected users
 	 */
-	public function removeUsers()
+	public function removeUsers(): void
 	{
 		if (empty($_POST['ids']))
 		{
 			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
-
-		$this->plugin->includeClass('models/class.ilCoSubUser.php');
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
-
 
 		foreach($_POST['ids'] as $user_id)
 		{

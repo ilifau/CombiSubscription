@@ -65,7 +65,6 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 	 */
 	protected function initPropertiesForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 
 		// title
@@ -146,7 +145,6 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		}
 		$this->form->addItem($method);
 
-        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
         $targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
         $config = new ilCoSubTargetsConfig($this->object);
         $config->readFromObject();
@@ -166,7 +164,6 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 			// last process
 			if (is_object($this->object->getLastProcess()))
 			{
-				require_once('Services/Calendar/classes/class.ilDatePresentation.php');
 				$last = new ilNonEditableValueGUI($this->plugin->txt('last_process'), 'last_process');
 				$last->setValue(ilDatePresentation::formatDate($this->object->getLastProcess()));
 				$this->form->addItem($last);
@@ -227,7 +224,6 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->object->setMinChoices($this->form->getInput('min_choices'));
 		$this->object->setMethod($this->form->getInput('method'));
 
-        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
         $targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
         $config = new ilCoSubTargetsConfig($this->object);
         $config->readFromObject();

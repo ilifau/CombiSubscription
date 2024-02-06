@@ -9,7 +9,7 @@
  */
 class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 {
-	/** @var string command to show the list of users */
+	/** command to show the list of users */ 
 	protected string $cmdUserList = 'editAssignments';
 
 	/**
@@ -23,8 +23,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		{
 			// assignments import
 			case 'ilcosubassignmentsimportgui':
-				$this->plugin->includeClass('abstract/class.ilCoSubImportBaseGUI.php');
-				$this->plugin->includeClass('guis/class.ilCoSubAssignmentsImportGUI.php');
 				$this->ctrl->setReturn($this, 'editAssignments');
 				$this->tabs->activateSubTab('import');
 				$this->ctrl->forwardCommand(new ilCoSubAssignmentsImportGUI($this->parent));
@@ -72,8 +70,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	{
 		global $ilToolbar;
 
-		require_once 'Services/UIComponent/Button/classes/class.ilSubmitButton.php';
-
 		/** @var ilToolbarGUI $ilToolbar */
 		$ilToolbar->setFormAction($this->ctrl->getFormAction($this));
 
@@ -95,7 +91,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 			{
 				$options[$run->run_id] = $this->object->getRunLabel($index).': '.ilDatePresentation::formatDate($run->run_start);
 			}
-			include_once './Services/Form/classes/class.ilSelectInputGUI.php';
 			$si = new ilSelectInputGUI($this->plugin->txt('saved_label'), "run_id");
 			$si->setOptions($options);
 			$si->setValue($source_run);
@@ -134,7 +129,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		$this->parent->checkUnfinishedRuns();
 		$this->setAssignmentsToolbar();
 
-		$this->plugin->includeClass('guis/class.ilCoSubAssignmentsTableGUI.php');
 		$table_gui = new ilCoSubAssignmentsTableGUI($this, 'editAssignments');
 		$table_gui->prepareData();
 
@@ -202,7 +196,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
             }
             else
             {
-                $this->plugin->includeClass('models/class.ilCoSubRun.php');
                 $run = new ilCoSubRun;
                 $run->obj_id = $this->object->getId();
                 $run->method = $this->object->getMethodObject()->getId();
@@ -260,7 +253,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 
 		$this->savePostedAssignments();
 
-		$this->plugin->includeClass('models/class.ilCoSubRun.php');
 		$run = new ilCoSubRun();
 		$run->obj_id = $this->object->getId();
 		$run->run_start = new ilDateTime(time(), IL_CAL_UNIX);
@@ -395,7 +387,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
         $suppress_target_emails = $form->getInput('suppress_target_emails');
         $transfer_to_waiting = $form->getInput('transfer_to_waiting');
 
-        $this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 		$targets_obj->filterUntrashedTargets();
 		if ($transfer_to_waiting) {
@@ -409,11 +400,9 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 		$this->object->fixAssignedUsers();
 
 		if (!$suppress_target_emails) {
-            $this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
             $conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
             $removedConflicts = $conflictsObj->removeConflicts();
 
-            $this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
             $notification = new ilCombiSubscriptionMailNotification();
             $notification->setPlugin($this->plugin);
             $notification->setObject($this->object);
@@ -431,8 +420,6 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function notifyAssignmentsConfirmation(): void
 	{
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
-
 		$conf_gui = new ilConfirmationGUI();
 		$conf_gui->setFormAction($this->ctrl->getFormAction($this,'notifyAssignments'));
 		$conf_gui->setHeaderText($this->plugin->txt('notify_assignments_confirmation'));
@@ -450,11 +437,9 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	public function notifyAssignments(): void
 	{
 		$this->object->fixAssignedUsers();
-		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
 		$conflictsObj = new ilCombiSubscriptionConflicts($this->object, $this->plugin);
 		$removedConflicts = $conflictsObj->removeConflicts();
 
-		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this->object);

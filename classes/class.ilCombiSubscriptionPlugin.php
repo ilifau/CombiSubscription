@@ -1,7 +1,5 @@
 <?php
 
-include_once('./Services/Repository/classes/class.ilRepositoryObjectPlugin.php');
- 
 /**
 * Combined subscription repository object plugin
 *
@@ -11,17 +9,14 @@ include_once('./Services/Repository/classes/class.ilRepositoryObjectPlugin.php')
 */
 class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 {
-	/** @var  ilSetting[]  $settings  */
-	protected static $settings;
-
-	/** @var self */
-	protected static $instance;
+	/** ilSetting[] */
+	protected static array $settings;
+	protected static self $instance;
 
 	/**
 	 * Get the plugin instance
-	 * @return self
 	 */
-	public static function getInstance() {
+	public static function getInstance(): self {
 		if (!isset(self::$instance)) {
 			self::$instance = new self();
 		}
@@ -29,22 +24,21 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 
 
-	function getPluginName()
+	public function getPluginName(): string
 	{
 		return 'CombiSubscription';
 	}
 
 	/**
 	 * Get the available target types
-	 * @return array
 	 */
-	function getAvailableTargetTypes()
+	function getAvailableTargetTypes(): array
 	{
 		return array('crs','grp','sess');
 	}
 
 
-	protected function uninstallCustom()
+	protected function uninstallCustom(): void
 	{
 		global $ilDB;
 
@@ -60,10 +54,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	}
 	/**
 	 * decides if this repository plugin can be copied
-	 *
-	 * @return bool
 	 */
-	public function allowCopy()
+	public function allowCopy(): bool
 	{
 		return true;
 	}
@@ -71,7 +63,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	/**
 	 * Limit for user queries
 	 */
-	public function getUserQueryLimit()
+	public function getUserQueryLimit(): int
 	{
 		return 100000;
 	}
@@ -79,9 +71,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Checks if a user has extended access to other user data
-	 * @return   boolean
 	 */
-	public function hasUserDataAccess()
+	public function hasUserDataAccess(): bool
 	{
 		global $DIC;
 
@@ -98,9 +89,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Check if the user has administrative access
-	 * @return bool
 	 */
-	public function hasAdminAccess()
+	public function hasAdminAccess(): bool
 	{
 		global $DIC;
 
@@ -110,7 +100,7 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	/**
 	 * Check if the FAU service is available (StudOn only)
 	 */
-	public function hasFauService() 
+	public function hasFauService(): bool
 	{
 		global $DIC;
 		return $DIC->isDependencyAvailable('fau');
@@ -119,9 +109,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Check if cron job is active
-	 * @return bool
 	 */
-	public function withCronJob()
+	public function withCronJob(): bool
 	{
 		/** @var ilPluginAdmin $ilPluginAdmin */
 		global $ilPluginAdmin;
@@ -134,10 +123,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 * @return	int		Number of processed objects
 	 * @throws	Exception
 	 */
-	public function handleCronJob()
+	public function handleCronJob(): int
 	{
-		$this->includeClass('class.ilObjCombiSubscription.php');
-
 		$processed = 0;
 
 		foreach (ilObjCombiSubscription::_getRefIdsForAutoProcess() as $ref_id)
@@ -154,12 +141,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Get a global setting for a class (maintained in administration)
-	 * @param   string  $a_class
-	 * @param   string  $a_key
-	 * @param   string  $a_default_value
-	 * @return string	value
 	 */
-	public static function _getClassSetting($a_class, $a_key, $a_default_value = '')
+	public static function _getClassSetting(string $a_class, string $a_key, string $a_default_value = ''): string
 	{
 		self::_readClassSettings($a_class);
 		return self::$settings[$a_class]->get($a_key, $a_default_value);
@@ -168,11 +151,8 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Set a global setting for a class (maintained in administration)
-	 * @param string  $a_class
-	 * @param string  $a_key
-	 * @param string  $a_value
 	 */
-	public static function _setClassSetting($a_class, $a_key, $a_value)
+	public static function _setClassSetting(string $a_class, string $a_key, string $a_value): void
 	{
 		self::_readClassSettings($a_class);
 		self::$settings[$a_class]->set($a_key, $a_value, true);
@@ -181,13 +161,11 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Read the global settings for a class
-	 * @param   string  $a_class
 	 */
-	protected static function _readClassSettings($a_class)
+	protected static function _readClassSettings(string $a_class): void
 	{
 		if (!isset(self::$settings[$a_class]))
 		{
-			require_once("Services/Administration/classes/class.ilSetting.php");
 			$settings_obj = new ilSetting($a_class);
 			self::$settings[$a_class] = new ilSetting($a_class);;
 		}
@@ -195,21 +173,16 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Get a global setting for this method
-	 * @param   string  $a_key
-	 * @param   string  $a_default_value
-	 * @return string	value
 	 */
-	public static function _getSetting($a_key, $a_default_value = '')
+	public static function _getSetting(string $a_key, string $a_default_value = ''): string
 	{
 		return ilCombiSubscriptionPlugin::_getClassSetting('ilObjCombiSubscription', $a_key, $a_default_value);
 	}
 
 	/**
 	 * Set a global setting for this method
-	 * @param string  $a_key
-	 * @param string  $a_value
 	 */
-	public static function _setSetting($a_key, $a_value)
+	public static function _setSetting(string $a_key, string $a_value): void
 	{
 		ilCombiSubscriptionPlugin::_setClassSetting('ilObjCombiSubscription', $a_key, $a_value);
 	}
@@ -217,36 +190,32 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 
 	/**
 	 * Get the configured time buffer for conflict recognition
-	 * @return int
 	 */
-	public function getOutOfConflictTime()
+	public function getOutOfConflictTime(): int
 	{
 		return (int) self::_getSetting('out_of_conflict_time', 900);
 	}
 
 	/**
 	 * Get the tolerated percentage of schedule time being in conflict with other item
-	 * @eturn int;
 	 */
-	public function getToleratedConflictPercentage()
+	public function getToleratedConflictPercentage(): int
 	{
 		return (int) self::_getSetting('tolerated_conflict_percentage', 20);
 	}
 
 	/**
 	 * Get the number of calculation tries for the auto assignment
-	 * @return int
 	 */
-	public function getNumberOfTries()
+	public function getNumberOfTries(): int
 	{
 		return (int) self::_getSetting('number_of_tries', 5);
 	}
 
 	/**
 	 * Get the number of calculation tries for the auto assignment
-	 * @return bool
 	 */
-	public function getCloneWithChoices()
+	public function getCloneWithChoices(): bool
 	{
 		return (bool) self::_getSetting('clone_with_choices', 0);
 	}

@@ -10,31 +10,14 @@
 abstract class ilCoSubMethodBase
 {
 
-	/** @var int minimum seconds between appointments without conflict */
+	/** minimum seconds between appointments without conflict */ 
 	public int $out_of_conflict_time = 3600;
-
-	/** @var int tolerated percentage of schedule time being in conflict with other item */
+	/** tolerated percentage of schedule time being in conflict with other item */ 
 	public int $tolerated_conflict_percentage = 20;
-
-	/** @var  ilObjCombiSubscription */
 	protected ilObjCombiSubscription $object;
-
-	/** @var ilCombiSubscriptionPlugin  */
 	protected ilCombiSubscriptionPlugin $plugin;
-
-	/** @var  string error message */
 	protected string $error;
 
-
-	/** @var  array raw object properties  */
-	private array $object_properties;
-
-
-	/**
-	 * Constructor
-	 * @param ilObjCombiSubscription        $a_object
-	 * @param ilCombiSubscriptionPlugin     $a_plugin
-	 */
 	public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
 	{
 		$this->object = $a_object;
@@ -43,7 +26,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the unique id of the method
-	 * @return string
 	 */
 	final public static function _getId(): string
 	{
@@ -52,7 +34,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the unique id of the method
-	 * @return string
 	 */
 	final public function getId(): string
 	{
@@ -62,7 +43,6 @@ abstract class ilCoSubMethodBase
 	/**
 	 * Get the name of the properties GUI class
 	 * (oberwrite this if no properties GUI is provided)
-	 * @return string
 	 */
 	public function getPropertiesGuiName(): string
 	{
@@ -72,7 +52,6 @@ abstract class ilCoSubMethodBase
 	/**
 	 * Get the file of the properties GUI class
 	 * (overwrite this if no properties GUI is provided)
-	 * @return string
 	 */
 	public function getPropertiesGuiPath(): string
 	{
@@ -85,7 +64,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the title of the method (to be used in lists or as headline)
-	 * @return string
 	 */
 	public function getTitle(): string
 	{
@@ -94,7 +72,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get a description of the method (shown as tooltip or info text)
-	 * @return string
 	 */
 	public function getDescription(): string
 	{
@@ -103,7 +80,7 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get an explanation that is shown to the assigning participants
-	 * @return string   html codes allowed
+	 * html codes allowed
 	 */
 	public function getExplanation(): string
 	{
@@ -113,7 +90,7 @@ abstract class ilCoSubMethodBase
 	/**
 	 * Get the supported priorities
 	 * (0 is the highest)
-	 * @return array    number => name
+	 * number => name
 	 */
 	public function getPriorities(): array
 	{
@@ -126,7 +103,6 @@ abstract class ilCoSubMethodBase
 
     /**
      * Check if a priority is in the range of selected priorities
-     * @return bool
      */
     public function isSelectedPriority(int $a_priority): bool
     {
@@ -135,7 +111,7 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the background colors for a priority index (0 is the highest)
-	 * @return string    css color expression
+	 * return css color expression
 	 */
 	public function getPriorityBackgroundColor(string $a_priority): string
 	{
@@ -174,7 +150,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the minimum seconds between appointments without conflict
-	 * @eturn int;
 	 */
 	public function getOutOfConflictTime(): int
 	{
@@ -183,7 +158,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the tolerated percentage of schedule time being in conflict with other item
-	 * @eturn int;
 	 */
 	public function getToleratedConflictPercentage(): int
 	{
@@ -192,7 +166,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the number of assignments that are done by this method
-	 * @return int	(default: 1)
 	 */
 	public function getNumberAssignments(): int
 	{
@@ -209,7 +182,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * This methods allows multiple selections per priority
-	 * @return bool
 	 */
 	public function hasMultipleChoice(): bool
 	{
@@ -218,7 +190,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * This method allows a priority not being selected
-	 * @return bool
 	 */
 	public function hasEmptyChoice(): bool
 	{
@@ -227,7 +198,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * This method allows a selection of peers
-	 * @return bool
 	 */
 	public function hasPeerSelection(): bool
 	{
@@ -236,7 +206,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * This methods respects minimum subscriptions per assignment
-	 * @return bool
 	 */
 	public function hasMinSubscription(): bool
 	{
@@ -245,7 +214,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * This methods respects maximum subscriptions per assignment
-	 * @return bool
 	 */
 	public function hasMaxSubscription(): bool
 	{
@@ -262,7 +230,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * This method is active
-	 * @return bool
 	 */
 	public function isActive(): bool
 	{
@@ -271,9 +238,8 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Calculate multiple assignment runs and get the best one
-	 * @param	integer		number of tries
-     * @param	bool		delete other runs except the best
-	 * @return 	ilCoSubRun|null
+	 * $a_tries: number of tries
+     * $a_cleanup: delete other runs except the best
 	 */
 	public function getBestCalculationRun(int $a_tries, bool $a_cleanup = false): ?ilCoSubRun
 	{
@@ -285,7 +251,6 @@ abstract class ilCoSubMethodBase
         //$a_tries = 1;
         //$a_cleanup = false;
         
-		$this->plugin->includeClass('models/class.ilCoSubRun.php');
 		$runs = array();
 		for ($try = 1; $try <= $a_tries; $try++)
 		{
@@ -377,9 +342,7 @@ abstract class ilCoSubMethodBase
 	 * Calculate the assignments
 	 * - Should create the run assignments when it is finished
 	 * - Should set the run_end date and save the run when it is finished
-	 *
-	 * @param ilCoSubRun    $a_run
-	 * @return bool         true: calculation is started, false: an error occurred, see getError()
+	 * return: true: calculation is started, false: an error occurred, see getError()
 	 */
 	public function calculateAssignments(ilCoSubRun $a_run): bool
 	{
@@ -391,9 +354,7 @@ abstract class ilCoSubMethodBase
 	 * This will be called for each unfinished run when the list of runs or assignments is shown
 	 * - Should create the run assignments when it is finished
 	 * - Should set the run_end date and save the run when it is finished
-	 *
-	 * @param ilCoSubRun    $a_run
-	 * @return bool         true: result is available, false: result is not availeble or an error occurred, see getError()
+	 * return: true: result is available, false: result is not availeble or an error occurred, see getError()
 	 */
 	public function checkForResult(ilCoSubRun $a_run): bool
 	{
@@ -402,7 +363,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get the error message from calculateAssignments() or  checkForResult()
-	 * @return string
 	 */
 	public function getError(): string
 	{
@@ -412,9 +372,6 @@ abstract class ilCoSubMethodBase
 	/**
 	 * Get a localized text
 	 * The language variable will be prefixed with lowercase class name, e.g. 'ilmymethod_'
-	 *
-	 * @param string	$a_langvar	language variable
-	 * @return string
 	 */
 	public function txt(string $a_langvar): string
 	{
@@ -424,9 +381,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get a global setting for this method
-	 * @param   string  $a_key
-	 * @param   string  $a_default_value
-	 * @return string	value
 	 */
 	public static function _getSetting(string $a_key, string $a_default_value = ''): string
 	{
@@ -435,8 +389,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Set a global setting for this method
-	 * @param string  $a_key
-	 * @param string  $a_value
 	 */
 	public static function _setSetting(string $a_key, string $a_value): void
 	{
@@ -445,9 +397,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Get an object property of this method
-	 * @param   string  $a_key
-	 * @param   string  $a_default_value
-	 * @return string	value
 	 */
 	protected function getProperty(string $a_key, string $a_default_value): string
 	{
@@ -456,8 +405,6 @@ abstract class ilCoSubMethodBase
 
 	/**
 	 * Set an object property for this method
-	 * @param string  $a_key
-	 * @param string  $a_value
 	 */
 	protected function setProperty(string $a_key, string $a_value): void
 	{

@@ -1,7 +1,5 @@
 <?php
 
-include_once('./Services/Repository/classes/class.ilObjectPlugin.php');
-
 /**
 * Application class for combined subscription repository object
 *
@@ -34,46 +32,35 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	protected $last_process = null;
 	protected $class_properties = array();
 
-	/** @var  ilCombiSubscriptionPlugin */
-	public $plugin;
+	protected ?ilCoSubMethodBase $method_object;
 
-	/** @var  ilCoSubMethodBase | null */
-	protected $method_object;
+	/** ilCoSubItem[] | null (indexed by item_id) */
+	protected ?array $items;
 
-	/** @var ilCoSubItem[] | null (indexed by item_id) */
-	protected $items;
+	/** ilCoSubCategory[] | null  (indexed by cat_id) */
+	protected ?array $categories;
 
-	/** @var ilCoSubCategory[] | null  (indexed by cat_id) */
-	protected $categories;
+	/** ilCoSubUser[] | null  (indexed by user_id) */
+	protected ?array $users;
 
-	/** @var  ilCoSubUser[] | null  (indexed by user_id) */
-	protected $users;
+	/** ilCoSubRun[] | null  (numerically indexed) */
+	protected ?array $runs;
 
-	/** @var  ilCoSubRun[] | null  (numerically indexed) */
-	protected $runs;
+	/** user_id => item_id => priority */
+	protected array $priorities;
 
-	/** @var  array     user_id => item_id => priority */
-	protected $priorities;
+	/** item_id => item_id[] */
+	protected array $conflicts;
 
-	/** @var  array 	item_id => item_id[] */
-	protected $conflicts;
+	/** the priorities of all users are loaded */
+	protected bool $all_priorities_loaded = false;
 
-	/** @var  bool      the priorities of all users are loaded */
-	protected $all_priorities_loaded = false;
-
-	/** @var  array     run_id => user_id => item_id => assign_id (run_id is 0 for the chosen assignments) */
-	protected $assignments;
+	/** run_id => user_id => item_id => assign_id (run_id is 0 for the chosen assignments) */
+	protected array $assignments;
 
 	# endregion
 
-
-	/**
-	 * Constructor
-	 *
-	 * @access    public
-	 * @param int $a_ref_id
-	 */
-	function __construct($a_ref_id = 0)
+	public function __construct(int $a_ref_id = 0)
 	{
 		parent::__construct($a_ref_id);
 	}
@@ -82,7 +69,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	* Get type
 	*/
-	final function initType()
+	final public function initType(): void
 	{
 		$this->setType('xcos');
 	}
@@ -90,7 +77,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	* Create object
 	*/
-	function doCreate()
+	protected function doCreate(bool $clone_mode = false): void
 	{
 		global $ilDB;
 
@@ -115,7 +102,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	* Read data from db
 	*/
-	function doRead()
+	protected function doRead(): void
 	{
 		global $ilDB;
 		
@@ -152,7 +139,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	* Update data
 	*/
-	function doUpdate()
+	protected function doUpdate(): void
 	{
 		global $ilDB;
 		
@@ -174,7 +161,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	* Delete data from db
 	*/
-	function doDelete()
+	protected function doDelete(): void
 	{
 		global $DIC;
 		
@@ -189,11 +176,8 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	
 	/**
 	 * Do Cloning
-	 * @param self $new_obj
-	 * @param integer $a_target_id
-	 * @param int	$a_copy_id
 	 */
-	function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
+	function doCloneObject(ilObject2 $new_obj, int $a_target_id, ?int $a_copy_id = null): void
 	{
         global $DIC;
 
@@ -614,7 +598,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$classfile = $this->plugin->getDirectory().'/classes/methods/class.'.$a_classname.'.php';
 		if (is_file($classfile))
 		{
-			$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
 			require_once($classfile);
 			return new $a_classname($this, $this->plugin);
 		}
@@ -627,8 +610,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getAvailableMethods()
 	{
-		$this->plugin->includeClass('abstract/class.ilCoSubMethodBase.php');
-
 		$methods = array();
 		$classfiles = glob($this->plugin->getDirectory().'/classes/methods/class.*.php');
 		if (!empty($classfiles))
@@ -655,7 +636,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->categories))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubCategory.php');
 			$this->categories = ilCoSubCategory::_getForObject($this->getId());
 		}
 		return $this->categories;
@@ -689,7 +669,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->items))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubItem.php');
 			$this->items = ilCoSubItem::_getForObject($this->getId());
 		}
 
@@ -825,7 +804,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
      */
     public function getChoices()
     {
-        $this->plugin->includeClass('models/class.ilCoSubChoice.php');
         return ilCoSubChoice::_getForObject($this->getId());
     }
 
@@ -838,7 +816,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!$this->all_priorities_loaded)
 		{
-			$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 			$this->priorities = ilCoSubChoice::_getPriorities($this->getId());
 
 			foreach($this->getUsers() as $userObj)
@@ -894,7 +871,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		if (!isset($this->priorities[$a_user_id]))
 		{
 			$this->priorities[$a_user_id] = array();
-			$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 			$priorities = ilCoSubChoice::_getPriorities($this->getId(), $a_user_id);
 			if (is_array($priorities[$a_user_id]))
 			{
@@ -934,7 +910,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getPriorityCounts()
 	{
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
 		return ilCoSubChoice::_getPriorityCounts($this->getId());
 	}
 
@@ -946,7 +921,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->runs))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubRun.php');
 			$this->runs = ilCoSubRun::_getForObject($this->getId());
 		}
 		return $this->runs;
@@ -1011,7 +985,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->assignments) || $a_force)
 		{
-			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 			$this->assignments = ilCoSubAssign::_getForObjectAsArray($this->getId());
 		}
 		return $this->assignments;
@@ -1028,7 +1001,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->assignments))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 			$this->assignments = ilCoSubAssign::_getForObjectAsArray($this->getId());
 		}
 		return isset($this->assignments[$a_run_id][$a_user_id]) ? $this->assignments[$a_run_id][$a_user_id] : array();
@@ -1045,7 +1017,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->assignments))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 			$this->assignments = ilCoSubAssign::_getForObjectAsArray($this->getId());
 		}
 
@@ -1076,7 +1047,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->assignments))
 		{
-			$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 			$this->assignments = ilCoSubAssign::_getForObjectAsArray($this->getId());
 		}
 
@@ -1112,7 +1082,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
         $fixed_ids = ($a_keep_fixed ?  $this->getFixedUserIds() : []);
 
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
 		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run, $fixed_ids);
 
 		$assignments = $this->getAssignments(true);
@@ -1146,8 +1115,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getUser($a_user_id)
 	{
-		$this->plugin->includeClass('models/class.ilCoSubUser.php');
-
 		$userObj = ilCoSubUser::_getById($this->getId(), $a_user_id);
 		if (!isset($userObj))
 		{
@@ -1171,7 +1138,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		if (!isset($this->users) || $a_force)
 		{
-			$this->plugin->includeClass('models/class.ilCoSubUser.php');
 			$this->users = ilCoSubUser::_getForObject($this->getId());
 		}
 
@@ -1249,7 +1215,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function getUserDetails($a_user_ids)
 	{
 		// query for users
-		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter($a_user_ids);
 		$user_query->setLimit($this->plugin->getUserQueryLimit());
@@ -1452,10 +1417,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function removeUserData()
 	{
-		$this->plugin->includeClass('models/class.ilCoSubAssign.php');
-		$this->plugin->includeClass('models/class.ilCoSubChoice.php');
-		$this->plugin->includeClass('models/class.ilCoSubRun.php');
-
 		ilCoSubAssign::_deleteForObject($this->getId());
 		ilCoSubChoice::_deleteForObject($this->getId());
 		ilCoSubRun::_deleteForObject($this->getId());
@@ -1499,7 +1460,6 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->update();
 
 		// adjust subscribe users and maximum subscriptions
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
 		$targets_obj->syncFromTargetsBeforeCalculation();
 
@@ -1518,12 +1478,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->fixAssignedUsers();
 
 		// remove conflicting choices from other combined subscriptions
-		$this->plugin->includeClass('class.ilCombiSubscriptionConflicts.php');
 		$conflictsObj = new ilCombiSubscriptionConflicts($this, $this->plugin);
 		$removedConflicts = $conflictsObj->removeConflicts();
 
 		// notify users about calculation result
-		$this->plugin->includeClass('class.ilCombiSubscriptionMailNotification.php');
 		$notification = new ilCombiSubscriptionMailNotification();
 		$notification->setPlugin($this->plugin);
 		$notification->setObject($this);
@@ -1544,11 +1502,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function handleAutoProcessTargets()
 	{
-		$this->plugin->includeClass('models/class.ilCoSubTargetsConfig.php');
 		$config = new ilCoSubTargetsConfig($this);
 		$config->readFromObject();
 
-		$this->plugin->includeClass('class.ilCombiSubscriptionTargets.php');
 		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
 		$targets_obj->filterUntrashedTargets();
 		$targets_obj->applyTargetsConfig($config); 			// may change waiting list settings which is needed for assigning users

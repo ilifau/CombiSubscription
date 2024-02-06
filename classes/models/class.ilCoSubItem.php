@@ -1,67 +1,36 @@
 <?php
 
-require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/CombiSubscription/classes/models/class.ilCoSubSchedule.php');
-
 /**
  * Item of a combined subscription
  */
 class ilCoSubItem
 {
-	/** @var  integer */
-	public $item_id;
-
-	/** @var  integer */
-	public $obj_id;
-
-	/** @var  integer */
-	public $cat_id;
-
-	/** @var  integer */
-	public $target_ref_id;
-
-	/** @var  string */
-	public $identifier;
-
-	/** @var  string */
-	public $title;
-
-	/** @var  string */
-	public $description;
-
-	/** @var  integer */
-	public $sort_position;
-
-	/** @var  integer|null */
-	public $sub_min;
-
-	/** @var  integer|null */
-	public $sub_max;
-
-	/** @var  bool */
-	public $selectable = true;
-
-    /** @var string|null  */
-    public $import_id;
-
-	/** @var  ilCoSubSchedule[] */
-	public $schedules = null;
-
-	/** @var string cached info about the period */
-	protected $periodInfoCache;
-
-	/** @var string cached link to the object with this item */
-	protected $objectLinkCache;
-
-	/** @var string cached title of the object with this item */
-	protected $objectTitleCache;
+	public int $item_id;
+	public int $obj_id;
+	public int $cat_id;
+	public int $target_ref_id;
+	public string $identifier;
+	public string $title;
+	public string $description;
+	public int $sort_position;
+	public ?int $sub_min;
+	public ?int $sub_max;
+	public bool $selectable = true;
+    public ?string $import_id;
+	/** ilCoSubSchedule[] */
+	public ?array $schedules = null;
+	/** cached info about the period */ 
+	protected string $periodInfoCache;
+	/** cached link to the object with this item */ 
+	protected string $objectLinkCache;
+	/** cached title of the object with this item */ 
+	protected string $objectTitleCache;
 
 
 	/**
 	 * Get item by id
-	 * @param integer  $a_id
-	 * @return ilCoSubItem or null if not exists
 	 */
-	public static function _getById($a_id)
+	public static function _getById(int $a_id): ?ilCoSubItem
 	{
 		global $ilDB;
 
@@ -83,9 +52,8 @@ class ilCoSubItem
 
 	/**
 	 * Delete an item by its id
-	 * @param integer $a_id
 	 */
-	public static function _deleteById($a_id)
+	public static function _deleteById(int $a_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_items WHERE item_id = ' . $ilDB->quote($a_id,'integer'));
@@ -93,10 +61,9 @@ class ilCoSubItem
 
 	/**
 	 * Get items by parent object id
-	 * @param integer   object id
-	 * @return ilCoSubItem[]	indexed by item_id
+	 * return ilCoSubItem[]	indexed by item_id
 	 */
-	public static function _getForObject($a_obj_id)
+	public static function _getForObject(int $a_obj_id): array
 	{
 		global $ilDB;
 
@@ -117,9 +84,8 @@ class ilCoSubItem
 
 	/**
 	 * Delete all items for a parent object id
-	 * @param integer object id
 	 */
-	public static function _deleteForObject($a_obj_id)
+	public static function _deleteForObject(int $a_obj_id): void
 	{
 		global $ilDB;
 		$ilDB->manipulate('DELETE FROM rep_robj_xcos_items WHERE obj_id = ' . $ilDB->quote($a_obj_id,'integer'));
@@ -127,13 +93,11 @@ class ilCoSubItem
 
 	/**
 	 * Check if two items have a period conflict
-	 * @param self $item1
-	 * @param self $item2
-	 * @param int $buffer		needed free time between appointments in seconds
-	 * @param int $tolerance	tolerated percentage of schedule time being in conflict with other item
-	 * @return bool
+	 * int $buffer		needed free time between appointments in seconds
+	 * int $tolerance	tolerated percentage of schedule time being in conflict with other item
+	 * return bool
 	 */
-	public static function _haveConflict($item1, $item2, $buffer = 0, $tolerance = 0)
+	public static function _haveConflict(self $item1, self $item2, int $buffer = 0, int $tolerance = 0): bool
 	{
 		$conflict_time = 0;
 		$item1_time = $item1->getSumOfTimes();
@@ -167,11 +131,11 @@ class ilCoSubItem
 
 	/**
 	 * Clone the item for a new object
-	 * @param int	$a_obj_id
-	 * @param array	$a_cat_map (old_cat_id => new_cat_id)
-	 * @return self
+	 * int	$a_obj_id
+	 * array	$a_cat_map (old_cat_id => new_cat_id)
+	 * return self
 	 */
-	public function saveClone($a_obj_id, $a_cat_map)
+	public function saveClone(int $a_obj_id, array $a_cat_map): self
 	{
 		$clone = clone $this;
 		$clone->obj_id = $a_obj_id;
@@ -192,9 +156,9 @@ class ilCoSubItem
 
 	/**
 	 * Fill the properties with data from an array
-	 * @param array $data assoc data
+	 * array $data assoc data
 	 */
-	protected function fillData($data)
+	protected function fillData(array $data): void
 	{
 		$this->item_id = $data['item_id'];
 		$this->obj_id = $data['obj_id'];
@@ -212,9 +176,9 @@ class ilCoSubItem
 
 	/**
 	 * Save an item object
-	 * @return  boolean     success
+	 * return  boolean     success
 	 */
-	public function save()
+	public function save(): bool
 	{
 		global $ilDB;
 
@@ -256,9 +220,8 @@ class ilCoSubItem
 
     /**
      * Get the Campo course id of an item (FAU specific)
-     * @return int|null
      */
-    public function getCampoCourseId()
+    public function getCampoCourseId(): ?int
     {
         if (!empty($this->import_id) && ilCombiSubscriptionPlugin::getInstance()->hasFauService()) {
             $import_id = \FAU\Study\Data\ImportId::fromString($this->import_id);
@@ -272,9 +235,9 @@ class ilCoSubItem
     
 	/**
 	 * Get the schedules of the item
-	 * @return ilCoSubSchedule[]
+	 * return ilCoSubSchedule[]
 	 */
-	public function getSchedules()
+	public function getSchedules(): array
 	{
         // first try to get schedules from the campo course (these should have precedence)
 		if (!isset($this->schedules) && !empty($course_id = $this->getCampoCourseId())) {
@@ -294,7 +257,7 @@ class ilCoSubItem
 	/**
 	 * Delete the schedules of the item
 	 */
-	public function deleteSchedules()
+	public function deleteSchedules(): void
 	{
 		foreach ($this->getSchedules() as $schedule)
 		{
@@ -305,9 +268,8 @@ class ilCoSubItem
 
 	/**
 	 * Get info about a period
-	 * @return string
 	 */
-	public function getPeriodInfo()
+	public function getPeriodInfo(): string
 	{
 	    if (!isset($this->periodInfoCache)) {
 
@@ -331,7 +293,7 @@ class ilCoSubItem
 	/**
      * Get the title of the object to which this item belongs
      */
-	public function getObjectTitle()
+	public function getObjectTitle(): string
     {
         if (!isset($this->objectTitleCache)) {
             $this->objectTitleCache = ilObject::_lookupTitle($this->obj_id);
@@ -342,7 +304,7 @@ class ilCoSubItem
     /**
      * Get the Link to the object to which this item belongs
      */
-    public function getObjectLink()
+    public function getObjectLink(): string
     {
         if (!isset($this->objectLinkCache)) {
             foreach (ilObject::_getAllReferences($this->obj_id) as $ref_id) {
@@ -357,9 +319,9 @@ class ilCoSubItem
 
 	/**
 	 * Get the sum of times of this item
-	 * @return int	sum in seconds
+	 * return int	sum in seconds
 	 */
-	public function getSumOfTimes()
+	public function getSumOfTimes(): int
 	{
 		$sum = 0;
 		foreach ($this->getSchedules() as $schedule)

@@ -10,22 +10,11 @@
  */
 class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 {
-	/** @var ilObjCombiSubscriptionGUI */
 	public ilObjCombiSubscriptionGUI $parent;
-
-	/** @var  ilObjCombiSubscription */
 	public ilObjCombiSubscription $object;
-
-	/** @var  ilCombiSubscriptionPlugin */
 	public ilCombiSubscriptionPlugin $plugin;
-
-	/** @var  ilCtrl */
 	public ilCtrl $ctrl;
-
-	/** @var ilLanguage */
 	public ilLanguage $lng;
-
-	/** @var ilPropertyFormGUI */
 	protected ilPropertyFormGUI $form;
 
 
@@ -35,7 +24,6 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 */
 	public function executeCommand(): void
 	{
-		$this->plugin->includeClass('models/class.ilCoSubCategory.php');
 
 		$cmd = $this->ctrl->getCmd('listCategories');
 		switch ($cmd)
@@ -69,7 +57,6 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 		$ilToolbar->setFormAction($this->ctrl->getFormAction($this));
 		$ilToolbar->addFormButton($this->plugin->txt('create_category'), 'createCategory');
 
-		$this->plugin->includeClass('guis/class.ilCoSubCategoriesTableGUI.php');
 		$table_gui = new ilCoSubCategoriesTableGUI($this, 'listCategories');
 		$table_gui->prepareData($this->object->getCategories());
 
@@ -150,7 +137,6 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 			$this->ctrl->redirect($this,'listICategories');
 		}
 
-		require_once('Services/Utilities/classes/class.ilConfirmationGUI.php');
 		$conf_gui = new ilConfirmationGUI();
 		$conf_gui->setFormAction($this->ctrl->getFormAction($this));
 		$conf_gui->setHeaderText($this->plugin->txt('confirm_delete_categories')
@@ -203,11 +189,10 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Init the category form
-	 * @param string $a_mode    'edit' or 'create'
+	 * $a_mode    'edit' or 'create'
 	 */
 	protected function initCategoryForm(string $a_mode = 'edit'): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 
 		// title
@@ -256,7 +241,6 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Load the properties of a category to the form
-	 * @param ilCoSubCategory   $a_category
 	 */
 	protected function loadCategoryProperties(ilCoSubCategory $a_category): void
 	{
@@ -272,8 +256,7 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Save the properties from the form to a category
-	 * @param   ilCoSubCategory   $a_category
-	 * @return  boolean       success
+	 * return  boolean  success
 	 */
 	protected function saveCategoryProperties(ilCoSubCategory $a_category): bool
 	{

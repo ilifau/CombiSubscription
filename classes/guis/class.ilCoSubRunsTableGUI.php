@@ -1,19 +1,14 @@
 <?php
 
-require_once('Services/Table/classes/class.ilTable2GUI.php');
 /**
  * Table GUI for calculation runs
  */
 class ilCoSubRunsTableGUI extends ilTable2GUI
 {
-	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
+	protected ilObjCombiSubscriptionGUI $parent;
+	protected ilCombiSubscriptionPlugin $plugin;	 
 
-	/**
-	 * ilCoSubItemsTableGUI constructor.
-	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
-	 * @param string                    $a_parent_cmd
-	 */
 	function __construct(ilObjCombiSubscriptionGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
@@ -44,7 +39,6 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
 
 	/**
 	 * Prepare the data to be displayed
-	 * @param   ilCoSubRun[]   $a_runs
 	 */
 	public function prepareData(array $a_runs): void
 	{
@@ -182,9 +176,9 @@ class ilCoSubRunsTableGUI extends ilTable2GUI
      * Excel Version of Fill Row. Most likely to
      * be overwritten by derived class.
      *
-     * @param	ilExcel	$a_excel	excel wrapper
-     * @param	int		$a_row		row counter
-     * @param	array	$a_set		data array
+     * $a_excel	excel wrapper
+     * $a_row		row counter
+     * $a_set		data array
      */
     protected function fillRowExcel(ilExcel $a_excel, int &$a_row, array $a_set): void
     {

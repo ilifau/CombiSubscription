@@ -1,46 +1,21 @@
 <?php
 
-require_once('Services/Table/classes/class.ilTable2GUI.php');
 /**
  * Table GUI for registered users
  */
 class ilCoSubUsersTableGUI extends ilTable2GUI
 {
-	/** @var  ilCtrl */
 	protected ilCtrl $ctrl;
-
-    /**
-     * @var ilObjCombiSubscription
-     */
     protected ilObjCombiSubscription $object;
-
-    /** @var ilCombiSubscriptionPlugin  */
     protected ilCombiSubscriptionPlugin $plugin;
-
-    /**
-	 * List of users (indexed by user_id)
-	 * @var ilCoSubUser[];
-	 */
+    /** ilCoSubUser[] List of users (indexed by user_id) */
 	protected array $users;
-
-
-	/**
-	 * User priorities
-	 * @var array  (user_id => item_id => priority)
-	 */
+	/** User priorities  (user_id => item_id => priority) */
 	protected array $priorities;
-
-	/**
-	 * Run assignments
-	 * @var array   (run_id => user_id => item_id => assign_id)
-	 */
+	/** Run assignments (run_id => user_id => item_id => assign_id) */
 	protected array $assignments;
+	protected ilCoSubAssignmentsGUI $parent;
 
-	/**
-	 * ilCoSubItemsTableGUI constructor.
-	 * @param ilCoSubAssignmentsGUI     $a_parent_gui
-	 * @param string                    $a_parent_cmd
-	 */
 	function __construct(ilCoSubAssignmentsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
@@ -99,7 +74,6 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		}
 
 		// query for users
-		include_once("Services/User/classes/class.ilUserQuery.php");
 		$user_query = new ilUserQuery();
 		$user_query->setLimit($this->plugin->getUserQueryLimit());
 		$user_query->setUserFilter(array_keys($this->users));
@@ -149,11 +123,10 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 
 	/**
 	 * Fill a single data row
-	 *
-	 * @param array $a_set [
-	 *                  'user_id' => int
-	 *                  'user' => string
-	 *                  'result' => integer, e.g. SATISFIED_FULL ]
+	 * $a_set [
+    *            'user_id' => int
+    *            'user' => string
+    *            'result' => integer, e.g. SATISFIED_FULL ]
 	 */
 	protected function fillRow(array $a_set): void
 	{

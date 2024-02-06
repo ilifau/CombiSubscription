@@ -10,13 +10,8 @@
  */
 class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 {
-	/** @var ilCoSubMethodRandom */
 	protected ilCoSubMethodRandom $method;
 
-	/**
-	 * ilCoSubMethodRandomPropertiesGUI constructor.
-	 * @param ilObjCombiSubscriptionGUI $a_parent_gui
-	 */
 	public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
 	{
 		parent::__construct($a_parent_gui);
@@ -83,7 +78,6 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 	 */
 	protected function initPropertiesForm(): void
 	{
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 
@@ -160,7 +154,6 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Add spcific calculation settings to a properties form
-	 * @param ilPropertyFormGUI $form
 	 */
 	public function addCalculationSettings(ilPropertyFormGUI $form): void
 	{
@@ -208,7 +201,6 @@ class ilCoSubMethodRandomPropertiesGUI extends ilCoSubBaseGUI
 
 	/**
 	 * Apply the specific settings fom a posted properties form
-	 * @param ilPropertyFormGUI $form
 	 */
 	public function applyCalculationSettings(ilPropertyFormGUI $form): void
 	{
