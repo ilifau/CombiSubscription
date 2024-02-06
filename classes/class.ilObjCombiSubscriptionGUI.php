@@ -15,9 +15,7 @@
 class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 {
 	protected ?ilPropertyFormGUI $form = null;
-	public ?ilObjCombiSubscription $object;
-	public ?ilCombiSubscriptionPlugin $plugin;
-	public ilTabsGUI $tabs_gui;/
+	public ilTabsGUI $tabs_gui;
 	public ilCtrl $ctrl;
 
 

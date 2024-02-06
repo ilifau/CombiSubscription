@@ -8,7 +8,7 @@
  *
  * @ilCtrl_isCalledBy ilCoSubExportGUI: ilObjCombiSubscriptionGUI
  */
-class ilCoSubExportGUI extends ilCoSubBaseGUI
+class ilCoSubExportGUI extends ilCoSubBaseGUI 
 {
 	/**
 	 * Execute a command

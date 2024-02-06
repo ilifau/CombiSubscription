@@ -11,7 +11,7 @@
 * @author 		Fred Neumann <fred.neumann@fau.de>
 * @version      $id$
 */
-class ilObjCombiSubscriptionListGUI extends ilObjectPluginListGUI
+class ilObjCombiSubscriptionListGUI extends ilObjectPluginListGUI 
 {
 	
 	/**
