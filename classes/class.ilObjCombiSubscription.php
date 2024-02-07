@@ -64,7 +64,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
 		parent::__construct($a_ref_id);
 	}
-	
+
+	public function getPlugin(): ilCombiSubscriptionPlugin
+	{
+		return parent::getPlugin();
+	}
 
 	/**
 	* Get type
@@ -169,7 +173,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			" obj_id = ".$DIC->database()->quote($this->getId(), 'integer')
 			);
 
-		if ($this->plugin->hasFauService()) {
+		if ($this->getPlugin()->hasFauService()) {
             $DIC->fau()->cond()->soft()->deleteConditionsOfObject($this->getId());
         }
 	}
@@ -212,12 +216,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
             $item_map[$item_id] = $clone->item_id;
 		}
 
-		if ($this->plugin->hasFauService())
+		if ($this->getPlugin()->hasFauService())
 		{
             $DIC->fau()->cond()->soft()->cloneConditions($this->getId(), $new_obj->getId());
 		}
 
-        if ($this->plugin->getCloneWithChoices()) {
+        if ($this->getPlugin()->getCloneWithChoices()) {
 
             // clone the users
             foreach ($this->getUsers() as $user)
@@ -595,11 +599,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getMethodObjectByClass($a_classname)
 	{
-		$classfile = $this->plugin->getDirectory().'/classes/methods/class.'.$a_classname.'.php';
+		$classfile = $this->getPlugin()->getDirectory().'/classes/methods/class.'.$a_classname.'.php';
 		if (is_file($classfile))
 		{
 			require_once($classfile);
-			return new $a_classname($this, $this->plugin);
+			return new $a_classname($this, $this->getPlugin());
 		}
 		return null;
 	}
@@ -611,7 +615,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	public function getAvailableMethods()
 	{
 		$methods = array();
-		$classfiles = glob($this->plugin->getDirectory().'/classes/methods/class.*.php');
+		$classfiles = glob($this->getPlugin()->getDirectory().'/classes/methods/class.*.php');
 		if (!empty($classfiles))
 		{
 			foreach ($classfiles as $file)
@@ -621,7 +625,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				if (substr($classname, -3) != 'GUI')
 				{
 					require_once($file);
-					$methods[] = new $classname($this, $this->plugin);
+					$methods[] = new $classname($this, $this->getPlugin());
 				}
 			}
 		}
@@ -720,7 +724,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 */
 	public function getItemsConflicts()
 	{
-		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->plugin->getOutOfConflictTime());
+		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->getPlugin()->getOutOfConflictTime());
 		$tolerance = $this->getMethodObject()->getToleratedConflictPercentage();
 
 		if (!isset($this->conflicts))
@@ -837,7 +841,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      */
     public function getPrioritiesWithPassedRestrictions()
     {
-        if (!$this->plugin->hasFauService()) {
+        if (!$this->getPlugin()->hasFauService()) {
             return $this->getPriorities();
         }
 
@@ -1173,7 +1177,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	{
         global $DIC;
 
-		if (!$this->plugin->hasFauService())
+		if (!$this->getPlugin()->hasFauService())
 		{
 			return $this->getUsers();
 		}
@@ -1217,7 +1221,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		// query for users
 		$user_query = new ilUserQuery();
 		$user_query->setUserFilter($a_user_ids);
-		$user_query->setLimit($this->plugin->getUserQueryLimit());
+		$user_query->setLimit($this->getPlugin()->getUserQueryLimit());
 		$user_query_result = $user_query->query();
 
 		$details = array();
@@ -1280,11 +1284,11 @@ class ilObjCombiSubscription extends ilObjectPlugin
         $details = [];
         if (count($assignments) > $method->getNumberAssignments()) {
             $list = [
-                sprintf($this->plugin->txt('total_assignments_details'), $method->getNumberAssignments(), count($assignments))
+                sprintf($this->getPlugin()->txt('total_assignments_details'), $method->getNumberAssignments(), count($assignments))
             ];
             $details['total_assignments_exceeded'] = [
                 'status' => self::SATISFIED_OVER,
-                'text' => $this->plugin->txt('total_assignments_exceeded'),
+                'text' => $this->getPlugin()->txt('total_assignments_exceeded'),
                 'list' => $list
             ];
         }
@@ -1292,12 +1296,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
             $list = [];
             foreach ($exceeded as $cat_id => $num_assigned) {
                 $category = $categories[$cat_id];
-                $list[] = sprintf($this->plugin->txt('category_limits_exceeded_details'), 
+                $list[] = sprintf($this->getPlugin()->txt('category_limits_exceeded_details'), 
                     $category->title, $category->max_assignments, $num_assigned);
             }
             $details['category_limits_exceeded'] = [
                 'status' => self::SATISFIED_OVER,
-                'text' => $this->plugin->txt('category_limits_exceeded'),
+                'text' => $this->getPlugin()->txt('category_limits_exceeded'),
                 'list' => $list
             ];
         }
@@ -1308,18 +1312,18 @@ class ilObjCombiSubscription extends ilObjectPlugin
             }
             $details['assignments_with_conflicts'] = [
                 'status' => self::SATISFIED_CONFLICT,
-                'text' => $this->plugin->txt('assignments_with_conflicts'),
+                'text' => $this->getPlugin()->txt('assignments_with_conflicts'),
                 'list' => $list
             ];
         }
         if (count($assignments) < $method->getNumberAssignments()
             && !($method instanceof ilCoSubMethodRandom && $method->allow_low_filled_users)) {
             $list = [
-                sprintf($this->plugin->txt('total_assignments_details'), $method->getNumberAssignments(), count($assignments))
+                sprintf($this->getPlugin()->txt('total_assignments_details'), $method->getNumberAssignments(), count($assignments))
             ];
             $details['total_assignments_not_reached'] = [
                 'status' => self::SATISFIED_NOT,
-                'text' => $this->plugin->txt('total_assignments_not_reached'),
+                'text' => $this->getPlugin()->txt('total_assignments_not_reached'),
                 'list' => $list
             ];
         }
@@ -1341,21 +1345,21 @@ class ilObjCombiSubscription extends ilObjectPlugin
         if (!empty($not_chosen)) {
             $details['assignments_not_chosen'] = [
                 'status' => self::SATISFIED_NOT,
-                'text' => $this->plugin->txt('assignments_not_chosen'),
+                'text' => $this->getPlugin()->txt('assignments_not_chosen'),
                 'list' => $not_chosen
             ];
         }
         if (!empty($lower_priority)) {
             $details['assignments_with_lower_priority'] = [
                 'status' => self::SATISFIED_MEDIUM,
-                'text' => $this->plugin->txt('assignments_with_lower_priority'),
+                'text' => $this->getPlugin()->txt('assignments_with_lower_priority'),
                 'list' => $lower_priority
             ];
         }
         if (!empty($highest_priority)) {
             $details['assignments_with_highest_priority'] = [
                 'status' => self::SATISFIED_FULL,
-                'text' => $this->plugin->txt('assignments_with_highest_priority'),
+                'text' => $this->getPlugin()->txt('assignments_with_highest_priority'),
                 'list' => $highest_priority
             ];
         }
@@ -1460,12 +1464,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->update();
 
 		// adjust subscribe users and maximum subscriptions
-		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
+		$targets_obj = new ilCombiSubscriptionTargets($this, $this->getPlugin());
 		$targets_obj->syncFromTargetsBeforeCalculation();
 
 
 		// calculate the assignments
-		$run = $this->getMethodObject()->getBestCalculationRun($this->plugin->getNumberOfTries(), true);
+		$run = $this->getMethodObject()->getBestCalculationRun($this->getPlugin()->getNumberOfTries(), true);
 		if (!isset($run))
 		{
 			return false;
@@ -1478,12 +1482,12 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$this->fixAssignedUsers();
 
 		// remove conflicting choices from other combined subscriptions
-		$conflictsObj = new ilCombiSubscriptionConflicts($this, $this->plugin);
+		$conflictsObj = new ilCombiSubscriptionConflicts($this, $this->getPlugin());
 		$removedConflicts = $conflictsObj->removeConflicts();
 
 		// notify users about calculation result
 		$notification = new ilCombiSubscriptionMailNotification();
-		$notification->setPlugin($this->plugin);
+		$notification->setPlugin($this->getPlugin());
 		$notification->setObject($this);
 		$notification->sendAssignments($removedConflicts);
 
@@ -1505,7 +1509,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		$config = new ilCoSubTargetsConfig($this);
 		$config->readFromObject();
 
-		$targets_obj = new ilCombiSubscriptionTargets($this, $this->plugin);
+		$targets_obj = new ilCombiSubscriptionTargets($this, $this->getPlugin());
 		$targets_obj->filterUntrashedTargets();
 		$targets_obj->applyTargetsConfig($config); 			// may change waiting list settings which is needed for assigning users
 		$targets_obj->addAssignedUsersAsMembers();

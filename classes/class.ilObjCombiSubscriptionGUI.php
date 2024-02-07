@@ -30,21 +30,31 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 			$this->tpl->setDescription($this->object->getDescription());
 			$alerts = array();
 			array_push($alerts, array(
-				'property' => $this->object->plugin->txt('subscription_period'),
+				'property' => $this->object->getPlugin()->txt('subscription_period'),
 				'value' => ilDatePresentation::formatPeriod($this->object->getSubscriptionStart(), $this->object->getSubscriptionEnd())
 			));
 			if (!$this->object->getOnline())
 			{
 				array_push($alerts, array(
-					'property' => $this->object->plugin->txt('status'),
-					'value' => $this->object->plugin->txt('offline'))
+					'property' => $this->object->getPlugin()->txt('status'),
+					'value' => $this->object->getPlugin()->txt('offline'))
 				);
 			}
 
 			$this->tpl->setAlertProperties($alerts);
-			$this->tpl->addCss($this->object->plugin->getStyleSheetLocation('ilObjCombiSubscription.css'));
+			$this->tpl->addCss($this->object->getPlugin()->getStyleSheetLocation('ilObjCombiSubscription.css'));
 
 		}
+	}
+
+	public function getObject(): ilObjCombiSubscription
+	{
+    	return parent::getObject();
+	}
+
+	public function getPlugin(): ilCombiSubscriptionPlugin
+	{
+    	return parent::getPlugin();
 	}
 	
 	/**

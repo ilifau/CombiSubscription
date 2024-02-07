@@ -24,8 +24,8 @@ abstract class ilCoSubBaseGUI
 
         $this->dic = $DIC;
 		$this->parent = $a_parent_gui;
-		$this->object = $this->parent->object;
-		$this->plugin = $this->parent->plugin;
+		$this->object = $this->parent->getObject();
+		$this->plugin = $this->parent->getPlugin();
 		$this->ctrl = $this->dic->ctrl();
 		$this->tabs = $this->dic->tabs();
 		$this->toolbar = $this->dic->toolbar();
