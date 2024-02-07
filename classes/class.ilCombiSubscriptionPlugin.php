@@ -112,10 +112,11 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 */
 	public function withCronJob(): bool
 	{
-		/** @var ilPluginAdmin $ilPluginAdmin */
-		global $ilPluginAdmin;
+		global $DIC;
 
-		return $ilPluginAdmin->isActive('Services', 'Cron', 'crnhk', 'CombiSubscriptionCron');
+		if($DIC["component.repository"]->hasPluginId('crnhk'))
+			return $DIC["component.repository"]->getPluginByName('CombiSubscriptionCron')->isActive();
+		else return false;
 	}
 
 	/**
