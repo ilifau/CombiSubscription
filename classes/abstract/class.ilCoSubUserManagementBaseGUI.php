@@ -65,10 +65,12 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function addUsers(array $user_ids, ?int $a_type = null): bool
 	{
+		global $DIC;
+
 		if (empty($user_ids[0]))
 		{
 			$GLOBALS['lng']->loadLanguageModule('search');
-			ilUtil::sendFailure($this->lng->txt('search_err_user_not_exist'),true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('search_err_user_not_exist'),true);
 			return false;
 		}
 
@@ -101,7 +103,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 			}
 		}
 
-		ilUtil::sendSuccess($this->plugin->txt('users_added'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('users_added'), true);
 		$this->redirectToUserList();
 	}
 
@@ -110,6 +112,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function showInfo(): void
 	{
+		global $DIC;
 		$messages = array();
 		$transfer_time = $this->object->getClassProperty('ilCoSubAssignmentsGUI', 'transfer_time', 0);
 		if ($transfer_time > 0)
@@ -126,7 +129,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 
 		if (!empty($messages))
 		{
-			ilUtil::sendInfo(implode('<br />', $messages));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('info', implode('<br />', $messages));
 		}
 	}
 
@@ -135,9 +138,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function fixUsersConfirmation(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 
@@ -161,9 +166,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function fixUsers(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 
@@ -173,7 +180,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 			$userObj->save();
 		}
 
-		ilUtil::sendSuccess($this->plugin->txt('fix_users_done'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('fix_users_done'), true);
 		$this->redirectToUserList();
 	}
 
@@ -182,9 +189,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function unfixUsersConfirmation(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 
@@ -208,9 +217,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function unfixUsers(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 
@@ -220,7 +231,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 			$userObj->save();
 		}
 
-		ilUtil::sendSuccess($this->plugin->txt('unfix_users_done'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('unfix_users_done'), true);
 		$this->redirectToUserList();
 	}
 
@@ -230,9 +241,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function mailToUsers(): void
 	{
+		global $DIC;
+		
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('afilure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 		$rcps = array();
@@ -260,9 +273,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function removeUsersConfirmation(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 
@@ -287,9 +302,11 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	 */
 	public function removeUsers(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 
@@ -305,7 +322,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 		$mail->setPlugin($this->plugin);
 		$mail->sendRemoval($_POST['ids']);
 
-		ilUtil::sendSuccess($this->plugin->txt('remove_users_done'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('remove_users_done'), true);
 		$this->redirectToUserList();
 	}
 

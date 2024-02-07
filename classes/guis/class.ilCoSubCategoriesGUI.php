@@ -78,12 +78,14 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveCategory(): void
 	{
+		global $DIC;
+
 		$this->initCategoryForm('create');
 		if ($this->form->checkInput())
 		{
 			$category = new ilCoSubCategory();
 			$this->saveCategoryProperties($category);
-			ilUtil::sendSuccess($this->plugin->txt('msg_category_created'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_category_created'), true);
 			$this->ctrl->redirect($this, 'listCategories');
 		}
 		else
@@ -110,13 +112,15 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 */
 	protected function updateCategory(): void
 	{
+		global $DIC;
+
 		$this->ctrl->saveParameter($this, 'cat_id');
 		$this->initCategoryForm('edit');
 		if ($this->form->checkInput())
 		{
 			$category = ilCoSubCategory::_getById($_GET['cat_id']);
 			$this->saveCategoryProperties($category);
-			ilUtil::sendSuccess($this->plugin->txt('msg_category_updated'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success',$this->plugin->txt('msg_category_updated'), true);
 			$this->ctrl->redirect($this, 'listCategories');
 		}
 		else
@@ -131,9 +135,11 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 */
 	protected function confirmDeleteCategories(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['cat_ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',$this->lng->txt('select_at_least_one_object'), true);
 			$this->ctrl->redirect($this,'listICategories');
 		}
 
@@ -158,11 +164,13 @@ class ilCoSubCategoriesGUI extends ilCoSubBaseGUI
 	 */
 	protected function deleteCategories(): void
 	{
+		global $DIC;
+		
 		foreach($_POST['cat_ids'] as $cat_id)
 		{
 			ilCoSubCategory::_deleteById($cat_id);
 		}
-		ilUtil::sendSuccess($this->plugin->txt(count($_POST['cat_ids']) == 1  ? 'msg_category_deleted' : 'msg_categories_deleted'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt(count($_POST['cat_ids']) == 1  ? 'msg_category_deleted' : 'msg_categories_deleted'), true);
 		$this->ctrl->redirect($this, 'listCategories');
 	}
 

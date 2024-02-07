@@ -209,9 +209,11 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	 */
 	protected function checkMethodAvailable(): void 
 	{
+		global $DIC;
+
 		if (!$this->object->getMethodObject())
 		{
-			ilUtil::sendFailure($this->plugin->txt('method_not_defined'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('method_not_defined'), true);
 			if ($this->checkPermissionBool('write'))
 			{
 				$this->ctrl->redirect($this,'editProperties');
@@ -362,6 +364,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	 */
 	public function checkUnfinishedRuns(): void
 	{
+		global $DIC;
+		
 		$success_messages = array();
 		$failure_messages = array();
 
@@ -390,12 +394,12 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 		if (!empty($success_messages))
 		{
-			ilUtil::sendSuccess(implode('<br />', $success_messages));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', implode('<br />', $success_messages));
 		}
 
 		if (!empty($failure_messages))
 		{
-			ilUtil::sendFailure(implode('<br />', $failure_messages));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', implode('<br />', $failure_messages));
 		}
 
 	}

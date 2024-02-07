@@ -92,6 +92,8 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 	 */
 	public function processFile(): void
 	{
+		global $DIC;
+
 		$this->initImportForm();
 		if (!$this->form->checkInput() || !$this->form->hasFileUpload('import_file'))
 		{
@@ -116,13 +118,13 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 			}
 			else
 			{
-				ilUtil::sendSuccess($this->modes[$mode]['success'], true);
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->modes[$mode]['success'], true);
 				$this->ctrl->returnToParent($this);
 			}
 		}
 		else
 		{
-			ilUtil::sendFailure($this->modes[$mode]['failure'] . '<br />' . $this->script->getMessage(), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->modes[$mode]['failure'] . '<br />' . $this->script->getMessage(), true);
 			$this->ctrl->redirect($this);
 		}
 	}

@@ -171,9 +171,11 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	protected function calculateAssignments(): void
 	{
+		global $DIC;
+
 		if (!$this->object->getMethodObject()->isActive())
 		{
-			ilUtil::sendFailure($this->plugin->txt('msg_method_not_active'),true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('msg_method_not_active'),true);
 		}
 		else
 		{
@@ -214,16 +216,16 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 					// copy the calculated assignments of the run to the current assignments
 					$this->object->copyAssignments($run->run_id, 0, !$method->fill_fixed_users);
 					$this->object->setClassProperty(get_class($this), 'source_run', $run->run_id);
-					ilUtil::sendSuccess(sprintf($this->plugin->txt('msg_calculation_finished'), $letter, $date), true);
+					$DIC->ui()->mainTemplate()->setOnScreenMessage('success', sprintf($this->plugin->txt('msg_calculation_finished'), $letter, $date), true);
 				}
 				else
 				{
-					ilUtil::sendInfo($this->plugin->txt('msg_calculation_started'), true);
+					$DIC->ui()->mainTemplate()->setOnScreenMessage('info', $this->plugin->txt('msg_calculation_started'), true);
 				}
 			}
 			else
 			{
-				ilUtil::sendFailure($this->plugin->txt('msg_calculation_failed')
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('msg_calculation_failed')
 					.'<br />'.$this->object->getMethodObject()->getError(), true);
 			}
 		}
@@ -236,8 +238,10 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function saveAssignments(): void
 	{
+		global $DIC;
+		
 		$this->savePostedAssignments();
-		ilUtil::sendSuccess($this->plugin->txt('msg_assignments_saved'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_assignments_saved'), true);
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
@@ -249,6 +253,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	{
 		/** @var ilObjUser $ilUser */
 		global $ilUser;
+		global $DIC;
 
 
 		$this->savePostedAssignments();
@@ -266,7 +271,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 
 		$letter = $this->object->getRunLabel(count($this->object->getRuns()) -1);
 		$date = ilDatePresentation::formatDate($run->run_start);
-		ilUtil::sendSuccess(sprintf($this->plugin->txt('msg_assignments_saved_as_run'), $date, $letter), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', sprintf($this->plugin->txt('msg_assignments_saved_as_run'), $date, $letter), true);
 		$this->ctrl->redirect($this,'editAssignments');
 	}
 
@@ -315,11 +320,13 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function setRunAssignments(): void
 	{
+		global $DIC;
+
 		if (!empty($_POST['run_id']))
 		{
 			$this->object->copyAssignments($_POST['run_id'], 0);
 			$this->object->setClassProperty(get_class($this), 'source_run', $_POST['run_id']);
-			ilUtil::sendSuccess($this->plugin->txt('msg_assignments_set'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_assignments_set'), true);
 		}
 		$this->ctrl->redirect($this,'editAssignments');
 	}
@@ -342,7 +349,8 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 
         if (empty($targets))
         {
-            ilUtil::sendFailure($this->plugin->txt('no_target_objects'),true);
+			global $DIC;
+            $DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('no_target_objects'),true);
             $this->ctrl->redirect($this,'editAssignments');
         }
 

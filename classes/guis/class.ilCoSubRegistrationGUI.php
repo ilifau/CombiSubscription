@@ -212,6 +212,8 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function editRegistration(?array $priorities = null): void
 	{
+		global $DIC;
+
 		// get the user for checking if it is fixed
 		$userObj = $this->object->getUser($this->ilias_user->getId());
 
@@ -228,17 +230,17 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			// check subscription period
 			if ($this->object->isBeforeSubscription())
 			{
-				ilUtil::sendInfo($this->plugin->txt('subscription_period_not_started'));
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('info', $this->plugin->txt('subscription_period_not_started'));
 				$this->disabled = true;
 			}
 			elseif ($this->object->isAfterSubscription())
 			{
-				ilUtil::sendInfo($this->plugin->txt('subscription_period_finished'));
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('info', $this->plugin->txt('subscription_period_finished'));
 				$this->disabled = true;
 			}
 			elseif ($userObj->is_fixed)
 			{
-				ilUtil::sendInfo($this->plugin->txt('subscription_message_user_fixed'));
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('info', $this->plugin->txt('subscription_message_user_fixed'));
 				$this->disabled = true;
 			}
 		}
@@ -256,7 +258,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			elseif ($this->object->getPreSelect())
 			{
 				$priorities = array();
-				ilUtil::sendInfo($this->plugin->txt('pre_select_message'));
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('info', $this->plugin->txt('pre_select_message'));
 				foreach ($this->object->getItems() as $item)
 				{
 					$priorities[$item->item_id] = '0';
@@ -513,6 +515,8 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function saveRegistration(): void
 	{
+		global $DIC;
+
 		$userObj = $this->object->getUser($this->ilias_user->getId());
 
 		// check fixation and subscription period
@@ -534,7 +538,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$posted = $this->getPostedPriorities();
 		if (count($posted) < $min_choices)
 		{
-			ilUtil::sendFailure(sprintf($this->plugin->txt('min_choices_alert'), $min_choices));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', sprintf($this->plugin->txt('min_choices_alert'), $min_choices));
 			$this->editRegistration($posted);
 		}
 
@@ -546,7 +550,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			{
 				if (isset($used_prio[$priority]) && !$has_mc)
 				{
-					ilUtil::sendFailure($this->plugin->txt('multiple_choice_alert'));
+					$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('multiple_choice_alert'));
 					$this->editRegistration($posted);
 				}
 
@@ -573,7 +577,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		// check for unused priorities if each priority has to be chosen
 		if (count($used_prio) <= $max_prio && !$has_ec)
 		{
-			ilUtil::sendFailure($this->plugin->txt('empty_choice_alert'));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('empty_choice_alert'));
 			$this->editRegistration($posted);
 		}
 
@@ -588,7 +592,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		}
 		if (!empty($catmess))
 		{
-			ilUtil::sendFailure(implode('<br />', $catmess));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', implode('<br />', $catmess));
 			$this->editRegistration($posted);
 		}
 
@@ -602,7 +606,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 
 		if ($this->isOwnRegistration())
 		{
-			ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved_own')
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_registration_saved_own')
 				.sprintf('<br /><a class="small" href="%s">%s</a>',
 					$this->ctrl->getLinkTarget($this, 'sendSubscriptionEmail'),
 					$this->plugin->txt('msg_send_email_confirmation')));
@@ -614,7 +618,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 			$notification->setObject($this->object);
 			$notification->sendRegistration($userObj->user_id, true);
 
-			ilUtil::sendSuccess($this->plugin->txt('msg_registration_saved'));
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_registration_saved'));
 		}
 		// don't redirect because this may show the pre-select
 		$this->editRegistration($posted);
@@ -652,9 +656,10 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function deleteRegistration(): void
 	{
+		global $DIC;
 		ilCoSubChoice::_deleteForObject($this->object->getId(), $this->ilias_user->getId());
 		ilCoSubUser::_deleteForObject($this->object->getId(), $this->ilias_user->getId());
-		ilUtil::sendSuccess($this->plugin->txt('registration_deleted'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('registration_deleted'), true);
 		if ($this->isOwnRegistration())
 		{
 			$this->parent->returnToContainer();

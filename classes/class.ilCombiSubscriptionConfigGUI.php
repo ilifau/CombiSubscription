@@ -137,11 +137,12 @@ class ilCombiSubscriptionConfigGUI extends ilPluginConfigGUI
 	 */
 	protected function updateProperties(): void
 	{
+		global $DIC;
 		$this->initPropertiesForm();
 		if ($this->form->checkInput())
 		{
 			$this->savePropertiesValues();
-			ilUtil::sendSuccess($this->lng->txt('msg_obj_modified'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->lng->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'configure');
 		}
 		else

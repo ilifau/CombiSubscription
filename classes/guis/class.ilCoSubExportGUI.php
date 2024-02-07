@@ -85,6 +85,8 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 	 */
 	public function doExport(): void
 	{
+		global $DIC;
+		
 		$this->initExportForm();
 		if (!$this->form->checkInput())
 		{
@@ -133,7 +135,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		}
 		else
 		{
-			ilUtil::sendFailure($this->plugin->txt('export_not_found'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',$this->plugin->txt('export_not_found'), true);
 			$this->ctrl->redirect($this);
 		}
 	}

@@ -147,6 +147,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveRepositoryItems(): void
 	{
+		global $DIC;
+
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 
 		$items = array();
@@ -186,7 +188,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$targets->setItems($items);
 			$targets->applyDefaultTargetsConfig();
 
-			ilUtil::sendSuccess($this->plugin->txt(count($_POST['ref_id']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt(count($_POST['ref_id']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
 		}
 
 		$this->ctrl->redirect($this, 'listItems');
@@ -199,6 +201,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function checkTargetsWritable(array $a_ref_ids = [], bool $a_redirect = false): bool
 	{
+		global $DIC;
+		
 		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
 
@@ -209,7 +213,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 				$obj_id = ilObject::_lookupObjId($ref_id);
 				$title = ilObject::_lookupTitle($obj_id);
 
-				ilUtil::sendFailure(sprintf($this->plugin->txt('target_object_not_writable'), $title), $a_redirect);
+				$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',sprintf($this->plugin->txt('target_object_not_writable'), $title), $a_redirect);
 				return false;
 			}
 		}
@@ -223,6 +227,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
      */
     protected function checkTargetAndCategory(?int $target_ref_id = null, ?int $cat_id = null): bool
     {
+		global $DIC;
+
         if (!$this->plugin->hasFauService()) {
             return true;
         }
@@ -245,7 +251,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
                 || $import_id->getTermId() != $cat_import_id->getTermId()
             ) {
                 if (!empty($event = $this->dic->fau()->study()->repo()->getEvent($cat_import_id->getEventId()))) {
-                    ilUtil::sendFailure(sprintf($this->plugin->txt('message_cat_for_event'), $category->title, $event->getTitle()));
+                    $DIC->ui()->mainTemplate()->setOnScreenMessage('failure', sprintf($this->plugin->txt('message_cat_for_event'), $category->title, $event->getTitle()));
                     return false;
                 }
             }
@@ -267,6 +273,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveItem(): void
 	{
+		global $DIC;
+
 		$this->initItemForm();
 		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))) &&
             $this->checkTargetAndCategory($this->form->getInput('target_ref_id'), $this->form->getInput('cat_id')))
@@ -275,7 +283,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$this->saveItemProperties($item);
 			$this->saveSchedulesProperties($item);
 
-			ilUtil::sendSuccess($this->plugin->txt('msg_item_created'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success',$this->plugin->txt('msg_item_created'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 		else
@@ -302,6 +310,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function updateItem(): void
 	{
+		global $DIC;
+
 		$this->ctrl->saveParameter($this, 'item_id');
 		$item = ilCoSubItem::_getById($_GET['item_id']);
         $schedules = isset($item) ? $item->getSchedules() : [];
@@ -312,7 +322,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$item = ilCoSubItem::_getById($_GET['item_id']);
 			$this->saveItemProperties($item);
 			$this->saveSchedulesProperties($item, $schedules);
-			ilUtil::sendSuccess($this->plugin->txt('msg_item_updated'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_item_updated'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 		else
@@ -327,9 +337,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function confirmDeleteItems(): void
 	{
+		global $DIC;
+		
 		if (empty($_POST['item_ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('select_at_least_one_object'), true);
 			$this->ctrl->redirect($this,'listItems');
 		}
 
@@ -353,9 +365,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
      */
     protected function confirmTransferAssignments(): void
     {
+		global $DIC;
+
         if (empty($_POST['item_ids']))
         {
-            ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+            $DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('select_at_least_one_object'), true);
             $this->ctrl->redirect($this,'listItems');
         }
 
@@ -379,7 +393,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
         }
         if ($count == 0)
         {
-            ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+            $DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('select_at_least_one_object'), true);
             $this->ctrl->redirect($this,'listItems');
         }
 
@@ -419,11 +433,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function deleteItems(): void
 	{
+		global $DIC;
+
 		foreach($_POST['item_ids'] as $item_id)
 		{
 			ilCoSubItem::_deleteById($item_id);
 		}
-		ilUtil::sendSuccess($this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_deleted' : 'msg_items_deleted'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt(count($_POST['item_ids']) == 1  ? 'msg_item_deleted' : 'msg_items_deleted'), true);
 		$this->ctrl->redirect($this, 'listItems');
 	}
 
@@ -787,6 +803,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveSchedulesProperties(ilCoSubItem $a_item, array $a_schedules = [])
 	{
+		global $DIC;
+
         if (!empty($a_item->getCampoCourseId())) {
             // schedules of campo courses don't need to be saved
             return true;
@@ -842,7 +860,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 					$schedule->save();
 
 					if ($schedule->getTimesCount() > ilCoSubSchedule::MAX_TIMES) {
-						ilUtil::sendInfo(sprintf($this->plugin->txt('message_too_many_schedule_times'),
+						$DIC->ui()->mainTemplate()->setOnScreenMessage('info', sprintf($this->plugin->txt('message_too_many_schedule_times'),
 							$schedule->getPeriodInfo(), $schedule->getTimesCount(), ilCoSubSchedule::MAX_TIMES), true);
 					}
 					unset($a_schedules[$schedule_id]);			// prevent from being deleted at the end
@@ -864,9 +882,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function configureTargets(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['item_ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('select_at_least_one_object'), true);
 			$this->ctrl->redirect($this,'listItems');
 		}
 
@@ -874,19 +894,19 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$targets->setItemsByIds($_POST['item_ids']);
 		if (!$targets->targetsExist())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_defined'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('targets_not_defined'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 		if (!$targets->targetsWritable())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('targets_not_writable'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
 		$type = $targets->getCommonType();
 		if (empty($type))
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_different_type'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',$this->plugin->txt('targets_different_type'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
@@ -899,11 +919,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function saveTargetsConfig(): void
 	{
+		global $DIC;
+
 		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
 		$targets->setItemsByIds($_POST['item_ids']);
 		if (!$targets->targetsWritable())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('targets_not_writable'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
@@ -920,11 +942,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		}
 		catch (Exception $e)
 		{
-			ilUtil::sendFailure($this->plugin->txt('target_config_failed').'<br />'. $e->getMessage(), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('target_config_failed').'<br />'. $e->getMessage(), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
-		ilUtil::sendSuccess($this->plugin->txt('target_config_saved'), true);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('target_config_saved'), true);
 		$this->ctrl->redirect($this, 'listItems');
 	}
 
@@ -933,9 +955,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function addGrouping(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['item_ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('select_at_least_one_object'), true);
 			$this->ctrl->redirect($this,'listItems');
 		}
 
@@ -943,19 +967,19 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$targets->setItemsByIds($_POST['item_ids']);
 		if (!$targets->targetsExist())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_defined'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('targets_not_defined'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 		if (!$targets->targetsWritable())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('targets_not_writable'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
 		$type = $targets->getCommonType();
 		if (empty($type))
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_different_type'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',$this->plugin->txt('targets_different_type'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
@@ -968,9 +992,11 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function removeGrouping(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['item_ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt('select_at_least_one_object'), true);
 			$this->ctrl->redirect($this,'listItems');
 		}
 
@@ -978,12 +1004,12 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$targets->setItemsByIds($_POST['item_ids']);
 		if (!$targets->targetsExist())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_defined'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('targets_not_defined'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 		if (!$targets->targetsWritable())
 		{
-			ilUtil::sendFailure($this->plugin->txt('targets_not_writable'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',$this->plugin->txt('targets_not_writable'), true);
 			$this->ctrl->redirect($this, 'listItems');
 		}
 
@@ -997,6 +1023,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	 */
 	protected function showConflicts(): void
 	{
+		global $DIC;
+		
 		$conflicts = $this->object->getItemsConflicts();
 		$items = $this->object->getItems();
 
@@ -1031,7 +1059,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 			$html = $this->plugin->txt('no_conflicts_found');
 		}
 
-		ilUtil::sendInfo($html, false);
+		$DIC->ui()->mainTemplate()->setOnScreenMessage('info', $html, false);
 		$this->listItems();
 	}
 

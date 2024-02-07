@@ -53,9 +53,11 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	 */
 	protected function confirmDeleteRuns(): void
 	{
+		global $DIC;
+
 		if (empty($_POST['run_ids']))
 		{
-			ilUtil::sendFailure($this->lng->txt('select_at_least_one_object'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',$this->lng->txt('select_at_least_one_object'), true);
 			$this->ctrl->redirect($this,'listRuns');
 		}
 
@@ -79,6 +81,7 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 	 */
 	protected function deleteRuns(): void
 	{
+		global $DIC;
 		if (isset($_POST['run_ids']))
 		{
 			foreach ($_POST['run_ids'] as $run_id)
@@ -87,7 +90,7 @@ class ilCoSubRunsGUI extends ilCoSubBaseGUI
 				ilCoSubRun::_deleteById($run_id);
 			}
 
-			ilUtil::sendSuccess($this->plugin->txt('msg_assignments_deleted'), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt('msg_assignments_deleted'), true);
 		}
 		$this->ctrl->redirect($this,'listRuns');
 	}
