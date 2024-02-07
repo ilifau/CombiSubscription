@@ -245,7 +245,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 		
 		if (empty($_POST['ids']))
 		{
-			$DIC->ui()->mainTemplate()->setOnScreenMessage('afilure', $this->lng->txt("no_checkbox"), true);
+			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->lng->txt("no_checkbox"), true);
 			$this->redirectToUserList();
 		}
 		$rcps = array();
