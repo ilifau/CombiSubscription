@@ -54,6 +54,7 @@ class ilCoSubScript
 	/** tweak: owner of created objects */ 
 	protected int $owner_id = 6;
 	/** tweak: owner of created objects (higher precedence as owner_id) */ 
+	protected $owner_login = '';
 	//protected $owner_login = 'root';
     //protected $owner_login = 'martin.killmann';
     //protected $owner_login = 'andreas.rohrmoser';
@@ -205,7 +206,7 @@ class ilCoSubScript
 
 			if ($write)
 			{
-				ilUtil::makeDirParents(dirname($resultFile));
+				ilFileUtils::makeDirParents(dirname($resultFile));
 				$excelObj = new Spreadsheet();
 				$this->writeData($excelObj->getActiveSheet());
 
@@ -410,7 +411,7 @@ class ilCoSubScript
                 }
                 /** @var ilExAssignment $ass */
                 $ass = current(ilExAssignment::getInstancesByExercise(ilObject::_lookupObjId($rowdata['ex_orig_id'])));
-                $ass->setId(null);
+                $ass->setId(0);
                 $ass->setExerciseId($newExercise->getId());
                 $ass->setType(ilExAssignment::TYPE_UPLOAD_TEAM);
                 $ass->setStartTime($period_end);

@@ -104,8 +104,8 @@ class ilCoSubExport
         $excelObj = new Spreadsheet();
 		//$excelObj->setActiveSheetIndex(0);
 
-        $directory = $directory ?? ilUtil::ilTempnam();
-        ilUtil::makeDirParents($directory);
+        $directory = $directory ?? ilFileUtils::ilTempnam();
+		ilFileUtils::makeDirParents($directory);
 
 		switch($mode ?? $this->mode)
 		{
@@ -153,10 +153,10 @@ class ilCoSubExport
                 break;
 
             case self::MODE_RAW_DATA:
-                $name = ilUtil::getASCIIFilename($this->object->getTitle()) . '_' . $this->object->getRefId();
+                $name = ilFileUtils::getASCIIFilename($this->object->getTitle()) . '_' . $this->object->getRefId();
                 $subdir = $directory . '/' . str_replace(' ', '_', $name);
 
-                ilUtil::makeDirParents($subdir);
+                ilFileUtils::makeDirParents($subdir);
                 $this->buildExportFile($subdir, self::MODE_RAW_ITEMS);
                 $this->buildExportFile($subdir, self::MODE_RAW_CHOICES);
                 $this->buildExportFile($subdir, self::MODE_RAW_SOLUTION);
@@ -165,7 +165,7 @@ class ilCoSubExport
                 $this->buildExportFile($subdir, self::MODE_RAW_COMFLICTS);
 
                 $zipfile = $subdir . '.zip';
-                ilUtil::zip($subdir, $zipfile);
+                ilFileUtils::zip($subdir, $zipfile);
                 return $zipfile;
 		}
 

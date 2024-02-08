@@ -90,6 +90,7 @@ class ilCoSubImport
 					break;
 
 				case 'Csv':
+					/** @var Csv $reader */
 					$reader = IOFactory::createReader($type);
 					$reader->setDelimiter(';');
 					$reader->setEnclosure('"');
@@ -553,8 +554,9 @@ class ilCoSubImport
 	/**
 	 * Create choices for assignments
 	 * This is done for users who don't have an assignment
+	 * @param ilCoSubAssign[] $a_assignments
 	 */
-	public function createChoicesForAssignments(ilCoSubAssign $a_assignments): void
+	public function createChoicesForAssignments(array $a_assignments): void
 	{
 		$method = $this->object->getMethodObject();
 		$has_mc = $method->hasMultipleChoice();

@@ -264,7 +264,7 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 			array(),
 			array('type' => 'new', 'sig' => rawurlencode(base64_encode($signature))));
 
-		ilUtil::redirect($target);
+		$DIC->ctrl()->redirectToURL($target);
 	}
 
 

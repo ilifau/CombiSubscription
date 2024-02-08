@@ -194,7 +194,8 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	public function returnToContainer(): void
 	{
 		global $tree;
-		ilUtil::redirect(ilLink::_getLink($tree->getParentId($this->object->getRefId())));
+		global $DIC;
+		$DIC->ctrl()->redirectToURL(ilLink::_getLink($tree->getParentId($this->object->getRefId())));
 	}
 
 

@@ -114,7 +114,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 		switch ($mode)
 		{
             case ilCoSubExport::MODE_RAW_DATA:
-                $name = ilUtil::getASCIIFilename($this->object->getTitle());
+                $name = ilFileUtils::getASCIIFilename($this->object->getTitle());
                 $suffix = '.zip';
                 break;
 
@@ -131,7 +131,7 @@ class ilCoSubExportGUI extends ilCoSubBaseGUI
 
 		if (is_file($file))
 		{
-			ilUtil::deliverFile($file, basename($file));
+			ilFileDelivery::deliverFileLegacy($file, basename($file));
 		}
 		else
 		{

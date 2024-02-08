@@ -143,7 +143,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 	 */
 	public function calculateAssignmentsConfirmation(): void
 	{
-		ilUtil::sendQuestion($this->plugin->txt('calculate_assignments_confirmation')
+		$this->tpl->setOnScreenMessage('question', $this->plugin->txt('calculate_assignments_confirmation')
 			. $this->messageDetails($this->plugin->txt('calculate_assignments_confirmation_details')));
 
 		$form = new ilPropertyFormGUI();
@@ -354,7 +354,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
             $this->ctrl->redirect($this,'editAssignments');
         }
 
-        ilUtil::sendQuestion($this->plugin->txt('transfer_assignments_confirmation')
+        $this->tpl->setOnScreenMessage('question', $this->plugin->txt('transfer_assignments_confirmation')
             . $this->messageDetails(implode('', $targets)));
 
         $form = new ilPropertyFormGUI();

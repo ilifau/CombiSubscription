@@ -109,12 +109,12 @@ class ilCoSubScriptsGUI extends ilCoSubBaseGUI
 
 		$this->script->setMode($mode);
 
-		$tempname = ilUtil::ilTempnam();
+		$tempname = ilFileUtils::ilTempnam();
 		if ($this->script->processFile($file['tmp_name'], $tempname))
 		{
 			if (is_file($tempname))
 			{
-				ilUtil::deliverFile($tempname, $this->modes[$mode]['filename']);
+				ilFileDelivery::deliverFileLegacy($tempname, $this->modes[$mode]['filename']);
 			}
 			else
 			{
