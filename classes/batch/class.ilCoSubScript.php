@@ -680,7 +680,7 @@ class ilCoSubScript
 
 		// get the relevant exercises in the group
 		$gt_data = $tree->getNodeTreeData($group_id);
-		$et_data = $tree->getSubTree($gt_data, true, 'exc');
+		$et_data = $tree->getSubTree($gt_data, true, ['exc']);
 
 		//log_var($et_data, '$et_data');
 

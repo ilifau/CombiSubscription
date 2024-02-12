@@ -29,8 +29,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
     public bool $assume_all_items_selected = false;
 	/** tweak: calculate as if the maximum per item is limited by the minimum */
     public bool $assume_sub_min_as_limit = false;
-    /** tweak: allow to fill up missing assignments of fixed users */
-    public bool $fill_fixed_users = false;
+
     
     
     //

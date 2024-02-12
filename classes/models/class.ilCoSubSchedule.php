@@ -237,7 +237,7 @@ class ilCoSubSchedule
 		}
 
 		// multiple schedule
-		$defZone = ilTimeZone::_getInstance(ilTimeZone::_getDefaultTimeZone());
+		$defZone = ilTimeZone::_getDefaultTimeZone();
 
 		$start = self::_dayDate($this->period_start, $defZone);
 		$end =  self::_dayDate($this->period_end, $defZone);

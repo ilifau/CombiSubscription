@@ -17,6 +17,8 @@ abstract class ilCoSubMethodBase
 	protected ilObjCombiSubscription $object;
 	protected ilCombiSubscriptionPlugin $plugin;
 	protected string $error;
+	/** tweak: allow to fill up missing assignments of fixed users */
+	public bool $fill_fixed_users = false;
 
 	public function __construct(ilObjCombiSubscription $a_object, ilCombiSubscriptionPlugin $a_plugin)
 	{

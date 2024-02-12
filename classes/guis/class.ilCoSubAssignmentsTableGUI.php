@@ -338,7 +338,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
         
         $group = $factory->item()->group('', $items);
         $panel = $factory->panel()->listing()->standard($user_name, [$group]);
-        $modal = $factory->modal()->roundtrip($this->plugin->txt('satisfaction'), $panel);
+        $modal = $factory->modal()->roundtrip($this->plugin->txt('satisfaction'), [$panel]);
         $button = $factory->button()->shy($this->plugin->txt('details'), '#')
                                 ->withOnClick($modal->getShowSignal());
         

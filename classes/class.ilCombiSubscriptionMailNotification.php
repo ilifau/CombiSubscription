@@ -82,7 +82,7 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 		$this->appendBody($this->createPermanentLink());
 
 		$this->getMail()->appendInstallationSignature(true);
-		$this->sendMail(array($user_id),array('system'));
+		$this->sendMail(array($user_id));
 	}
 
 	/**
@@ -168,7 +168,7 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 			$this->appendBody($this->createPermanentLink());
 
 			$this->getMail()->appendInstallationSignature(true);
-			$this->sendMail(array($user_id),array('system'));
+			$this->sendMail(array($user_id));
 		}
 
 	}
@@ -195,7 +195,7 @@ class ilCombiSubscriptionMailNotification extends ilMailNotification
 			$this->appendBody($this->createPermanentLink());
 
 			$this->getMail()->appendInstallationSignature(true);
-			$this->sendMail(array($user_id),array('system'));
+			$this->sendMail(array($user_id));
 		}
 
 	}

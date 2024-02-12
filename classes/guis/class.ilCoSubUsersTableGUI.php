@@ -14,9 +14,9 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 	protected array $priorities;
 	/** Run assignments (run_id => user_id => item_id => assign_id) */
 	protected array $assignments;
-	protected ilCoSubAssignmentsGUI $parent;
+	protected ilCoSubUserManagementBaseGUI $parent;
 
-	function __construct(ilCoSubAssignmentsGUI $a_parent_gui, string $a_parent_cmd)
+	function __construct(ilCoSubUserManagementBaseGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
 

@@ -6,10 +6,10 @@
 class ilCoSubRunsTableGUI extends ilTable2GUI
 {
 	protected ilCtrl $ctrl;
-	protected ilObjCombiSubscriptionGUI $parent;
+	protected ilCoSubRunsGUI $parent;
 	protected ilCombiSubscriptionPlugin $plugin;	 
 
-	function __construct(ilObjCombiSubscriptionGUI $a_parent_gui, string $a_parent_cmd)
+	function __construct(ilCoSubRunsGUI $a_parent_gui, string $a_parent_cmd)
 	{
 		global $ilCtrl;
 		$this->setId('il_xcos_runs');

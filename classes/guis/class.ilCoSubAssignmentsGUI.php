@@ -401,7 +401,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
             $targets_obj->addAssignedUsersAsSubscribers();
         }
 		else {
-            $targets_obj->addAssignedUsersAsMembers(null, $suppress_target_emails ? false : null);
+            $targets_obj->addAssignedUsersAsMembers([], $suppress_target_emails ? false : null);
             $targets_obj->addNonAssignedUsersAsSubscribers();
         }
 
