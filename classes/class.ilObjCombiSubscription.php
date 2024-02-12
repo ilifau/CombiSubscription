@@ -116,7 +116,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		if ($rec = $ilDB->fetchAssoc($set))
 		{
 			$this->setOnline($rec['is_online']);
-			$this->setExplanation($rec['explanation']);
+			$this->setExplanation((string) $rec['explanation']);
 			$this->setSubscriptionStart(new ilDateTime($rec['sub_start'],IL_CAL_DATETIME));
 			$this->setSubscriptionEnd(new ilDateTime($rec['sub_end'],IL_CAL_DATETIME));
 			$this->setShowBars((bool) $rec['show_bars']);
@@ -242,7 +242,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	*
 	* @param	boolean		$a_val
 	*/
-	public function setOnline($a_val)
+	public function setOnline(bool $a_val): void
 	{
 		$this->online = $a_val;
 	}
@@ -252,7 +252,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	*
 	* @return	boolean		online
 	*/
-	public function getOnline()
+	public function getOnline(): bool
 	{
 		return $this->online;
 	}
@@ -262,7 +262,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 *
 	 * @param	string		$a_val
 	 */
-	public function setExplanation($a_val)
+	public function setExplanation(string $a_val): void
 	{
 		$this->explanation = $a_val;
 	}
@@ -272,9 +272,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 *
 	 * @return	string		explanation
 	 */
-	public function getExplanation()
+	public function getExplanation(): string
 	{
-		return $this->explanation;
+		return (string) $this->explanation;
 	}
 
 
@@ -282,7 +282,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set Subscription Start
 	 * @param ilDateTime    $a_sub_start
 	 */
-	public function setSubscriptionStart($a_sub_start)
+	public function setSubscriptionStart(ilDateTime $a_sub_start): void
 	{
 		$this->sub_start = $a_sub_start;
 	}
@@ -291,7 +291,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get Subscription Start
 	 * @return ilDateTime
 	 */
-	public function 	getSubscriptionStart()
+	public function getSubscriptionStart(): ilDateTime
 	{
 		return $this->sub_start;
 	}
@@ -300,7 +300,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set Subscription End
 	 * @param $a_sub_end
 	 */
-	public function setSubscriptionEnd($a_sub_end)
+	public function setSubscriptionEnd(ilDateTime $a_sub_end): void
 	{
 		$this->sub_end = $a_sub_end;
 	}
@@ -309,7 +309,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get Subscription End
 	 * @return ilDateTime
 	 */
-	public function getSubscriptionEnd()
+	public function getSubscriptionEnd(): ilDateTime
 	{
 		return $this->sub_end;
 	}
@@ -317,7 +317,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Check if the current date is before the subscription period
 	 */
-	public function isBeforeSubscription()
+	public function isBeforeSubscription(): bool
 	{
 		if (ilDateTime::_before(new ilDateTime(time(),IL_CAL_UNIX), $this->getSubscriptionStart()))
 		{
@@ -329,7 +329,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Check if the current date is after the subscription period
 	 */
-	public function isAfterSubscription()
+	public function isAfterSubscription(): bool
 	{
 		if (ilDateTime::_after(new ilDateTime(time(),IL_CAL_UNIX), $this->getSubscriptionEnd()))
 		{
@@ -342,7 +342,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get if bars should be shown on the registratin screen
 	 * @return bool
 	 */
-	public function getShowBars()
+	public function getShowBars(): bool
 	{
 		return $this->show_bars;
 	}
@@ -352,7 +352,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set if bars should be shown on the registration screen
 	 * @param bool	$a_show_bars
 	 */
-	public function setShowBars($a_show_bars)
+	public function setShowBars(bool $a_show_bars): void
 	{
 		$this->show_bars = (bool) $a_show_bars;
 	}
@@ -361,7 +361,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get if choices shouls be pre-selected for the first time
 	 * @return bool
 	 */
-	public function getPreSelect()
+	public function getPreSelect(): bool
 	{
 		return $this->pre_select;
 	}
@@ -371,7 +371,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set if choices shouls be pre-selected for the first time
 	 * @param bool $a_pre_select
 	 */
-	public function setPreSelect($a_pre_select)
+	public function setPreSelect(bool $a_pre_select): void
 	{
 		$this->pre_select = $a_pre_select;
 	}
@@ -380,7 +380,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get auto processing after subscription end
 	 * @return bool
 	 */
-	public function getAutoProcess()
+	public function getAutoProcess(): bool
 	{
 		return $this->auto_process;
 	}
@@ -389,7 +389,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set auto processing after subscription end
 	 * @param bool $a_val
 	 */
-	public function setAutoProcess($a_val)
+	public function setAutoProcess(bool $a_val): void
 	{
 		$this->auto_process = $a_val;
 	}
@@ -399,7 +399,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the last processing time
 	 * @return ilDateTime|null
 	 */
-	public function getLastProcess()
+	public function getLastProcess(): ?ilDateTime
 	{
 		return $this->last_process;
 	}
@@ -408,7 +408,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set the last processing tile
 	 * @param ilDateTime|null $a_val
 	 */
-	public function setLastProcess($a_val = null)
+	public function setLastProcess(?ilDateTime $a_val = null): void
 	{
 		$this->last_process = $a_val;
 	}
@@ -418,7 +418,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the minimum choices that must be selected for registration
 	 * @return int
 	 */
-	public function getMinChoices()
+	public function getMinChoices(): int
 	{
 		return (int) $this->min_choices;
 	}
@@ -428,7 +428,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set the minimum choices that must be selected for registration
 	 * @param	int		$a_choices
 	 */
-	public function setMinChoices($a_choices)
+	public function setMinChoices(int $a_choices): void
 	{
 		$this->min_choices = (int) $a_choices;
 	}
@@ -440,7 +440,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param   string  $a_default_value
 	 * @return string	value
 	 */
-	public function getProperty($a_key, $a_default_value)
+	public function getProperty(string $a_key, string $a_default_value): string
 	{
 		return $this->getClassProperty(get_class($this), $a_key, $a_default_value);
 	}
@@ -450,7 +450,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param   string  $a_key
 	 * @param   string  $a_value
 	 */
-	public function setProperty($a_key, $a_value)
+	public function setProperty(string $a_key, string $a_value): void
 	{
 		$this->setClassProperty(get_class($this),  $a_key, $a_value);
 	}
@@ -462,7 +462,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param   string  $a_default_value
 	 * @return string	value
 	 */
-	public function getClassProperty($a_class, $a_key, $a_default_value)
+	public function getClassProperty(string $a_class, string $a_key, string $a_default_value): string
 	{
 		$this->readClassProperties($a_class);
 		return isset($this->class_properties[$a_class][$a_key]) ? $this->class_properties[$a_class][$a_key] : $a_default_value;
@@ -474,7 +474,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param   string  $a_key
 	 * @param   string  $a_value
 	 */
-	public function setClassProperty($a_class, $a_key, $a_value)
+	public function setClassProperty(string $a_class, string $a_key, string $a_value): void
 	{
 		/** @var ilDB $ilDB */
 		global $ilDB;
@@ -498,7 +498,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Read the object properties for a certain class
 	 * @param $a_class
 	 */
-	private function readClassProperties($a_class)
+	private function readClassProperties(string $a_class): void
 	{
 		if (!isset($this->class_properties[$a_class]))
 		{
@@ -523,7 +523,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Clone all properties for classes of this object
 	 * @param int	$a_obj_id	new object id
 	 */
-	private function cloneProperties($a_obj_id)
+	private function cloneProperties(int $a_obj_id): void
 	{
 		/** @var ilDB $ilDB */
 		global $ilDB;
@@ -543,7 +543,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $a_default_value
 	 * @return string
 	 */
-	public function getPreference($a_class, $a_key, $a_default_value)
+	public function getPreference(string $a_class, string $a_key, string $a_default_value): string
 	{
 		return (isset($_SESSION['CombiSubscription'][$a_class][$a_key]) ? $_SESSION['CombiSubscription'][$a_class][$a_key] : $a_default_value);
 	}
@@ -554,7 +554,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $a_key
 	 * @param $a_value
 	 */
-	public function setPreference($a_class, $a_key, $a_value)
+	public function setPreference(string $a_class, string $a_key, string $a_value): void
 	{
 		$_SESSION['CombiSubscription'][$a_class][$a_key] = $a_value;
 	}
@@ -564,7 +564,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Set the Assignment Method
 	 * @param $a_method
 	 */
-	public function setMethod($a_method)
+	public function setMethod(string $a_method): void
 	{
 		$this->method = $a_method;
 	}
@@ -573,7 +573,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the Assignment Method
 	 * @return string
 	 */
-	public function getMethod()
+	public function getMethod(): string
 	{
 		return $this->method;
 	}
@@ -582,7 +582,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the Assignment Method Object
 	 * @return ilCoSubMethodBase
 	 */
-	public function getMethodObject()
+	public function getMethodObject(): ilCoSubMethodBase
 	{
 		if (!isset($this->method_object))
 		{
@@ -597,7 +597,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $a_classname
 	 * @return null
 	 */
-	public function getMethodObjectByClass($a_classname)
+	public function getMethodObjectByClass(string $a_classname)
 	{
 		$classfile = $this->getPlugin()->getDirectory().'/classes/methods/class.'.$a_classname.'.php';
 		if (is_file($classfile))
@@ -612,7 +612,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the available assignment methods
 	 * @return ilCoSubMethodBase[]
 	 */
-	public function getAvailableMethods()
+	public function getAvailableMethods(): array
 	{
 		$methods = array();
 		$classfiles = glob($this->getPlugin()->getDirectory().'/classes/methods/class.*.php');
@@ -636,7 +636,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the categories defined in this object (lazy loading)
 	 * @return ilCoSubCategory[]	indexed by cat_id
 	 */
-	public function getCategories()
+	public function getCategories(): array
 	{
 		if (!isset($this->categories))
 		{
@@ -650,7 +650,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Only categories with limits are included
 	 * @return array	$cat_id => $limit
 	 */
-	public function getCategoryLimits()
+	public function getCategoryLimits(): array
 	{
 		$limits = array();
 		foreach ($this->getCategories() as $cat_id => $category)
@@ -669,7 +669,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @var string $filter		'selectable'
 	 * @return ilCoSubItem[]	indexed by item_id
 	 */
-	public function getItems($filter = '')
+	public function getItems(string $filter = ''): array
 	{
 		if (!isset($this->items))
 		{
@@ -699,7 +699,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @var string $filter		'selectable'
 	 * @return array	cat_id => item_id => ilCoSubItem
 	 */
-	public function getItemsByCategory($filter = '')
+	public function getItemsByCategory(string $filter = ''): array
 	{
 		$items = array(
 			0 => array()	// index for items without category
@@ -722,7 +722,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get a list conflicting items
 	 * @return array	item_id => item_id[]
 	 */
-	public function getItemsConflicts()
+	public function getItemsConflicts(): array
 	{
 		$buffer = max($this->getMethodObject()->getOutOfConflictTime(), $this->getPlugin()->getOutOfConflictTime());
 		$tolerance = $this->getMethodObject()->getToleratedConflictPercentage();
@@ -752,7 +752,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param int[] $a_item_ids
 	 * @return array [[item_id1, item_id2], ..]
 	 */
-	public function getConflictPairs($a_item_ids)
+	public function getConflictPairs(array $a_item_ids): array
 	{
         $conflicts = $this->getItemsConflicts();
 
@@ -772,7 +772,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param int[] $a_item_ids assigned item ids
 	 * @return array    cat_id => number of assigned item_ids
 	 */
-	public function categoriesOverAssignmentLimit($a_item_ids)
+	public function categoriesOverAssignmentLimit(array $a_item_ids): array
 	{
 		$items = $this->getItems();
 		$limits = $this->getCategoryLimits();
@@ -806,7 +806,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      * Get the choices of an object
      * @return ilCoSubChoice[] indexed by choice_id
      */
-    public function getChoices()
+    public function getChoices(): array
     {
         return ilCoSubChoice::_getForObject($this->getId());
     }
@@ -816,7 +816,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the priorities of all users
 	 * @return  array   user_id => item_id => priority
 	 */
-	public function getPriorities()
+	public function getPriorities(): array
 	{
 		if (!$this->all_priorities_loaded)
 		{
@@ -839,7 +839,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      *
      * @return  array   user_id => item_id => priority
      */
-    public function getPrioritiesWithPassedRestrictions()
+    public function getPrioritiesWithPassedRestrictions(): array
     {
         if (!$this->getPlugin()->hasFauService()) {
             return $this->getPriorities();
@@ -870,7 +870,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $a_user_id
 	 * @return array item_id => priority
 	 */
-	public function getPrioritiesOfUser($a_user_id)
+	public function getPrioritiesOfUser(int $a_user_id): array
 	{
 		if (!isset($this->priorities[$a_user_id]))
 		{
@@ -890,7 +890,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $a_item_id
 	 * @return array user_id => priority
 	 */
-	public function getPrioritiesOfItem($a_item_id)
+	public function getPrioritiesOfItem(int $a_item_id): array
 	{
 		$priorities = array();
 
@@ -912,7 +912,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * This should avoid reading all choices
 	 * @return array item_id => priority => count
 	 */
-	public function getPriorityCounts()
+	public function getPriorityCounts(): array
 	{
 		return ilCoSubChoice::_getPriorityCounts($this->getId());
 	}
@@ -921,7 +921,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the runs done for this object
 	 * @return ilCoSubRun[]
 	 */
-	public function getRuns()
+	public function getRuns(): array
 	{
 		if (!isset($this->runs))
 		{
@@ -934,7 +934,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the finished runs done for this object
 	 * @return ilCoSubRun[]
 	 */
-	public function getRunsFinished()
+	public function getRunsFinished(): array
 	{
 		$runs = array();
 		foreach ($this->getRuns() as $run)
@@ -951,7 +951,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the unfinished runs started for this object
 	 * @return ilCoSubRun[]
 	 */
-	public function getRunsUnfinished()
+	public function getRunsUnfinished(): array
 	{
 		$runs = array();
 		foreach ($this->getRuns() as $run)
@@ -969,7 +969,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $index
 	 * @return string
 	 */
-	public function getRunLabel($index)
+	public function getRunLabel(int $index): string
 	{
 		for($label = ''; $index >= 0; $index = intval($index / 26) - 1)
 		{
@@ -985,7 +985,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @return array     run_id => user_id => item_id => assign_id
 	 *                   (run_id is 0 for the chosen assignments)
 	 */
-	public function getAssignments($a_force = false)
+	public function getAssignments(bool $a_force = false): array
 	{
 		if (!isset($this->assignments) || $a_force)
 		{
@@ -1001,7 +1001,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param integer    $a_run_id (default 0 for the chosen assignments)
 	 * @return array     item_id => assign_id
 	 */
-	public function getAssignmentsOfUser($a_user_id, $a_run_id = 0)
+	public function getAssignmentsOfUser(int $a_user_id, int $a_run_id = 0): array
 	{
 		if (!isset($this->assignments))
 		{
@@ -1017,7 +1017,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param integer    $a_run_id (default 0 for the chosen assignments)
 	 * @return array     user_id => assign_id
 	 */
-	public function getAssignmentsOfItem($a_item_id, $a_run_id = 0)
+	public function getAssignmentsOfItem(int $a_item_id, int $a_run_id = 0): array
 	{
 		if (!isset($this->assignments))
 		{
@@ -1047,7 +1047,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param integer   $a_run_id (default 0 for the chosen assignments)
 	 * @return array   	item_id => sum of assignments
 	 */
-	public function getAssignmentsSums($a_run_id = 0)
+	public function getAssignmentsSums(int $a_run_id = 0): array
 	{
 		if (!isset($this->assignments))
 		{
@@ -1082,7 +1082,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param int 	$a_target_run
      * @param bool $a_keep_fixed
 	 */
-	public function copyAssignments($a_source_run, $a_target_run, $a_keep_fixed = true)
+	public function copyAssignments(int $a_source_run, int $a_target_run, bool $a_keep_fixed = true): void
 	{
         $fixed_ids = ($a_keep_fixed ?  $this->getFixedUserIds() : []);
 
@@ -1117,7 +1117,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param	int	$a_user_id
 	 * @return	ilCoSubUser
 	 */
-	public function getUser($a_user_id)
+	public function getUser(int $a_user_id): ilCoSubUser
 	{
 		$userObj = ilCoSubUser::_getById($this->getId(), $a_user_id);
 		if (!isset($userObj))
@@ -1138,7 +1138,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param bool		$a_force 	force the reading of users
 	 * @return	ilCoSubUser[]       indexed by user_id
 	 */
-	public function getUsers($a_user_ids = array(), $a_force = false)
+	public function getUsers(array $a_user_ids = [], bool $a_force = false): array
 	{
 		if (!isset($this->users) || $a_force)
 		{
@@ -1173,7 +1173,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      * @param bool $a_with_fixed    add fixed users (regardless of condition)
 	 * @return	array $user_id => $user data object
 	 */
-	public function getUsersForStudyCond($a_with_fixed = true)
+	public function getUsersForStudyCond(bool $a_with_fixed = true): array
 	{
         global $DIC;
 
@@ -1216,7 +1216,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param $a_user_ids
 	 * @return array	user_id => assoc details
 	 */
-	public function getUserDetails($a_user_ids)
+	public function getUserDetails(array $a_user_ids): array
 	{
 		// query for users
 		$user_query = new ilUserQuery();
@@ -1239,7 +1239,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * @param integer   $a_run_id (default 0 for the chosen assignments)
 	 * @return integer  satisfaction, e.g. self::SATISFIED_FULL
 	 */
-	public function getUserSatisfaction($a_user_id, $a_run_id = 0)
+	public function getUserSatisfaction(int $a_user_id, int $a_run_id = 0): int
 	{
         $details = $this->getUserSatisfactionDetails($a_user_id, $a_run_id = 0);
         if (isset($details['total_assignments_exceeded'])) {
@@ -1272,7 +1272,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      * @param integer   $a_run_id (default 0 for the chosen assignments)
      * @return array  
      */
-    public function getUserSatisfactionDetails($a_user_id, $a_run_id = 0)
+    public function getUserSatisfactionDetails(int $a_user_id, int $a_run_id = 0): array
     {
         /** @var ilCoSubMethodBase $method */
         $method = $this->getMethodObject();
@@ -1371,7 +1371,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Get the user ids of fixed users
 	 * @return int[]
 	 */
-	public function getFixedUserIds()
+	public function getFixedUserIds(): array
 	{
 		$fixed_ids = array();
 		foreach ($this->getUsers() as $user_id => $user_obj)
@@ -1387,7 +1387,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Set all users with assignments to 'fixed'
 	 */
-	public function fixAssignedUsers()
+	public function fixAssignedUsers(): void
 	{
 		foreach ($this->getUsers() as $subUser)
 		{
@@ -1403,7 +1403,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
      * Set specific users to 'fixed'
      * @param array $a_user_ids
      */
-	public function fixUsers($a_user_ids = array())
+	public function fixUsers(array $a_user_ids = []): void
     {
         foreach ($this->getUsers() as $subUser)
         {
@@ -1419,7 +1419,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Remove all user related data choices, runs and assignments
 	 */
-	public function removeUserData()
+	public function removeUserData(): void
 	{
 		ilCoSubAssign::_deleteForObject($this->getId());
 		ilCoSubChoice::_deleteForObject($this->getId());
@@ -1430,7 +1430,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Get a list of reference ids that are due for an auto procesing
 	 */
-	public static function _getRefIdsForAutoProcess()
+	public static function _getRefIdsForAutoProcess(): array
 	{
 		global $ilDB;
 
@@ -1457,7 +1457,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	/**
 	 * Handle the auto processing of an object
 	 */
-	public function handleAutoProcess()
+	public function handleAutoProcess(): bool
 	{
 		$this->setAutoProcess(false);
 		$this->setLastProcess(new ilDateTime(time(), IL_CAL_UNIX));
@@ -1504,7 +1504,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 	 * Add users as members or subscribers to the target objects
 	 * Set the new object configuration for the target objects
 	 */
-	public function handleAutoProcessTargets()
+	public function handleAutoProcessTargets(): void
 	{
 		$config = new ilCoSubTargetsConfig($this);
 		$config->readFromObject();
