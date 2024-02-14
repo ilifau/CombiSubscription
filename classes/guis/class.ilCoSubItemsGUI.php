@@ -17,7 +17,8 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 	public ilCtrl $ctrl;
 	public ilLanguage $lng;
 	protected ilPropertyFormGUI $form;
-    protected ilCoSubCategory $categories;
+	/** @var ilCoSubCategory[] $categories */
+    protected array $categories;
 
     public function __construct(ilObjCombiSubscriptionGUI $a_parent_gui)
     {

@@ -876,7 +876,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		{
 			$this->priorities[$a_user_id] = array();
 			$priorities = ilCoSubChoice::_getPriorities($this->getId(), $a_user_id);
-			if (is_array($priorities[$a_user_id]))
+			if (isset($priorities[$a_user_id]) && is_array($priorities[$a_user_id]))
 			{
 				$this->priorities[$a_user_id] = $priorities[$a_user_id];
 			}

@@ -1,11 +1,13 @@
 <?php
 
+use ILIAS\DI\Container;
+
 /**
  * Table GUI for registration items
  */
 class ilCoSubItemsTableGUI extends ilTable2GUI
 {
-    protected ilContainer $dic;
+    protected Container $dic;
 	protected ilCtrl $ctrl;
 	protected ilCoSubItemsGUI $parent;
 	protected ilCombiSubscriptionPlugin $plugin;
