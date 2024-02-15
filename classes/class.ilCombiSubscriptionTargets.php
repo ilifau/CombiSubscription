@@ -1,5 +1,5 @@
 <?php
-
+use FAU\Ilias\Helper\CourseConstantsHelper;
 /**
  * Target management for combined subscriptions
  * All course/group related functions should go here
@@ -1065,7 +1065,7 @@ class ilCombiSubscriptionTargets
         if ($config->set_sub_type) {
             switch ($config->sub_type) {
                 case ilCoSubTargetsConfig::SUB_TYPE_COMBI:
-                    $target->setSubscriptionType(IL_CRS_SUBSCRIPTION_OBJECT);
+                    $target->setSubscriptionType(CourseConstantsHelper::IL_CRS_SUBSCRIPTION_OBJECT);
                     $target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
                     $target->setSubscriptionRefId($this->object->getRefId());
                     $target->setSubscriptionStart($this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
