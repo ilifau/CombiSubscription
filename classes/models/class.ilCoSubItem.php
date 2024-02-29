@@ -7,16 +7,16 @@ class ilCoSubItem
 {
 	public int $item_id;
 	public int $obj_id;
-	public int $cat_id;
-	public int $target_ref_id;
-	public string $identifier;
-	public string $title;
-	public string $description;
+	public ?int $cat_id = null;
+	public int $target_ref_id = 0;
+	public string $identifier = "";
+	public string $title = "";
+	public string $description = "";
 	public int $sort_position;
-	public ?int $sub_min;
-	public ?int $sub_max;
+	public ?int $sub_min = null;
+	public ?int $sub_max = null;
 	public bool $selectable = true;
-    public ?string $import_id;
+    public ?string $import_id = null;
 	/** ilCoSubSchedule[] */
 	public ?array $schedules = null;
 	/** cached info about the period */ 

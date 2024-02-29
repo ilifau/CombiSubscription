@@ -7,11 +7,11 @@ class ilCoSubSchedule
 {
 	const MAX_TIMES = 200;
 
-	public int $schedule_id;
-	public int $obj_id;
-	public int $item_id;
-	public ?int $period_start;
-	public ?int $period_end;
+	public int $schedule_id = 0;
+	public int $obj_id = 0;
+	public int $item_id = 0;
+	public ?int $period_start = null;
+	public ?int $period_end = null;
 	/** array  '10:00-12:00' => ['mo', 'tu', ...] */ 
 	public array $slots = [];
 

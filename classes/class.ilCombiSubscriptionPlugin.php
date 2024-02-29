@@ -17,8 +17,10 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	 * Get the plugin instance
 	 */
 	public static function getInstance(): self {
+		global $DIC;
+
 		if (!isset(self::$instance)) {
-			self::$instance = new self();
+			self::$instance = new self($DIC->database(), $DIC["component.repository"], "xcos");
 		}
 		return self::$instance;
 	}
@@ -114,9 +116,16 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	{
 		global $DIC;
 
-		if($DIC["component.repository"]->hasPluginId('crnhk'))
-			return $DIC["component.repository"]->getPluginByName('CombiSubscriptionCron')->isActive();
-		else return false;
+		/** @var ilComponentFactory $factory */
+		$factory = $DIC["component.factory"];
+
+		/** @var ilPlugin $plugin */
+		foreach ($factory->getActivePluginsInSlot('crnhk') as $plugin) {
+			if ($plugin->getPluginName() == 'CombiSubscriptionCron') {
+				return $plugin->isActive();
+			}
+		}
+		return false;
 	}
 
 	/**

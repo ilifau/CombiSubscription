@@ -707,7 +707,7 @@ class ilCombiSubscriptionTargets
     /**
      * Read the list of groupings for the item targets
      */
-    public function getGroupingData(): ilCombiSubscriptionTargets
+    public function getGroupingData(): array
     {
         if (!isset($this->groupings)) {
             $this->groupings = array();

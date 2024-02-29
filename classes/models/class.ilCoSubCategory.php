@@ -12,7 +12,7 @@ class ilCoSubCategory
 	public int $sort_position;
 	public ?int $min_choices;
 	public ?int $max_assignments;
-    public ?string $import_id;
+    public ?string $import_id = null;
 
 	public static function _getById(int $a_id): ?ilCoSubCategory
 	{
