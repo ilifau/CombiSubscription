@@ -44,7 +44,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 
 			// repository item selection
 			case "ilpropertyformgui":
-				$this->initItemForm(ilCoSubItem::_getById($_GET['item_id']));
+				$this->initItemForm(ilCoSubItem::_getById((int) $_GET['item_id']));
 				$this->ctrl->saveParameter($this, 'item_id');
 				$this->ctrl->setReturn($this, "setTargetObject");
 				$this->ctrl->forwardCommand($this->form);

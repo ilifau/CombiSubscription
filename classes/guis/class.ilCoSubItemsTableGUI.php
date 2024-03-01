@@ -78,6 +78,7 @@ class ilCoSubItemsTableGUI extends ilTable2GUI
 			if (!empty($row['cat_id'])) {
 				$row['category'] = $this->categories[$row['cat_id']]->title;
 			}
+			else $row['category'] = "";
 			$row['period'] = $item->getPeriodInfo();
 			$row['selectable'] = $this->lng->txt($row['selectable'] ? 'yes' : 'no');
 			$row['groupings'] = $this->targets->getGroupingsOfItem($item);

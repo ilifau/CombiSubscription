@@ -65,6 +65,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 		return 'xcos';
 	}
 
+
 	/**
 	 * Handles all commmands of this class, centralizes permission checks
 	 *

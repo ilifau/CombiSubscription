@@ -1066,26 +1066,26 @@ class ilCombiSubscriptionTargets
             switch ($config->sub_type) {
                 case ilCoSubTargetsConfig::SUB_TYPE_COMBI:
                     $target->setSubscriptionType(CourseConstantsHelper::IL_CRS_SUBSCRIPTION_OBJECT);
-                    $target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
+                    $target->setSubscriptionLimitationType(ilCourseConstants::IL_CRS_SUBSCRIPTION_LIMITED);
                     $target->setSubscriptionRefId($this->object->getRefId());
                     $target->setSubscriptionStart($this->object->getSubscriptionStart()->get(IL_CAL_UNIX));
                     $target->setSubscriptionEnd($this->object->getSubscriptionEnd()->get(IL_CAL_UNIX));
 
                     break;
                 case ilCoSubTargetsConfig::SUB_TYPE_CONFIRM:
-                    $target->setSubscriptionType(IL_CRS_SUBSCRIPTION_CONFIRMATION);
+                    $target->setSubscriptionType(ilCourseConstants::IL_CRS_SUBSCRIPTION_CONFIRMATION);
                     break;
                 case ilCoSubTargetsConfig::SUB_TYPE_DIRECT:
-                    $target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DIRECT);
+                    $target->setSubscriptionType(ilCourseConstants::IL_CRS_SUBSCRIPTION_DIRECT);
                     break;
                 case ilCoSubTargetsConfig::SUB_TYPE_NONE:
-                    $target->setSubscriptionType(IL_CRS_SUBSCRIPTION_DEACTIVATED);
+                    $target->setSubscriptionType(ilCourseConstants::IL_CRS_SUBSCRIPTION_DEACTIVATED);
                     break;
             }
         }
 
         if ($config->set_sub_period) {
-            $target->setSubscriptionLimitationType(IL_CRS_SUBSCRIPTION_LIMITED);
+            $target->setSubscriptionLimitationType(ilCourseConstants::IL_CRS_SUBSCRIPTION_LIMITED);
             $target->setSubscriptionStart($config->sub_period_start);
             $target->setSubscriptionEnd($config->sub_period_end);
         }

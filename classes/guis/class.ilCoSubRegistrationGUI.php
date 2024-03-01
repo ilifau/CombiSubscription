@@ -417,7 +417,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		$acc_gui->setAllowMultiOpened(true);
         $acc_gui->setBehaviour("FirstOpen");
 		$acc_gui->setActiveHeaderClass('ilCoSubRegAccHeaderActive');
-		$acc_gui->head_class_set = true;	// workaround
+	//	$acc_gui->head_class_set = true;	// workaround
 
 		$items = $this->object->getItemsByCategory('selectable');
 		$counts = $this->object->getPriorityCounts();

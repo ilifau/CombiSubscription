@@ -81,7 +81,10 @@ class ilCoSubRegistrationTableGUI extends ilTable2GUI
 		foreach ($a_items as $item)
 		{
 			$row = get_object_vars($item);
-			$priority = $a_priorities[$item->item_id];
+			$priority = null;
+			if(isset($a_priorities[$item->item_id]))
+				$priority = $a_priorities[$item->item_id];
+
 			if (isset($priority))
 			{
 				$row['priority'] = $priority;

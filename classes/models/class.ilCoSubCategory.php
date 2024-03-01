@@ -8,10 +8,10 @@ class ilCoSubCategory
 	public int $cat_id;
 	public int $obj_id;
 	public string $title;
-	public string $description;
+	public string $description = "";
 	public int $sort_position;
-	public ?int $min_choices;
-	public ?int $max_assignments;
+	public ?int $min_choices = null;
+	public ?int $max_assignments = null;
     public ?string $import_id = null;
 
 	public static function _getById(int $a_id): ?ilCoSubCategory
