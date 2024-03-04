@@ -445,7 +445,7 @@ class ilCombiSubscriptionTargets
             switch ($action['type']) {
                 case 'crs':
                     $part_obj = ilCourseParticipants::_getInstanceByObjId($action['obj_id']);
-                    $role = IL_CRS_MEMBER;
+                    $role = ilParticipants::IL_CRS_MEMBER;
                     $mail_obj = new ilCourseMembershipMailNotification();
                     $mail_obj->setRefId($ref_id);
                     $mail_obj->setType(ilCourseMembershipMailNotification::TYPE_ADMISSION_MEMBER);
@@ -454,7 +454,7 @@ class ilCombiSubscriptionTargets
 
                 case 'grp':
                     $part_obj = ilGroupParticipants::_getInstanceByObjId($action['obj_id']);
-                    $role = IL_GRP_MEMBER;
+                    $role = ilParticipants::IL_GRP_MEMBER;
                     $mail_obj = new ilGroupMembershipMailNotification();
                     $mail_obj->setRefId($ref_id);
                     $mail_obj->setType(ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER);
@@ -463,7 +463,7 @@ class ilCombiSubscriptionTargets
 
                 case 'sess':
                     $part_obj = ilSessionParticipants::_getInstanceByObjId($action['obj_id']);
-                    $role = IL_SESS_MEMBER;
+                    $role = ilParticipants::IL_SESS_MEMBER;
                     $mail_obj = new ilSessionMembershipMailNotification();
                     $mail_obj->setRefId($ref_id);
                     $mail_obj->setType(ilSessionMembershipMailNotification::TYPE_ADMISSION_MEMBER);

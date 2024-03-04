@@ -116,6 +116,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
             if (!empty($item->title)) {
                 $tpl->setVariable('TITLE', $item->title);
             }
+			$limit = $limit ?? '';
 			$tpl->setVariable('LIMIT', $limit);
 			$tpl->setVariable('SUM_LABEL', $this->plugin->txt('item_assignment_sum_label'));
 			$tpl->setVariable('SUM', $sum);
@@ -253,7 +254,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 			$this->tpl->setVariable('USER_ID', $user_id);
 			$this->tpl->setVariable('ITEM_ID', $item_id);
 			$this->tpl->setVariable('TYPE', $multiple_assignments ? 'checkbox' : 'radio');
-			$this->tpl->setVariable('CHECKED', $a_set['item'.$item_id] ? 'checked="checked"' : '');
+			$this->tpl->setVariable('CHECKED', isset($a_set['item'.$item_id]) && $a_set['item'.$item_id] ? 'checked="checked"' : '');
 			if ($a_set['assigned'.$item_id])
 			{
 				$this->tpl->setVariable('CHECKED', 'checked="checked"');

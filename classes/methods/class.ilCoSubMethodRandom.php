@@ -470,7 +470,7 @@ class ilCoSubMethodRandom extends ilCoSubMethodBase
 	 */
 	protected function getSortedItemsForUser(int $a_user_id): array
 	{
-		if (!is_array($this->priorities[$a_user_id]))
+		if (!isset($this->priorities[$a_user_id]) || !is_array($this->priorities[$a_user_id]))
 		{
 			return [];
 		}

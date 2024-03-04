@@ -290,7 +290,7 @@ class ilCoSubAssignmentsGUI extends ilCoSubUserManagementBaseGUI
 
 			$assignments = $this->object->getAssignmentsOfUser($user_id, 0);
 
-			$new_item_ids = (array) $_POST['assignment'][$user_id];
+			$new_item_ids = isset($_POST['assignment'][$user_id]) ? (array) $_POST['assignment'][$user_id] : array();
 			$old_item_ids = array_keys($assignments);
 
 			foreach ($assignments as $item_id => $assign_id)

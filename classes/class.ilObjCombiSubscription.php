@@ -785,7 +785,9 @@ class ilObjCombiSubscription extends ilObjectPlugin
 				$item = $items[$item_id];
 				if (!empty($item->cat_id))
 				{
-					$catcounts[$item->cat_id]++;
+					if (!array_key_exists($item->cat_id, $catcounts))
+						$catcounts[$item->cat_id] = 0;
+					else $catcounts[$item->cat_id]++;
 				}
 			}
 		}
@@ -1089,7 +1091,7 @@ class ilObjCombiSubscription extends ilObjectPlugin
 		ilCoSubAssign::_deleteForObject($this->getId(), $a_target_run, $fixed_ids);
 
 		$assignments = $this->getAssignments(true);
-		if (is_array($assignments[$a_source_run]))
+		if (isset($assignments[$a_source_run]) && is_array($assignments[$a_source_run]))
 		{
 			foreach ($assignments[$a_source_run] as $user_id => $items)
 			{

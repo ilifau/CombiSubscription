@@ -7,10 +7,10 @@ class ilCoSubRun
 {
 	public int $run_id;
 	public int $obj_id;
-	public ilDateTime $run_start;
-	public ilDateTime $run_end;
+	public ?ilDateTime $run_start;
+	public ?ilDateTime $run_end;
 	public string $method;
-	public string $details;
+	public string $details = '';
 
 
 	/**
@@ -118,7 +118,7 @@ class ilCoSubRun
 			array(
 				'obj_id' => array('integer', $this->obj_id),
 				'run_start' => array('timestamp', $this->run_start->get(IL_CAL_DATETIME)),
-				'run_end' => array('timestamp', $this->run_end ? $this->run_end->get(IL_CAL_DATETIME) : null),
+				'run_end' => array('timestamp', isset($this->run_end) && $this->run_end ? $this->run_end->get(IL_CAL_DATETIME) : null),
 				'method' => array('text', $this->method),
 				'details' => array('text', $this->details),
 			)
