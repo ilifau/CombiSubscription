@@ -154,8 +154,8 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		{
 			$this->tpl->setVariable('NO_STUDYCOND', $this->plugin->txt('studycond_not_fulfilled'));
 		}
-		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
-		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
+//		$this->tpl->setVariable('RESULT_IMAGE', $this->parent->parent->getSatisfactionImageUrl($a_set['result']));
+//		$this->tpl->setVariable('RESULT_TITLE', $this->parent->parent->getSatisfactionTitle($a_set['result']));
 		$this->tpl->setVariable('REGISTRATIONS', $a_set['registrations']);
 
 		$this->tpl->setCurrentBlock('link');

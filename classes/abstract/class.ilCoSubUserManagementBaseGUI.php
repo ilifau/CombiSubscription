@@ -60,10 +60,10 @@ abstract class ilCoSubUserManagementBaseGUI extends ilCoSubBaseGUI
 	/**
 	 * Add the users to the registration
 	 * @param array|int $user_ids
-	 * @param mixed $a_type
+	 * @param string $a_type
 	 * @return bool
 	 */
-	public function addUsers(array $user_ids, ?int $a_type = null): bool
+	public function addUsers(array $user_ids, string $a_type = ""): bool
 	{
 		global $DIC;
 
