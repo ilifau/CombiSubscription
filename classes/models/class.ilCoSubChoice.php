@@ -10,7 +10,7 @@ class ilCoSubChoice
 	public int $user_id;
 	public int $item_id;
 	public int $priority;
-    public ?int $module_id;
+    public ?int $module_id = null;
 
 
 	/**

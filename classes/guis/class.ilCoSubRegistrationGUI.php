@@ -569,7 +569,10 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
                 }
 				$choices[] = $choice;
 
-				$cat_counts[(int) $item->cat_id]++;
+				if (!array_key_exists((int) $item->cat_id, $cat_counts))
+					$cat_counts[(int) $item->cat_id] = 0;
+				else $cat_counts[(int) $item->cat_id]++;
+
 				$used_prio[$priority] = true;
 			}
 		}
