@@ -123,7 +123,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$form_gui->setKeepOpen(true);
 		$html = $form_gui->getHTML();
 
-		$selector_gui = new ilRepositorySelectorExplorerGUI($this,'addRepositoryItems',$this, 'saveRepositoryItems');
+		$selector_gui = new ilRepositorySelectorExplorerGUI($this,'addRepositoryItems', $this, 'saveRepositoryItems');
 		$selector_gui->setTypeWhiteList(array_merge(array('root','cat','crs','grp','fold'), $this->plugin->getAvailableTargetTypes()));
 		$selector_gui->setClickableTypes($this->plugin->getAvailableTargetTypes());
 		$selector_gui->setSelectMode('ref_id', true);
@@ -134,92 +134,13 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$html = $html . $selector_gui->getHTML();
 
 		$toolbar_gui = new ilToolbarGUI();
-		$toolbar_gui->addFormButton($this->lng->txt('select'),'saveRepositoryItems');
+	    $toolbar_gui->addFormButton($this->lng->txt('select'),'saveRepositoryItems');
 		$toolbar_gui->addFormButton($this->lng->txt('cancel'),'listItems');
 		$toolbar_gui->setOpenFormTag(false);
 		$toolbar_gui->setCloseFormTag(true);
 		$html = $html . $toolbar_gui->getHTML();
 
 		$this->tpl->setContent($html);
-	}
-
-	/**
-	 * save the items for the selected repository objects
-	 */
-	protected function saveRepositoryItems(): void
-	{
-		global $DIC;
-
-		$targets = new ilCombiSubscriptionTargets($this->object, $this->plugin);
-
-		$items = array();
-
-		if ($this->checkTargetsWritable($_POST['ref_id'], true))
-		{
-			foreach ($_POST['ref_id'] as $ref_id)
-			{
-                // add all parallel groups of a course
-                if ($this->plugin->hasFauService()) {
-                    if ($this->dic->fau()->ilias()->objects()->refHasParallelGroups($ref_id)) {
-                        // category will get the import id of the course
-                        $category = $targets->getCategoryForTarget($ref_id);
-                        $category->save();
-
-                        foreach ($this->dic->fau()->ilias()->objects()->findChildParallelGroups($ref_id) as $group_ref_id) {
-                            $item = $targets->getItemForTarget($group_ref_id);
-                            $item->cat_id = $category->cat_id;
-                            $item->save();
-                            $items[$item->item_id] = $item;
-                        }
-                        continue;
-                    }
-                }
-
-				$item = $targets->getItemForTarget($ref_id);
-				$item->save();
-				$items[$item->item_id] = $item;
-
-				foreach($targets->getSchedulesForTarget($ref_id) as $schedule)
-				{
-					$schedule->obj_id = $this->object->getId();
-					$schedule->item_id = $item->item_id;
-					$schedule->save();
-				}
-			}
-			$targets->setItems($items);
-			$targets->applyDefaultTargetsConfig();
-
-			$DIC->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin->txt(count($_POST['ref_id']) == 1  ? 'msg_item_created' : 'msg_items_created'), true);
-		}
-
-		$this->ctrl->redirect($this, 'listItems');
-	}
-
-
-	/**
-	 * Check if target objects are writable
-     * $a_redirect		keep message for redirect
-	 */
-	protected function checkTargetsWritable(array $a_ref_ids = [], bool $a_redirect = false): bool
-	{
-		global $DIC;
-		
-		/** @var ilAccessHandler $ilAccess */
-		global $ilAccess;
-
-		foreach ($a_ref_ids as $ref_id)
-		{
-			if (!empty($ref_id) && !$ilAccess->checkAccess('write','', (int) $ref_id))
-			{
-				$obj_id = ilObject::_lookupObjId($ref_id);
-				$title = ilObject::_lookupTitle($obj_id);
-
-				$DIC->ui()->mainTemplate()->setOnScreenMessage('failure',sprintf($this->plugin->txt('target_object_not_writable'), $title), $a_redirect);
-				return false;
-			}
-		}
-
-		return true;
 	}
 
     /**
