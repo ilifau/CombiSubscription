@@ -183,10 +183,10 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 					$this->$cmd();
 					return;
 
-					default:
-					// show unknown command
-					$this->tpl->setContent($cmd);
-					return;
+				default:
+				// show unknown command
+				$this->tpl->setContent($cmd);
+				return;
 			}
 		}
 	}
@@ -197,7 +197,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 		$factory = new ilObjectFactory();
         $obj = $factory->getInstanceByRefId($this->requested_ref_id, false);
 		$targets = new ilCombiSubscriptionTargets($obj, $this->plugin);
-		
+
 		$items = array();
 
 		if ($this->checkTargetsWritable($_POST['ref_id'], true))
