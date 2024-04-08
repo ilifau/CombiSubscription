@@ -1,5 +1,7 @@
 <?php
 use FAU\Ilias\Helper\CourseConstantsHelper;
+use FAU\Ilias\Helper\WaitingListConstantsHelper;
+
 /**
  * Target management for combined subscriptions
  * All course/group related functions should go here
@@ -682,10 +684,10 @@ class ilCombiSubscriptionTargets
                 if (isset($list_obj)) {
                     if ($this->plugin->hasFauService()) {
                         if (!isset($action['passed']) || isset($action['passed'][$user_id])) {
-                            $to_confirm = ilWaitingList::REQUEST_NOT_TO_CONFIRM;
+                            $to_confirm = WaitingListConstantsHelper::REQUEST_NOT_TO_CONFIRM;
                         }
                         else {
-                            $to_confirm = ilWaitingList::REQUEST_TO_CONFIRM;
+                            $to_confirm = WaitingListConstantsHelper::REQUEST_TO_CONFIRM;
                         }
                         $list_obj->addToList($user_id, '', $to_confirm);
                         if (!empty($action['module_ids'][$user_id])) {
@@ -1137,20 +1139,20 @@ class ilCombiSubscriptionTargets
         if ($config->set_sub_type) {
             switch ($config->sub_type) {
                 case ilCoSubTargetsConfig::SUB_TYPE_COMBI:
-                    $target->setRegistrationType(GRP_REGISTRATION_OBJECT);
+                    $target->setRegistrationType(ilGroupConstants::GRP_REGISTRATION_OBJECT);
                     $target->setRegistrationRefId($this->object->getRefId());
                     $target->setRegistrationStart($this->object->getSubscriptionStart());
                     $target->setRegistrationEnd($this->object->getSubscriptionEnd());
 
                     break;
                 case ilCoSubTargetsConfig::SUB_TYPE_CONFIRM:
-                    $target->setRegistrationType(GRP_REGISTRATION_REQUEST);
+                    $target->setRegistrationType(ilGroupConstants::GRP_REGISTRATION_REQUEST);
                     break;
                 case ilCoSubTargetsConfig::SUB_TYPE_DIRECT:
-                    $target->setRegistrationType(GRP_REGISTRATION_DIRECT);
+                    $target->setRegistrationType(ilGroupConstants::GRP_REGISTRATION_DIRECT);
                     break;
                 case ilCoSubTargetsConfig::SUB_TYPE_NONE:
-                    $target->setRegistrationType(GRP_REGISTRATION_DEACTIVATED);
+                    $target->setRegistrationType(ilGroupConstants::GRP_REGISTRATION_DEACTIVATED);
                     break;
             }
         }

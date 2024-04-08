@@ -198,7 +198,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		global $DIC;
 
 		$this->initItemForm();
-		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id'))) &&
+		if ($this->form->checkInput() && $this->parent->checkTargetsWritable(array($this->form->getInput('target_ref_id'))) &&
             $this->checkTargetAndCategory($this->form->getInput('target_ref_id'), $this->form->getInput('cat_id')))
 		{
 			$item = new ilCoSubItem();
@@ -238,7 +238,7 @@ class ilCoSubItemsGUI extends ilCoSubBaseGUI
 		$item = ilCoSubItem::_getById($_GET['item_id']);
         $schedules = isset($item) ? $item->getSchedules() : [];
 		$this->initItemForm($item, $schedules);
-		if ($this->form->checkInput() && $this->checkTargetsWritable(array($this->form->getInput('target_ref_id')))
+		if ($this->form->checkInput() && $this->parent->checkTargetsWritable(array($this->form->getInput('target_ref_id')))
             && $this->checkTargetAndCategory($this->form->getInput('target_ref_id'), $this->form->getInput('cat_id')))
 		{
 			$item = ilCoSubItem::_getById($_GET['item_id']);

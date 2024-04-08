@@ -246,7 +246,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 	 * Check if target objects are writable
      * $a_redirect		keep message for redirect
 	 */
-	protected function checkTargetsWritable(array $a_ref_ids = [], bool $a_redirect = false): bool
+	public function checkTargetsWritable(array $a_ref_ids = [], bool $a_redirect = false): bool
 	{
 		global $DIC;
 		
