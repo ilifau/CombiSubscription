@@ -227,7 +227,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 
 				foreach($targets->getSchedulesForTarget($ref_id) as $schedule)
 				{
-					$schedule->obj_id = $this->object->getId();
+					$schedule->obj_id = $this->object_id;
 					$schedule->item_id = $item->item_id;
 					$schedule->save();
 				}
