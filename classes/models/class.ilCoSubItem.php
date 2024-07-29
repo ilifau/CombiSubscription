@@ -164,7 +164,7 @@ class ilCoSubItem
 		$this->obj_id = $data['obj_id'];
 		$this->cat_id = $data['cat_id'];
 		$this->target_ref_id = $data['target_ref_id'];
-		$this->identifier = $data['identifier'];
+		$this->identifier = (string) $data['identifier'];
 		$this->title = $data['title'];
 		$this->description = $data['description'];
 		$this->sort_position = $data['sort_position'];
