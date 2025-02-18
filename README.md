@@ -1,7 +1,9 @@
 Copyright (c) 2016 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg
 GPLv3, see LICENSE
 
-Author Fred Neumann <fred.neumann@fau.de>
+Author 
+* Fred Neumann <fred.neumann@fau.de>
+* Christina Fuchs <chr.fuchs@fau.de>
 
 This plugin includes the PHPExcel library, see lib/PHPExcel-1.8/license.md
 
