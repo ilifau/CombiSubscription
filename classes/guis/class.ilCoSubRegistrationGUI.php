@@ -726,11 +726,14 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 	protected function getPostedPriorities(): array
 	{
 		$priorities = array();
-		foreach ((array) $_POST['priority'] as $item_id => $priority)
+		if(isset($_POST['priority'])) 
 		{
-			if (is_numeric($item_id) && is_numeric($priority))
+			foreach ((array) $_POST['priority'] as $item_id => $priority)
 			{
-				$priorities[$item_id] = $priority;
+				if (is_numeric($item_id) && is_numeric($priority))
+				{
+					$priorities[$item_id] = $priority;
+				}
 			}
 		}
 		return $priorities;
