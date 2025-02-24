@@ -163,7 +163,7 @@ class ilCoSubItem
 		$this->item_id = $data['item_id'];
 		$this->obj_id = $data['obj_id'];
 		$this->cat_id = $data['cat_id'];
-		$this->target_ref_id = $data['target_ref_id'];
+		$this->target_ref_id = $data['target_ref_id'] ?? 0;
 		$this->identifier = (string) $data['identifier'];
 		$this->title = $data['title'];
 		$this->description = $data['description'] ?? "";
