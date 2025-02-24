@@ -166,7 +166,7 @@ class ilCoSubItem
 		$this->target_ref_id = $data['target_ref_id'];
 		$this->identifier = (string) $data['identifier'];
 		$this->title = $data['title'];
-		$this->description = $data['description'];
+		$this->description = $data['description'] ?? "";
 		$this->sort_position = $data['sort_position'];
 		$this->sub_min = $data['sub_min'];
 		$this->sub_max = $data['sub_max'];
