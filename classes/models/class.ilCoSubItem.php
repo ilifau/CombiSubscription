@@ -5,7 +5,7 @@
  */
 class ilCoSubItem
 {
-	public int $item_id = 0;
+	public ?int $item_id = 0;
 	public int $obj_id = 0;
 	public ?int $cat_id = null;
 	public int $target_ref_id = 0;

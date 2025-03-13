@@ -7,7 +7,7 @@ class ilCoSubSchedule
 {
 	const MAX_TIMES = 200;
 
-	public int $schedule_id = 0;
+	public ?int $schedule_id = 0;
 	public int $obj_id = 0;
 	public int $item_id = 0;
 	public ?int $period_start = null;

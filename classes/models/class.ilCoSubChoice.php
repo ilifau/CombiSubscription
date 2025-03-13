@@ -5,7 +5,7 @@
  */
 class ilCoSubChoice
 {
-	public int $choice_id;
+	public ?int $choice_id;
 	public int $obj_id;
 	public int $user_id;
 	public int $item_id;

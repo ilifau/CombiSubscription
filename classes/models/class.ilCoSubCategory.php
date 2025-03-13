@@ -5,7 +5,7 @@
  */
 class ilCoSubCategory
 {
-	public int $cat_id;
+	public ?int $cat_id;
 	public int $obj_id;
 	public string $title;
 	public string $description = "";
