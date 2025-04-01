@@ -545,7 +545,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		// create choice objects to be saved
 		foreach ($this->object->getItems() as $item)
 		{
-			$priority = $_POST['priority'][$item->item_id];
+			$priority = $_POST['priority'][$item->item_id] ?? null;
 			if (is_numeric($priority) && $priority >= 0 && $priority <= $max_prio)
 			{
 				if (isset($used_prio[$priority]) && !$has_mc)
