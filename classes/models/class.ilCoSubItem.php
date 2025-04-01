@@ -20,11 +20,11 @@ class ilCoSubItem
 	/** ilCoSubSchedule[] */
 	public ?array $schedules = null;
 	/** cached info about the period */ 
-	protected string $periodInfoCache;
+	protected ?string $periodInfoCache = null;
 	/** cached link to the object with this item */ 
-	protected string $objectLinkCache;
+	protected ?string $objectLinkCache = null;
 	/** cached title of the object with this item */ 
-	protected string $objectTitleCache;
+	protected ?string $objectTitleCache = null;
 
 
 	/**
