@@ -12,7 +12,7 @@ class ilCoSubItem
 	public string $identifier = "";
 	public string $title = "";
 	public string $description = "";
-	public int $sort_position;
+	public ?int $sort_position = null;
 	public ?int $sub_min = null;
 	public ?int $sub_max = null;
 	public bool $selectable = true;
