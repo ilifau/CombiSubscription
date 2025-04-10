@@ -104,9 +104,9 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 				'user_id' => $user_id,
 				'login' => $user['login'],
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
-				'matriculation' => $user['matriculation'],
-                'studydata' => $user['studydata'],
-                'educations' => $user['educations'],
+				'matriculation' => $user['matriculation'] ?? "",
+                'studydata' => $user['studydata'] ?? "",
+                'educations' => $user['educations'] ?? "",
 				'is_fixed' => $userObj->is_fixed,
 				// performance killer
 				//'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
