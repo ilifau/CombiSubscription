@@ -572,7 +572,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				$choices[] = $choice;
 
 				if (!array_key_exists((int) $item->cat_id, $cat_counts))
-					$cat_counts[(int) $item->cat_id] = 0;
+					$cat_counts[(int) $item->cat_id] = 1;
 				else $cat_counts[(int) $item->cat_id]++;
 
 				$used_prio[$priority] = true;
@@ -593,7 +593,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		{
 			if(!isset($cat_counts[$cat_id])) 
 				$cat_counts[$cat_id] = 0;
-			
+
 			if (!empty($category->min_choices) && $cat_counts[$cat_id] < $category->min_choices)
 			{
 				$catmess[] = sprintf($this->plugin->txt('cat_choose_low_mess'), $category->title);
