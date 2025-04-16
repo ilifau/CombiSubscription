@@ -539,7 +539,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		if (count($posted) < $min_choices)
 		{
 			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', sprintf($this->plugin->txt('min_choices_alert'), $min_choices));
-			$this->editRegistration($posted);
+			return $this->editRegistration($posted);
 		}
 
 		// create choice objects to be saved
@@ -551,7 +551,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 				if (isset($used_prio[$priority]) && !$has_mc)
 				{
 					$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('multiple_choice_alert'));
-					$this->editRegistration($posted);
+					return $this->editRegistration($posted);
 				}
 
 				$choice = new ilCoSubChoice();
@@ -581,7 +581,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		if (count($used_prio) <= $max_prio && !$has_ec)
 		{
 			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin->txt('empty_choice_alert'));
-			$this->editRegistration($posted);
+			return $this->editRegistration($posted);
 		}
 
 		// check for mimimum choices in categories
@@ -596,7 +596,7 @@ class ilCoSubRegistrationGUI extends ilCoSubUserManagementBaseGUI
 		if (!empty($catmess))
 		{
 			$DIC->ui()->mainTemplate()->setOnScreenMessage('failure', implode('<br />', $catmess));
-			$this->editRegistration($posted);
+			return $this->editRegistration($posted);
 		}
 
 		// finally save the choices
