@@ -624,10 +624,13 @@ class ilCoSubExport
 	{
 		foreach ($data as $key => $value)
 		{
-			$coordinate = $mapping[$key].(string) $row;
-			$cell = $worksheet->getCell($coordinate);
-			$cell->setValue($value);
-			$cell->getStyle()->getAlignment()->setWrapText(true);
+			if(isset($mapping[$key]))
+			{
+				$coordinate = $mapping[$key].(string) $row;
+				$cell = $worksheet->getCell($coordinate);
+				$cell->setValue($value);
+				$cell->getStyle()->getAlignment()->setWrapText(true);
+			}
 		}
 	}
 
