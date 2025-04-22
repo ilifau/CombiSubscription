@@ -479,7 +479,7 @@ class ilCoSubExport
 			foreach ($this->object->getPrioritiesOfUser($user['usr_id']) as $item_id => $value)
 			{
 				$data['prio'.$value] = empty($data['prio'.$value]) ? '' : $data['prio'.$value] . ', ';
-				$data['prio'.$value] .= $item_names[$item_id];
+				$data['prio'.$value] .= $item_names[$item_id] ??'';
 			}
 
 			$this->fillRowData($worksheet, $data, $mapping, $row);
