@@ -306,15 +306,18 @@ class ilCoSubExport
         $assignments = $this->object->getAssignments();
 
         $row = 2;
-        foreach ((array) $assignments[0] as $user_id => $ass) {
-            foreach ($ass as $item_id => $assign_id) {
-                $data = [];
-                $data['obj_id'] = $this->object->getId();
-                $data['user_id'] = $user_id;
-                $data['item_id'] = $item_id;
-                $this->fillRowData($worksheet, $data, $mapping, $row++);
-            }
-        }
+		if(isset($assignments[0]))
+		{
+			foreach ((array) $assignments[0] as $user_id => $ass) {
+				foreach ($ass as $item_id => $assign_id) {
+					$data = [];
+					$data['obj_id'] = $this->object->getId();
+					$data['user_id'] = $user_id;
+					$data['item_id'] = $item_id;
+					$this->fillRowData($worksheet, $data, $mapping, $row++);
+				}
+			}
+		}
 
         $worksheet->setTitle('solution');
     }
