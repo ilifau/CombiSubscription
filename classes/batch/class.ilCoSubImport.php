@@ -470,7 +470,7 @@ class ilCoSubImport
 				$item->obj_id = $this->object->getId();
 			}
 
-			$item->title = $rowdata['title'];
+			$item->title = $rowdata['title'] ?? "";
 
 			if (!empty($rowdata['description']))
 			{
