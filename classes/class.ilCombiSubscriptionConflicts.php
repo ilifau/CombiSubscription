@@ -146,7 +146,7 @@ class ilCombiSubscriptionConflicts
 							{
 								foreach ($assign_ids[$other_item_id] as $run => $assign_id)
 								{
-									ilCoSubAssign::_deleteById($assign_ids[$other_item_id]);
+									ilCoSubAssign::_deleteById($assign_id);
 								}
 							}
 
