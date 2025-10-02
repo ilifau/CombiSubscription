@@ -314,7 +314,7 @@ class ilCoSubItem
                 }
             }
         }
-        return $this->objectLinkCache;
+        return $this->objectLinkCache ?? "";
     }
 
 	/**
