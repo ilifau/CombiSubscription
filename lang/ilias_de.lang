@@ -436,7 +436,7 @@ fix_assignments_confirmation#:#Sollen alle erfolgreichen Zuteilungen fixiert wer
 message_cat_for_event#:#Die Kategorie %s kann nur für Parallelgruppen der Lehrveranstaltung %s verwendet werden!
 message_cat_not_mixed#:#Die Parallelgruppe kann nur mit anderen Parallelgruppen derselben Veranstaltung in einer Kategorie liegen.
 total_assignments_exceeded#:#Gesamtzahl an Zuteilungen überschritten
-total_assignments_not_reached#:#Gesamztahl an Zuteilungen nicht erreicht
+total_assignments_not_reached#:#Gesamtzahl an Zuteilungen nicht erreicht
 total_assignments_details#:#erfordert: %s, zugeteilt: %s
 category_limits_exceeded#:#Zuteilungen in Auswahl-Kategorien überschritten
 category_limits_exceeded_details#:#%s - maximal: %s, zugeteilt: %s
