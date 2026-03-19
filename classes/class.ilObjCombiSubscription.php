@@ -1068,7 +1068,10 @@ class ilObjCombiSubscription extends ilObjectPlugin
 			{
 				foreach ($user_items as $item_id => $assign_id)
 				{
-					$sums[$item_id]++;
+					if (isset($sums[$item_id]))
+					{
+						$sums[$item_id]++;
+					}
 				}
 			}
 		}
