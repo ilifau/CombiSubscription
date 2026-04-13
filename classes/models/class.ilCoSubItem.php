@@ -275,7 +275,7 @@ class ilCoSubItem
 
             if (ilCombiSubscriptionPlugin::getInstance()->hasFauService() && !empty($course_id = $this->getCampoCourseId())) {
                 global $DIC;
-                $info = $DIC->fau()->study()->dates()->getPlannedDatesList($course_id, true);
+                $info = $DIC->fau()->study()->dates()->getPlannedDatesList($course_id, true, false);
             }
             else {
                 $info = array();
