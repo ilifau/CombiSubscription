@@ -407,7 +407,7 @@ class ilCoSubScript
                 /** @var ilExAssignment $assignment */
                 foreach (ilExAssignment::getInstancesByExercise($newExercise->getId()) as $assignment)
                 {
-                    $assignment->delete();
+                    $assignment->delete($newExercise);
                 }
                 /** @var ilExAssignment $ass */
                 $ass = current(ilExAssignment::getInstancesByExercise(ilObject::_lookupObjId($rowdata['ex_orig_id'])));
