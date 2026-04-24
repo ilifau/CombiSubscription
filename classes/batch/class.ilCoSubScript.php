@@ -303,7 +303,7 @@ class ilCoSubScript
 			$rowdata = array();
 			foreach ($this->columns as $colname)
 			{
-				$rowdata[$c] = $row[$colname];
+				$rowdata[$c] = isset($row[$colname]) ? $row[$colname] : null;
 				$c++;
 			}
 			$data[$r] = $rowdata;
@@ -387,7 +387,7 @@ class ilCoSubScript
             /**
              * Take existing test
              */
-            if (!empty($rowdata['test_orig_id'])) {
+            if (isset($rowdata['test_orig_id']) && !empty($rowdata['test_orig_id'])) {
                 $newTest = new ilObjTest($rowdata['test_orig_id'], true);
             }
 
@@ -900,7 +900,7 @@ class ilCoSubScript
 				throw new Exception("Gruppe $group_id nicht gefunden in Zeile $r!");
 			}
 
-			$test_orig_id = $rowdata['test_orig_id'];
+			$test_orig_id = isset($rowdata['test_orig_id']) ? $rowdata['test_orig_id'] : null;
 			if (!empty($test_orig_id) && (!ilObject::_exists($test_orig_id,true, 'tst') || ilObject::_isInTrash($test_orig_id)))
 			{
 				throw new Exception("Test $test_orig_id nicht gefunden in Zeile $r!");
