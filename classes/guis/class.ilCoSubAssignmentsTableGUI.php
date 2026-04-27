@@ -347,5 +347,4 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 								        
         return $renderer->render([$modal, $button]);
     }
-    
 }
