@@ -326,23 +326,25 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
         $items = [];
         foreach ($details as $detail) {
 
-            $list = $renderer->render($factory->listing()->unordered($detail['list']));
-            
-            $icon = $factory->symbol()->icon()->custom(
+			$icon = $factory->symbol()->icon()->custom(
                 $this->parent->parent->getSatisfactionImageUrl($detail['status']),
                 $this->parent->parent->getSatisfactionTitle($detail['status']));
             
-            $items[] = $factory->item()->standard($detail['text'])
-                ->withLeadIcon($icon)
-                ->withDescription($list);
+            $items[] = $factory->panel()->standard
+			(
+				$renderer->render(
+					$factory->item()->standard($detail['text'])
+						->withLeadIcon($icon)), 
+					$factory->listing()->unordered($detail['list'])
+			);
         }
-        
+
         $group = $factory->item()->group('', $items);
-        $panel = $factory->panel()->listing()->standard($user_name, [$group]);
+        $panel = $factory->panel()->standard($user_name, $group);
         $modal = $factory->modal()->roundtrip($this->plugin->txt('satisfaction'), [$panel]);
         $button = $factory->button()->shy($this->plugin->txt('details'), '#')
                                 ->withOnClick($modal->getShowSignal());
-        
+								        
         return $renderer->render([$modal, $button]);
     }
     
