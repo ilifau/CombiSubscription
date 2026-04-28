@@ -333,7 +333,7 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
             $items[] = $factory->panel()->standard
 			(
 				$renderer->render(
-					$factory->item()->standard($detail['text'])
+					$factory->item()->shy($detail['text'])
 						->withLeadIcon($icon)), 
 					$factory->listing()->unordered($detail['list'])
 			);
