@@ -417,7 +417,7 @@ class ilObjCombiSubscriptionGUI extends ilObjectPluginGUI
 				return ilUtil::getImagePath('scorm/failed.svg');
 			case ilObjCombiSubscription::SATISFIED_OVER:
 			case ilObjCombiSubscription::SATISFIED_CONFLICT:
-				return ilUtil::getImagePath('icon_alert.svg');
+				return ilUtil::getImagePath('standard/icon_alert_xcos.svg');
 			case ilObjCombiSubscription::SATISFIED_EMPTY:
             case ilObjCombiSubscription::SATISFIED_UNKNOWN:
 			default:
