@@ -431,8 +431,8 @@ if (!$ilDB->tableExists('rep_robj_xcos_users'))
 ?>
 <#18>
 <?php
-   // $query = "INSERT INTO rep_robj_xcos_users(obj_id, user_id, is_fixed) SELECT DISTINCT obj_id, user_id, 0 FROM rep_robj_xcos_choices";
-  //  $ilDB->manipulate($query);
+	$query = "INSERT INTO rep_robj_xcos_users(obj_id, user_id, is_fixed) SELECT DISTINCT obj_id, user_id, 0 FROM rep_robj_xcos_choices";
+  	$ilDB->manipulate($query);
 ?>
 <#19>
 <?php
