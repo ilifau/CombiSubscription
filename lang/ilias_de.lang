@@ -445,3 +445,9 @@ assignments_not_chosen#:#Zuteilungen ohne Auswahl
 assignments_with_lower_priority#:#Zuteilungen mit niedriger Priorität
 assignments_with_highest_priority#:#Zuteilungen mit höchster Priorität
 details#:#Details
+job_title#:#Kombi-Anmeldung
+job_description#:#Führt automatische Zuteilungen in kombinierten Anmeldungen durch. Dazu muss das Plugin CombiSubscription installiert und aktiviert sein.
+message_subscription_plugin_missing#:#Bitte installieren und aktivieren Sie das zuerst das Plugin CombiSubscription (https://github.com/ilifau/CombiSubscription)!
+no_subscription_processed#:#Kein Anmeldeobjekt zugeteilt
+one_subscription_processed#:#1 Anmeldeobjekt zugeteilt
+x_subscriptions_processed#:#%s Anmeldeobjekte zugeteilt

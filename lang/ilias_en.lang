@@ -425,3 +425,9 @@ assignments_not_chosen#:#Assignments without selection
 assignments_with_lower_priority#:#Assignments with lower priority
 assignments_with_highest_priority#:#Assignments with highest priority
 details#:#Details
+job_title#:#Combined Subscription
+job_description#:#Assigns combined subscriptions. This requires the plugin CombiSubscription.
+message_subscription_plugin_missing#:#Please install and activete the plugin CombiSubscription (https://github.com/ilifau/CombiSubscription) first!
+no_subscription_processed#:#No subscription object processed.
+one_subscription_processed#:#1 subscription object processed.
+x_subscriptions_processed#:#%s subscription objects processed.

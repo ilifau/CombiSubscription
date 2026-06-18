@@ -1,5 +1,8 @@
 <?php
 
+use ILIAS\Cron\CronJob;
+use ILIAS\Cron\Job\JobProvider;
+
 /**
 * Combined subscription repository object plugin
 *
@@ -7,11 +10,13 @@
 * @version $Id$
 *
 */
-class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
+class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin implements JobProvider
 {
 	/** ilSetting[] */
 	protected static array $settings;
 	protected static self $instance;
+
+	protected ?CronJob $cron_job = null;
 
 	/**
 	 * Get the plugin instance
@@ -112,20 +117,9 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	/**
 	 * Check if cron job is active
 	 */
-	public function withCronJob(): bool
+	public function isCronJobActive(): bool
 	{
-		global $DIC;
-
-		/** @var ilComponentFactory $factory */
-		$factory = $DIC["component.factory"];
-
-		/** @var ilPlugin $plugin */
-		foreach ($factory->getActivePluginsInSlot('crnhk') as $plugin) {
-			if ($plugin->getPluginName() == 'CombiSubscriptionCron') {
-				return $plugin->isActive();
-			}
-		}
-		return false;
+		return $this->getCronJobInstance(ilCombiSubscriptionCronJob::id)->isActive();
 	}
 
 	/**
@@ -229,5 +223,25 @@ class ilCombiSubscriptionPlugin extends ilRepositoryObjectPlugin
 	{
 		return (bool) self::_getSetting('clone_with_choices', 0);
 	}
+
+    public function getCronJobInstances(): array
+    {
+        return [$this->getCronJobInstance(ilCombiSubscriptionCronJob::id)];
+    }
+
+    public function getCronJobInstance(string $jobId): CronJob
+    {
+        if ($jobId !== ilCombiSubscriptionCronJob::id) {
+            throw new OutOfBoundsException(
+                "Job [$jobId] not found."
+            );
+        }
+
+        if (!isset($this->cron_job)) {
+            $this->cron_job = new ilCombiSubscriptionCronJob($this);
+            $this->cron_job->loadData();
+        }
+        return $this->cron_job;
+    }	
 }
 ?>

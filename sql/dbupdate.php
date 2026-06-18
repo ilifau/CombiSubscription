@@ -1,5 +1,7 @@
 <#1>
 <?php
+if (!$ilDB->tableExists('rep_robj_xcos_data'))
+{
 	$fields = array(
 		'obj_id' => array(
 			'type' => 'integer',
@@ -33,9 +35,12 @@
 
 	$ilDB->createTable('rep_robj_xcos_data', $fields);
 	$ilDB->addPrimaryKey('rep_robj_xcos_data', array('obj_id'));
+}
 ?>
 <#2>
 <?php
+if (!$ilDB->tableExists('rep_robj_xcos_items'))
+{
 	$fields = array(
 		'item_id' => array(
 			'type' => 'integer',
@@ -79,9 +84,12 @@
 	$ilDB->addIndex('rep_robj_xcos_items', array('obj_id'), 'i1');
 	$ilDB->addIndex('rep_robj_xcos_items', array('target_ref_id'),'i2');
 	$ilDB->createSequence('rep_robj_xcos_items');
+}
 ?>
 <#3>
 <?php
+if (!$ilDB->tableExists('rep_robj_xcos_choices'))
+{
 	$fields = array(
 		'choice_id' => array(
 			'type' => 'integer',
@@ -114,9 +122,12 @@
 	$ilDB->addIndex('rep_robj_xcos_choices', array('obj_id'), 'i1');
 	$ilDB->addIndex('rep_robj_xcos_choices', array('user_id'),'i2');
 	$ilDB->createSequence('rep_robj_xcos_choices');
+}
 ?>
 <#4>
 <?php
+if (!$ilDB->tableExists('rep_robj_xcos_runs'))
+{
 	$fields = array(
 		'run_id' => array(
 			'type' => 'integer',
@@ -151,9 +162,12 @@
 	$ilDB->addPrimaryKey('rep_robj_xcos_runs', array('run_id'));
 	$ilDB->addIndex('rep_robj_xcos_runs', array('obj_id'), 'i1');
 	$ilDB->createSequence('rep_robj_xcos_runs');
+}
 ?>
 <#5>
-	<?php
+<?php
+if (!$ilDB->tableExists('rep_robj_xcos_ass'))
+{	
 	$fields = array(
 		'assign_id' => array(
 			'type' => 'integer',
@@ -186,9 +200,12 @@
 	$ilDB->addIndex('rep_robj_xcos_ass', array('obj_id'), 'i1');
 	$ilDB->addIndex('rep_robj_xcos_ass', array('run_id'), 'i2');
 	$ilDB->createSequence('rep_robj_xcos_ass');
+}
 ?>
 <#6>
 <?php
+if (!$ilDB->tableExists('rep_robj_xcos_prop'))
+{	
 	$fields = array(
 		'obj_id' => array(
 			'type' => 'integer',
@@ -213,6 +230,7 @@
 	);
 	$ilDB->createTable('rep_robj_xcos_prop', $fields);
 	$ilDB->addPrimaryKey('rep_robj_xcos_prop', array('obj_id','class','property'));
+}
 ?>
 <#7>
 <?php
@@ -274,6 +292,8 @@
 ?>
 <#12>
 <?php
+if(!$ilDB->tableExists('rep_robj_xcos_cats'))
+{
     $fields = array(
         'cat_id' => array(
             'type' => 'integer',
@@ -321,6 +341,7 @@
     $ilDB->addPrimaryKey('rep_robj_xcos_cats', array('cat_id'));
     $ilDB->addIndex('rep_robj_xcos_cats', array('obj_id'), 'i1');
     $ilDB->createSequence('rep_robj_xcos_cats');
+}
 ?>
 <#13>
 <?php
@@ -381,6 +402,8 @@
 ?>
 <#17>
 <?php
+if (!$ilDB->tableExists('rep_robj_xcos_users'))
+{
     $fields = array(
         'obj_id' => array(
             'type' => 'integer',
@@ -404,15 +427,18 @@
     $ilDB->addPrimaryKey('rep_robj_xcos_users', array('obj_id', 'user_id'));
     $ilDB->addIndex('rep_robj_xcos_users', array('obj_id'), 'i1');
 	$ilDB->addIndex('rep_robj_xcos_users', array('user_id'), 'i2');
+}
 ?>
 <#18>
 <?php
-    $query = "INSERT INTO rep_robj_xcos_users(obj_id, user_id, is_fixed) SELECT DISTINCT obj_id, user_id, 0 FROM rep_robj_xcos_choices";
-    $ilDB->manipulate($query);
+   // $query = "INSERT INTO rep_robj_xcos_users(obj_id, user_id, is_fixed) SELECT DISTINCT obj_id, user_id, 0 FROM rep_robj_xcos_choices";
+  //  $ilDB->manipulate($query);
 ?>
 <#19>
 <?php
-    $fields = array(
+if (!$ilDB->tableExists('rep_robj_xcos_scheds'))
+{
+    $fields = array(	
         'obj_id' => array(
             'type' => 'integer',
             'length' => 4,
@@ -449,6 +475,7 @@
     $ilDB->addPrimaryKey('rep_robj_xcos_scheds', array('schedule_id'));
     $ilDB->addIndex('rep_robj_xcos_scheds', array('obj_id'), 'i1');
     $ilDB->createSequence('rep_robj_xcos_scheds');
+}
 ?>
 <#20>
 <?php
