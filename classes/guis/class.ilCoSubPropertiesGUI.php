@@ -151,7 +151,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
         $config = new ilCoSubTargetsConfig($this->object);
         $config->readFromObject();
 
-        if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+        if ($this->plugin->isCronJobActive() && $this->object->getMethodObject()->hasInstantResult())
 		{
 			// auto process
 			$auto = new ilCheckboxInputGUI($this->plugin->txt('auto_process'), 'auto_process');
@@ -198,7 +198,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
 		$this->form->getItemByPostVar('pre_select')->setChecked($this->object->getPreSelect());
 		$this->form->getItemByPostVar('min_choices')->setValue($this->object->getMinChoices());
 		$this->form->getItemByPostVar('method')->setValue($this->object->getMethod());
-		if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+		if ($this->plugin->isCronJobActive() && $this->object->getMethodObject()->hasInstantResult())
 		{
 			$this->form->getItemByPostVar('auto_process')->setChecked($this->object->getAutoProcess());
 		}
@@ -230,7 +230,7 @@ class ilCoSubPropertiesGUI extends ilCoSubBaseGUI
         $config = new ilCoSubTargetsConfig($this->object);
         $config->readFromObject();
 
-        if ($this->plugin->withCronJob() && $this->object->getMethodObject()->hasInstantResult())
+        if ($this->plugin->isCronJobActive() && $this->object->getMethodObject()->hasInstantResult())
 		{
 			$this->object->setAutoProcess($this->form->getInput('auto_process'));
             $config = $targets->getFormInputs($this->form, 'auto', $config);

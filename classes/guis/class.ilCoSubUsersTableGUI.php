@@ -62,6 +62,8 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 		/** @var ilAccessHandler  $ilAccess*/
 		global $ilAccess;
 
+		global $DIC;
+
 		$this->users = $this->object->getUsers();
 		$this->priorities = $this->object->getPriorities();
 
@@ -81,12 +83,6 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
         $additional = [];
         if ($this->plugin->hasUserDataAccess()) {
             $additional[] = 'matriculation';
-
-            if ($this->plugin->hasFauService()) {
-                $additional[] = 'studydata';
-                $additional[] = 'educations';
-                $user_query->setEducationsRefId($this->object->getRefId());
-            }
         }
         $user_query->setAdditionalFields($additional);
 
@@ -100,13 +96,21 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 			$user_id = $user['usr_id'];
 			$userObj = $this->users[$user_id];
 
+			$studydata = "";
+			$educations = "";
+
+			if ($this->plugin->hasFauService()) {
+			    $studydata = $DIC->fau()->user()->getStudiesAsText((int) $user_id);
+			    $educations = $DIC->fau()->user()->getEducationsAsText((int) $user_id);
+			}
+
 			$row = array(
 				'user_id' => $user_id,
 				'login' => $user['login'],
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
 				'matriculation' => $user['matriculation'] ?? "",
-                'studydata' => $user['studydata'] ?? "",
-                'educations' => $user['educations'] ?? "",
+                'studydata' => $studydata,
+                'educations' => $educations,
 				'is_fixed' => $userObj->is_fixed,
 				// performance killer
 				//'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
