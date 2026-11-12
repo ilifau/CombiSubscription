@@ -69,6 +69,8 @@ class ilCoSubExport
 	protected bool $with_studydata = false;
     /** platform has educations */
     protected bool $with_educations = false;
+	/** platform has payment information */
+    protected bool $with_paymentinfo = false;
 
 	public function __construct(ilCombiSubscriptionPlugin $plugin, ilObjCombiSubscription $object, string $type = self::TYPE_EXCEL, string $mode = '')
 	{
@@ -89,6 +91,7 @@ class ilCoSubExport
 			{
 				$this->with_studydata = true;
                 $this->with_educations = true;
+				$this->with_paymentinfo = true;
 			}
 		}
 	}
@@ -403,7 +406,7 @@ class ilCoSubExport
 	protected function fillAssignmentsByItem(Worksheet $worksheet): void
 	{
 		// Column definition and header
-		$columns = $this->getUserColumns();
+		$columns = $this->getUserColumns(true);
 		$basecols = count($columns);
 		$row2 = array();
 		$row3 = array();
@@ -426,7 +429,7 @@ class ilCoSubExport
 		$row = 4;
 		foreach ($user_query_result['set'] as $user)
 		{
-			$data = $this->getUserColumnData($user);
+			$data = $this->getUserColumnData($user, true);
 
 			// registrations values
 			foreach ($this->object->getAssignmentsOfUser($user['usr_id']) as $item_id => $assign_id)
@@ -522,6 +525,10 @@ class ilCoSubExport
             {
                 $columns['educations'] =  $this->lng->txt('educations');
             }
+			
+			if ($this->with_paymentinfo)   {
+				$columns['payment_info'] =  $this->lng->txt('payment_info');
+            }
 		}
 
 		return $columns;
@@ -589,7 +596,16 @@ class ilCoSubExport
                     $educations = $DIC->fau()->tools()->convert()->quoteForExport($educations);
                 }
                 $data['educations'] = $educations;
-            }
+			}
+
+			if ($this->with_paymentinfo)
+			{
+				$payment_info = $DIC->fau()->user()->getPaymentInfoAsText((int) $user['usr_id'], (int) $this->object->getRefId());
+				if ($this->type == self::TYPE_CSV) {
+					$payment_info = $DIC->fau()->tools()->convert()->quoteForExport($payment_info);
+				}
+				$data['payment_info'] = $payment_info;
+			}
 		}
 
 		return $data;

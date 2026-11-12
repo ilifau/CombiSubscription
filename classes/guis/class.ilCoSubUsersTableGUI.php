@@ -103,10 +103,8 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 
 			if ($this->plugin->hasFauService()) {
 			    $studydata = $DIC->fau()->user()->getStudiesAsText((int) $user_id);
-			    $educations = $DIC->fau()->user()->getEducationsAsText((int) $user_id);
-			    if ($this->plugin->hasUserDataAccess()) {
-			        $payment_info = $DIC->fau()->user()->getPaymentInfoAsText((int) $user_id, $this->object->getRefId());
-			    }
+			    $educations = $DIC->fau()->user()->getEducationsAsText((int) $user_id, $this->object->getRefId());
+			    $payment_info = $DIC->fau()->user()->getPaymentInfoAsText((int) $user_id, $this->object->getRefId());
 			}
 
 			$row = array(
