@@ -406,7 +406,7 @@ class ilCoSubExport
 	protected function fillAssignmentsByItem(Worksheet $worksheet): void
 	{
 		// Column definition and header
-		$columns = $this->getUserColumns(true);
+		$columns = $this->getUserColumns();
 		$basecols = count($columns);
 		$row2 = array();
 		$row3 = array();
@@ -429,7 +429,7 @@ class ilCoSubExport
 		$row = 4;
 		foreach ($user_query_result['set'] as $user)
 		{
-			$data = $this->getUserColumnData($user, true);
+			$data = $this->getUserColumnData($user);
 
 			// registrations values
 			foreach ($this->object->getAssignmentsOfUser($user['usr_id']) as $item_id => $assign_id)
