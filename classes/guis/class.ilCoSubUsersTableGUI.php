@@ -40,6 +40,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
             if ($this->plugin->hasFauService()) {
                 $this->addColumn($this->lng->txt('studydata'), 'studydata');
                 $this->addColumn($this->lng->txt('fau_educations'), 'educations');
+				$this->addColumn($this->lng->txt('payment_info'), 'payment_info');
             }
         }
 		$this->addColumn($this->plugin->txt('selected_items'), 'registrations');
@@ -98,10 +99,14 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 
 			$studydata = "";
 			$educations = "";
+			$payment_info = "";
 
 			if ($this->plugin->hasFauService()) {
 			    $studydata = $DIC->fau()->user()->getStudiesAsText((int) $user_id);
 			    $educations = $DIC->fau()->user()->getEducationsAsText((int) $user_id);
+			    if ($this->plugin->hasUserDataAccess()) {
+			        $payment_info = $DIC->fau()->user()->getPaymentInfoAsText((int) $user_id, $this->object->getRefId());
+			    }
 			}
 
 			$row = array(
@@ -111,6 +116,7 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
 				'matriculation' => $user['matriculation'] ?? "",
                 'studydata' => $studydata,
                 'educations' => $educations,
+				'payment_info' => $payment_info,
 				'is_fixed' => $userObj->is_fixed,
 				// performance killer
 				//'has_access' => $ilAccess->checkAccessOfUser($user_id, 'read', '', $this->object->getRefId()),
@@ -148,6 +154,11 @@ class ilCoSubUsersTableGUI extends ilTable2GUI
                     $this->lng->txt('fau_educations_of') . ' ' . $a_set['user'],
                     50
                 ));
+				$this->tpl->setVariable('PAYMENT_INFO', fauTextViewGUI::getInstance()->showWithModal(
+					nl2br($a_set['payment_info']),
+					$this->lng->txt('fau_payment_info_of') . ' ' . $a_set['user'],
+					50
+				));
             }
         }
 //		if (!$a_set['has_access'])

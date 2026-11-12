@@ -58,6 +58,10 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 
 		$this->addColumn('','', 1, true);
 		$this->addColumn($this->lng->txt('user'), 'user');
+		if ($this->plugin->hasUserDataAccess() && $this->plugin->hasFauService())
+		{
+			$this->addColumn($this->lng->txt('payment_info'), 'payment_info');
+		}
 		$this->addColumn($this->plugin->txt('satisfaction'), 'result');
 		$this->addColumn($this->plugin->txt('assignments'), 'assignments');
 
@@ -181,10 +185,16 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		{
 			$user_id = $user['usr_id'];
 			$userObj = $this->users[$user_id];
+			$payment_info = '';
+			if ($this->plugin->hasUserDataAccess() && $this->plugin->hasFauService())
+			{
+				$payment_info = $this->dic->fau()->user()->getPaymentInfoAsText((int) $user_id, $this->object->getRefId());
+			}
 
 			$row = array(
 				'user_id' => $user_id,
 				'user' => $user['lastname'] . ', ' . $user['firstname'],
+				'payment_info' => $payment_info,
 				'result' => $this->object->getUserSatisfaction($user_id, 0),
 				'assignments' => 0,
 				'is_fixed' => $userObj->is_fixed,
@@ -301,6 +311,16 @@ class ilCoSubAssignmentsTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('ID', $a_set['user_id']);
 
 		$this->tpl->setVariable($a_set['is_fixed'] ? 'USER_FIXED' : 'USER', $a_set['user']);
+		if ($this->plugin->hasUserDataAccess() && $this->plugin->hasFauService())
+		{
+			$this->tpl->setCurrentBlock('payment_info');
+			$this->tpl->setVariable('PAYMENT_INFO', fauTextViewGUI::getInstance()->showWithModal(
+				nl2br($a_set['payment_info']),
+				$this->lng->txt('fau_payment_info_of') . ' ' . $a_set['user'],
+				50
+			));
+			$this->tpl->parseCurrentBlock();
+		}
 //		if (!$a_set['has_access'])
 //		{
 //			$this->tpl->setVariable('NO_ACCESS', $this->lng->txt('permission_denied'));
